@@ -1,0 +1,24 @@
+# Vagrant folder
+.vagrant/
+vagrant/
+bcfg2/
+
+# IDE project files
+.idea/
+nbproject/
+
+# local files
+local.json
+phpinfo.php
+local.env
+local.php
+aws.env
+*.aes
+
+# yii runtime stuff
+application/runtime/
+
+# simplesaml config files
+application/simplesamlphp/cert/
+build/saml.crt
+build/saml.pem

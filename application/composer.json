@@ -1,0 +1,25 @@
+{
+    "autoload": {
+        "psr-4": {"Sil\\DevPortal\\": "protected/"}
+    },
+    "require": {
+        "yiisoft/yii": "1.1.15",
+        "fillup/apiaxle": "^0.7.2",
+        "guzzle/guzzle": "3.9.*",
+        "forevermatt/calc-api-sig": "0.1.1",
+        "hybridauth/hybridauth": "2.*",
+        "silinternational/opsworks-deploy": "dev-master",
+        "silinternational/php-env": "0.*",
+        "roave/security-advisories": "dev-master"
+    },
+    "require-dev": {
+        "phake/phake": "2.*",
+        "phpunit/phpunit": "3.*",
+        "phpunit/phpunit-selenium": "1.*",
+        "phpunit/phpunit-story": "1.*",
+        "phpunit/dbunit": "1.*",
+        "phpunit/php-invoker": "1.*",
+        "fillup/phpmyadmin-minimal": "4.4.13.1",
+        "johnkary/phpunit-speedtrap": "1.*"
+    }
+}

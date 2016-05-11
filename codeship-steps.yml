@@ -1,0 +1,33 @@
+- name: test
+  service: portal
+  command: /data/run-tests.sh
+
+- name: push_develop
+  service: portal
+  type: push
+  image_name: docker.sil.org/developer-portal
+  #image_tag: "{{.Timestamp}}"
+  image_tag: latest
+  tag: develop
+  registry: docker.sil.org
+  encrypted_dockercfg_path: dockercfg.encrypted
+
+- name: push_production
+  service: portal
+  type: push
+  image_name: docker.sil.org/developer-portal
+  #image_tag: "{{.Timestamp}}"
+  image_tag: production
+  tag: master
+  registry: docker.sil.org
+  encrypted_dockercfg_path: dockercfg.encrypted
+
+- name: deploy_staging
+  service: ecsdeploy
+  tag: develop
+  command: "-c staging1 -n staging-developer-portal -i docker.sil.org/developer-portal:latest"
+
+- name: deploy_production
+  service: ecsdeploy
+  tag: master
+  command: "-c production1 -n production-developer-portal -i docker.sil.org/developer-portal:production"

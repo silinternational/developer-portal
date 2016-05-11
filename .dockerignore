@@ -1,0 +1,7 @@
+.vagrant/
+vagrant/
+bin/
+bcfg2/
+application/protected/runtime/application.log
+conf-dist/
+nbproject/

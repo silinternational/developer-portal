@@ -1,0 +1,56 @@
+db:
+    image: silintl/mariadb:latest
+    environment:
+        MYSQL_ROOT_PASSWORD: r00tp@ss!
+        MYSQL_DATABASE: test
+        MYSQL_USER: developer_portal
+        MYSQL_PASSWORD: developer_portal
+
+redis:
+    image: redis:latest
+
+api:
+    image: silintl/apiaxle:latest
+    links:
+        - redis
+    ports:
+        - "80"
+    environment:
+        NODE_ENV: docker
+    command: whenavail redis 6379 100 apiaxle-api -h 0.0.0.0 -p 80
+
+proxy:
+    image: silintl/apiaxle:latest
+    links:
+        - api
+        - redis
+    ports:
+        - "80"
+    environment:
+        NODE_ENV: docker
+    command: whenavail redis 6379 100 apiaxle-proxy -h 0.0.0.0 -p 80
+
+portal:
+    build:
+        image: docker.sil.org/developer-portal
+        dockerfile_path: Dockerfile
+    links:
+        - db
+        - proxy:apiaxle.api.proxy
+        - api
+    environment:
+        MYSQL_HOST: db
+        MYSQL_DATABASE: test
+        MYSQL_USER: developer_portal
+        MYSQL_PASSWORD: developer_portal
+        APIAXLE_ENDPOINT: http://apiaxle.api.proxy/v1
+        APIAXLE_KEY: developer-portal-dev-key
+        APIAXLE_SECRET: developer-portal-dev-secret
+        APIAXLE_SSL_VERIFYPEER: false
+        GOOGLE_OAUTH_ENABLED: false
+        SAML_ENTITY_ID: http://developer-portal.local/simplesaml/module.php/saml/sp/metadata.php/default-sp
+    working_dir: /data
+
+ecsdeploy:
+    image: silintl/ecs-deploy:latest
+    encrypted_env_file: aws.env.encrypted

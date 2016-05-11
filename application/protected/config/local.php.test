@@ -1,0 +1,35 @@
+<?php
+/**
+ * Get config settings from ENV vars or set defaults
+ */
+$mysqlHost = getenv('MYSQL_HOST') ?: null;
+$mysqlDatabase = getenv('MYSQL_DATABASE') ?: null;
+$mysqlUser = getenv('MYSQL_USER') ?: null;
+$mysqlPassword = getenv('MYSQL_PASSWORD') ?: null;
+// Return the array of config settings for this environment.
+return array(
+    "components" => array(
+        'db' => array(
+            'class'=>'CDbConnection', //    ======>   THIS IS IMPORTANT
+            "connectionString" => "mysql:host=$mysqlHost;dbname=$mysqlDatabase",
+            "username" => $mysqlUser,
+            "password" => $mysqlPassword,
+            'emulatePrepare' => false,
+            'charset' => 'utf8',
+            'tablePrefix' => '',
+        ),
+    ),
+    "params" => array(
+        'apiaxle' => array(
+            'endpoint' => 'http://apiaxle.api.127.0.0.1.xip.io:3000/v1',
+            'key' => 'developer-portal-dev-key',
+            'secret' => 'developer-portal-dev-secret',
+        ),
+        "mail" => false,
+        "smtp" => false,
+        "google_analytics" => array(
+            "enabled" => false,
+            "tracking_id" => "",
+        ),
+    ),
+);

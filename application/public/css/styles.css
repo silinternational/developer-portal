@@ -1,0 +1,92 @@
+body {
+    padding-bottom: 40px;
+    padding-top: 60px;
+}
+
+.card-contents {
+  border: 1px solid #333;
+  border-left-width: 8px;
+  border-radius: 3px;
+  margin: 5px;
+  min-height: 65px;
+  padding: 4px 8px 12px;
+}
+.card-contents:hover .card-hover-content { display: inline; }
+
+.card-hover-content { display: none; }
+
+.card-title {
+  font-size: larger;
+  font-weight: bold;
+}
+
+.chart-line-label {
+  border-style: solid;
+  border-width: 0 0 0 4px;
+  display: inline-block;
+  margin: 4px 10px;
+  padding-left: 4px;
+}
+
+dd { margin-bottom: 10px; }
+
+.cursor-info {
+  cursor: help;
+}
+
+#footer {
+  color: #999;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.has-tooltip {
+  border-bottom: 1px dashed #999;
+  cursor: help;
+}
+
+.nowrap { white-space: nowrap; }
+
+.pad-horiz {
+    padding-left: 1ex;
+    padding-right: 1ex;
+}
+
+.pad-top { padding-top: 20px; }
+
+.page-title {
+  line-height: 1;
+}
+.page-title > small {
+  position: relative;
+  top: -6px;
+}
+
+@media (max-width: 479px) {
+  .shrink-below-480 > .btn {
+    padding: 4px 8px;
+  }
+}
+
+.sil-blue { color: #005B99; }
+
+.space-after-icon > i { padding-right: 4px; }
+.space-horiz {
+    padding-left: 1ex;
+    padding-right: 1ex;
+}
+
+.tab-content {
+  border: 1px solid #ddd;
+  border-top: none;
+  margin-top: -20px;
+  padding: 10px 10px 0;
+}
+
+.text-dark { color: #333; }
+
+.usage-chart-container {
+  margin-bottom: 10px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
