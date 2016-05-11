@@ -2,7 +2,7 @@
 
 class m150203_200118_add_unique_endpoint_path_constraint extends CDbMigration
 {
-	public function safeUp()
+    public function safeUp()
     {
         $this->alterColumn(
             '{{api}}',
@@ -15,11 +15,11 @@ class m150203_200118_add_unique_endpoint_path_constraint extends CDbMigration
             'endpoint,default_path',
             true
         );
-	}
+    }
 
-	public function safeDown()
-	{
-		$this->dropIndex(
+    public function safeDown()
+    {
+        $this->dropIndex(
             'uq_endpoint_default_path',
             '{{api}}'
         );
@@ -28,5 +28,5 @@ class m150203_200118_add_unique_endpoint_path_constraint extends CDbMigration
             'default_path',
             'varchar(1024) DEFAULT NULL'
         );
-	}
+    }
 }
