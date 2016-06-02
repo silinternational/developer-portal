@@ -93,7 +93,7 @@ class UserIdentityTest extends \CDbTestCase
     {
         // Arrange:
         $userAuthData = new UserAuthenticationData(
-            'IdP One',
+            'Insite',
             uniqid(),
             '', // Empty string as (intentionally invalid) email address.
             'Test',
@@ -124,7 +124,7 @@ class UserIdentityTest extends \CDbTestCase
             microtime(true)
         );
         $userAuthData = new UserAuthenticationData(
-            'IdP One',
+            'Insite',
             uniqid(),
             $newEmailAddress,
             'Test',
@@ -162,7 +162,7 @@ class UserIdentityTest extends \CDbTestCase
         // Arrange:
         $dataFromExistingUser = $this->users['user1'];
         $userAuthData = new UserAuthenticationData(
-            'IdP One',
+            'Insite',
             uniqid(),
             $dataFromExistingUser['email'],
             $dataFromExistingUser['first_name'],
@@ -189,7 +189,7 @@ class UserIdentityTest extends \CDbTestCase
     public function testFindUserRecord_existingUser()
     {
         // Arrange:
-        $existingUser = $this->users('userFromIdpOne');
+        $existingUser = $this->users('userFromInsite');
         $userAuthData = \Phake::mock('\Sil\DevPortal\components\UserAuthenticationData');
         \Phake::when($userAuthData)->getAuthProvider->thenReturn(
             $existingUser->auth_provider
@@ -219,7 +219,7 @@ class UserIdentityTest extends \CDbTestCase
         // Arrange:
         $userAuthData = \Phake::mock('\Sil\DevPortal\components\UserAuthenticationData');
         \Phake::when($userAuthData)->getAuthProvider->thenReturn(
-            'IdP One'
+            'Insite'
         );
         \Phake::when($userAuthData)->getAuthProviderUserIdentifier->thenReturn(
             'fake-identifier-1461943872'
@@ -324,7 +324,7 @@ class UserIdentityTest extends \CDbTestCase
         $userIdentity = \Phake::mock('Sil\DevPortal\components\UserIdentity');
         \Phake::when($userIdentity)->loadIdentity->thenCallParent();
         \Phake::when($userIdentity)->getAuthType->thenReturn($authType);
-        $user = $this->users('userFromIdpOne');
+        $user = $this->users('userFromInsite');
         $accessGroups = array('test access_group', 'other-test_ACCESS-group');
         $uuid = uniqid(); // Dummy value for uuid.
         
@@ -391,7 +391,7 @@ class UserIdentityTest extends \CDbTestCase
         // Arrange:
         $tempUniqueId = uniqid();
         $userAuthData = new UserAuthenticationData(
-            'IdP One',
+            'Insite',
             'fake-identifier-1461943899',
             $tempUniqueId . '@jaars.net',
             'Some Test',
@@ -418,7 +418,7 @@ class UserIdentityTest extends \CDbTestCase
     {
         // Arrange:
         /* @var $user \User */
-        $user = $this->users('userFromIdpOne');
+        $user = $this->users('userFromInsite');
         $newFirstName = uniqid(); // Random value.
         $newLastName = uniqid(); // Random value.
         $newDisplayName = uniqid(); // Random value.
@@ -507,7 +507,7 @@ class UserIdentityTest extends \CDbTestCase
     {
         // Arrange:
         /* @var $user \User */
-        $user = $this->users('userFromIdpOne');
+        $user = $this->users('userFromInsite');
         $userAuthData = new UserAuthenticationData(
             'Google',
             uniqid(),

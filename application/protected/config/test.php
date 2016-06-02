@@ -38,10 +38,10 @@ return CMap::mergeArray(
             'mail' => false,
             'smtp' => false,
             'saml' => array(
-                'trustEmailAsFallbackIdFor' => 'IdP One',
+                'trustEmailAsFallbackIdFor' => 'Insite',
+                
                 'authSources' => array(
-                    'IdP One' => 'dummy.value.one',
-                    'IdP Two' => 'dummy.value.two',
+                    'Insite' => 'dummy.idp.entity.id',
                 ),
             ),
         ),

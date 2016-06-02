@@ -148,8 +148,8 @@ class SamlUserIdentityTest extends \CDbTestCase
         $samlUserIdentity = \Phake::mock(
             '\Sil\DevPortal\components\SamlUserIdentity'
         );
-        $idp = 'dummy.value.one'; // Match value in config/test.php file.
-        $expectedResult = 'IdP One';
+        $idp = 'dummy.idp.entity.id'; // Match value in config/test.php file.
+        $expectedResult = 'Insite';
         \Phake::when($samlUserIdentity)->getAuthSourceIdpEntityId->thenReturn($idp);
         \Phake::when($samlUserIdentity)->getNameOfAuthProvider->thenCallParent();
         

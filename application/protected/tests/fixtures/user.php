@@ -8,7 +8,7 @@ return array(
         'display_name'  => 'Tommy_Tester',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'user2'  => array(
         'user_id'       => 2,
@@ -18,7 +18,7 @@ return array(
         'display_name'  => 'Test User',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithNoKeyRequests' => array(
         'user_id'       => 3,
@@ -27,7 +27,7 @@ return array(
         'last_name'     => 'Key Requests',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithApprovedKeyRequest' => array(
         'user_id'       => 4,
@@ -36,7 +36,7 @@ return array(
         'last_name'     => 'Key Request',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithDeniedKeyRequest' => array(
         'user_id'       => 5,
@@ -45,7 +45,7 @@ return array(
         'last_name'     => 'Key Request',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithPendingKeyRequest' => array(
         'user_id'       => 6,
@@ -54,7 +54,7 @@ return array(
         'last_name'     => 'Key Request',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithRevokedKeyRequest' => array(
         'user_id'       => 7,
@@ -63,7 +63,7 @@ return array(
         'last_name'     => 'Key Request',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userThatOwnsASingleApi' => array(
         'user_id'       => 8,
@@ -72,7 +72,7 @@ return array(
         'last_name'     => 'A Single API',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_ADMIN,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithRoleOfUser' => array(
         'user_id'       => 9,
@@ -81,7 +81,7 @@ return array(
         'last_name'     => 'Of User',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithFirstKeyForApiWithTwoKeys' => array(
         'user_id'       => 10,
@@ -90,7 +90,7 @@ return array(
         'last_name'     => 'For API With Two Keys',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithSecondKeyForApiWithTwoKeys' => array(
         'user_id'       => 11,
@@ -99,7 +99,7 @@ return array(
         'last_name'     => 'For API With Two Keys',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWith1stPKRForApiWithTwoPendingKeyRequests' => array(
         'user_id'       => 12,
@@ -108,7 +108,7 @@ return array(
         'last_name'     => 'For API With Two Pending Key Requests',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWith2ndPKRForApiWithTwoPendingKeyRequests' => array(
         'user_id'       => 13,
@@ -117,7 +117,7 @@ return array(
         'last_name'     => 'For API With Two Pending Key Requests',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userThatDoesNotOwnAnyApis' => array(
         'user_id'       => 14,
@@ -126,7 +126,7 @@ return array(
         'last_name'     => 'Own Any APIs',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_OWNER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithRoleOfAdmin' => array(
         'user_id'       => 15,
@@ -135,7 +135,7 @@ return array(
         'last_name'     => 'Of Admin',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_ADMIN,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithRoleOfOwner' => array(
         'user_id'       => 17,
@@ -144,7 +144,7 @@ return array(
         'last_name'     => 'Of Owner',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_OWNER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'user18' => array(
         'user_id'       => 18,
@@ -153,7 +153,7 @@ return array(
         'last_name'     => 'Of API 12',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_OWNER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithKeyToApiOwnedByUser18' => array(
         'user_id'       => 19,
@@ -162,7 +162,7 @@ return array(
         'last_name'     => 'To API Owned By User 18',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithRoleOfAdminButNoKeys' => array(
         'user_id'       => 20,
@@ -171,7 +171,7 @@ return array(
         'last_name'     => 'But No Keys',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_ADMIN,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'ownerThatDoesNotOwnAnyApisOrKeys' => array(
         'user_id'       => 21,
@@ -180,7 +180,7 @@ return array(
         'last_name'     => 'Any APIs Or Keys',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_OWNER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
     'userWithPendingKeyRequestForApiOwnedByUser18' => array(
         'user_id'       => 22,
@@ -189,17 +189,17 @@ return array(
         'last_name'     => 'For API Owned By User 18',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
     ),
-    'userFromIdpOne' => array(
+    'userFromInsite' => array(
         'user_id'       => 23,
-        'email'         => 'userFromIdpOne@jaars.net',
+        'email'         => 'userFromInsite@jaars.net',
         'first_name'    => 'User From',
-        'last_name'     => 'Idp One',
-        'display_name'  => 'User From Idp One',
+        'last_name'     => 'Insite',
+        'display_name'  => 'User From Insite',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
         'auth_provider_user_identifier' => 'fake-identifier-1462913079',
     ),
     'userFromTrustedAuthProviderLackingIdentifier' => array(
@@ -210,7 +210,7 @@ return array(
         'display_name'  => 'User From Trusted Auth Provider Lacking Identifier',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP One',
+        'auth_provider' => 'Insite',
         'auth_provider_user_identifier' => null,
     ),
     'userFromOtherAuthProviderLackingIdentifier' => array(
@@ -221,7 +221,7 @@ return array(
         'display_name'  => 'User From Other Auth Provider Lacking Identifier',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'IdP Two',
+        'auth_provider' => 'Google',
         'auth_provider_user_identifier' => null,
     ),
 );
