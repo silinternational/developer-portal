@@ -15,12 +15,16 @@
  * @property string $role
  * @property string $auth_provider
  * @property string $auth_provider_user_identifier
+ * @property string $customer_id
+ * @property integer $verified_nonprofit
  *
  * The followings are the available model relations:
  * @property Api[] $apis
+ * @property ApiVisibilityDomain[] $apiVisibilityDomains
+ * @property ApiVisibilityUser[] $apiVisibilityUsers
+ * @property ApiVisibilityUser[] $apiVisibilityUsers1
+ * @property Event[] $events
  * @property Key[] $keys
- * @property KeyRequest[] $keyRequests
- * @property KeyRequest[] $keyRequests1
  */
 class UserBase extends CActiveRecord
 {
@@ -40,17 +44,16 @@ class UserBase extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('email, first_name, last_name, status, role, auth_provider', 'required'),
-			array('status', 'numerical', 'integerOnly'=>true),
-			array('email', 'length', 'max'=>128),
-			array('first_name, last_name, auth_provider', 'length', 'max'=>32),
+			array('email, first_name, last_name, created, updated', 'required'),
+			array('status, verified_nonprofit', 'numerical', 'integerOnly'=>true),
+			array('email, auth_provider_user_identifier, customer_id', 'length', 'max'=>255),
+			array('first_name, last_name', 'length', 'max'=>32),
 			array('display_name', 'length', 'max'=>64),
-			array('role', 'length', 'max'=>16),
-			array('auth_provider_user_identifier', 'length', 'max'=>255),
-			array('created, updated', 'safe'),
+			array('role', 'length', 'max'=>5),
+			array('auth_provider', 'length', 'max'=>9),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('user_id, email, first_name, last_name, display_name, status, created, updated, role, auth_provider, auth_provider_user_identifier', 'safe', 'on'=>'search'),
+			array('user_id, email, first_name, last_name, display_name, status, created, updated, role, auth_provider, auth_provider_user_identifier, customer_id, verified_nonprofit', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -63,9 +66,11 @@ class UserBase extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'apis' => array(self::HAS_MANY, 'Api', 'owner_id'),
+			'apiVisibilityDomains' => array(self::HAS_MANY, 'ApiVisibilityDomain', 'invited_by_user_id'),
+			'apiVisibilityUsers' => array(self::HAS_MANY, 'ApiVisibilityUser', 'invited_by_user_id'),
+			'apiVisibilityUsers1' => array(self::HAS_MANY, 'ApiVisibilityUser', 'invited_user_id'),
+			'events' => array(self::HAS_MANY, 'Event', 'user_id'),
 			'keys' => array(self::HAS_MANY, 'Key', 'user_id'),
-			'keyRequests' => array(self::HAS_MANY, 'KeyRequest', 'processed_by'),
-			'keyRequests1' => array(self::HAS_MANY, 'KeyRequest', 'user_id'),
 		);
 	}
 
@@ -86,6 +91,8 @@ class UserBase extends CActiveRecord
 			'role' => 'Role',
 			'auth_provider' => 'Auth Provider',
 			'auth_provider_user_identifier' => 'Auth Provider User Identifier',
+			'customer_id' => 'Customer',
+			'verified_nonprofit' => 'Verified Nonprofit',
 		);
 	}
 
@@ -118,6 +125,8 @@ class UserBase extends CActiveRecord
 		$criteria->compare('role',$this->role,true);
 		$criteria->compare('auth_provider',$this->auth_provider,true);
 		$criteria->compare('auth_provider_user_identifier',$this->auth_provider_user_identifier,true);
+		$criteria->compare('customer_id',$this->customer_id,true);
+		$criteria->compare('verified_nonprofit',$this->verified_nonprofit);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
