@@ -208,7 +208,7 @@ class Key extends KeyBase
         $newKey->secret = Utils::getRandStr(128);//hash('sha512', $seed); // length 128
         
         if ($newKey->save()) {
-			
+            
             // If we are in an environment where we should send email
             // notifications...
             if (Yii::app()->params['smtp'] !== FALSE) {

@@ -696,7 +696,7 @@ class Api extends ApiBase
     public static function model($className = __CLASS__) {
         return parent::model($className);
     }
-	
+    
     /**
      * @param string $attribute the name of the attribute to be validated
      * @param array $params options specified in the validation rule
@@ -711,7 +711,7 @@ class Api extends ApiBase
                             . 'or path.');
             }
     }
-	
+    
     /**
      * Validate that the specified owner_id is an acceptable value.
      * 

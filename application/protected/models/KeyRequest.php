@@ -17,11 +17,11 @@ class KeyRequest extends KeyRequestBase
         );
     }
            
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
+    /**
+     * @return array relational rules.
+     */
+    public function relations()
+    {
         // Get the relations defined by the base (aka. parent) class.
         $baseClassRelations = parent::relations();
         
@@ -36,7 +36,7 @@ class KeyRequest extends KeyRequestBase
         
         // Return the resulting relations definitions.
         return $baseClassRelations;
-	}
+    }
 
     public function rules() {
         $rules = parent::rules();

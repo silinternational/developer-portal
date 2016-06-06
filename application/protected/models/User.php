@@ -208,25 +208,25 @@ class User extends UserBase
         );
     }
     
-	/**
-	 * Convert a role value to a user-friendly string.
+    /**
+     * Convert a role value to a user-friendly string.
      * 
-	 * @param mixed $roleValue The role value to be converted to a user-friendly
+     * @param mixed $roleValue The role value to be converted to a user-friendly
      *     string. Should be equal to the value of one of the User class's
      *     constants whose name begins with "ROLE_".
-	 * @return (string|null) The string, or null if that role value is unknown.
-	 */
+     * @return (string|null) The string, or null if that role value is unknown.
+     */
     public static function getRoleString($roleValue)
     {
-		// Get the array of roles.
-		$roles = User::getRoles();
-		
-		// Return the one associated with the given value (if any).
-		if (isset($roles[$roleValue])) {
-			return $roles[$roleValue];
-		} else {
-			return null;
-		}
+        // Get the array of roles.
+        $roles = User::getRoles();
+        
+        // Return the one associated with the given value (if any).
+        if (isset($roles[$roleValue])) {
+            return $roles[$roleValue];
+        } else {
+            return null;
+        }
     }
     
     public static function getStatuses()
@@ -237,26 +237,26 @@ class User extends UserBase
         );
     }
     
-	/**
-	 * Convert a status value to a user-friendly string.
+    /**
+     * Convert a status value to a user-friendly string.
      * 
-	 * @param mixed $statusValue The status value to be converted to a
-	 *     user-friendly string. Should be equal to the value of one of the User
-	 *     class's constants whose name begins with "STATUS_".
-	 * @return (string|null) The string, or null if that status value is
-	 *     unknown.
-	 */
+     * @param mixed $statusValue The status value to be converted to a
+     *     user-friendly string. Should be equal to the value of one of the User
+     *     class's constants whose name begins with "STATUS_".
+     * @return (string|null) The string, or null if that status value is
+     *     unknown.
+     */
     public static function getStatusString($statusValue)
     {
-		// Get the array of statuses.
-		$statuses = User::getStatuses();
-		
-		// Return the one associated with the given value (if any).
-		if (isset($statuses[$statusValue])) {
-			return $statuses[$statusValue];
-		} else {
-			return null;
-		}
+        // Get the array of statuses.
+        $statuses = User::getStatuses();
+        
+        // Return the one associated with the given value (if any).
+        if (isset($statuses[$statusValue])) {
+            return $statuses[$statusValue];
+        } else {
+            return null;
+        }
     }
     
     /**
@@ -580,24 +580,24 @@ class User extends UserBase
         return $newRules;
     }
     
-	/**
+    /**
      * NOTE: We are completely overriding (and ignoring) the base class's
      *       relations definition.  This is because Gii autogenerates them
      *       incorrectly due to not understanding the two possible relationships
      *       between Key Requests and Users (requested by vs. processed by).
      * 
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		return array(
-			'apis' => array(self::HAS_MANY, 'Api', 'owner_id'),
+     * @return array relational rules.
+     */
+    public function relations()
+    {
+        return array(
+            'apis' => array(self::HAS_MANY, 'Api', 'owner_id'),
             'keyCount' => array(self::STAT, 'Key', 'user_id'),
-			'keyRequests' => array(self::HAS_MANY, 'KeyRequest', 'user_id'),
-			'keyRequestsProcessed' => array(self::HAS_MANY, 'KeyRequest', 'processed_by'),
-			'keys' => array(self::HAS_MANY, 'Key', 'user_id'),
-		);
-	}
+            'keyRequests' => array(self::HAS_MANY, 'KeyRequest', 'user_id'),
+            'keyRequestsProcessed' => array(self::HAS_MANY, 'KeyRequest', 'processed_by'),
+            'keys' => array(self::HAS_MANY, 'Key', 'user_id'),
+        );
+    }
     
     /**
      * Set the list of access groups that this User is in.
