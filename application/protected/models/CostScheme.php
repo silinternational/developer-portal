@@ -3,37 +3,43 @@
 class CostScheme extends CostSchemeBase
 {
     /**
-     * Validate that at least one of the attributes listed in the 'fullList'
-     * parameter has a value.
+     * Validate that at least one of the price fields has a (non-zero) value.
      * 
      * @param string $attribute The name of the attribute to be validated.
      * @param array $params The options specified in the validation rule.
      */
-    public function hasAtLeastOne($attribute, $params)
+    public function hasAtLeastOnePrice($attribute, $params)
     {
-        if (empty($params['fullList'])) {
+        if (empty($params['priceFields'])) {
             throw new \Exception(
-                'You must specify the fullList (array) of attributes to check to use the hasAtLeastOne validator.',
+                'You must specify the list (array) of priceFields to use the hasAtLeastOnePrice validator.',
                 1465233329
             );
         }
         
         $foundAtLeastOne = false;
-        foreach ($params['fullList'] as $attributeToCheck) {
-            if ( ! empty($this->$attributeToCheck)) {
+        foreach ($params['priceFields'] as $priceField) {
+            if ( ! $this->hasAttribute($priceField)) {
+                throw new \Exception(
+                    'The hasAtLeastOnePrice validator\'s list of priceFields included "%s", '
+                    . 'but there is no such attribute.',
+                    1465234845
+                );
+            }
+            
+            if (is_numeric($this->$priceField) && ($this->$priceField > 0)) {
                 $foundAtLeastOne = true;
-                break;
             }
         }
         
         if ( ! $foundAtLeastOne) {
-            $attributeLabels = array();
-            foreach ($params['fullList'] as $attributeName) {
-                $attributeLabels[] = $this->getAttributeLabel($attributeName);
+            $priceFieldLabels = array();
+            foreach ($params['priceFields'] as $priceField) {
+                $priceFieldLabels[] = $this->getAttributeLabel($priceField);
             }
             $this->addError($attribute, sprintf(
-                'You must provide a value for at least one of the following: %s',
-                "\n" . implode(", \n", $attributeLabels)
+                'You must provide a price (greater than zero) for at least one of the following: %s',
+                "\n" . implode(", \n", $priceFieldLabels)
             ));
         }
     }
@@ -51,6 +57,12 @@ class CostScheme extends CostSchemeBase
             throw new \Exception(
                 'You must specify the otherAttribute name to use the hasBothOrNeither validator.',
                 1465228147
+            );
+        } elseif ( ! $this->hasAttribute($params['otherAttribute'])) {
+            throw new \Exception(
+                'The hasBothOrNeither validator was given an otherAttribute of "%s", '
+                . 'but there is no such attribute.',
+                1465235006
             );
         }
         
@@ -118,8 +130,8 @@ class CostScheme extends CostSchemeBase
             ),
             array(
                 'yearly_commercial_price',
-                'hasAtLeastOne',
-                'fullList' => array(
+                'hasAtLeastOnePrice',
+                'priceFields' => array(
                     'yearly_commercial_price',
                     'yearly_nonprofit_price',
                     'monthly_commercial_price',
