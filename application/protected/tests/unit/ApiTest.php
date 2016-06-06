@@ -71,6 +71,15 @@ class ApiTest extends DeveloperPortalTestCase
                 Api::getStrictSsls());
     }
     
+    public function testConfirmVisibilityConstantsDiffer()
+    {
+        $this->confirmConstantsDiffer(
+            'Api',
+            'VISIBILITY_',
+            Api::getVisibilityDescriptions()
+        );
+    }
+    
     public function testCreateApiWithModelBadCode()
     {
         $this->deleteApis();
@@ -215,22 +224,6 @@ class ApiTest extends DeveloperPortalTestCase
             $result,
             'Failed to include the link target URL in the generated badge '
             . 'HTML.'
-        );
-    }
-    
-    public function testGetAccessTypeDescription()
-    {
-        // Arrange:
-        /* @var $api Api */
-        $api = $this->apis('api4');
-        
-        // Act:
-        $result = $api->getAccessTypeDescription();
-        
-        // Assert:
-        $this->assertNotNull(
-            $result,
-            'Failed to retrieve access type description.'
         );
     }
     
@@ -608,6 +601,22 @@ class ApiTest extends DeveloperPortalTestCase
         );
     }
 	
+    public function testGetVisibilityDescription()
+    {
+        // Arrange:
+        /* @var $api Api */
+        $api = $this->apis('api4');
+        
+        // Act:
+        $result = $api->getVisibilityDescription();
+        
+        // Assert:
+        $this->assertNotNull(
+            $result,
+            'Failed to retrieve visibility description.'
+        );
+    }
+    
 	public function testHasKeyRequestsRelationship()
     {
         // Confirm that the relationship is set up between the classes.

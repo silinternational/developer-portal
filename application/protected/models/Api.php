@@ -20,6 +20,9 @@ class Api extends ApiBase
     CONST REGEX_ENDPOINT = '/^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\.?$/';
     CONST REGEX_PATH = '/^\/[a-zA-Z0-9\-\.\/_]{0,}$/';
     
+    CONST VISIBILITY_INVITATION = 'invitation';
+    CONST VISIBILITY_PUBLIC = 'public';
+    
     public function afterSave()
     {
         parent::afterSave();
@@ -99,26 +102,6 @@ class Api extends ApiBase
             self::APPROVAL_TYPE_AUTO => 'Automatically Approved',
             self::APPROVAL_TYPE_OWNER => 'API Owner Approved',
         );
-    }
-    
-    /**
-     * Get the user-friendly description of this Api's access type.
-     * 
-     * @return string|null The description of the access type (if available).
-     */
-    public function getAccessTypeDescription()
-    {
-        // Get the descriptions of the various access types.
-        $accessTypeDescriptions = self::getAccessTypes();
-        
-        // Return the description for this Api's access type (if set).
-        if ($this->access_type === null) {
-            return null;
-        } elseif ( ! isset($accessTypeDescriptions[$this->access_type])) {
-            return 'UNKNOWN ACCESS TYPE';
-        } else {
-            return $accessTypeDescriptions[$this->access_type];
-        }
     }
     
     public static function getAccessTypes()
@@ -395,6 +378,32 @@ class Api extends ApiBase
         
         // Return the resulting data.
         return $usage;
+    }
+    
+    /**
+     * Get the user-friendly description of this Api's visibility.
+     * 
+     * @return string|null The description of the visibility (if available).
+     */
+    public function getVisibilityDescription()
+    {
+        // Get the descriptions of the various access types.
+        $visibilityDescriptions = self::getVisibilityDescriptions();
+        
+        // Return the description for this Api's visibility.
+        if ( ! isset($visibilityDescriptions[$this->visibility])) {
+            return 'UNKNOWN VISIBILITY';
+        } else {
+            return $visibilityDescriptions[$this->visibility];
+        }
+    }
+    
+    public static function getVisibilityDescriptions()
+    {
+        return array(
+            self::VISIBILITY_INVITATION => 'By Invitation Only',
+            self::VISIBILITY_PUBLIC => 'Publicly Available',
+        );
     }
     
     public function rules() {

@@ -102,9 +102,9 @@ $attrLabels = $api->attributeLabels();
                     }
                 ?>&nbsp;</dd>
 
-                <dt><?php echo CHtml::encode($attrLabels['access_type']); ?></dt>
+                <dt><?php echo \CHtml::encode($attrLabels['visibility']); ?></dt>
                 <dd><?php
-                    echo CHtml::encode($api->getAccessTypeDescription());
+                    echo \CHtml::encode($api->getVisibilityDescription());
                 ?>&nbsp;</dd>
 
                 <?php
