@@ -381,6 +381,12 @@ class Api extends ApiBase
         }
     }
     
+    /**
+     * Get the list of visibility descriptions, indexed by the visibility
+     * constant values.
+     * 
+     * @return array<string,string>
+     */
     public static function getVisibilityDescriptions()
     {
         return array(
