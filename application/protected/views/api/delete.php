@@ -85,10 +85,15 @@ $this->pageTitle = 'Delete API';
             <dt>Visibility</dt>
             <dd><?php echo CHtml::encode($api->getVisibilityDescription()); ?></dd>
 
-            <dt>Access Options</dt>
-            <dd><?php echo (is_null($api->access_options) ? 
-                            '<i class="muted">(none)</i>' : 
-                            CHtml::encode($api->access_options)); ?></dd>
+            <?php if (count($api->apiVisibilityUsers) > 0): ?>
+                <dt>Invited Users</dt>
+                <dd><?php echo count($api->apiVisibilityUsers); ?></dd>
+            <?php endif; ?>
+            
+            <?php if (count($api->apiVisibilityDomains) > 0): ?>
+                <dt>Invited Domains</dt>
+                <dd><?php echo count($api->apiVisibilityDomains); ?></dd>
+            <?php endif; ?>
 
             <dt>Approval Type</dt>
             <dd><?php echo CHtml::encode($api->approval_type); ?></dd>

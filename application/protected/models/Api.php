@@ -123,7 +123,6 @@ class Api extends ApiBase
      */
     public function attributeLabels() {
         return \CMap::mergeArray(parent::attributeLabels(), array(
-            'access_options' => 'Groups',
             'queries_second' => 'Queries per Second',
             'queries_day' => 'Queries per Day',
             'protocol' => 'Endpoint Protocol',
@@ -426,8 +425,6 @@ class Api extends ApiBase
                 'value' => new CDbExpression('NOW()'),
                 'setOnEmpty' => true, 'on' => 'insert'),
             array('code', 'unsafe', 'on' => 'update'),
-            array('access_options', 'default', 'setOnEmpty' => true,
-                'value' => NULL),
             array('protocol', 'default',
                 'value' => 'http',
                 'setOnEmpty' => true, 'on' => 'insert'),

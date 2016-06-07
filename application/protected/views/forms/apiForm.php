@@ -94,14 +94,6 @@ return array(
                 Api::getVisibilityDescriptions()
             ),
         ),
-        'access_options' => array(
-            'htmlOptions' => array(
-                'hint' => '<i class="icon-info-sign"></i> Enter one or more ' .
-                          'Insite access groups separated by commas.',
-                'class' => 'input-xxlarge',
-            ),
-            'type' => 'text',
-        ),
         'approval_type' => array(
             'type' => 'dropdownlist',
             'data' => array_merge(

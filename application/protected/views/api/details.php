@@ -107,22 +107,16 @@ $attrLabels = $api->attributeLabels();
                     echo \CHtml::encode($api->getVisibilityDescription());
                 ?>&nbsp;</dd>
 
-                <?php
-
-                // Also show the access options (such as which groups it's limited to,
-                // if applicable).
-                echo sprintf(
-                    '<dt>%s</dt> <dd>%s&nbsp;</dd>',
-                    CHtml::encode($attrLabels['access_options']),
-                    (
-                        is_null($api->access_options) ?
-                        '<i class="muted">(none)</i>' : 
-                        CHtml::encode($api->access_options)
-                    )
-                );
-
-                ?>
-
+                <?php if (count($api->apiVisibilityUsers) > 0): ?>
+                    <dt>Invited Users</dt>
+                    <dd><?php echo count($api->apiVisibilityUsers); ?></dd>
+                <?php endif; ?>
+                
+                <?php if (count($api->apiVisibilityDomains) > 0): ?>
+                    <dt>Invited Domains</dt>
+                    <dd><?php echo count($api->apiVisibilityDomains); ?></dd>
+                <?php endif; ?>
+                
                 <dt><?php echo CHtml::encode($attrLabels['approval_type']); ?></dt>
                 <dd><?php
                     echo CHtml::encode($api->getApprovalTypeDescription());
