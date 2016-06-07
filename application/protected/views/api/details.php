@@ -142,10 +142,16 @@ $attrLabels = $api->attributeLabels();
             }
 
             // If the Api has an support text, show it.
-            if ($api->support) {
+            if ($api->technical_support) {
                 ?>
-                <dt><?php echo CHtml::encode($attrLabels['support']); ?></dt>
-                <dd><?php echo CHtml::encode($api->support); ?>&nbsp;</dd>
+                <dt><?php echo CHtml::encode($attrLabels['technical_support']); ?></dt>
+                <dd><?php echo CHtml::encode($api->technical_support); ?>&nbsp;</dd>
+                <?php
+            }
+            if ($api->customer_support) {
+                ?>
+                <dt><?php echo CHtml::encode($attrLabels['customer_support']); ?></dt>
+                <dd><?php echo CHtml::encode($api->customer_support); ?>&nbsp;</dd>
                 <?php
             }
 

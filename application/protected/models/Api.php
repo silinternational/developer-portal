@@ -128,7 +128,6 @@ class Api extends ApiBase
             'protocol' => 'Endpoint Protocol',
             'strict_ssl' => 'Endpoint Strict SSL',
             'endpoint_timeout' => 'Endpoint Timeout',
-            'support' => 'For Support',
         ));
     }
     
