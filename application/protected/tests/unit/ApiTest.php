@@ -635,6 +635,38 @@ class ApiTest extends DeveloperPortalTestCase
         $this->assertClassHasRelation(new Api(), 'owner', 'User');
     }
     
+    public function testIsPubliclyVisible_no()
+    {
+        // Arrange:
+        /* @var $api \Api */
+        $api = $this->apis('apiVisibleByInvitationOnly');
+        
+        // Act:
+        $result = $api->isPubliclyVisible();
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a non-public Api is publicly visible.'
+        );
+    }
+    
+    public function testIsPubliclyVisible_yes()
+    {
+        // Arrange:
+        /* @var $api \Api */
+        $api = $this->apis('publicApi');
+        
+        // Act:
+        $result = $api->isPubliclyVisible();
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to report that a public Api is publicly visible.'
+        );
+    }
+    
     public function testIsVisibleToUser_publicApi_noUser()
     {
         // Arrange:

@@ -591,6 +591,11 @@ class Api extends ApiBase
         }
     }
     
+    public function isPubliclyVisible()
+    {
+        return ($this->visibility === self::VISIBILITY_PUBLIC);
+    }
+    
     /**
      * Confirm that this Api's endpoint and default_path are a unique
      * combination.
