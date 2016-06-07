@@ -583,6 +583,7 @@ class User extends UserBase
     public function rules()
     {
         return array_merge(array(
+            array('email', 'email'),
             array(
                 'updated',
                 'default',
