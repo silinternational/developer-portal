@@ -178,6 +178,12 @@ class User extends UserBase
         return $this->currentAccessGroups ?: array();
     }
     
+    public function getEmailAddressDomain()
+    {
+        list(, $domain) = explode('@', $this->email);
+        return $domain;
+    }
+    
     public function getKeyRequestsWithApiNames()
     {
         // Get the ID of the current user (as an integer).

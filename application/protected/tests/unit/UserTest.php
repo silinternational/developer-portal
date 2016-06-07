@@ -512,6 +512,20 @@ class UserTest extends DeveloperPortalTestCase
                 User::getStatuses());
     }
     
+    public function testGetEmailAddressDomain()
+    {
+        // Arrange:
+        /* @var $user \User */
+        $user = $this->users('userWithEmailDomainNotInvitedToSeeAnyApi');
+        $expected = 'not-invited-domain.example.com';
+        
+        // Act:
+        $actual = $user->getEmailAddressDomain();
+        
+        // Assert:
+        $this->assertSame($expected, $actual);
+    }
+    
     public function testGetRoles_isCompleteList()
     {
         // Arrange:

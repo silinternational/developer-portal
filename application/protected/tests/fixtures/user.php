@@ -250,4 +250,17 @@ return array(
         'auth_provider_user_identifier' => null,
         'verified_nonprofit' => false,
     ),
+    'userWithEmailDomainNotInvitedToSeeAnyApi' => array(
+        'user_id'       => 28,
+        'email'         => 'userWithEmailDomainNotInvitedToSeeAnyApi@not-invited-domain.example.com',
+        'first_name'    => 'With Email Domain',
+        'last_name'     => 'Not Invited To See Any API',
+        'status'        => User::STATUS_ACTIVE,
+        'created'       => 1465323308,
+        'updated'       => 1465323308,
+        'role'          => User::ROLE_USER,
+        'auth_provider' => 'Google',
+        'auth_provider_user_identifier' => null,
+        'verified_nonprofit' => false,
+    ),
 );
