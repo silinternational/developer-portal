@@ -1289,6 +1289,52 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testIsInvitedByDomainToSeeApi_no()
+    {
+        // Arrange:
+        /* @var $api \Api */
+        $api = $this->apis('apiVisibleByInvitationOnly');
+        /* @var $user \User */
+        $user = $this->users('userWithEmailDomainNotInvitedToSeeAnyApi');
+        
+        // Pre-assert:
+        $apiVisibilityDomains = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+            'domain' => $user->getEmailAddressDomain(),
+        ));
+        $this->assertCount(
+            0,
+            $apiVisibilityDomains,
+            'This test requires a user that has an email domain that has NOT been invited to see any Apis.'
+        );
+        
+        // Act:
+        $result = $user->isInvitedByDomainToSeeApi($api);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that that a User has an email domain that has been invited to see an Api.'
+        );
+    }
+    
+    public function testIsInvitedByDomainToSeeApi_yes()
+    {
+        // Arrange:
+        /* @var $api \Api */
+        $api = $this->apis('apiVisibleByInvitationOnly');
+        /* @var $user \User */
+        $user = $this->users('userWithEmailDomainInvitedToSeeApi');
+        
+        // Act:
+        $result = $user->isInvitedByDomainToSeeApi($api);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to report that a User DOES have an email domain that has been invited to see an Api.'
+        );
+    }
+    
     public function testIsOwnerOfApi_yes()
     {
         // Arrange:

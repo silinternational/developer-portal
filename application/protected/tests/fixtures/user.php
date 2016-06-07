@@ -263,4 +263,17 @@ return array(
         'auth_provider_user_identifier' => null,
         'verified_nonprofit' => false,
     ),
+    'userWithEmailDomainInvitedToSeeApi' => array(
+        'user_id'       => 29,
+        'email'         => 'userWithEmailDomainInvitedToSeeApi@invited-domain.example.com',
+        'first_name'    => 'Not Individually Invited',
+        'last_name'     => 'To See Any API',
+        'status'        => User::STATUS_ACTIVE,
+        'created'       => 1465310568,
+        'updated'       => 1465310568,
+        'role'          => User::ROLE_USER,
+        'auth_provider' => 'Google',
+        'auth_provider_user_identifier' => null,
+        'verified_nonprofit' => false,
+    ),
 );
