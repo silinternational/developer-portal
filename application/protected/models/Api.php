@@ -641,64 +641,16 @@ class Api extends ApiBase
      */
     public function isVisibleToUser($user)
     {
-        // If the user is a guest...
+        // If the user is a guest, they can't see any APIs.
         if ( ! ($user instanceof \User)) {
-            
-            // They can't see any APIs.
             return false;
         }
         
-        
-        // ** Otherwise, determine access based on the API Access Type, etc: **
-        
-        // If the API is public, then it's visible to the user.
-        if ($this->access_type === self::ACCESS_TYPE_PUBLIC) {
-            return true;
-        }
-        // OR, if the API can be see by anyone in Insite...
-        elseif ($this->access_type == self::ACCESS_TYPE_INTERNAL_ALL) {
-            
-            // ... then the user can see it only if they're in Insite.
-            return $user->isInAccessGroup(
-                \Yii::app()->params['allInsiteUsersGroup']
-            );
-        }
-        // OR, if the API can only be seen by people in specific access
-        // groups...
-        elseif ($this->access_type == self::ACCESS_TYPE_INTERNAL_GROUPS) {
-            
-            // The user can only see if it they are in at least one of the
-            // specified access groups.
-            if (isset($this->access_options) && !is_null($this->access_options)) {
-                
-                // Get the list of groups allowed to see this API.
-                $allowedGroups = explode(',', $this->access_options);
-                foreach ($allowedGroups as $group) {
-                    
-                    // Clean up / format the group name.
-                    $group = strtoupper(trim($group));
-                    
-                    // If that groups is one of the groups that the user is
-                    // part of, then they can see this API.
-                    if ($user->isInAccessGroup($group)) {
-                        return true;
-                    }
-                }
-            }
-            
-            // If we reach this point, then the user was NOT in any of the
-            // groups allowed to see this API.
-            return false;
-        }
-        
-        // If we reach this point, we have come across a situation that we
-        // are not yet set up to handle.
-        throw new \Exception(
-            'Unable to determine whether a User should be allowed to see a '
-            . 'particular API because we do not know how to handle an API '
-            . 'access_type of "' . $this->access_type . '".',
-            1417718496
-        );
+        return $this->isPubliclyVisible() ||
+               $user->isIndividuallyInvitedToSeeApi($this) ||
+               $user->isInvitedByDomainToSeeApi($this) ||
+               $user->isAdmin() ||
+               $user->isOwnerOfApi($this);
     }
     
     /**

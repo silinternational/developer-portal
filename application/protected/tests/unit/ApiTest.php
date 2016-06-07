@@ -679,7 +679,7 @@ class ApiTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertFalse(
             $result,
-            'Failed to hide public API from unauthenticated (null) User.'
+            'Failed to hide public Api from unauthenticated (null) User.'
         );
     }
     
@@ -695,36 +695,15 @@ class ApiTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertTrue(
             $result,
-            'Failed to show public API to a normal authenticated user.'
+            'Failed to show public Api to a normal authenticated user.'
         );
     }
     
-    public function testIsVisibleToUser_allInsiteApi_nonInsiteUser()
+    public function testIsVisibleToUser_nonPublicApi_adminUser()
     {
         // Arrange:
-        $accessGroups = array();
-        $user = $this->users('userWithRoleOfUser');
-        $user->setAccessGroups($accessGroups);
-        $api = $this->apis('allInsiteApi');
-        
-        // Act:
-        $result = $api->isVisibleToUser($user);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Failed to hide an API that is visible to all Insite users from a '
-            . 'non-Insite user.'
-        );
-    }
-    
-    public function testIsVisibleToUser_allInsiteApi_insiteUser()
-    {
-        // Arrange:
-        $accessGroups = array(\Yii::app()->params['allInsiteUsersGroup']);
-        $user = $this->users('userWithRoleOfUser');
-        $user->setAccessGroups($accessGroups);
-        $api = $this->apis('allInsiteApi');
+        $user = $this->users('userWithRoleOfAdmin');
+        $api = $this->apis('apiVisibleByInvitationOnlyWithNoInvitations');
         
         // Act:
         $result = $api->isVisibleToUser($user);
@@ -732,18 +711,15 @@ class ApiTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertTrue(
             $result,
-            'Failed to show an API that is visible to all Insite users to an '
-            . 'Insite user.'
+            'Failed to show non-public Api to an admin user.'
         );
     }
     
-    public function testIsVisibleToUser_specificInsiteGroupApi_yes()
+    public function testIsVisibleToUser_nonPublicApi_apiOwner()
     {
         // Arrange:
-        $accessGroups = array('FAKE_AUTHORIZED_ACCESS_GROUP');
-        $user = $this->users('userWithRoleOfUser');
-        $user->setAccessGroups($accessGroups);
-        $api = $this->apis('specificInsiteGroupApi');
+        $user = $this->users('userWithRoleOfOwner');
+        $api = $this->apis('apiVisibleByInvitationOnlyWithNoInvitations');
         
         // Act:
         $result = $api->isVisibleToUser($user);
@@ -751,18 +727,36 @@ class ApiTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertTrue(
             $result,
-            'Failed to show an API that is visible to a specific access group '
-            . 'to a user in that access group.'
+            'Failed to show non-public Api to the owner of that Api.'
         );
     }
     
-    public function testIsVisibleToUser_specificInsiteGroupApi_no()
+    public function testIsVisibleToUser_no()
     {
         // Arrange:
-        $accessGroups = array();
-        $user = $this->users('userWithRoleOfUser');
-        $user->setAccessGroups($accessGroups);
-        $api = $this->apis('specificInsiteGroupApi');
+        /* @var $api \Api */
+        $api = $this->apis('apiVisibleByInvitationOnlyWithNoInvitations');
+        /* @var $user \User */
+        $user = $this->users('userNotInvitedToSeeAnyApi');
+        
+        // Pre-assert:
+        $apiVisibilityDomains = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+            'api_id' => $api->api_id,
+        ));
+        $this->assertCount(
+            0,
+            $apiVisibilityDomains,
+            'This test requires an Api that no domains have been invited to see.'
+        );
+        $apiVisibilityUsers = \ApiVisibilityUser::model()->findAllByAttributes(array(
+            'api_id' => $api->api_id,
+        ));
+        $this->assertCount(
+            0,
+            $apiVisibilityUsers,
+            'This test requires an Api that no individuals have been invited to see.'
+        );
+        
         
         // Act:
         $result = $api->isVisibleToUser($user);
@@ -770,8 +764,7 @@ class ApiTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertFalse(
             $result,
-            'Failed to hide an API that is visible to a specific access group '
-            . 'from a user NOT in that access group.'
+            'Incorrectly reported that an uninvited user could see a non-public Api.'
         );
     }
     
