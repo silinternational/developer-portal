@@ -582,35 +582,52 @@ class User extends UserBase
     
     public function rules()
     {
-        $rules = parent::rules();
-        $newRules = array_merge($rules, array(
-            array('updated', 'default',
+        return array_merge(array(
+            array(
+                'updated',
+                'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => false, 'on' => 'update'),
-            array('created', 'default',
+                'setOnEmpty' => false,
+                'on' => 'update',
+            ),
+            array(
+                'created',
+                'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => true, 'on' => 'insert')
-        ));
-        
-        return $newRules;
+                'setOnEmpty' => true,
+                'on' => 'insert',
+            ),
+        ), parent::rules());
     }
     
     /**
      * NOTE: We are completely overriding (and ignoring) the base class's
      *       relations definition.  This is because Gii autogenerates them
      *       incorrectly due to not understanding the two possible relationships
-     *       between Key Requests and Users (requested by vs. processed by).
-     * 
+     *       between Keys and Users (requested by vs. processed by) and between
+     *       Users and ApiVisibilityUser/ApiVisibilityDomain. Those latter
+     *       relations we simply do not define here at all, leaving those
+     *       objects to be retrieve via static model functions (such as
+     *       findByAttributes).
+     *
      * @return array relational rules.
      */
     public function relations()
     {
         return array(
             'apis' => array(self::HAS_MANY, 'Api', 'owner_id'),
-            'keyCount' => array(self::STAT, 'Key', 'user_id'),
-            'keyRequests' => array(self::HAS_MANY, 'KeyRequest', 'user_id'),
-            'keyRequestsProcessed' => array(self::HAS_MANY, 'KeyRequest', 'processed_by'),
+            'events' => array(self::HAS_MANY, 'Event', 'user_id'),
+            
+            /**
+             * @todo This might no longer provide accurate information, since
+             *       it doesn't currently distinguish between requested and
+             *       granted keys (which it used to do when the only keys that
+             *       existed were those that had already been granted).
+             */
+            //'keyCount' => array(self::STAT, 'Key', 'user_id'),
+            
             'keys' => array(self::HAS_MANY, 'Key', 'user_id'),
+            'keysProcessed' => array(self::HAS_MANY, 'KeyRequest', 'processed_by'),
         );
     }
     
