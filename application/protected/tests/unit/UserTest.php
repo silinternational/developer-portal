@@ -4,7 +4,8 @@ class UserTest extends DeveloperPortalTestCase
 {
     public $fixtures = array(
         'apis' => 'Api',
-        'keyRequests' => 'KeyRequest',
+        'apiVisibilityDomains' => 'ApiVisibilityDomain',
+        'apiVisibilityUsers' => 'ApiVisibilityUser',
         'keys' => 'Key',
         'users' => 'User',
     );
@@ -1225,6 +1226,52 @@ class UserTest extends DeveloperPortalTestCase
         $this->assertTrue(
             $result,
             'Failed to return true for an email address that is in use.'
+        );
+    }
+    
+    public function testIsIndividuallyInvitedToSeeApi_no()
+    {
+        // Arrange:
+        /* @var $api \Api */
+        $api = $this->apis('apiVisibleByInvitationOnly');
+        /* @var $user \User */
+        $user = $this->users('userNotIndividuallyInvitedToSeeAnyApi');
+        
+        // Pre-assert:
+        $apiVisibilityUsers = \ApiVisibilityUser::model()->findAllByAttributes(array(
+            'invited_user_id' => $user->user_id,
+        ));
+        $this->assertCount(
+            0,
+            $apiVisibilityUsers,
+            'This test requires a user that has not been individually invited to see any APIs.'
+        );
+        
+        // Act:
+        $result = $user->isIndividuallyInvitedToSeeApi($api);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Failed to report that a User has NOT been individually invited to see an Api.'
+        );
+    }
+    
+    public function testIsIndividuallyInvitedToSeeApi_yes()
+    {
+        // Arrange:
+        /* @var $api \Api */
+        $api = $this->apis('apiVisibleByInvitationOnly');
+        /* @var $user \User */
+        $user = $this->users('userIndividuallyInvitedToSeeApi');
+        
+        // Act:
+        $result = $user->isIndividuallyInvitedToSeeApi($api);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to report that a User HAS been individually invited to see an Api.'
         );
     }
     

@@ -539,6 +539,21 @@ class User extends UserBase
     }
     
     /**
+     * Find out whether this User has been individually invited to see this Api.
+     * 
+     * @param \Api $api The Api in question.
+     * @return boolean
+     */
+    public function isIndividuallyInvitedToSeeApi($api)
+    {
+        $apiVisibilityUser = \ApiVisibilityUser::model()->findByAttributes(array(
+            'api_id' => $api->api_id,
+            'invited_user_id' => $this->user_id,
+        ));
+        return ($apiVisibilityUser !== null);
+    }
+    
+    /**
      * Find out whether this User is the owner of the given Api.
      * 
      * @param Api $api The API in question.
