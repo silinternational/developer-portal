@@ -39,14 +39,6 @@ class ApiTest extends DeveloperPortalTestCase
         }            
     }
   
-    public function testConfirmAccessTypesDiffer()
-    {
-        // Make sure the access type constants differ (both in their values and
-        // in their user-friendly versions).
-        $this->confirmConstantsDiffer('Api', 'ACCESS_TYPE_',
-                Api::getAccessTypes());
-    }
-    
     public function testConfirmApprovalTypesDiffer()
     {
         // Make sure the approval type constants differ (both in their values
@@ -89,7 +81,7 @@ class ApiTest extends DeveloperPortalTestCase
         $api->endpoint = 'localhost';
         $api->queries_second = 2;
         $api->queries_day = 1000;
-        $api->access_type = 'public';
+        $api->visibility = \Api::VISIBILITY_PUBLIC;
         $api->protocol = 'http';
         $api->strict_ssl = 0;
         $api->approval_type = 'auto';
@@ -109,7 +101,7 @@ class ApiTest extends DeveloperPortalTestCase
         $api->endpoint = 'http://localhost';
         $api->queries_second = 2;
         $api->queries_day = 1000;
-        $api->access_type = Api::ACCESS_TYPE_PUBLIC;
+        $api->visibility = Api::VISIBILITY_PUBLIC;
         $api->protocol = Api::PROTOCOL_HTTP;
         $api->strict_ssl = Api::STRICT_SSL_FALSE;
         $api->approval_type = Api::APPROVAL_TYPE_AUTO;
@@ -138,7 +130,7 @@ class ApiTest extends DeveloperPortalTestCase
         $api->default_path = '/123/path/WITH/just-valid.char_acters';
         $api->queries_second = 2;
         $api->queries_day = 1000;
-        $api->access_type = Api::ACCESS_TYPE_PUBLIC;
+        $api->visibility = Api::VISIBILITY_PUBLIC;
         $api->protocol = Api::PROTOCOL_HTTP;
         $api->strict_ssl = Api::STRICT_SSL_FALSE;
         $api->approval_type = Api::APPROVAL_TYPE_AUTO;

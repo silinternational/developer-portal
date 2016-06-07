@@ -7,10 +7,6 @@ class Api extends ApiBase
     CONST APPROVAL_TYPE_AUTO = 'auto';
     CONST APPROVAL_TYPE_OWNER = 'owner';
     
-    CONST ACCESS_TYPE_PUBLIC = 'public';
-    CONST ACCESS_TYPE_INTERNAL_ALL = 'internal-all';
-    CONST ACCESS_TYPE_INTERNAL_GROUPS = 'internal-groups';
-    
     CONST PROTOCOL_HTTP = 'http';
     CONST PROTOCOL_HTTPS = 'https';
     
@@ -104,15 +100,6 @@ class Api extends ApiBase
         );
     }
     
-    public static function getAccessTypes()
-    {
-        return array(
-            self::ACCESS_TYPE_PUBLIC => 'Publicly Available',
-            self::ACCESS_TYPE_INTERNAL_ALL => 'All Insite Users',
-            self::ACCESS_TYPE_INTERNAL_GROUPS => 'Insite Users of Specific Groups',
-        );
-    }
-    
     public static function getProtocols()
     {
         return array(
@@ -135,10 +122,8 @@ class Api extends ApiBase
      *     base class.
      */
     public function attributeLabels() {
-        $labels = parent::attributeLabels();
-        $newLabels = array_merge($labels, array(
+        return \CMap::mergeArray(parent::attributeLabels(), array(
             'access_options' => 'Groups',
-            'access_type' => 'Visibility',
             'queries_second' => 'Queries per Second',
             'queries_day' => 'Queries per Day',
             'protocol' => 'Endpoint Protocol',
@@ -146,8 +131,6 @@ class Api extends ApiBase
             'endpoint_timeout' => 'Endpoint Timeout',
             'support' => 'For Support',
         ));
-        
-        return $newLabels;
     }
     
     /**

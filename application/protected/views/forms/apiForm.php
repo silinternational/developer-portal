@@ -87,11 +87,11 @@ return array(
             ),
             'type' => 'text',
         ),
-        'access_type' => array(
+        'visibility' => array(
             'type' => 'dropdownlist',
             'data' => array_merge(
                 array('' => '-- Select one: --'),
-                Api::getAccessTypes()
+                Api::getVisibilityDescriptions()
             ),
         ),
         'access_options' => array(

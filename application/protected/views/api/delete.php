@@ -82,8 +82,8 @@ $this->pageTitle = 'Delete API';
                 ?>
             </dd>
 
-            <dt>Access Type</dt>
-            <dd><?php echo CHtml::encode($api->access_type); ?></dd>
+            <dt>Visibility</dt>
+            <dd><?php echo CHtml::encode($api->getVisibilityDescription()); ?></dd>
 
             <dt>Access Options</dt>
             <dd><?php echo (is_null($api->access_options) ? 
