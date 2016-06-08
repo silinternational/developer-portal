@@ -4,8 +4,9 @@ class ApiTest extends DeveloperPortalTestCase
 {
     public $fixtures = array(
         'apis' => 'Api',
-        'keyRequests' => 'KeyRequest',
         'keys' => 'Key',
+        'apiVisibilityDomains' => 'ApiVisibilityDomain',
+        'apiVisibilityUsers' => 'ApiVisibilityUser',
         'users' => 'User',
     );
     
