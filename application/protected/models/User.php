@@ -614,7 +614,7 @@ class User extends UserBase
                 'on' => 'update',
             ),
             array(
-                'created',
+                'created,updated',
                 'default',
                 'value' => new CDbExpression('NOW()'),
                 'setOnEmpty' => true,
