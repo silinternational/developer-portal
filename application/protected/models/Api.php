@@ -535,11 +535,13 @@ class Api extends ApiBase
     {
         parent::beforeDelete();
 
-        // first delete keys and key_requests
         Key::model()->deleteAllByAttributes(array(
             'api_id' => $this->api_id,
         ));
-        KeyRequest::model()->deleteAllByAttributes(array(
+        ApiVisibilityDomain::model()->deleteAllByAttributes(array(
+            'api_id' => $this->api_id,
+        ));
+        ApiVisibilityUser::model()->deleteAllByAttributes(array(
             'api_id' => $this->api_id,
         ));
         
