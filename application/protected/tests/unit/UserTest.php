@@ -861,11 +861,114 @@ class UserTest extends DeveloperPortalTestCase
             'No way found to retrieve Keys from a User instance');
     }
     
-    public function testHasActiveKeyToApi_no_noApiGiven()
+    public function testGetActiveKeyToApi_noApiGiven()
     {
         // Arrange:
         $api = null;
         $user = $this->users('userWithApprovedKeyRequest');
+        
+        // Act:
+        $result = $user->getActiveKeyToApi($api);
+        
+        // Assert:
+        $this->assertNull(
+            $result,
+            'Failed to return null when an invalid Api was given.'
+        );
+    }
+    
+    public function testGetActiveKeyToApi_approvedKeyRequest()
+    {
+        // Arrange:
+        $api = $this->apis('api2');
+        $user = $this->users('userWithApprovedKeyRequest');
+        
+        // Act:
+        $result = $user->getActiveKeyToApi($api);
+        
+        // Assert:
+        $this->assertNotNull(
+            $result,
+            'Failed to a User\'s active key to an Api.'
+        );
+    }
+    
+    public function testGetActiveKeyToApi_noKeyRequest()
+    {
+        // Arrange:
+        $api = $this->apis('api2');
+        $user = $this->users('userWithNoKeyRequests');
+        
+        // Act:
+        $result = $user->getActiveKeyToApi($api);
+        
+        // Assert:
+        $this->assertNull(
+            $result,
+            'Incorrectly indicated that a User has an active key to an Api '
+            . 'when they have neither a Key nor a KeyRequest.'
+        );
+    }
+    
+    public function testGetActiveKeyToApi_deniedKeyRequest()
+    {
+        // Arrange:
+        $api = $this->apis('api2');
+        $user = $this->users('userWithDeniedKeyRequest');
+        
+        // Act:
+        $result = $user->getActiveKeyToApi($api);
+        
+        // Assert:
+        $this->assertNull(
+            $result,
+            'Incorrectly indicated that a User has an active key to an Api '
+            . 'when they only have a denied KeyRequest.'
+        );
+    }
+    
+    public function testGetActiveKeyToApi_no_pendingKey()
+    {
+        // Arrange:
+        $api = $this->apis('api2');
+        $user = $this->users('userWithPendingKeyRequest');
+        
+        // Act:
+        $result = $user->getActiveKeyToApi($api);
+        
+        // Assert:
+        $this->assertNull(
+            $result,
+            'Incorrectly indicated that a User has an active key to an Api '
+            . 'when they only have a pending Key.'
+        );
+    }
+    
+    public function testGetActiveKeyToApi_revokedKey()
+    {
+        // Arrange:
+        $api = $this->apis('api2');
+        $user = $this->users('userWithRevokedKeyRequest');
+        
+        // Act:
+        $result = $user->getActiveKeyToApi($api);
+        
+        // Assert:
+        $this->assertNull(
+            $result,
+            'Incorrectly indicated that a User has an active key to an Api '
+            . 'when they only have a revoked Key.'
+        );
+    }
+    
+    public function testHasActiveKeyToApi_no()
+    {
+        // Arrange:
+        $api = new Api();
+        /* @var $user \User */
+        $user = \Phake::mock('\User');
+        \Phake::when($user)->hasActiveKeyToApi->thenCallParent();
+        \Phake::when($user)->getActiveKeyToApi->thenReturn(null);
         
         // Act:
         $result = $user->hasActiveKeyToApi($api);
@@ -873,15 +976,19 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertFalse(
             $result,
-            'Incorrectly reported that a User has an active key to a null Api.'
+            'Incorrectly indicated that a User DOES have a Key to an Api when no Key was found.'
         );
     }
     
-    public function testHasActiveKeyToApi_yes_approvedKeyRequest()
+    public function testHasActiveKeyToApi_yes()
     {
         // Arrange:
-        $api = $this->apis('api2');
-        $user = $this->users('userWithApprovedKeyRequest');
+        $api = new Api();
+        $key = new Key();
+        /* @var $user \User */
+        $user = \Phake::mock('\User');
+        \Phake::when($user)->hasActiveKeyToApi->thenCallParent();
+        \Phake::when($user)->getActiveKeyToApi->thenReturn($key);
         
         // Act:
         $result = $user->hasActiveKeyToApi($api);
@@ -889,75 +996,7 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertTrue(
             $result,
-            'Failed to indicate that a User has an active key to an Api.'
-        );
-    }
-    
-    public function testHasActiveKeyToApi_no_noKeyRequest()
-    {
-        // Arrange:
-        $api = $this->apis('api2');
-        $user = $this->users('userWithNoKeyRequests');
-        
-        // Act:
-        $result = $user->hasActiveKeyToApi($api);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly indicated that a User has an active key to an Api '
-            . 'when they have neither a Key nor a KeyRequest.'
-        );
-    }
-    
-    public function testHasActiveKeyToApi_no_deniedKeyRequest()
-    {
-        // Arrange:
-        $api = $this->apis('api2');
-        $user = $this->users('userWithDeniedKeyRequest');
-        
-        // Act:
-        $result = $user->hasActiveKeyToApi($api);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly indicated that a User has an active key to an Api '
-            . 'when they only have a denied KeyRequest.'
-        );
-    }
-    
-    public function testHasActiveKeyToApi_no_pendingKeyRequest()
-    {
-        // Arrange:
-        $api = $this->apis('api2');
-        $user = $this->users('userWithPendingKeyRequest');
-        
-        // Act:
-        $result = $user->hasActiveKeyToApi($api);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly indicated that a User has an active key to an Api '
-            . 'when they only have a pending KeyRequest.'
-        );
-    }
-    
-    public function testHasActiveKeyToApi_no_revokedKeyRequest()
-    {
-        // Arrange:
-        $api = $this->apis('api2');
-        $user = $this->users('userWithRevokedKeyRequest');
-        
-        // Act:
-        $result = $user->hasActiveKeyToApi($api);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly indicated that a User has an active key to an Api '
-            . 'when they only have a revoked KeyRequest.'
+            'Failed to indicated that a User has a Key to an Api when a Key was returned.'
         );
     }
     

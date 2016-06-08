@@ -414,6 +414,27 @@ class User extends UserBase
     }
     
     /**
+     * Retrieve the User's active (i.e. - approved, not revoked) Key to the
+     * given Api (if any such Key exists).
+     * 
+     * @param Api $api The Api in question.
+     * @return \Key|null The Key, or null if it doesn't exist.
+     */
+    public function getActiveKeyToApi($api)
+    {
+        // If not given an API, return null.
+        if ( ! ($api instanceof Api)) {
+            return null;
+        }
+        
+        return \Key::model()->findByAttributes(array(
+            'api_id' => $api->api_id,
+            'user_id' => $this->user_id,
+            'status' => \Key::STATUS_APPROVED,
+        ));
+    }
+    
+    /**
      * Find out whether the User has an active (i.e. - approved, not revoked)
      * Key to the given Api.
      * 
@@ -422,19 +443,7 @@ class User extends UserBase
      */
     public function hasActiveKeyToApi($api)
     {
-        // If not given an API, return false.
-        if ( ! ($api instanceof Api)) {
-            return false;
-        }
-        
-        // See if there's an active key for this user and API.
-        $result = \Key::model()->findByAttributes(array(
-            'api_id' => $api->api_id,
-            'user_id' => $this->user_id,
-        ));
-        
-        // Indicate whethere there was such a key.
-        return ($result !== null);
+        return ($this->getActiveKeyToApi($api) !== null);
     }
     
     /**
