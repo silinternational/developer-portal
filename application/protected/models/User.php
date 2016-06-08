@@ -484,6 +484,26 @@ class User extends UserBase
     }
     
     /**
+     * Retrieve the User's pending Key (if such a Key exists) for the given Api.
+     * 
+     * @param Api $api The Api in question.
+     * @return \Key|null The pending Key, or null if no such Key exists.
+     */
+    public function getPendingKeyForApi($api)
+    {
+        // If not given an API, return null.
+        if ( ! ($api instanceof Api)) {
+            return null;
+        }
+        
+        return \Key::model()->findByAttributes(array(
+            'api_id' => $api->api_id,
+            'user_id' => $this->user_id,
+            'status' => \Key::STATUS_PENDING,
+        ));
+    }
+    
+    /**
      * Find out whether the User has a pending Key for the given Api.
      * 
      * @param Api $api The Api in question.
@@ -491,20 +511,7 @@ class User extends UserBase
      */
     public function hasPendingKeyForApi($api)
     {
-        // If not given an API, return false.
-        if ( ! ($api instanceof Api)) {
-            return false;
-        }
-        
-        // See if there's a pending Key for this User and Api.
-        $pendingKey = \Key::model()->findByAttributes(array(
-            'api_id' => $api->api_id,
-            'user_id' => $this->user_id,
-            'status' => \Key::STATUS_PENDING,
-        ));
-        
-        // Indicate whethere there was such a pending key.
-        return ($pendingKey !== null);
+        return ($this->getPendingKeyForApi($api) !== null);
     }
     
     /**
