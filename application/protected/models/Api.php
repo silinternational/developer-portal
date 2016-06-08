@@ -473,16 +473,21 @@ class Api extends ApiBase
     public function relations()
     {
         return array_merge(parent::relations(), array(
-            'keyCount' => array(self::STAT, 'Key', 'api_id'),
-            'pendingKeyCount' => array(
+            'keyCount' => array(
                 self::STAT,
-                'KeyRequest',
+                'Key',
                 'api_id',
                 'condition' => 'status = :status',
-                'params' => array(':status' => \KeyRequest::STATUS_PENDING),
+                'params' => array(':status' => \Key::STATUS_APPROVED),
+            ),
+            'pendingKeyCount' => array(
+                self::STAT,
+                'Key',
+                'api_id',
+                'condition' => 'status = :status',
+                'params' => array(':status' => \Key::STATUS_PENDING),
             ),
         ));
-        
     }
     
     public function beforeSave()
