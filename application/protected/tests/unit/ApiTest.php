@@ -39,7 +39,24 @@ class ApiTest extends DeveloperPortalTestCase
             $api->delete();  
         }            
     }
-  
+    
+    public function testFixtureDataValidity()
+    {
+        foreach ($this->apis as $fixtureName => $fixtureData) {
+            /* @var $api \Api */
+            $api = $this->apis($fixtureName);
+            $api->delete();
+            $apiOnInsert = new \Api();
+            $apiOnInsert->attributes = $fixtureData;
+            $this->assertTrue($apiOnInsert->save(), sprintf(
+                'Api fixture "%s" (%s) does not have valid data: %s',
+                $fixtureName,
+                $apiOnInsert->display_name,
+                var_export($apiOnInsert->getErrors(), true)
+            ));
+        }
+    }
+    
     public function testConfirmApprovalTypesDiffer()
     {
         // Make sure the approval type constants differ (both in their values
