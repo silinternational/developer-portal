@@ -2,11 +2,6 @@
 
 class KeyRequest extends KeyRequestBase
 {
-    const STATUS_APPROVED = 'approved';
-    const STATUS_DENIED = 'denied';
-    const STATUS_PENDING = 'pending';
-    const STATUS_REVOKED = 'revoked';
-    
     public static function getValidStatusValues()
     {
         return array(
