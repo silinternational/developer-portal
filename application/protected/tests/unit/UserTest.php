@@ -1009,14 +1009,14 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testHasPendingKeyRequestForApi_no_noApiGiven()
+    public function testHasPendingKeyForApi_no_noApiGiven()
     {
         // Arrange:
         $api = null;
         $user = $this->users('userWithPendingKeyRequest');
         
         // Act:
-        $result = $user->hasPendingKeyRequestForApi($api);
+        $result = $user->hasPendingKeyForApi($api);
         
         // Assert:
         $this->assertFalse(
@@ -1026,14 +1026,14 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testHasPendingKeyRequestForApi_no_onlyHasApprovedKeyRequest()
+    public function testHasPendingKeyForApi_no_onlyHasApprovedKeyRequest()
     {
         // Arrange:
         $api = $this->apis('api2');
         $user = $this->users('userWithApprovedKeyRequest');
         
         // Act:
-        $result = $user->hasPendingKeyRequestForApi($api);
+        $result = $user->hasPendingKeyForApi($api);
         
         // Assert:
         $this->assertFalse(
@@ -1043,14 +1043,14 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testHasPendingKeyRequestForApi_no_noKeyRequest()
+    public function testHasPendingKeyForApi_no_noKeyRequest()
     {
         // Arrange:
         $api = $this->apis('api2');
         $user = $this->users('userWithNoKeyRequests');
         
         // Act:
-        $result = $user->hasPendingKeyRequestForApi($api);
+        $result = $user->hasPendingKeyForApi($api);
         
         // Assert:
         $this->assertFalse(
@@ -1060,14 +1060,14 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testHasPendingKeyRequestForApi_no_onlyHasDeniedKeyRequest()
+    public function testHasPendingKeyForApi_no_onlyHasDeniedKeyRequest()
     {
         // Arrange:
         $api = $this->apis('api2');
         $user = $this->users('userWithDeniedKeyRequest');
         
         // Act:
-        $result = $user->hasPendingKeyRequestForApi($api);
+        $result = $user->hasPendingKeyForApi($api);
         
         // Assert:
         $this->assertFalse(
@@ -1077,14 +1077,14 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testHasPendingKeyRequestForApi_yes_hasPendingKeyRequest()
+    public function testHasPendingKeyForApi_yes_hasPendingKeyRequest()
     {
         // Arrange:
         $api = $this->apis('api2');
         $user = $this->users('userWithPendingKeyRequest');
         
         // Act:
-        $result = $user->hasPendingKeyRequestForApi($api);
+        $result = $user->hasPendingKeyForApi($api);
         
         // Assert:
         $this->assertTrue(
@@ -1093,14 +1093,14 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testHasPendingKeyRequestForApi_no_onlyHasRevokedKeyRequest()
+    public function testHasPendingKeyForApi_no_onlyHasRevokedKeyRequest()
     {
         // Arrange:
         $api = $this->apis('api2');
         $user = $this->users('userWithRevokedKeyRequest');
         
         // Act:
-        $result = $user->hasPendingKeyRequestForApi($api);
+        $result = $user->hasPendingKeyForApi($api);
         
         // Assert:
         $this->assertFalse(
