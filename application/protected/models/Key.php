@@ -22,7 +22,7 @@ class Key extends KeyBase
                 'on' => 'update',
             ),
             array(
-                'created,updated',
+                'created,updated,requested_on',
                 'default',
                 'value' => new CDbExpression('NOW()'),
                 'setOnEmpty' => true,
