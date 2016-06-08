@@ -697,89 +697,64 @@ class ApiController extends Controller
         // If the user already has an active key to this API, show its details
         // instead.
         if ($user->hasActiveKeyToApi($api)) {
-            \Yii::app()->user->setFlash(
-                'info',
-                sprintf(
-                    '<strong>Note:</strong> You already have the following key '
-                    . 'to the %s API.',
-                    $api->display_name
-                )
-            );
-            $key = \Key::model()->findByAttributes(array(
-                'api_id' => $api->api_id,
-                'user_id' => $user->user_id,
+            \Yii::app()->user->setFlash('info', sprintf(
+                '<strong>Note:</strong> You already have the following key '
+                . 'to the %s API.',
+                $api->display_name
             ));
-            $this->redirect(array('/key/details/', 'id' => $key->key_id));
+            $activeKey = $user->getActiveKeyToApi($api);
+            $this->redirect(array('/key/details/', 'id' => $activeKey->key_id));
         }
 
-        // If the user already has a pending key request for this API, show its
-        // details instead.
-        if ($user->hasPendingKeyRequestForApi($api)) {
-            \Yii::app()->user->setFlash(
-                'info',
-                sprintf(
-                    '<strong>Note:</strong> You already have the following '
-                    . 'pending key request for the %s API.',
-                    $api->display_name
-                )
-            );
-            $keyRequest = \KeyRequest::model()->findByAttributes(array(
-                'api_id' => $api->api_id,
-                'user_id' => $user->user_id,
-                'status' => \KeyRequest::STATUS_PENDING,
+        // If the user already has a pending key for this API, show its details
+        // instead.
+        if ($user->hasPendingKeyForApi($api)) {
+            \Yii::app()->user->setFlash('info', sprintf(
+                '<strong>Note:</strong> You already have the following '
+                . 'pending key for the %s API.',
+                $api->display_name
             ));
+            $pendingKey = $user->getPendingKeyForApi($api);
             $this->redirect(array(
-                '/key-request/details/',
-                'id' => $keyRequest->key_request_id,
+                '/key/details/',
+                'id' => $pendingKey->key_id,
             ));
         }
-
-        // Create a new KeyRequest object.
-        $model = new KeyRequest;
+        
+        // Create a new (pending) Key object.
+        $key = new Key();
         
         // If the form has been submitted...
-        if (isset($_POST['KeyRequest'])) {
+        $request = \Yii::app()->getRequest();
+        if ($request->isPostRequest) {
             
-            // Record the submitted form data into the new KeyRequest object.
-            $model->attributes = $_POST['KeyRequest'];
+            /**
+             * @todo Refactor the following to something like...
+             *     $key = $user->requestKeyForApi($api, $domain, $purpose);
+             */
+
+            /* Retrieve ONLY the applicable pieces of data that we trust the
+             * user to provide when requesting a Key.  */
+            $key->domain = $request->getPost('domain');
+            $key->purpose = $request->getPost('purpose');
             
-            // Also record the extra data it needs.
-            $model->user_id = $user->user_id;
-            $model->api_id = $api->api_id;
-            $model->status = KeyRequest::STATUS_PENDING;
+            // Also record the extra data it needs (not submitted by the user).
+            $key->user_id = $user->user_id;
+            $key->api_id = $api->api_id;
+            $key->status = Key::STATUS_PENDING;
+            $key->queries_day = $api->queries_day;
+            $key->queries_second = $api->queries_second;
             
             // If the form submission was valid...
-            if ($model->validate()) {
+            if ($key->validate()) {
                 
                 // If this API is set to auto-approve key requests...
                 if ($api->approval_type == API::APPROVAL_TYPE_AUTO) {
                     
-                    // Record a few more details into the Key Request object.
-                    $model->status = KeyRequest::STATUS_APPROVED;
-                    $model->processed_by = $user->user_id;
-                    
-                    // Try to save this new Key Request to the database.
-                    if ( ! $model->save()) {
-                        throw new \Exception(
-                            sprintf(
-                                'Unable to create a key request. (Error: %s).',
-                                var_export($model->getErrors(), true)
-                            ),
-                            1418849904
-                        );
-                    }
-                    
-                    // Attempt to create the requested Key.
-                    $createResults = Key::createKey(
-                        $api->api_id,
-                        $user->user_id,
-                        $model->key_request_id
-                    );
-                    
-                    // If we FAILED to create the new Key...
-                    if ( ! $createResults[0]) {
+                    // Try to approve this pending (i.e. - requested) Key.
+                    if ( ! $key->approve($user)) {
                         
-                        // Record that in the log.
+                        // If not successful, record that in the log.
                         Yii::log(
                             'Key request auto-approval FAILED: User ID '
                             . $user->user_id . ', API ID ' . $api->api_id,
@@ -791,7 +766,7 @@ class ApiController extends Controller
                         Yii::app()->user->setFlash(
                             'error',
                             '<strong>Error!</strong> Unable to create key: '
-                            . '<br />' .  $createResults[1]
+                            . '<br />' .  print_r($key->getErrors(), true)
                         );
                     }
                     // Otherwise...
@@ -801,7 +776,7 @@ class ApiController extends Controller
                         Yii::log(
                             'Key request auto-approved: User ID '
                             . $user->user_id . ', API ID ' . $api->api_id
-                            . ', Key ID ' . $createResults[1]->key_id,
+                            . ', Key ID ' . $key->key_id,
                             CLogger::LEVEL_INFO,
                             __CLASS__ . '.' . __FUNCTION__
                         );
@@ -816,8 +791,8 @@ class ApiController extends Controller
                 // Otherwise (i.e. - this API is NOT set to auto-approve)...
                 else {
                     
-                    // Save the new Key Request to the database.
-                    $model->save();
+                    // Save the new pending Key to the database.
+                    $key->save();
 
                     // Record that in the log.
                     Yii::log(
@@ -849,7 +824,7 @@ class ApiController extends Controller
         // If we reach this point, show the Request Key page.
         $this->render('requestKey', array(
             'api' => $api,
-            'model' => $model,
+            'model' => $key,
         ));
     }
     
