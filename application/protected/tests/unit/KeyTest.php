@@ -295,6 +295,88 @@ class KeyTest extends DeveloperPortalTestCase
         $this->assertEquals($results[1], 'Bad key_id', 'Accepted bad key_id');
     }
     
+    public function testRecordDateWhenProcessed_processedByIsSet()
+    {
+        // Arrange:
+        $user = $this->users('user18');
+        /* @var $key \Key */
+        $key = $this->keys('pendingKeyForApiOwnedByUser18');
+        $key->processed_by = $user->user_id;
+        
+        // Pre-assert:
+        $this->assertNull(
+            $key->processed_on,
+            'This test requires a Key with a processed_on value of null.'
+        );
+        $this->assertNotNull(
+            $key->processed_by,
+            'Failed to set processed_by as part of the setup for this test.'
+        );
+        
+        // Act:
+        $key->recordDateWhenProcessed('processed_on', null);
+        
+        // Assert:
+        $this->assertNotNull(
+            $key->processed_on,
+            'Failed to set the processed_on value even though the processed_by value was set.'
+        );
+    }
+    
+    public function testRecordDateWhenProcessed_processedByNotSet()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('pendingKeyForApiOwnedByUser18');
+        
+        // Pre-assert:
+        $this->assertNull(
+            $key->processed_on,
+            'This test requires a Key with a processed_on value of null.'
+        );
+        $this->assertNull(
+            $key->processed_by,
+            'This test requires a Key with a processed_by value of null.'
+        );
+        
+        // Act:
+        $key->recordDateWhenProcessed('processed_on', null);
+        
+        // Assert:
+        $this->assertNull(
+            $key->processed_on,
+            'Incorrectly set the processed_on value even though the processed_by value was null.'
+        );
+    }
+    
+    public function testRecordDateWhenProcessed_processedOnNotChangedIfAlreadySet()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('keyToApiOwnedByUser18');
+        $originalProcessedOnValue = $key->processed_on;
+        
+        // Pre-assert:
+        $this->assertNotNull(
+            $key->processed_on,
+            'This test requires a Key with a non-null processed_on value.'
+        );
+        $this->assertNotNull(
+            $key->processed_by,
+            'This test requires a Key with a non-null processed_by value.'
+        );
+        
+        // Act:
+        $key->recordDateWhenProcessed('processed_on', null);
+        
+        // Assert:
+        $this->assertEquals(
+            $originalProcessedOnValue,
+            $key->processed_on,
+            'Incorrectly changed the processed_on value even though it was already set.'
+        );
+    }
+    
     public function testResetKey() 
     {
         // Get the Key we added through our fixture.

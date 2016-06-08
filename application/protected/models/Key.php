@@ -28,6 +28,7 @@ class Key extends KeyBase
                 'setOnEmpty' => true,
                 'on' => 'insert',
             ),
+            array('processed_on', 'recordDateWhenProcessed'),
         ), parent::rules());
     }
     
@@ -545,4 +546,19 @@ class Key extends KeyBase
         return parent::model($className);
     }
     
+    /**
+     * If the Key has a processed_by value but no processed_on value, use now
+     * as the processed_on value.
+     * 
+     * @param string $attribute The name of the attribute to be validated.
+     * @param array $params The options specified in the validation rule.
+     */
+    public function recordDateWhenProcessed($attribute, $params)
+    {
+        if ( ! empty($this->processed_by)) {
+            if (empty($this->processed_on)) {
+                $this->processed_on = new CDbExpression('NOW()');
+            }
+        }
+    }
 }
