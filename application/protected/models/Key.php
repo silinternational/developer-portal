@@ -6,18 +6,24 @@ use ApiAxle\Api\Keyring as AxleKeyring;
 
 class Key extends KeyBase
 {
-    public function rules() {
-        $rules = parent::rules();
-        $newRules = array_merge($rules, array(
-            array('updated', 'default',
+    public function rules()
+    {
+        return \CMap::mergeArray(array(
+            array(
+                'updated',
+                'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => false, 'on' => 'update'),
-            array('created,updated', 'default',
+                'setOnEmpty' => false,
+                'on' => 'update',
+            ),
+            array(
+                'created,updated',
+                'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => false, 'on' => 'insert')
-        ));
-        
-        return $newRules;
+                'setOnEmpty' => true,
+                'on' => 'insert',
+            ),
+        ), parent::rules());
     }
     
     public function beforeSave()

@@ -393,50 +393,81 @@ class Api extends ApiBase
         );
     }
     
-    public function rules() {
-        $rules = parent::rules();
-        $newRules = array_merge($rules, array(
+    public function rules()
+    {
+        return \CMap::mergeArray(array(
             array('code', 'unique'),
-            array('code', 'match',
+            array(
+                'code',
+                'match',
                 'allowEmpty' => false,
                 'pattern' => '/^([a-z0-9]{1}[a-z0-9\-]{1,}[a-z0-9]{1})$/',
-                'message' => 'The API code must only be (lowercase) letters ' .
-                'and numbers. It may contain hyphens, but not ' .
-                'at the beginning or end.'),
+                'message' => 'The API code must only be (lowercase) letters '
+                . 'and numbers. It may contain hyphens, but not at the '
+                . 'beginning or end.',
+            ),
             array('owner_id', 'validateOwnerId'),
-            array('endpoint', 'match',
+            array(
+                'endpoint',
+                'match',
                 'allowEmpty' => false,
                 'pattern' => self::REGEX_ENDPOINT,
                 'message' => 'Endpoint must be the domain only, no protocol or '
                 . 'path should be included. (ex: sub.domain.com)',
             ),
-            array('default_path', 'match',
+            array(
+                'default_path',
+                'match',
                 'allowEmpty' => true,
                 'pattern' => self::REGEX_PATH,
-                'message' => 'Default Path must begin with a / and should not include '
-                . 'any query string parameters. (ex: /example/path)',
+                'message' => 'Default Path must begin with a / and should not '
+                . 'include any query string parameters. (ex: /example/path)',
             ),
             array('endpoint', 'isUniqueEndpointDefaultPathCombo'),
-            array('updated', 'default',
+            array(
+                'updated',
+                'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => false, 'on' => 'update'),
-            array('created,updated', 'default',
+                'setOnEmpty' => false,
+                'on' => 'update',
+            ),
+            array(
+                'created,updated',
+                'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => true, 'on' => 'insert'),
+                'setOnEmpty' => true,
+                'on' => 'insert',
+            ),
             array('code', 'unsafe', 'on' => 'update'),
-            array('protocol', 'default',
+            array(
+                'protocol',
+                'default',
                 'value' => 'http',
-                'setOnEmpty' => true, 'on' => 'insert'),
-            array('strict_ssl', 'default',
+                'setOnEmpty' => true,
+                'on' => 'insert',
+            ),
+            array(
+                'strict_ssl',
+                'default',
                 'value' => 1,
-                'setOnEmpty' => true, 'on' => 'insert'),
-            array('endpoint_timeout', 'numerical',
-                'integerOnly' => true, 'min' => 2, 'max' => 900),
-            array('queries_second, queries_day', 'numerical',
-                'integerOnly' => true, 'min' => 1, 'max' => 1000000000),
-        ));
-
-        return $newRules;
+                'setOnEmpty' => true,
+                'on' => 'insert',
+            ),
+            array(
+                'endpoint_timeout',
+                'numerical',
+                'integerOnly' => true,
+                'min' => 2,
+                'max' => 900,
+            ),
+            array(
+                'queries_second, queries_day',
+                'numerical',
+                'integerOnly' => true,
+                'min' => 1,
+                'max' => 1000000000,
+            ),
+        ), parent::rules());
     }
     
     public function relations()

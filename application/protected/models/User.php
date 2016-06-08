@@ -604,7 +604,7 @@ class User extends UserBase
     
     public function rules()
     {
-        return array_merge(array(
+        return \CMap::mergeArray(array(
             array('email', 'email'),
             array(
                 'updated',

@@ -2,19 +2,25 @@
 
 class Faq extends FaqBase
 {
-    public function rules() {
-        $rules = parent::rules();
-        $newRules = array_merge($rules, array(
-            array('updated', 'default',
+    public function rules()
+    {
+        return \CMap::mergeArray(array(
+            array(
+                'updated',
+                'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => false, 'on' => 'update'),
-            array('created,updated', 'default',
+                'setOnEmpty' => false,
+                'on' => 'update',
+            ),
+            array(
+                'created,updated',
+                'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => true, 'on' => 'insert'),
+                'setOnEmpty' => true,
+                'on' => 'insert',
+            ),
             array('question, answer', 'safe', 'on' => 'search'),
-        ));
-        
-        return $newRules;
+        ), parent::rules());
     }
     
     /**
