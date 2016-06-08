@@ -627,12 +627,6 @@ class ApiTest extends DeveloperPortalTestCase
         );
     }
     
-	public function testHasKeyRequestsRelationship()
-    {
-        // Confirm that the relationship is set up between the classes.
-        $this->assertClassHasRelation(new Api(), 'keyRequests', 'KeyRequest');
-    }
-    
 	public function testHasKeysRelationship()
     {
         // Confirm that the relationship is set up between the classes.
