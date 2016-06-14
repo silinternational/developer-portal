@@ -26,6 +26,23 @@ class KeyTest extends DeveloperPortalTestCase
         parent::setUp();       
     }
     
+    public function testFixtureDataValidity()
+    {
+        foreach ($this->keys as $fixtureName => $fixtureData) {
+            /* @var $key \Key */
+            $key = $this->keys($fixtureName);
+            $key->delete();
+            $keyOnInsert = new \Key();
+            $keyOnInsert->attributes = $fixtureData;
+            $this->assertTrue($keyOnInsert->save(), sprintf(
+                'Key fixture "%s" (ID %s) does not have valid data: %s',
+                $fixtureName,
+                $keyOnInsert->key_id,
+                var_export($keyOnInsert->getErrors(), true)
+            ));
+        }
+    }
+    
     public function testApprove_alreadyApprovedKey()
     {
         // Arrange:
