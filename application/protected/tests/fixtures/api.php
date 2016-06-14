@@ -292,7 +292,7 @@ return array(
     ),
     'publicApiThatRequiresApproval' => array(
         'api_id'           => 19,
-        'code'             => 'public-api-that-requires-approval',
+        'code'             => 'public-that-requires-approval',
         'display_name'     => 'Public API that requires approval',
         'endpoint'         => 'local',
         'default_path'     => '/publicApiThatRequiresApproval',
@@ -309,7 +309,7 @@ return array(
     ),
     'publicApiThatAutoApprovesKeys' => array(
         'api_id'           => 20,
-        'code'             => 'public-api-that-auto-approves-keys',
+        'code'             => 'public-that-auto-approves-keys',
         'display_name'     => 'Public API that auto-approves keys',
         'endpoint'         => 'local',
         'default_path'     => '/publicApiThatAutoApprovesKeys',
