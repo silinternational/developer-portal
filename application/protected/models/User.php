@@ -12,6 +12,28 @@ class User extends UserBase
     protected $currentAccessGroups = null;
     
     /**
+     * Find out whether this User is allowed to approve the given (pending) Key.
+     * 
+     * @param \Key $key The (pending) Key to be approved.
+     * @return boolean
+     */
+    public function isAuthorizedToApproveKey($key)
+    {
+        // If no Key Request was given, say no.
+        if ( ! ($key instanceof \Key)) {
+            return false;
+        }
+        
+        // If the Key is for an API that belongs to this user, say yes.
+        if ($key->isToApiOwnedBy($this)) {
+            return true;
+        }
+        
+        // Otherwise, say no.
+        return false;
+    }
+    
+    /**
      * Find out whether this user is allowed to delete the given KeyRequest.
      * 
      * @param KeyRequest $keyRequest The KeyRequest in question.

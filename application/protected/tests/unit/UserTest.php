@@ -1197,6 +1197,59 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testIsAuthorizedToApproveKey_no()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('pendingKeyForApiOwnedByUser18');
+        /* @var $user \User */
+        $user = $this->users('userWithRoleOfOwner'); // NOT owner of Key's Api.
+        
+        // Act:
+        $result = $user->isAuthorizedToApproveKey($key);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a User is authorized to approve a Key to an Api that the User does NOT own.'
+        );
+    }
+    
+    public function testIsAuthorizedToApproveKey_noKeyGiven()
+    {
+        // Arrange:
+        $key = null;
+        /* @var $user \User */
+        $user = $this->users('userWithRoleOfOwner'); // NOT owner of Key's Api.
+        
+        // Act:
+        $result = $user->isAuthorizedToApproveKey($key);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a User is authorized to approve a null Key.'
+        );
+    }
+    
+    public function testIsAuthorizedToApproveKey_yes()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('pendingKeyForApiOwnedByUser18');
+        /* @var $user \User */
+        $user = $this->users('user18');
+        
+        // Act:
+        $result = $user->isAuthorizedToApproveKey($key);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to report that a User is authorized to approve a Key to an Api that the User owns.'
+        );
+    }
+    
     public function testIsDisabled_no()
     {
         // Arrange:
