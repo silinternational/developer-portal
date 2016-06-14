@@ -749,10 +749,10 @@ class ApiController extends Controller
             if ($key->validate()) {
                 
                 // If this API is set to auto-approve key requests...
-                if ($api->approval_type == API::APPROVAL_TYPE_AUTO) {
+                if ( ! $key->requiresApproval()) {
                     
                     // Try to approve this pending (i.e. - requested) Key.
-                    if ( ! $key->approve($user)) {
+                    if ( ! $key->approve()) {
                         
                         // If not successful, record that in the log.
                         Yii::log(
