@@ -699,7 +699,7 @@ class User extends UserBase
             //'keyCount' => array(self::STAT, 'Key', 'user_id'),
             
             'keys' => array(self::HAS_MANY, 'Key', 'user_id'),
-            'keysProcessed' => array(self::HAS_MANY, 'KeyRequest', 'processed_by'),
+            'keysProcessed' => array(self::HAS_MANY, 'Key', 'processed_by'),
         );
     }
     
