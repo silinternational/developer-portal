@@ -377,6 +377,32 @@ class KeyTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testRequiresApproval_no()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('pendingKeyToPublicApiThatRequiresApproval');
+        
+        // Act:
+        $result = $key->requiresApproval();
+        
+        // Assert:
+        $this->assertTrue($result);
+    }
+    
+    public function testRequiresApproval_yes()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('pendingKeyToPublicApiThatAutoApprovesKeys');
+        
+        // Act:
+        $result = $key->requiresApproval();
+        
+        // Assert:
+        $this->assertFalse($result);
+    }
+    
     public function testResetKey() 
     {
         // Get the Key we added through our fixture.

@@ -403,6 +403,11 @@ class Key extends KeyBase
         );
     }
     
+    public function requiresApproval()
+    {
+        return ($this->api->approval_type !== \Api::APPROVAL_TYPE_AUTO);
+    }
+    
     public static function resetKey($key_id) {
         /**
          * Updates a Key instance with a new value and secret.
