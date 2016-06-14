@@ -512,6 +512,48 @@ class UserTest extends DeveloperPortalTestCase
                 User::getStatuses());
     }
     
+    public function testGetDisplayName_isDefined()
+    {
+        // Arrange:
+        $user = $this->users('user1');
+        
+        // Pre-assert:
+        $this->assertNotEmpty(
+            $user->display_name,
+            'This test requires a user with a display_name defined.'
+        );
+        
+        // Act:
+        $result = $user->getDisplayName();
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $result,
+            'Failed to return a display name for a user with a display_name defined.'
+        );
+    }
+    
+    public function testGetDisplayName_isNotDefined()
+    {
+        // Arrange:
+        $user = $this->users('userWithNoKeyRequests');
+        
+        // Pre-assert:
+        $this->assertEmpty(
+            $user->display_name,
+            'This test requires a user with no display_name defined.'
+        );
+        
+        // Act:
+        $result = $user->getDisplayName();
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $result,
+            'Failed to assemble and return display name for a user with no display_name defined.'
+        );
+    }
+    
     public function testGetEmailAddressDomain()
     {
         // Arrange:

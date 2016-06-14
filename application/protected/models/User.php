@@ -200,6 +200,17 @@ class User extends UserBase
         return $this->currentAccessGroups ?: array();
     }
     
+    /**
+     * Get a display name for the User. If no explicit display name has been
+     * set, combine the first and last names and use that.
+     * 
+     * @return string A display name for this User
+     */
+    public function getDisplayName()
+    {
+        return ($this->display_name ?: $this->first_name . ' ' . $this->last_name);
+    }
+    
     public function getEmailAddressDomain()
     {
         list(, $domain) = explode('@', $this->email);
