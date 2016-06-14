@@ -132,6 +132,87 @@ class Key extends KeyBase
 //      }
     }
     
+    /**
+     * Attempt to approve a pending (i.e. - requested) Key, receiving back an
+     * indicator of whether it was successful.
+     * 
+     * @param \User $approvingUser The user to record as the one who approved
+     *     the request for this Key (for Keys to Apis that require approval).
+     *     Defaults to null (used for auto-approved Keys).
+     * @return boolean True if the Key was successfully approved. If not, check
+     *     the Key's list of errors to find out why.
+     * @throws \Exception
+     */
+    public function approve($approvingUser = null)
+    {
+        if ($this->status !== self::STATUS_PENDING) {
+            $this->addError('status', 'Only pending keys can be approved.');
+            return false;
+        }
+        
+        if ($this->requiresApproval()) {
+            if ( ! $approvingUser instanceof \User) {
+                // This should not happen in the normal flow of things... thus
+                // the exception.
+                throw new \Exception(
+                    'No User provided when trying to approve a Key that '
+                    . 'requires approval.',
+                    1465926569
+                );
+            } elseif ( ! $approvingUser->isAuthorizedToApproveKey($this)) {
+                $this->addError('processed_by', sprintf(
+                    'That user (%s) is not authorized to approve keys to that API.',
+                    $approvingUser->getDisplayName()
+                ));
+                return false;
+            }
+            
+            // At this point, we know the given $approvingUser is authorized
+            // to (and needs to) approve this Key.
+            $this->processed_by = $approvingUser->user_id;
+        }
+        $this->status = self::STATUS_APPROVED;
+        $this->value = \Utils::getRandStr(32);
+        $this->secret = \Utils::getRandStr(128);
+        
+        if ($this->save()) {
+            
+            // If we are in an environment where we should send email
+            // notifications...
+            if (\Yii::app()->params['smtp'] !== false) {
+            
+                // If possible, include the API owner as Cc: on the email.
+                $cc = array();
+                if ($this->api->owner && $this->api->owner->email) {
+                    $cc[] = $this->api->owner->email;
+                }
+                
+                // Send an email notification.
+                $mail = \Utils::getMailer();
+                $mail->setView('key-created');
+                $mail->setTo($this->user->email);
+                $mail->setCc($cc);
+                $mail->setSubject(sprintf(
+                    'API key created for %s API',
+                    $this->api->display_name
+                ));
+                if (isset(\Yii::app()->params['mail']['bcc'])) {
+                    $mail->setBcc(\Yii::app()->params['mail']['bcc']);
+                }
+                $mail->setData(array(
+                    'key' => $this,
+                    'api' => $this->api,
+                ));
+                $mail->send();
+            }
+            
+            // Indicate success.
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     public function beforeDelete()
     {
         parent::beforeDelete();

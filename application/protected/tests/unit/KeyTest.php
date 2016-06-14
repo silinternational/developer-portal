@@ -6,7 +6,6 @@ class KeyTest extends DeveloperPortalTestCase
         'apis'        => 'Api',
         'users'       => 'User',
         'keys'        => 'Key',
-        'keyRequests' => 'KeyRequest',
     );  
     
     public function deleteKeys()
@@ -25,7 +24,174 @@ class KeyTest extends DeveloperPortalTestCase
         }
         Yii::app()->user->id = 1;
         parent::setUp();       
-    }  
+    }
+    
+    public function testApprove_alreadyApprovedKey()
+    {
+        // Arrange:
+        $key = $this->keys('approvedKey');
+        $approvingUser = $key->api->owner;
+        
+        // Act:
+        $result = $key->approve($approvingUser);
+
+        // Assert:
+        $this->assertFalse($result, 'Incorrectly approved an already-approved key.');
+    }
+    
+    public function testApprove_deniedKey()
+    {
+        // Arrange:
+        $key = $this->keys('deniedKeyUser5');
+        $approvingUser = $key->api->owner;
+        
+        // Act:
+        $result = $key->approve($approvingUser);
+
+        // Assert:
+        $this->assertFalse($result, 'Failed to reject approval of a denied key.');
+    }
+    
+    public function testApprove_revokedKey()
+    {
+        // Arrange:
+        $key = $this->keys('revokedKeyUser7');
+        $approvingUser = $key->api->owner;
+        
+        // Act:
+        $result = $key->approve($approvingUser);
+
+        // Assert:
+        $this->assertFalse($result, 'Failed to reject approval of a revoked key.');
+    }
+    
+    public function testApprove_requiresApproval_noUserGiven()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('pendingKeyToPublicApiThatRequiresApproval');
+        $approvingUser = null;
+        
+        // Pre-assert:
+        $this->assertSame(
+            \Key::STATUS_PENDING,
+            $key->status,
+            'This test requires a pending key.'
+        );
+        $this->setExpectedException('\Exception', 'No User provided', 1465926569);
+        
+        // Act:
+        $key->approve($approvingUser);
+    }
+    
+    public function testApprove_requiresApproval_unauthorizedUser()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('pendingKeyToPublicApiThatRequiresApproval');
+        $approvingUser = $this->users('userThatDoesNotOwnAnyApis');
+        
+        // Pre-assert:
+        $this->assertSame(
+            \Key::STATUS_PENDING,
+            $key->status,
+            'This test requires a pending key.'
+        );
+        $this->assertNotSame(
+            $key->api->owner_id,
+            $approvingUser->user_id,
+            'This test requires the User that does NOT own the API that the Key is for.'
+        );
+        
+        // Act:
+        $result = $key->approve($approvingUser);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly allowed an unauthorized user (with role of owner) to approve a Key to an Api that requires '
+            . 'approval.'
+        );
+        $this->assertNotEmpty(
+            $key->errors,
+            'Failed to set error message when an unauthorized User tried to approve a Key.'
+        );
+        $key->refresh();
+        $this->assertNotSame(
+            \Key::STATUS_APPROVED,
+            $key->status,
+            'Incorrectly set the Key as approved.'
+        );
+    }
+    
+    public function testApprove_autoApproval()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('pendingKeyToPublicApiThatAutoApprovesKeys');
+        
+        // Pre-assert:
+        $this->assertSame(
+            \Key::STATUS_PENDING,
+            $key->status,
+            'This test requires a pending key.'
+        );
+        
+        // Act:
+        $result = $key->approve();
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to approve a Key to an Api that auto-approves Keys.'
+        );
+        $key->refresh();
+        $this->assertSame(
+            \Key::STATUS_APPROVED,
+            $key->status,
+            'Failed to set the Key as approved.'
+        );
+    }
+    
+    public function testApprove_requiresApproval_authorizedUser()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('pendingKeyToPublicApiThatRequiresApproval');
+        $approvingUser = $this->users('userWithRoleOfOwner');
+        
+        // Pre-assert:
+        $this->assertSame(
+            \Key::STATUS_PENDING,
+            $key->status,
+            'This test requires a pending key.'
+        );
+        $this->assertSame(
+            $key->api->owner_id,
+            $approvingUser->user_id,
+            'This test requires the User that owns the API that the Key is for.'
+        );
+        
+        // Act:
+        $result = $key->approve($approvingUser);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to allow the owner of an Api (which requires approval) to approve a Key for it.'
+        );
+        $key->refresh();
+        $this->assertSame(
+            \Key::STATUS_APPROVED,
+            $key->status,
+            'Failed to set the Key as approved.'
+        );
+        $this->assertSame(
+            $approvingUser->user_id,
+            $key->processed_by,
+            'Failed to record that the Key was processed by that approving User.'
+        );
+    }
     
     public function testCreateKeyBadApi() 
     {
