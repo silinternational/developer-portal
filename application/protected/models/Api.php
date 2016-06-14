@@ -538,7 +538,9 @@ class Api extends ApiBase
     
     public function beforeDelete()
     {
-        parent::beforeDelete();
+        if ( ! parent::beforeDelete()) {
+            return false;
+        }
 
         Key::model()->deleteAllByAttributes(array(
             'api_id' => $this->api_id,
