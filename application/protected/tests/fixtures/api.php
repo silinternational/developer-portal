@@ -15,7 +15,7 @@ return array(
         'created'         => '2016-06-07 15:08:12',
         'updated'         => '2016-06-07 15:08:12',
     ),
-    'api2'  => array(
+    'api2' => array(
         'api_id'          => 2,
         'code'            => 'owner',
         'display_name'    => 'Api that has to be approved by the owner',
@@ -26,6 +26,7 @@ return array(
         'approval_type'   => Api::APPROVAL_TYPE_OWNER,
         'protocol'        => Api::PROTOCOL_HTTP,
         'strict_ssl'      => Api::STRICT_SSL_FALSE,
+        'owner_id'        => 17,
         'visibility'      => Api::VISIBILITY_PUBLIC,
         'created'         => '2016-06-07 15:08:12',
         'updated'         => '2016-06-07 15:08:12',
