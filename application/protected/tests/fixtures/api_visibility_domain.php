@@ -5,7 +5,7 @@ return array(
         'api_id' => 17,
         'domain' => 'invited-domain.example.com',
         'invited_by_user_id' => 17,
-        'created' => 1465323520,
-        'updated' => 1465323520,
+        'created' => '2016-06-07 14:18:40',
+        'updated' => '2016-06-07 14:18:40',
     ),
 );
