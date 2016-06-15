@@ -12,9 +12,13 @@ class CostSchemeTest extends \CDbTestCase
         foreach ($this->costSchemes as $fixtureName => $fixtureData) {
             /* @var $costScheme \CostScheme */
             $costScheme = $this->costSchemes($fixtureName);
-            $costScheme->delete();
+            $this->assertTrue($costScheme->delete(), sprintf(
+                'Could not delete cost scheme fixture %s: %s',
+                $fixtureName,
+                print_r($costScheme->getErrors(), true)
+            ));
             $costSchemeOnInsert = new \CostScheme();
-            $costSchemeOnInsert->attributes = $fixtureData;
+            $costSchemeOnInsert->setAttributes($fixtureData, false);
             $this->assertTrue($costSchemeOnInsert->save(), sprintf(
                 'CostScheme fixture "%s" (ID %s) does not have valid data: %s',
                 $fixtureName,

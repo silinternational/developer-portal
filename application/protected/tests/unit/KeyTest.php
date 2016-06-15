@@ -31,9 +31,13 @@ class KeyTest extends DeveloperPortalTestCase
         foreach ($this->keys as $fixtureName => $fixtureData) {
             /* @var $key \Key */
             $key = $this->keys($fixtureName);
-            $key->delete();
+            $this->assertTrue($key->delete(), sprintf(
+                'Could not delete key fixture %s: %s',
+                $fixtureName,
+                print_r($key->getErrors(), true)
+            ));
             $keyOnInsert = new \Key();
-            $keyOnInsert->attributes = $fixtureData;
+            $keyOnInsert->setAttributes($fixtureData, false);
             $this->assertTrue($keyOnInsert->save(), sprintf(
                 'Key fixture "%s" (ID %s) does not have valid data: %s',
                 $fixtureName,

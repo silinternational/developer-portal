@@ -45,9 +45,13 @@ class ApiTest extends DeveloperPortalTestCase
         foreach ($this->apis as $fixtureName => $fixtureData) {
             /* @var $api \Api */
             $api = $this->apis($fixtureName);
-            $api->delete();
+            $this->assertTrue($api->delete(), sprintf(
+                'Could not delete api fixture %s: %s',
+                $fixtureName,
+                print_r($api->getErrors(), true)
+            ));
             $apiOnInsert = new \Api();
-            $apiOnInsert->attributes = $fixtureData;
+            $apiOnInsert->setAttributes($fixtureData, false);
             $this->assertTrue($apiOnInsert->save(), sprintf(
                 'Api fixture "%s" (%s) does not have valid data: %s',
                 $fixtureName,
