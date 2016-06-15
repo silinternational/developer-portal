@@ -603,51 +603,51 @@ class Key extends KeyBase
         
     }
     
-    public static function revokeKey($key_id)
+    /**
+     * Attempt to revoke a Key, receiving back an indicator of whether it was
+     * successful.
+     * 
+     * @param \User $revokingUser The User trying to revoke this Key.
+     * @return boolean True if the Key was successfully revoked. If not, check
+     *     the Key's list of errors to find out why.
+     * @throws \Exception
+     */
+    public function revoke($revokingUser)
     {
-        /**
-         * Revokes a Key instance.
-         * 
-         * Returns an array with two values ...
-         *  - a boolean as to whether the revokation worked
-         *  - the Key instance or a string as an error message
-         */
-        
-        $key = Key::model()->findByPk($key_id);  
-        if (is_null($key)) {
-            return array(false, 'Bad key_id');
-        }
-        
-        // Keep a reference to its KeyRequest (if any) and the old status of
-        // that (if applicable).
-        $keyRequest = $key->keyRequest;
-        $oldKeyRequestStatus = null;
-        
-        // If we have the key request for this key...
-        if ($keyRequest !== null) {
-
-            // Make a note of it's old status, then mark it as revoked and save
-            // that change.
-            $oldKeyRequestStatus = $keyRequest->status;
-            $keyRequest->status = \KeyRequest::STATUS_REVOKED;
-            if ( ! $keyRequest->save()) {
-                
-                // TODO: Log that we failed to save this change.
-                throw new Exception(
-                    'We did not delete the key as requested because we failed '
-                    . 'to mark key request as revoked: '
-                    . var_export($keyRequest->getErrors(), true)
-                );
-            }
+        if ( ! $revokingUser instanceof \User) {
+            // This should not happen in the normal flow of things... thus
+            // the exception.
+            throw new \Exception(
+                'No User provided when trying to revoke a Key.',
+                1466000163
+            );
+        } elseif ( ! $revokingUser->canRevokeKey($this)) {
+            $this->addError('processed_by', sprintf(
+                'That user (%s) is not authorized to revoke this key.',
+                $revokingUser->getDisplayName()
+            ));
+            return false;
         }
 
-        if ($key->delete()) {
+        if ($this->status !== self::STATUS_APPROVED) {
+            $this->addError('status', 'Only approved keys can be revoked.');
+            return false;
+        }
+        
+        $this->processed_by = $revokingUser->user_id;
+        $this->status = self::STATUS_REVOKED;
+        /* NOTE: Leave the key value intact (for identifying the revoked key,
+         *       both to ApiAxle and to the end user). Do get rid of the secret,
+         *       though.  */
+        $this->secret = null;
+        
+        if ($this->save()) {
             
             // If we are in an environment where we should send email
             // notifications...
-            if (Yii::app()->params['mail'] !== FALSE) {
+            if (\Yii::app()->params['smtp'] !== false) {
                 
-                // Send notification to owner of key that it was reset
+                // Send notification to owner of key that it was revoked.
                 $mail = Utils::getMailer();
                 $mail->setView('key-deleted');
                 $mail->setTo($key->user->email);
@@ -662,27 +662,36 @@ class Key extends KeyBase
                 $mail->send();
             }
             
+            // Indicate success.
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public static function revokeKey($key_id, $revokingUser)
+    {
+        /**
+         * Revokes a Key instance.
+         * 
+         * Returns an array with two values ...
+         *  - a boolean as to whether the revokation worked
+         *  - the Key instance or a string as an error message
+         */
+        /* @var $key \Key */
+        $key = Key::model()->findByPk($key_id);  
+        if (is_null($key)) {
+            return array(false, 'Bad key_id');
+        }
+        
+        if ($key->revoke($revokingUser)) {
+            
             return array(true, null);
+            
         } else {
             
-            // If we failed to delete it, restore the key request's previous
-            // status (if applicable and possible).
-            if (($keyRequest !== null) && ($oldKeyRequestStatus !== null)) {
-                $keyRequest->status = $oldKeyRequestStatus;
-                if ( ! $keyRequest->save()) {
-
-                    // TODO: Log that we failed to save this change.
-                    throw new Exception(
-                        'Failed to restore the previous status of the key '
-                        . 'request (back from revoked) when we were unable to '
-                        . 'delete this key.'
-                    );
-
-                }
-            }
-            
             // Return the error messages.
-            return array(false,print_r($key->getErrors(),true));
+            return array(false, print_r($key->getErrors(), true));
         }
     }
     

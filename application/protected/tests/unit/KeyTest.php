@@ -627,32 +627,210 @@ class KeyTest extends DeveloperPortalTestCase
                 'Key has wrong key_request_id');
     }
     
-    public function testRevokeKey_ensureRelatedKeyRequestStatusSetToRevoked()
+    public function testRevoke_ensureStatusSetToRevoked()
     {
         // Arrange:
+        /* @var $key \Key */
         $key = $this->keys('approvedKey');
-        $keyRequestId = $key->key_request_id;
-        $this->assertNotNull(
-            $keyRequestId,
-            'Given key (from fixture) does not specify a key_request_id, so '
-            . 'this test will not be able to run.'
+        
+        // Act:
+        $key->revoke($key->user);
+        
+        // Assert:
+        $key->refresh();
+        $this->assertEquals(
+            \Key::STATUS_REVOKED,
+            $key->status,
+            'Failed to set status of the key to revoked when revoking it.'
+        );
+    }
+    
+    public function testRevoke_alreadyRevokedKey()
+    {
+        // Arrange:
+        $key = $this->keys('revokedKeyUser7');
+        $revokingUser = $key->api->owner;
+        
+        // Act:
+        $result = $key->revoke($revokingUser);
+
+        // Assert:
+        $this->assertFalse($result, 'Incorrectly revoked an already-revoked key.');
+    }
+    
+    public function testRevoke_deniedKey()
+    {
+        // Arrange:
+        $key = $this->keys('deniedKeyUser5');
+        $revokingUser = $key->api->owner;
+        
+        // Act:
+        $result = $key->revoke($revokingUser);
+
+        // Assert:
+        $this->assertFalse($result, 'Failed to reject revocation of a denied key.');
+    }
+    
+    public function testRevoke_pendingKey()
+    {
+        // Arrange:
+        $key = $this->keys('pendingKeyUser6');
+        $revokingUser = $key->api->owner;
+        
+        // Act:
+        $result = $key->revoke($revokingUser);
+
+        // Assert:
+        $this->assertFalse($result, 'Failed to reject revocation of a pending key.');
+    }
+    
+    public function testRevoke_noUserGiven()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('approvedKey');
+        $revokingUser = null;
+        
+        // Pre-assert:
+        $this->assertSame(
+            \Key::STATUS_APPROVED,
+            $key->status,
+            'This test requires an approved key.'
+        );
+        $this->setExpectedException('\Exception', 'No User provided', 1466000163);
+        
+        // Act:
+        $key->revoke($revokingUser);
+    }
+    
+    public function testRevoke_unauthorizedUser()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('approvedKey');
+        $revokingUser = $this->users('ownerThatDoesNotOwnAnyApisOrKeys');
+        
+        // Pre-assert:
+        $this->assertSame(
+            \Key::STATUS_APPROVED,
+            $key->status,
+            'This test requires an approved key.'
+        );
+        $this->assertNotSame(
+            $key->api->owner_id,
+            $revokingUser->user_id,
+            'This test requires the User that does NOT own the API that the Key is for.'
+        );
+        $this->assertNotSame(
+            $key->user_id,
+            $revokingUser->user_id,
+            'This test requires the User that does NOT own the Key being revoked.'
         );
         
         // Act:
-        \Key::revokeKey($key->key_id);
-        $keyRequest = \KeyRequest::model()->findByPk($keyRequestId);
-        $this->assertNotNull(
-            $keyRequest,
-            'Failed to find the key request associated with the revoked key, '
-            . 'so this test cannot run.'
-        );
+        $result = $key->revoke($revokingUser);
         
         // Assert:
-        $this->assertEquals(
-            \KeyRequest::STATUS_REVOKED,
-            $keyRequest->status,
-            'Failed to set status of key request to revoked when revoking the '
-            . 'related key.'
+        $this->assertFalse(
+            $result,
+            'Incorrectly allowed an unauthorized user (with role of owner) to revoke a Key that they do not own to an '
+            . 'Api that they do not own.'
+        );
+        $this->assertNotEmpty(
+            $key->errors,
+            'Failed to set error message when an unauthorized User tried to revoke a Key.'
+        );
+        $key->refresh();
+        $this->assertNotSame(
+            \Key::STATUS_REVOKED,
+            $key->status,
+            'Incorrectly set the Key as revoked.'
+        );
+    }
+    
+    public function testRevoke_byKeyOwner()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('approvedKey');
+        $revokingUser = $key->user; // The owner of the Key.
+        
+        // Pre-assert:
+        $this->assertSame(
+            \Key::STATUS_APPROVED,
+            $key->status,
+            'This test requires an approved key.'
+        );
+        
+        // Act:
+        $result = $key->revoke($revokingUser);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to let a User revoke one of their own Keys.'
+        );
+        $key->refresh();
+        $this->assertSame(
+            \Key::STATUS_REVOKED,
+            $key->status,
+            'Failed to set the Key as revoked.'
+        );
+        $this->assertNotEmpty(
+            $key->value,
+            'Incorrectly removed the Key\'s value when revoking it.'
+        );
+        $this->assertEmpty(
+            $key->secret,
+            'Failed to remove the Key\'s secret when revoking it.'
+        );
+    }
+    
+    public function testRevoke_byApiOwner()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('approvedKey');
+        $revokingUser = $key->api->owner; // The owner of the Api.
+        
+        // Pre-assert:
+        $this->assertSame(
+            \Key::STATUS_APPROVED,
+            $key->status,
+            'This test requires an approved key.'
+        );
+        $this->assertSame(
+            $key->api->owner_id,
+            $revokingUser->user_id,
+            'This test requires the User that owns the API that the Key is for.'
+        );
+        
+        // Act:
+        $result = $key->revoke($revokingUser);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to allow the owner of an Api to revoke a Key for it.'
+        );
+        $key->refresh();
+        $this->assertSame(
+            \Key::STATUS_REVOKED,
+            $key->status,
+            'Failed to set the Key as revoked.'
+        );
+        $this->assertSame(
+            $revokingUser->user_id,
+            $key->processed_by,
+            'Failed to record that the Key was processed by that revoking User.'
+        );
+        $this->assertNotEmpty(
+            $key->value,
+            'Incorrectly removed the Key\'s value when revoking it.'
+        );
+        $this->assertEmpty(
+            $key->secret,
+            'Failed to remove the Key\'s secret when revoking it.'
         );
     }
 }
