@@ -11,6 +11,76 @@ class User extends UserBase
     
     protected $currentAccessGroups = null;
     
+    public function beforeDelete()
+    {
+        if ( ! parent::beforeDelete()) {
+            return false;
+        }
+        
+        $apiVisibilityDomainsGranted = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+            'invited_by_user_id' => $this->user_id,
+        ));
+        if (count($apiVisibilityDomainsGranted) > 0) {
+            $this->addError(
+                'user_id',
+                'We cannot delete this user because they are responsible for the ability for a domain to see an API.'
+            );
+            return false;
+        }
+        
+        $apiVisibilityUsersGranted = \ApiVisibilityUser::model()->findAllByAttributes(array(
+            'invited_by_user_id' => $this->user_id,
+        ));
+        if (count($apiVisibilityUsersGranted) > 0) {
+            $this->addError(
+                'user_id',
+                'We cannot delete this user because they are responsible for the ability for a user to see an API.'
+            );
+            return false;
+        }
+        
+        if (count($this->keysProcessed) > 0) {
+            $this->addError(
+                'user_id',
+                'We cannot delete this user because they are recorded as having processed at least one key.'
+            );
+            return false;
+        }
+        
+        if (count($this->events) > 0) {
+            $this->addError(
+                'user_id',
+                'We cannot delete this user because there are events in our log that reference this user.'
+            );
+            return false;
+        }
+        
+        foreach ($this->apis as $api) {
+            $api->owner_id = null;
+            if ( ! $api->save()) {
+                $this->addError('user_id', sprintf(
+                    'We cannot delete this user because we could not finish removing them as the owner of their APIs '
+                    . '(though we may done so for some of their APIs): %s',
+                    print_r($api->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        foreach ($this->keys as $key) {
+            if ( ! $key->delete()) {
+                $this->addError('user_id', sprintf(
+                    'We cannot delete this user because we could not finish deleting the user\'s keys (though we may '
+                    . 'have deleted some of them): %s',
+                    print_r($key->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
     /**
      * Find out whether this User is allowed to approve the given (pending) Key.
      * 

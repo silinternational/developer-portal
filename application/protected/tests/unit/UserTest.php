@@ -32,6 +32,23 @@ class UserTest extends DeveloperPortalTestCase
             'Failed to return the correct number of APIs for a user.'
         );
     }
+    
+    public function testBeforeDelete()
+    {
+        // Arrange:
+        /* @var $user \User */
+        $user = $this->users('userWithKeyToApiOwnedByUser18');
+        
+        // Act:
+        $result = $user->delete();
+        
+        // Assert:
+        $this->assertEmpty($user->getErrors());
+        $this->assertTrue(
+            $result,
+            'Failed to delete a user.'
+        );
+    }
 
     public function testCanDeleteKeyRequest_nullKeyRequest()
     {
