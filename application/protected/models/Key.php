@@ -275,15 +275,24 @@ class Key extends KeyBase
          *       that the key has been deleted from Axle at this point?
          */
         
-        if ($this->status === self::STATUS_APPROVED) {
-            $axleKey = new AxleKey(Yii::app()->params['apiaxle']);
-            try{
-                $axleKey->delete($this->value);
+        $axleKey = new AxleKey(Yii::app()->params['apiaxle']);
+        try{
+            $axleKey->delete($this->value);
+            return true;
+        } catch (\Exception $e) {
+
+            // If the key was not found, consider the deletion successful.
+            $notFoundMessage = sprintf(
+                'API returned error: Key \'%s\' not found.',
+                $this->value
+            );
+            if (($e->getCode() == 201) && ($notFoundMessage === $e->getMessage())) {
                 return true;
-            } catch (\Exception $e) {
-                $this->addError('value',$e->getMessage());
-                return false;
             }
+
+            // Otherwise, consider it not successful.
+            $this->addError('value',$e->getMessage());
+            return false;
         }
     }
     
