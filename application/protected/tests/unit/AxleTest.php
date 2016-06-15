@@ -12,8 +12,8 @@ class AxleTest extends DeveloperPortalTestCase
     protected $config;
     
     public $fixtures = array(
-        'users'       => 'User',
-        'keyRequests' => 'KeyRequest',
+        'users' => 'User',
+        'keys' => 'Key',
     );  
     
     public function setUp()
@@ -110,11 +110,13 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertTrue($inList,'Api was created locally but not found on ApiAxle');
     }
     
-    public function testAxleResetKey()
+    public function testAxleCreateAndResetKey()
     {
-        // Create a new Api.
-        $apiData = array(
-            'code' => 'test-' . str_replace(array(' ', '.'), '', microtime()),
+        // Arrange:
+        $user = $this->users('userWithRoleOfUser');
+        $api = new \Api();
+        $api->setAttributes(array(
+            'code' => 'test-' . str_replace('.', '', microtime(true)),
             'display_name' => __FUNCTION__,
             'endpoint' => 'localhost',
             'default_path' => '/path/' . __FUNCTION__,
@@ -125,43 +127,83 @@ class AxleTest extends DeveloperPortalTestCase
             'strict_ssl' => Api::STRICT_SSL_TRUE,
             'approval_type' => Api::APPROVAL_TYPE_AUTO,
             'endpoint_timeout' => 2,
+        ));
+        $this->assertTrue(
+            $api->save(),
+            'Failed to create API: ' . print_r($api->getErrors(), true)
         );
-        $api = new Api();
-        $api->setAttributes($apiData);
-        $result = $api->save();
-        $this->assertTrue($result,
-                'Failed to create API: ' . print_r($api->getErrors(), true));
+        $key = new \Key();
+        $key->setAttributes(array(
+            'user_id' => $user->user_id,
+            'api_id' => $api->api_id,
+            'queries_second' => $api->queries_second,
+            'queries_day' => $api->queries_day,
+            'created' => 1465414526,
+            'updated' => 1465414526,
+            'requested_on' => 1465414526,
+            'status' => Key::STATUS_PENDING,
+            'purpose' => 'Unit testing',
+            'domain' => 'developer-portal.local',
+        ));
         
-        // Create a Key, using the IDs of the User and KeyRequest from our
-        // fixture data.
-        $key = Key::createKey($api->api_id, $this->users('user1')->user_id,
-                $this->keyRequests('keyRequest1')->key_request_id);
-        $this->assertTrue($key[0],
-                'Failed to create Key: ' . print_r($key[1], true));
+        // Act (create):
+        $approveKeyResult = $key->approve($user);
         
+        // Assert (create):
+        $this->assertTrue(
+            $approveKeyResult,
+            'Failed to create/approve Key: ' . print_r($key->getErrors(), true)
+        );
         $axleApi = new AxleApi($this->config, $api->code);
-        $apiKeys = $axleApi->getKeyList();
-        $hasKey = false;
-        foreach($apiKeys as $apiKey){
-            if($apiKey->getKey() == $key[1]->value){
-                $hasKey = true;
+        $axleApiKeysAfterCreate = $axleApi->getKeyList();
+        $hasKeyAfterCreate = false;
+        foreach ($axleApiKeysAfterCreate as $axleApiKey) {
+            if ($axleApiKey->getKey() == $key->value) {
+                $hasKeyAfterCreate = true;
                 break;
             }
         }
-        $this->assertTrue($hasKey,'New key is not linked to Api. Key errors (if any): '.print_r($key[1],true));
+        $this->assertTrue(
+            $hasKeyAfterCreate,
+            'New key is not linked to AxleApi. Key errors (if any): '
+            . print_r($key, true)
+        );
+        $initialKeyValue = $key->value;
+        $initialKeySecret = $key->secret;
         
-        $resetKey = Key::resetKey($key[1]->key_id);
-        $this->assertTrue($resetKey[0],'Unable to reset key: '.print_r($resetKey[1],true));
+        // Act (reset):
+        $resetKeyResult = \Key::resetKey($key->key_id);
         
-        $apiKeys = $axleApi->getKeyList();
-        $hasKey = false;
-        foreach($apiKeys as $apiKey){
-            if($apiKey->getKey() == $resetKey[1]->value){
-                $hasKey = true;
+        // Assert (reset):
+        $this->assertTrue(
+            $resetKeyResult[0],
+            'Unable to reset key: ' . print_r($resetKeyResult[1], true)
+        );
+        $axleApiKeysAfterReset = $axleApi->getKeyList();
+        $hasKeyAfterReset = false;
+        foreach ($axleApiKeysAfterReset as $axleApiKey) {
+            if ($axleApiKey->getKey() == $resetKeyResult[1]->value) {
+                $hasKeyAfterReset = true;
                 break;
             }
         }
-        $this->assertTrue($hasKey,'Reset key is not linked to Api. Key errors (if any): '.print_r($resetKey[1],true));
+        $this->assertTrue(
+            $hasKeyAfterReset,
+            'Reset key is not linked to AxleApi. Key errors (if any): '
+            . print_r($resetKeyResult[1], true)
+        );
+        $changedKeyValue = $resetKeyResult[1]->value;
+        $changedKeySecret = $resetKeyResult[1]->secret;
+        $this->assertNotEquals(
+            $initialKeyValue,
+            $changedKeyValue,
+            'Resetting the key did not change its value.'
+        );
+        $this->assertNotEquals(
+            $initialKeySecret,
+            $changedKeySecret,
+            'Resetting the key did not change its secret.'
+        );
     }
     
     public function testRevokeKey()
