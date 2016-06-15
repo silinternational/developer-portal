@@ -25,6 +25,7 @@
  * The followings are the available model relations:
  * @property Event[] $events
  * @property Api $api
+ * @property User $processedBy
  * @property User $user
  */
 class KeyBase extends CActiveRecord
@@ -68,6 +69,7 @@ class KeyBase extends CActiveRecord
 		return array(
 			'events' => array(self::HAS_MANY, 'Event', 'key_id'),
 			'api' => array(self::BELONGS_TO, 'Api', 'api_id'),
+			'processedBy' => array(self::BELONGS_TO, 'User', 'processed_by'),
 			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
 		);
 	}
