@@ -10,6 +10,72 @@ class UserTest extends DeveloperPortalTestCase
         'users' => 'User',
     );
     
+    public function setUp()
+    {
+        global $ENABLE_AXLE;
+        if (!isset($ENABLE_AXLE) || $ENABLE_AXLE == true) {
+            $ENABLE_AXLE = false;
+        }
+        parent::setUp();       
+    }
+    
+    public function testFixtureDataValidity()
+    {
+        foreach ($this->users as $fixtureName => $fixtureData) {
+            /* @var $user \User */
+            $user = $this->users($fixtureName);
+            $avdGrants = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+                'invited_by_user_id' => $user->user_id,
+            ));
+            foreach ($avdGrants as $avdGrant) {
+                $this->assertTrue($avdGrant->delete(), sprintf(
+                    'Could not delete ApiVisibilityDomain fixture: %s',
+                    print_r($avdGrant->getErrors(), true)
+                ));
+            }
+            $avuGrants = \ApiVisibilityUser::model()->findAllByAttributes(array(
+                'invited_by_user_id' => $user->user_id,
+            ));
+            foreach ($avuGrants as $avuGrant) {
+                $this->assertTrue($avuGrant->delete(), sprintf(
+                    'Could not delete ApiVisibilityUser fixture: %s',
+                    print_r($avuGrant->getErrors(), true)
+                ));
+            }
+            $keysProcessed = \Key::model()->findAllByAttributes(array(
+                'processed_by' => $user->user_id,
+            ));
+            foreach ($keysProcessed as $keyProcessed) {
+                $this->assertTrue($keyProcessed->delete(), sprintf(
+                    'Could not delete Key fixture: %s',
+                    print_r($keyProcessed->getErrors(), true)
+                ));
+            }
+            $events = \Event::model()->findAllByAttributes(array(
+                'user_id' => $user->user_id,
+            ));
+            foreach ($events as $event) {
+                $this->assertTrue($event->delete(), sprintf(
+                    'Could not delete Event fixture: %s',
+                    print_r($event->getErrors(), true)
+                ));
+            }
+            $this->assertTrue($user->delete(), sprintf(
+                'Could not delete user fixture %s: %s',
+                $fixtureName,
+                print_r($user->getErrors(), true)
+            ));
+            $userOnInsert = new \User();
+            $userOnInsert->setAttributes($fixtureData, false);
+            $this->assertTrue($userOnInsert->save(), sprintf(
+                'User fixture "%s" (ID %s) does not have valid data: %s',
+                $fixtureName,
+                $userOnInsert->user_id,
+                var_export($userOnInsert->getErrors(), true)
+            ));
+        }
+    }
+    
     public function testApis()
     {
         // Arrange:
