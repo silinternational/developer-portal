@@ -34,65 +34,49 @@ class Key extends KeyBase
     
     public function beforeSave()
     {
-        parent::beforeSave();
+        if ( ! parent::beforeSave()) {
+            return false;
+        }
         
         global $ENABLE_AXLE;
-        if(isset($ENABLE_AXLE) && !$ENABLE_AXLE){
+        if (isset($ENABLE_AXLE) && !$ENABLE_AXLE) {
             return true;
         }
         
-        $axleKey = new AxleKey(Yii::app()->params['apiaxle']);
-        $keyData = array(
-            'sharedSecret' => $this->secret,
-            'qpd' => (int)$this->queries_day,
-            'qps' => (int)$this->queries_second,
-        );
+        /* ***** ApiAxle-specific checks: ***** */
         
-        /**
-         * If Keyring does not already exist, we need to create it.
-         */
-        $user = User::model()->findByPk($this->user_id);
-        $keyringName = md5($user->email);
-        $axleKeyring = new AxleKeyring(Yii::app()->params['apiaxle']);
-        try {
-            $axleKeyring->get($keyringName);
-        } catch (\Exception $e) {
-            $axleKeyring->create($keyringName);
-        }
+        if ($this->status === \Key::STATUS_APPROVED) {
         
-        if($this->getIsNewRecord()){
+            $axleKey = new AxleKey(Yii::app()->params['apiaxle']);
+            $keyData = array(
+                'sharedSecret' => $this->secret,
+                'qpd' => (int)$this->queries_day,
+                'qps' => (int)$this->queries_second,
+            );
+
+            /**
+             * If Keyring does not already exist, we need to create it.
+             */
+            $user = User::model()->findByPk($this->user_id);
+
+            /**
+             * @todo Verify that a change to the User's email won't break anything
+             *       related to this.
+             */
+            $keyringName = md5($user->email);
+            $axleKeyring = new AxleKeyring(Yii::app()->params['apiaxle']);
             try {
-                /**
-                 * Create new Key in apiaxle
-                 */
-                $axleKey->create($this->value,$keyData);
-                /**
-                 * Link key to keyring
-                 */
-                $axleKeyring->linkKey($axleKey);
-                /**
-                 * Link key to Api
-                 */
-                $api = Api::model()->findByPk($this->api_id);
-                $axleApi = new AxleApi(Yii::app()->params['apiaxle'],$api->code);
-                $axleApi->linkKey($axleKey);
-                return true;
+                $axleKeyring->get($keyringName);
             } catch (\Exception $e) {
-                $this->addError('value',$e->getMessage());
-                return false;
+                $axleKeyring->create($keyringName);
             }
-        } else {
-            try{
-                /**
-                 * Get current key to check for key value change
-                 */
-                $current = Key::model()->findByPk($this->key_id);
-                if($current->value != $this->value){
-                    /*
-                     * Need to delete existing key and create new key
+
+            if ($this->getIsNewRecord()) {
+                try {
+                    /**
+                     * Create new Key in apiaxle
                      */
-                    $axleKey->delete($current->value);
-                    $axleKey->create($this->value, $keyData);
+                    $axleKey->create($this->value,$keyData);
                     /**
                      * Link key to keyring
                      */
@@ -101,20 +85,82 @@ class Key extends KeyBase
                      * Link key to Api
                      */
                     $api = Api::model()->findByPk($this->api_id);
-                    $axleApi = new AxleApi(Yii::app()->params['apiaxle'], $api->code);
+                    $axleApi = new AxleApi(Yii::app()->params['apiaxle'],$api->code);
                     $axleApi->linkKey($axleKey);
-                } else {
-                    /**
-                    * Update Key in apiaxle
-                    */
-                    $axleKey->get($this->value);
-                    $axleKey->update($keyData);
+                    return true;
+                } catch (\Exception $e) {
+                    $this->addError('value',$e->getMessage());
+                    return false;
                 }
-                return true;
-            } catch (\Exception $e) {
-                $this->addError('value',$e->getMessage());
-                return false;
+            } else {
+                try{
+                    /**
+                     * Get current key to check for key value change
+                     */
+                    $current = Key::model()->findByPk($this->key_id);
+                    if($current->value != $this->value){
+                        /*
+                         * Need to delete existing key and create new key
+                         */
+                        $axleKey->delete($current->value);
+                        $axleKey->create($this->value, $keyData);
+                        /**
+                         * Link key to keyring
+                         */
+                        $axleKeyring->linkKey($axleKey);
+                        /**
+                         * Link key to Api
+                         */
+                        $api = Api::model()->findByPk($this->api_id);
+                        $axleApi = new AxleApi(Yii::app()->params['apiaxle'], $api->code);
+                        $axleApi->linkKey($axleKey);
+                    } else {
+                        /**
+                        * Update Key in apiaxle
+                        */
+                        $axleKey->get($this->value);
+                        $axleKey->update($keyData);
+                    }
+                    return true;
+                } catch (\Exception $e) {
+                    $this->addError('value',$e->getMessage());
+                    return false;
+                }
             }
+        } elseif ($this->status === \Key::STATUS_DENIED) {
+            
+            /**
+             * @todo Figure out what to do in ApiAxle when a Key in our database
+             *       is denied.
+             */
+            
+            // TEMP
+            return true;
+            
+        } elseif ($this->status === \Key::STATUS_PENDING) {
+            
+            /**
+             * @todo Figure out what to do in ApiAxle (if anything) when a Key
+             *       in our database is pending.
+             */
+            
+            // TEMP
+            return true;
+            
+        } elseif ($this->status === \Key::STATUS_REVOKED) {
+            
+            /**
+             * @todo Figure out how to delete the key from Axle when the Key
+             *       is revoked.
+             */
+            
+            // TEMP
+            return true;
+            
+        } else {
+            
+            $this->addError('status', 'Unknown status value.');
+            return false;
         }
     }
     
@@ -222,13 +268,22 @@ class Key extends KeyBase
             return true;
         }
         
-        $axleKey = new AxleKey(Yii::app()->params['apiaxle']);
-        try{
-            $axleKey->delete($this->value);
-            return true;
-        } catch (\Exception $e) {
-            $this->addError('value',$e->getMessage());
-            return false;
+        /**
+         * @todo We will probably only need to delete the key from Axle if it
+         *       it was an approved key. Make sure we're deleting keys from Axle
+         *       when denied/revoked. Should we also just go ahead and re-try/confirm
+         *       that the key has been deleted from Axle at this point?
+         */
+        
+        if ($this->status === self::STATUS_APPROVED) {
+            $axleKey = new AxleKey(Yii::app()->params['apiaxle']);
+            try{
+                $axleKey->delete($this->value);
+                return true;
+            } catch (\Exception $e) {
+                $this->addError('value',$e->getMessage());
+                return false;
+            }
         }
     }
     
