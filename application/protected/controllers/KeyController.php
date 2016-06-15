@@ -38,7 +38,7 @@ class KeyController extends Controller
         if (Yii::app()->request->isPostRequest) {
             
             // Revoke the key, paying attention to the results.
-            $revokeResults = Key::revokeKey($key->key_id);
+            $revokeResults = Key::revokeKey($key->key_id, $user);
             
             // If we were unable to delete that Key...
             if ( ! $revokeResults[0]) {
