@@ -104,8 +104,8 @@ return array(
     'userWith1stPKRForApiWithTwoPendingKeyRequests' => array(
         'user_id'       => 12,
         'email'         => 'userWith1stPKRForApiWithTwoPendingKeyRequests@jaars.net',
-        'first_name'    => 'With First Pending Key Request',
-        'last_name'     => 'For API With Two Pending Key Requests',
+        'first_name'    => 'With 1st Pending Key Request For',
+        'last_name'     => 'API With 2 Pending Key Requests',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Insite',
@@ -113,8 +113,8 @@ return array(
     'userWith2ndPKRForApiWithTwoPendingKeyRequests' => array(
         'user_id'       => 13,
         'email'         => 'userWith2ndPKRForApiWithTwoPendingKeyRequests@jaars.net',
-        'first_name'    => 'With Second Pending Key Request',
-        'last_name'     => 'For API With Two Pending Key Requests',
+        'first_name'    => 'With 2nd Pending Key Request For',
+        'last_name'     => 'API With 2 Pending Key Requests',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Insite',
@@ -235,7 +235,7 @@ return array(
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Google',
         'auth_provider_user_identifier' => null,
-        'verified_nonprofit' => false,
+        'verified_nonprofit' => 0,
     ),
     'userNotIndividuallyInvitedToSeeAnyApi' => array(
         'user_id'       => 27,
@@ -248,7 +248,7 @@ return array(
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Google',
         'auth_provider_user_identifier' => null,
-        'verified_nonprofit' => false,
+        'verified_nonprofit' => 0,
     ),
     'userWithEmailDomainNotInvitedToSeeAnyApi' => array(
         'user_id'       => 28,
@@ -261,7 +261,7 @@ return array(
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Google',
         'auth_provider_user_identifier' => null,
-        'verified_nonprofit' => false,
+        'verified_nonprofit' => 0,
     ),
     'userWithEmailDomainInvitedToSeeApi' => array(
         'user_id'       => 29,
@@ -274,7 +274,7 @@ return array(
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Google',
         'auth_provider_user_identifier' => null,
-        'verified_nonprofit' => false,
+        'verified_nonprofit' => 0,
     ),
     'userNotInvitedToSeeAnyApi' => array(
         'user_id'       => 30,
@@ -287,6 +287,6 @@ return array(
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Google',
         'auth_provider_user_identifier' => null,
-        'verified_nonprofit' => false,
+        'verified_nonprofit' => 0,
     ),
 );
