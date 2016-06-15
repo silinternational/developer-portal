@@ -134,8 +134,8 @@ class Key extends KeyBase
              *       is denied.
              */
             
-            // TEMP
-            return true;
+            // Make sure the key does not still exist in ApiAxle.
+            return $this->deleteFromApiAxle();
             
         } elseif ($this->status === \Key::STATUS_PENDING) {
             
@@ -154,8 +154,8 @@ class Key extends KeyBase
              *       is revoked.
              */
             
-            // TEMP
-            return true;
+            // Make sure the key does not still exist in ApiAxle.
+            return $this->deleteFromApiAxle();
             
         } else {
             
