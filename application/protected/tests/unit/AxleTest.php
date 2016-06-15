@@ -110,7 +110,7 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertTrue($inList,'Api was created locally but not found on ApiAxle');
     }
     
-    public function testAxleCreateAndResetKey()
+    public function testAxleCreateResetAndRevokeKey()
     {
         // Arrange:
         $user = $this->users('userWithRoleOfUser');
@@ -204,56 +204,29 @@ class AxleTest extends DeveloperPortalTestCase
             $changedKeySecret,
             'Resetting the key did not change its secret.'
         );
-    }
-    
-    public function testRevokeKey()
-    {
-        $apiData = array(
-            'code' => 'test-' . str_replace(array(' ', '.'), '', microtime()),
-            'display_name' => __FUNCTION__,
-            'endpoint' => 'localhost',
-            'default_path' => '/path/' . __FUNCTION__,
-            'queries_second' => 3,
-            'queries_day' => 1000,
-            'visibility' => Api::VISIBILITY_PUBLIC,
-            'protocol' => Api::PROTOCOL_HTTP,
-            'strict_ssl' => Api::STRICT_SSL_TRUE,
-            'approval_type' => Api::APPROVAL_TYPE_AUTO,
-            'endpoint_timeout' => 2,
+        
+        // Act (revoke):
+        $revokeKeyResult = \Key::revokeKey($key->key_id, $user);
+        
+        // Assert (revoke):
+        $key->refresh();
+        $this->assertTrue(
+            $revokeKeyResult[0],
+            'Unable to revoke key: ' . print_r($revokeKeyResult[1], true)
         );
-        $api = new Api();
-        $api->setAttributes($apiData);
-        $result = $api->save();
-        $this->assertTrue($result,
-                'Failed to create API: ' . print_r($api->getErrors(), true));
-        
-        $key = Key::createKey($api->api_id, 1, 1);
-        $this->assertTrue($key[0],'Failed to create Key: '.print_r($key[1],true));
-        
-        $axleApi = new AxleApi($this->config, $api->code);
-        $apiKeys = $axleApi->getKeyList();
-        $hasKey = false;
-        foreach($apiKeys as $apiKey){
-            if($apiKey->getKey() == $key[1]->value){
-                $hasKey = true;
+        $axleApiKeysAfterRevoke = $axleApi->getKeyList();
+        $hasKeyAfterRevoke = false;
+        foreach ($axleApiKeysAfterRevoke as $axleApiKey) {
+            if ($axleApiKey->getKey() == $key->value) {
+                $hasKeyAfterRevoke = true;
                 break;
             }
         }
-        $this->assertTrue($hasKey,'New key is not linked to Api. Key errors (if any): '.print_r($key[1],true));
-        
-        $revokeKey = Key::revokeKey($key[1]->key_id);
-        $this->assertTrue($revokeKey[0],'Failed to revoke key: '.print_r($revokeKey[1]));
-        
-        $apiKeys = $axleApi->getKeyList();
-        $hasKey = false;
-        foreach($apiKeys as $apiKey){
-            if($apiKey->getKey() == $key[1]->value){
-                $hasKey = true;
-                break;
-            }
-        }
-        $this->assertFalse($hasKey,'New key was not deleted from Api. Key errors (if any): '.print_r($revokeKey[1],true));
-        
+        $this->assertFalse(
+            $hasKeyAfterRevoke,
+            'Revoked key was not deleted from AxleApi. Key errors (if any): '
+            . print_r($revokeKeyResult[1], true)
+        );
     }
     
     public function testDeleteApi()
