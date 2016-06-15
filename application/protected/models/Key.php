@@ -275,8 +275,20 @@ class Key extends KeyBase
          *       that the key has been deleted from Axle at this point?
          */
         
-        $axleKey = new AxleKey(Yii::app()->params['apiaxle']);
+        return $this->deleteFromApiAxle();
+    }
+    
+    /**
+     * Try to delete this key from ApiAxle, returning an indicator of whether we
+     * were successful.
+     * 
+     * @return boolean Whether it was successfully removed from ApiAxle. If not,
+     *     check the key's errors.
+     */
+    protected function deleteFromApiAxle()
+    {
         try{
+            $axleKey = new AxleKey(\Yii::app()->params['apiaxle']);
             $axleKey->delete($this->value);
             return true;
         } catch (\Exception $e) {
@@ -291,7 +303,7 @@ class Key extends KeyBase
             }
 
             // Otherwise, consider it not successful.
-            $this->addError('value',$e->getMessage());
+            $this->addError('value', $e->getMessage());
             return false;
         }
     }
