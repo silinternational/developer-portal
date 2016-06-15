@@ -29,6 +29,7 @@ class Key extends KeyBase
                 'on' => 'insert',
             ),
             array('processed_on', 'recordDateWhenProcessed'),
+            array('api_id', 'onlyAllowOneKeyPerApi', 'on' => 'insert'),
         ), parent::rules());
     }
     
@@ -263,6 +264,8 @@ class Key extends KeyBase
     {
         parent::beforeDelete();
         
+        $this->sendKeyDeletionNotification();
+        
         global $ENABLE_AXLE;
         if(isset($ENABLE_AXLE) && !$ENABLE_AXLE){
             return true;
@@ -276,6 +279,44 @@ class Key extends KeyBase
          */
         
         return $this->deleteFromApiAxle();
+    }
+    
+    public function getStyledStatusHtml()
+    {
+        $cssClass = null;
+        $cssStyle = null;
+        switch ($this->status) {
+            case self::STATUS_APPROVED:
+                $displayText = ucfirst($this->status);
+                break;
+
+            case self::STATUS_DENIED:
+                $cssClass = 'text-error';
+                $displayText = ucfirst($this->status);
+                break;
+
+            case self::STATUS_PENDING:
+                $cssStyle = 'font-style: italic;';
+                $displayText = ucfirst($this->status);
+                break;
+
+            case self::STATUS_REVOKED:
+                $cssClass = 'text-error';
+                $cssStyle = 'font-weight: bold;';
+                $displayText = ucfirst($this->status);
+                break;
+
+            default:
+                $displayText = 'UNKNOWN STATUS: ' . $this->status;
+                break;
+        }
+        
+        return sprintf(
+            '<span%s%s>%s</span>',
+            ($cssClass ? ' class="' . $cssClass . '"' : ''),
+            ($cssStyle ? ' style="' . $cssStyle . '"' : ''),
+            CHtml::encode($displayText)
+        );
     }
     
     /**
@@ -374,6 +415,16 @@ class Key extends KeyBase
         return $usage;
     }
     
+    public static function getValidStatusValues()
+    {
+        return array(
+            self::STATUS_APPROVED,
+            self::STATUS_DENIED,
+            self::STATUS_PENDING,
+            self::STATUS_REVOKED,
+        );
+    }
+           
     /**
      * Indicate whether this Key belongs to the given User. Note that this is a
      * User model, not a Yii CWebUser. If no user is given, then false is
@@ -454,6 +505,166 @@ class Key extends KeyBase
             . 'of ' . var_export($user->role, true) . '.',
             1420733488
         );
+    }
+    
+    /**
+     * Try to send a notification email to the Owner of the Api that this
+     * (pending) Key is for. If no owner email address is available, send it to
+     * the admins.
+     * 
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function notifyApiOwnerOfPendingRequest(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params;
+        }
+        
+        // If we are in an environment where we should send email
+        // notifications...
+        if ($appParams['mail'] !== false) {
+            
+            // Figure out what email address to send the notification to.
+            $sendToEmail = null;
+            if ($this->api->owner && $this->api->owner->email) {
+                
+                // If the API has an owner and we know their email address, use
+                // that.
+                $sendToEmail = $this->api->owner->email;
+                
+            } elseif (isset(\Yii::app()->params['adminEmail'])) {
+                
+                // Otherwise, try to notify the admins.
+                $sendToEmail = \Yii::app()->params['adminEmail'];
+            }
+
+            // If we have an email address to send the notification to...
+            if ($sendToEmail) {
+                
+                // Try to send a notification email.
+                if ($mailer === null) {
+                    $mailer = Utils::getMailer();
+                }
+                $mailer->setView('key-request');
+                $mailer->setTo($sendToEmail);
+                $mailer->setSubject(sprintf(
+                    'New key request for %s API',
+                    $this->api->display_name
+                ));
+                if (isset($appParams['mail']['bcc'])) {
+                    $mailer->setBcc($appParams['mail']['bcc']);
+                }
+                $mailer->setData(array(
+                    'owner' => $this->api->owner,
+                    'api' => $this->api,
+                    'key' => $this,
+                    'requestingUser' => $this->user,
+                ));
+
+                // If unable to send the email, allow the process to
+                // continue but communicate the email failure somehow.
+                if ( ! $mailer->send()) {
+                    \Yii::log(
+                        'Unable to send pending key approval request email: '
+                        . $mailer->ErrorInfo,
+                        CLogger::LEVEL_WARNING
+                    );
+                }
+            }
+        }
+    }
+    
+    /**
+     * Try to send a notification email to the User that requested a Key that
+     * the request was denied.
+     * 
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function notifyUserOfDeniedKey(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params;
+        }
+        
+        // If we are in an environment where we should send email
+        // notifications...
+        if ($appParams['mail'] !== false) {
+            
+            // If we can successfully retrieve the requesting-user's email
+            // address...
+            if ($this->user && $this->user->email) {
+
+                // Try to send them a notification email.
+                if ($mailer === null) {
+                    $mailer = Utils::getMailer();
+                }
+                $mailer->setView('key-request-denied');
+                $mailer->setTo($this->user->email);
+                $mailer->setSubject(sprintf(
+                    'Key request for %s API was denied',
+                    $this->api->display_name
+                ));
+                if (isset($appParams['mail']['bcc'])) {
+                    $mailer->setBcc($appParams['mail']['bcc']);
+                }
+                $mailer->setData(array(
+                    'key' => $this,
+                ));
+
+                // If unable to send the email, allow the process to
+                // continue but communicate the email failure somehow.
+                if ( ! $mailer->send()) {
+                    \Yii::log(
+                        'Unable to send key-request-denied notification email '
+                        . 'to user: ' . $mailer->ErrorInfo,
+                        CLogger::LEVEL_WARNING
+                    );
+                }
+            }
+        }
+    }
+    
+    /**
+     * Prevent requests for new Keys that are for an Api that the requesting
+     * User already has either an active key or a pending key to.
+     * 
+     * @param string $attribute The name of the attribute to be validated.
+     */
+    public function onlyAllowOneKeyPerApi($attribute)
+    {
+        if ($this->user->hasActiveKeyToApi($this->api)) {
+            
+            // Prevent the user from requesting another key to an API that they
+            // already have an ACTIVE key for.
+            $this->addError(
+                $attribute,
+                'You already have an active key to that API.'
+            );
+        } elseif ($this->user->hasPendingKeyForApi($this->api)) {
+
+            // Prevent the user from requesting another key to an API that they
+            // already have a PENDING key request for.
+            $this->addError(
+                $attribute,
+                'You already have a pending key request for that API.'
+            );
+        }
     }
     
     public function requiresApproval()
@@ -550,25 +761,7 @@ class Key extends KeyBase
         $this->secret = null;
         
         if ($this->save()) {
-            
-            // If we are in an environment where we should send email
-            // notifications...
-            if (\Yii::app()->params['smtp'] !== false) {
-                
-                // Send notification to owner of key that it was revoked.
-                $mail = Utils::getMailer();
-                $mail->setView('key-deleted');
-                $mail->setTo($key->user->email);
-                $mail->setSubject('API key deleted for '.$key->api->display_name.' API');
-                if (isset(Yii::app()->params['mail']['bcc'])) {
-                    $mail->setBcc(Yii::app()->params['mail']['bcc']);
-                }
-                $mail->setData(array(
-                    'key' => $key,
-                    'api' => $key->api,
-                ));
-                $mail->send();
-            }
+            $this->sendKeyDeletionNotification();
             
             // Indicate success.
             return true;
@@ -626,6 +819,136 @@ class Key extends KeyBase
             if (empty($this->processed_on)) {
                 $this->processed_on = new CDbExpression('NOW()');
             }
+        }
+    }
+    
+    /**
+     * Try to send a notification email to the Owner of the Api that this
+     * pending Key is for. If no owner email address is available, send it to
+     * the admins.
+     * 
+     * @param YiiMailer $mailer See sendKeyDeletionNotification for details.
+     * @param array $appParams See sendKeyDeletionNotification for details.
+     */
+    protected function sendPendingKeyDeletionNotification(
+        YiiMailer $mailer,
+        array $appParams
+    ) {
+        // Figure out what email address to send the notification to.
+        $sendToEmail = null;
+        if ($this->api->owner && $this->api->owner->email) {
+            $sendToEmail = $this->api->owner->email;
+        } elseif (isset($appParams['adminEmail'])) {
+            $sendToEmail = $appParams['adminEmail'];
+        }
+        
+        if (empty($sendToEmail)) {
+            return;
+        }
+        
+        // Try to send a notification email.
+        $mailer->setView('key-request-deleted');
+        $mailer->setTo($sendToEmail);
+        $mailer->setSubject(sprintf(
+            'Key request (for %s API) deleted',
+            $this->api->display_name
+        ));
+        if (isset($appParams['mail']['bcc'])) {
+            $mailer->setBcc($appParams['mail']['bcc']);
+        }
+        $mailer->setData(array(
+            'owner' => $this->api->owner,
+            'api' => $this->api,
+            'keyRequest' => $this,
+            'requestingUser' => $this->user,
+        ));
+
+        // If unable to send the email, allow the process to
+        // continue but communicate the email failure somehow.
+        if ( ! $mailer->send()) {
+            \Yii::log(
+                'Unable to send key request deletion email: '
+                . $mailer->ErrorInfo,
+                CLogger::LEVEL_WARNING
+            );
+        }
+    }
+    
+    /**
+     * Try to notify the owner of this key that it has been deleted.
+     * 
+     * @param YiiMailer $mailer See sendKeyDeletionNotification for details.
+     * @param array $appParams See sendKeyDeletionNotification for details.
+     */
+    protected function sendNonPendingKeyDeletionNotification(
+        YiiMailer $mailer,
+        array $appParams
+    ) {
+        if ($this->user && $this->user->email) {
+
+            // Send notification to owner of key that it was revoked.
+            $mailer->setView('key-deleted');
+            $mailer->setTo($this->user->email);
+            $mailer->setSubject(sprintf(
+                'API key deleted for %s API',
+                $this->api->display_name
+            ));
+            if (isset($appParams['mail']['bcc'])) {
+                $mailer->setBcc($appParams['mail']['bcc']);
+            }
+            $mailer->setData(array(
+                'key' => $this,
+                'api' => $this->api,
+            ));
+            
+            // If unable to send the email, allow the process to
+            // continue but communicate the email failure somehow.
+            if ( ! $mailer->send()) {
+                \Yii::log(
+                    'Unable to send key deletion email: '
+                    . $mailer->ErrorInfo,
+                    CLogger::LEVEL_WARNING
+                );
+            }
+        }
+    }
+    
+    /**
+     * Try to send a notification email to the appropriate person about this
+     * Key having been deleted.
+     * 
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function sendKeyDeletionNotification(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params;
+        }
+        
+        // If we are in an environment where we should NOT send email
+        // notifications, then don't.
+        if ($appParams['mail'] === false) {
+            return;
+        }
+        
+        if ($this->status === self::STATUS_PENDING) {
+            $this->sendPendingKeyDeletionNotification(
+                $mailer,
+                $appParams
+            );
+        } else {
+            $this->sendNonPendingKeyDeletionNotification(
+                $mailer,
+                $appParams
+            );
         }
     }
 }

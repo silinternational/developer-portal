@@ -1,7 +1,7 @@
 <?php
 /* @var $owner User */
 /* @var $api Api */
-/* @var $keyRequest KeyRequest */
+/* @var $key Key */
 /* @var $requestingUser User */
 ?>
 <p>
@@ -14,8 +14,8 @@
     echo sprintf(
         '<a href="%s" title="%s">Click here</a> to view and approve or reject '
         . 'this request.',
-        \Yii::app()->createAbsoluteUrl('/key-request/details/', array(
-            'id' => $keyRequest->key_request_id,
+        \Yii::app()->createAbsoluteUrl('/key/details/', array(
+            'id' => $key->key_id,
         )),
         'View key request'
     );

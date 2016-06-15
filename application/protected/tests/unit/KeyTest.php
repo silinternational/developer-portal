@@ -214,33 +214,137 @@ class KeyTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testCreateKeyBadApi() 
+    public function testConfirmStatusesDiffer()
     {
-        $this->deleteKeys();
-        $results = Key::createKey(999, 1, 1);
-        $this->assertFalse($results[0], 'Accepted bad request');
-        $this->assertStringStartsWith('No Api found with api_id ', $results[1],
-                'Unexpected error message');
+        // Make sure the status constants have different values. (There aren't
+        // any separate user-friendly versions of the constants to check).
+        $this->confirmConstantsDiffer('Key', 'STATUS_');
     }
     
-    public function testCreateKeyBadUser() 
-    {        
-        $this->deleteKeys();
-        $results = Key::createKey(1,999, 1);
-        $this->assertFalse($results[0], 'Accepted bad request');
-        $this->assertStringStartsWith('No User found with user_id ',
-                $results[1], 'Unexpected error message');
+    public function testGetStyledStatusHtml_approved()
+    {
+        // Arrange:
+        $key = new Key();
+        $key->status = \Key::STATUS_APPROVED;
+        
+        // Act:
+        $result = $key->getStyledStatusHtml();
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $result,
+            "Failed to return any content for an approved Key's status."
+        );
     }
     
-    public function testCreateKey() 
+    public function testGetStyledStatusHtml_denied()
     {
-        $this->deleteKeys();
-        $results = Key::createKey(1,1,1);
-        $this->assertTrue($results[0], 'Rejected good request with: '.!is_null($results[1]) && is_string($results[1]) ? $results[1] : 'error');
-        $this->assertEquals($results[1]->api_id, 1, 'Created with wrong api_id');
-        $this->assertEquals($results[1]->user_id, 1, 'Created with wrong user_id');
-        $this->assertEquals($results[1]->key_request_id, 1, 
-                    'Key has wrong key_request_id');
+        // Arrange:
+        $key = new Key();
+        $key->status = \Key::STATUS_DENIED;
+        
+        // Act:
+        $result = $key->getStyledStatusHtml();
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $result,
+            "Failed to return any content for a denied Key's status."
+        );
+    }
+    
+    public function testGetStyledStatusHtml_pending()
+    {
+        // Arrange:
+        $key = new Key();
+        $key->status = \Key::STATUS_PENDING;
+        
+        // Act:
+        $result = $key->getStyledStatusHtml();
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $result,
+            "Failed to return any content for a pending Key's status."
+        );
+    }
+    
+    public function testGetStyledStatusHtml_revoked()
+    {
+        // Arrange:
+        $key = new Key();
+        $key->status = \Key::STATUS_REVOKED;
+        
+        // Act:
+        $result = $key->getStyledStatusHtml();
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $result,
+            "Failed to return any content for a revoked Key's status."
+        );
+    }
+    
+    public function testGetStyledStatusHtml_unknown()
+    {
+        // Arrange:
+        $key = new Key();
+        $key->status = 'fake-status';
+        
+        // Act:
+        $result = $key->getStyledStatusHtml();
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $result,
+            'Failed to return any content for a Key with an unknown '
+            . 'status.'
+        );
+    }
+    
+    public function testGetStyledStatusHtml_resultDiffer()
+    {
+        // Arrange:
+        $key = new Key();
+        $results = array();
+        
+        // Act:
+        $key->status = \Key::STATUS_APPROVED;
+        $results[] = $key->getStyledStatusHtml();
+        $key->status = \Key::STATUS_DENIED;
+        $results[] = $key->getStyledStatusHtml();
+        $key->status = \Key::STATUS_PENDING;
+        $results[] = $key->getStyledStatusHtml();
+        $key->status = \Key::STATUS_REVOKED;
+        $results[] = $key->getStyledStatusHtml();
+        $key->status = 'fake-status';
+        $results[] = $key->getStyledStatusHtml();
+        
+        // Assert:
+        $this->assertTrue(
+            self::ArrayValuesAreUnique($results),
+            'Failed to return unique HTML for each type of Key status.'
+        );
+    }
+    
+    public function testGetValidStatusValues_isCompleteList()
+    {
+        // Arrange:
+        $allStatusConstantsByKey = self::getConstantsWithPrefix(
+            'Key',
+            'STATUS_'
+        );
+        $allStatusValues = array_values($allStatusConstantsByKey);
+        
+        // Act:
+        $actual = \Key::getValidStatusValues();
+        
+        // Assert:
+        $this->assertEquals(
+            $allStatusValues,
+            $actual,
+            'Failed to retrieve the correct list of valid status values.'
+        );
     }
     
 	public function testHasApiRelationship()
@@ -249,10 +353,10 @@ class KeyTest extends DeveloperPortalTestCase
         $this->assertClassHasRelation(new Key(), 'api', 'Api');
     }
     
-	public function testHasKeyRequestRelationship()
+	public function testHasProcessedByRelationship()
     {
         // Confirm that the relationship is set up between the classes.
-        $this->assertClassHasRelation(new Key(), 'keyRequest', 'KeyRequest');
+        $this->assertClassHasRelation(new Key(), 'processedBy', 'User');
     }
     
 	public function testHasUserRelationship()
@@ -331,7 +435,7 @@ class KeyTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $key = $this->keys('keyToApiOwnedByUser18');
-        $user = $this->users('userWithNoKeyRequests');
+        $user = $this->users('userWithNoPendingKeys');
         
         // Act:
         $result = $key->isOwnedBy($user);
@@ -411,7 +515,7 @@ class KeyTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $key = $this->keys('keyToApiOwnedByUser18');
-        $user = $this->users('userWithNoKeyRequests');
+        $user = $this->users('userWithNoPendingKeys');
         
         // Act:
         $result = $key->isVisibleToUser($user);
@@ -471,6 +575,206 @@ class KeyTest extends DeveloperPortalTestCase
         $this->assertFalse(
             $result,
             'Incorrectly reported that a key is visible to a null user.'
+        );
+    }
+    
+    public function testNotifyApiOwnerOfPendingRequest_sendIsCalled()
+    {
+        /**************************** Arrange: ********************************/
+        
+        $key = $this->keys('pendingKeyForApiOwnedByUser18');
+        $appParams = array(
+            'mail' => array(),
+        );
+        
+        // Create a mock for the YiiMailer class, only mocking the send()
+        // method.
+        $mockMailer = $this->getMock('YiiMailer', array('send'));
+
+        // Set up the expectation for the send() method to be called only once.
+        $mockMailer->expects($this->once())
+                   ->method('send');
+        
+        /****************************** Act: **********************************/
+        $key->notifyApiOwnerOfPendingRequest(
+            $mockMailer,
+            $appParams
+        );
+        
+        /***************************** Assert: ********************************/
+        
+        // NOTE: If the YiiMailer->send() method was not called, the test will
+        //       fail.
+    }
+    
+    public function testNotifyUserOfDeniedKey_sendIsCalled()
+    {
+        /**************************** Arrange: ********************************/
+        
+        $key = $this->keys('pendingKeyForApiOwnedByUser18');
+        $appParams = array(
+            'mail' => array(),
+        );
+        
+        // Create a mock for the YiiMailer class, only mocking the send()
+        // method.
+        $mockMailer = $this->getMock('YiiMailer', array('send'));
+
+        // Set up the expectation for the send() method to be called only once.
+        $mockMailer->expects($this->once())
+                   ->method('send');
+        
+        /****************************** Act: **********************************/
+        $key->notifyUserOfDeniedKey(
+            $mockMailer,
+            $appParams
+        );
+        
+        /***************************** Assert: ********************************/
+        
+        // NOTE: If the YiiMailer->send() method was not called, the test will
+        //       fail.
+    }
+    
+    public function testOnlyAllowOneKeyPerApi_hasActiveKey()
+    {
+        // Arrange:
+        /* @var $existingKey Key */
+        $existingKey = $this->keys('approvedKey');
+        $newKey = new Key();
+        $newKey->api_id = $existingKey->api_id;
+        $newKey->user_id = $existingKey->user_id;
+        $newKey->purpose = 'Unit testing';
+        $newKey->domain = 'local';
+        $newKey->queries_second = 10;
+        $newKey->queries_day = 10000;
+        $newKey->status = \Key::STATUS_PENDING;
+        
+        // Act:
+        $result = $newKey->validate();
+        
+        // Assert:
+        $this->assertNotEmpty($newKey->errors);
+        $this->assertFalse(
+            $result,
+            'Incorrectly allowed a new Key for an Api that the User '
+            . 'already has an active Key to.'
+        );
+    }
+    
+    public function testOnlyAllowOneKeyPerApi_hasPendingKey()
+    {
+        // Arrange:
+        /* @var $existingKey \Key */
+        $existingKey = $this->keys('pendingKeyUser6');
+        $newKey = new Key();
+        $newKey->api_id = $existingKey->api_id;
+        $newKey->user_id = $existingKey->user_id;
+        $newKey->purpose = 'Unit testing';
+        $newKey->domain = 'local';
+        $newKey->queries_second = 10;
+        $newKey->queries_day = 10000;
+        $newKey->status = \Key::STATUS_PENDING;
+        
+        // Act:
+        $result = $newKey->validate();
+        
+        // Assert:
+        $this->assertNotEmpty($newKey->errors);
+        $this->assertFalse(
+            $result,
+            'Incorrectly allowed a new Key for an Api that the User '
+            . 'already has a pending Key for.'
+        );
+    }
+    
+    public function testOnlyAllowOneKeyPerApi_hasDeniedKey()
+    {
+        // Arrange:
+        /* @var $existingKey \Key */
+        $existingKey = $this->keys('deniedKeyUser5');
+        $newKey = new Key();
+        $newKey->api_id = $existingKey->api_id;
+        $newKey->user_id = $existingKey->user_id;
+        $newKey->purpose = 'Unit testing';
+        $newKey->domain = 'local';
+        $newKey->queries_second = 10;
+        $newKey->queries_day = 10000;
+        $newKey->status = \Key::STATUS_PENDING;
+        
+        // Act:
+        $result = $newKey->validate();
+        
+        // Assert:
+        $this->assertEquals(
+            array(),
+            $newKey->errors,
+            'Unexpected errors: ' . print_r($newKey->errors, true)
+        );
+        $this->assertTrue(
+            $result,
+            'Failed to allow a new Key for an Api that the User only '
+            . 'has a denied Key for.'
+        );
+    }
+    
+    public function testOnlyAllowOneKeyPerApi_hasRevokedKey()
+    {
+        // Arrange:
+        /* @var $existingKey \Key */
+        $existingKey = $this->keys('revokedKeyUser7');
+        $newKey = new Key();
+        $newKey->api_id = $existingKey->api_id;
+        $newKey->user_id = $existingKey->user_id;
+        $newKey->purpose = 'Unit testing';
+        $newKey->domain = 'local';
+        $newKey->queries_second = 10;
+        $newKey->queries_day = 10000;
+        $newKey->status = \Key::STATUS_PENDING;
+        
+        // Act:
+        $result = $newKey->validate();
+        
+        // Assert:
+        $this->assertEquals(
+            array(),
+            $newKey->errors,
+            'Unexpected errors: ' . print_r($newKey->errors, true)
+        );
+        $this->assertTrue(
+            $result,
+            'Failed to allow a new Key for an Api that the User only '
+            . 'has a revoked Key for.'
+        );
+    }
+    
+    public function testOnlyAllowOneKeyPerApi_noKeyOrKey()
+    {
+        // Arrange:
+        $api = $this->apis('apiWithZeroKeys');
+        $user = $this->users('userWithNoPendingKeys');
+        $newKey = new Key();
+        $newKey->api_id = $api->api_id;
+        $newKey->user_id = $user->user_id;
+        $newKey->purpose = 'Unit testing';
+        $newKey->domain = 'local';
+        $newKey->queries_second = 10;
+        $newKey->queries_day = 10000;
+        $newKey->status = \Key::STATUS_PENDING;
+        
+        // Act:
+        $result = $newKey->validate();
+        
+        // Assert:
+        $this->assertEquals(
+            array(),
+            $newKey->errors,
+            'Unexpected errors: ' . print_r($newKey->errors, true)
+        );
+        $this->assertTrue(
+            $result,
+            'Failed to allow a new Key for an Api that the User has '
+            . 'neither any Key to nor any pending Key for.'
         );
     }
     
@@ -602,29 +906,59 @@ class KeyTest extends DeveloperPortalTestCase
         $this->assertTrue($results[0], 'Rejected good request');
         
         // Make sure the attributes of the key that SHOULD have changed DID.
-        $this->assertNotEquals($key->value, $results[1]->value,
-                'Key value failed to change when reset');
-        $this->assertNotEquals($key->secret, $results[1]->secret,
-                'Key secret failed to change when reset');
-        $this->assertNotEquals($key->updated, $results[1]->updated,
-                'Key updated datetime failed to change when reset');
-        
+        $this->assertNotEquals(
+            $key->value,
+            $results[1]->value,
+            'Key value failed to change when reset'
+        );
+        $this->assertNotEquals(
+            $key->secret,
+            $results[1]->secret,
+            'Key secret failed to change when reset'
+        );
+        $this->assertNotEquals(
+            $key->updated,
+            $results[1]->updated,
+            'Key updated datetime failed to change when reset'
+        );
+
         // Make sure the attributes of the key that should NOT have changed
         // DIDN'T change.
-        $this->assertEquals($key->key_id, $results[1]->key_id,
-                'Key has wrong key_id');
-        $this->assertEquals($key->user_id, $results[1]->user_id,
-                'Key has wrong user_id');
-        $this->assertEquals($key->api_id, $results[1]->api_id,
-                'Key has wrong api_id');
-        $this->assertEquals($key->queries_second, $results[1]->queries_second,
-                'Key has wrong queries_second');
-        $this->assertEquals($key->queries_day, $results[1]->queries_day,
-                'Key has wrong queries_day');
-        $this->assertEquals($key->created, $results[1]->created,
-                'Key has wrong created datetime');
-        $this->assertEquals($key->key_request_id, $results[1]->key_request_id,
-                'Key has wrong key_request_id');
+        $this->assertEquals(
+            $key->key_id,
+            $results[1]->key_id,
+            'Key has wrong key_id'
+        );
+        $this->assertEquals(
+            $key->user_id,
+            $results[1]->user_id,
+            'Key has wrong user_id'
+        );
+        $this->assertEquals(
+            $key->api_id,
+            $results[1]->api_id,
+            'Key has wrong api_id'
+        );
+        $this->assertEquals(
+            $key->queries_second,
+            $results[1]->queries_second,
+            'Key has wrong queries_second'
+        );
+        $this->assertEquals(
+            $key->queries_day,
+            $results[1]->queries_day,
+            'Key has wrong queries_day'
+        );
+        $this->assertEquals(
+            $key->created,
+            $results[1]->created,
+            'Key has wrong created datetime'
+        );
+        $this->assertEquals(
+            $key->key_id,
+            $results[1]->key_id,
+            'Key has wrong key_id'
+        );
     }
     
     public function testRevoke_ensureStatusSetToRevoked()
@@ -833,5 +1167,36 @@ class KeyTest extends DeveloperPortalTestCase
             'Failed to remove the Key\'s secret when revoking it.'
         );
     }
-}
+    
+    public function testSendKeyDeletionNotification_sendIsCalled()
+    {
+        /**************************** Arrange: ********************************/
+        
+        $key = $this->keys('deniedKeyUser5');
+        $appParams = array(
+            'mail' => array(),
+            'adminEmail' => 'email@domain.com',
+        );
+        
+        // Create a mock for the YiiMailer class, only mocking the send()
+        // method.
+        $mockMailer = $this->getMock('YiiMailer', array('send'));
 
+        // Set up the expectation for the send() method to be called only once.
+        $mockMailer->expects($this->once())
+                   ->method('send');
+        
+        /****************************** Act: **********************************/
+        $key->sendKeyDeletionNotification(
+            $mockMailer,
+            $appParams
+        );
+        
+        /***************************** Assert: ********************************/
+        
+        // NOTE: If the YiiMailer->send() method was not called, the test will
+        //       fail.
+    }
+    
+    // TODO: Set up more unit tests.
+}

@@ -619,7 +619,7 @@ class UserTest extends DeveloperPortalTestCase
     public function testGetDisplayName_isNotDefined()
     {
         // Arrange:
-        $user = $this->users('userWithNoKeyRequests');
+        $user = $this->users('userWithNoPendingKeys');
         
         // Pre-assert:
         $this->assertEmpty(
@@ -710,7 +710,7 @@ class UserTest extends DeveloperPortalTestCase
     public function testGetKeyRequestsWithApiNames_none()
     {
         // Arrange:
-        $user = $this->users('userWithNoKeyRequests');
+        $user = $this->users('userWithNoPendingKeys');
         
         // Act:
         $keyRequests = $user->getKeyRequestsWithApiNames();
@@ -1022,7 +1022,7 @@ class UserTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $api = $this->apis('api2');
-        $user = $this->users('userWithNoKeyRequests');
+        $user = $this->users('userWithNoPendingKeys');
         
         // Act:
         $result = $user->getActiveKeyToApi($api);
@@ -1211,7 +1211,7 @@ class UserTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $api = $this->apis('api2');
-        $user = $this->users('userWithNoKeyRequests');
+        $user = $this->users('userWithNoPendingKeys');
         
         // Act:
         $result = $user->hasPendingKeyForApi($api);

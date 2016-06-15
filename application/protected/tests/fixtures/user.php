@@ -20,11 +20,11 @@ return array(
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Insite',
     ),
-    'userWithNoKeyRequests' => array(
+    'userWithNoPendingKeys' => array(
         'user_id'       => 3,
-        'email'         => 'userWithNoKeyRequests@jaars.net',
+        'email'         => 'userWithNoPendingKeys@jaars.net',
         'first_name'    => 'With No',
-        'last_name'     => 'Key Requests',
+        'last_name'     => 'Pending Keys',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Insite',

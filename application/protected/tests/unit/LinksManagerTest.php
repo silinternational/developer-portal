@@ -382,7 +382,7 @@ class LinksManagerTest extends CDbTestCase
     {
         // Arrange:
         $keyRequest = $this->keyRequests('pendingKeyRequestUser6');
-        $user = $this->users('userWithNoKeyRequests');
+        $user = $this->users('userWithNoPendingKeys');
         $expectedLinkTexts = array();
         
         // Act:
