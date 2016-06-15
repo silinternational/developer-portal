@@ -116,46 +116,46 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
 
-    public function testCanDeleteKeyRequest_nullKeyRequest()
+    public function testCanDeleteKey_nullKey()
     {
         // Arrange:
-        $keyRequest = null;
+        $key = null;
         $user = $this->users('user1');
         
         // Act:
-        $result = $user->canDeleteKeyRequest($keyRequest);
+        $result = $user->canDeleteKey($key);
         
         // Assert:
         $this->assertFalse(
             $result,
-            'Incorrectly reported that a User can delete a null Key Request.'
+            'Incorrectly reported that a User can delete a null Key.'
         );
     }
 
-    public function testCanDeleteKeyRequest_ownKeyRequest()
+    public function testCanDeleteKey_ownKey()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKR1_apiWithTwoPendingKeyRequests');
-        $user = $this->users('userWith1stPKRForApiWithTwoPendingKeyRequests');
+        $key = $this->keys('pendingKey1_apiWithTwoPendingKeys');
+        $user = $this->users('userWith1stPKForApiWithTwoPendingKeys');
         
         // Act:
-        $result = $user->canDeleteKeyRequest($keyRequest);
+        $result = $user->canDeleteKey($key);
         
         // Assert:
         $this->assertTrue(
             $result,
-            'Failed to report that a User can delete their own Key Request.'
+            'Failed to report that a User can delete their own Key.'
         );
     }
 
-    public function testCanDeleteKeyRequest_notOwnKeyRequest()
+    public function testCanDeleteKey_notOwnKey()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKR2_apiWithTwoPendingKeyRequests');
-        $user = $this->users('userWith1stPKRForApiWithTwoPendingKeyRequests');
+        $key = $this->keys('pendingKey2_apiWithTwoPendingKeys');
+        $user = $this->users('userWith1stPKForApiWithTwoPendingKeys');
         
         // Act:
-        $result = $user->canDeleteKeyRequest($keyRequest);
+        $result = $user->canDeleteKey($key);
         
         // Assert:
         $this->assertFalse(
@@ -165,54 +165,54 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
 
-    public function testCanDeleteKeyRequest_keyRequestForApiOwnedByUser()
+    public function testCanDeleteKey_pendingKeyForApiOwnedByUser()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKeyRequestForApiOwnedByUser18');
+        $key = $this->keys('pendingKeyForApiOwnedByUser18');
         $user = $this->users('user18');
         
         // Act:
-        $result = $user->canDeleteKeyRequest($keyRequest);
+        $result = $user->canDeleteKey($key);
         
         // Assert:
         $this->assertTrue(
             $result,
-            'Failed to report that a User can delete a Key Request for an Api '
+            'Failed to report that a User can delete a Key for an Api '
             . 'that they own.'
         );
     }
 
-    public function testCanDeleteKeyRequest_keyRequestNotOwnedByUserToApiNotOwnedByUser()
+    public function testCanDeleteKey_pendingKeyNotOwnedByUserToApiNotOwnedByUser()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKR1_apiWithTwoPendingKeyRequests');
+        $key = $this->keys('pendingKey1_apiWithTwoPendingKeys');
         $user = $this->users('ownerThatDoesNotOwnAnyApisOrKeys');
         
         // Act:
-        $result = $user->canDeleteKeyRequest($keyRequest);
+        $result = $user->canDeleteKey($key);
         
         // Assert:
         $this->assertFalse(
             $result,
             'Incorrectly reported that a user with role "owner" could delete '
-            . 'a Key Request that they do not own for an Api that they do not '
+            . 'a Key that they do not own for an Api that they do not '
             . 'own.'
         );
     }
 
-    public function testCanDeleteKeyRequest_adminUser()
+    public function testCanDeleteKey_adminUser()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKR1_apiWithTwoPendingKeyRequests');
+        $key = $this->keys('pendingKey1_apiWithTwoPendingKeys');
         $user = $this->users('userWithRoleOfAdminButNoKeys');
         
         // Act:
-        $result = $user->canDeleteKeyRequest($keyRequest);
+        $result = $user->canDeleteKey($key);
         
         // Assert:
         $this->assertTrue(
             $result,
-            'Failed to report that an admin User can delete any Key Request.'
+            'Failed to report that an admin User can delete any Key.'
         );
     }
     

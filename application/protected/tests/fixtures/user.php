@@ -101,11 +101,11 @@ return array(
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Insite',
     ),
-    'userWith1stPKRForApiWithTwoPendingKeyRequests' => array(
+    'userWith1stPKForApiWithTwoPendingKeys' => array(
         'user_id'       => 12,
-        'email'         => 'userWith1stPKRForApiWithTwoPendingKeyRequests@jaars.net',
-        'first_name'    => 'With 1st Pending Key Request For',
-        'last_name'     => 'API With 2 Pending Key Requests',
+        'email'         => 'userWith1stPKRForApiWithTwoPendingKeys@jaars.net',
+        'first_name'    => 'With 1st Pending Key For',
+        'last_name'     => 'API With 2 Pending Keys',
         'status'        => User::STATUS_ACTIVE,
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Insite',

@@ -104,25 +104,25 @@ class User extends UserBase
     }
     
     /**
-     * Find out whether this user is allowed to delete the given KeyRequest.
+     * Find out whether this user is allowed to delete the given Key.
      * 
-     * @param KeyRequest $keyRequest The KeyRequest in question.
+     * @param Key $key The Key in question.
      * @return boolean
      */
-    public function canDeleteKeyRequest($keyRequest)
+    public function canDeleteKey($key)
     {
-        // If no Key Request was given, say no.
-        if ( ! ($keyRequest instanceof KeyRequest)) {
+        // If no Key was given, say no.
+        if ( ! ($key instanceof Key)) {
             return false;
         }
         
-        // If the Key Request belongs to this user, say yes.
-        if ($keyRequest->isOwnedBy($this)) {
+        // If the Key belongs to this user, say yes.
+        if ($key->isOwnedBy($this)) {
             return true;
         }
         
-        // If the Key Request is for an API that belongs to this user, say yes.
-        if ($keyRequest->isForApiOwnedBy($this)) {
+        // If the Key is for an API that belongs to this user, say yes.
+        if ($key->isToApiOwnedBy($this)) {
             return true;
         }
         
