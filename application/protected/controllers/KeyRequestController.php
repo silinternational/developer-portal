@@ -10,58 +10,55 @@ class KeyRequestController extends Controller
         /* @var $user User */
         $user = \Yii::app()->user->user;
         
-        // Try to retrieve the specified KeyRequest's data.
-        /* @var $keyRequest KeyRequest */
-        $keyRequest = \KeyRequest::model()->findByPk($id);
+        // Try to retrieve the specified Key's data.
+        /* @var $key Key */
+        $key = \Key::model()->findByPk($id);
         
-        // If this is not a KeyRequest that the current User is allowed to
+        // If this is not a Key that the current User is allowed to
         // delete, say so.
-        if ( ! $user->canDeleteKeyRequest($keyRequest)) {
+        if ( ! $user->canDeleteKey($key)) {
             throw new CHttpException(
                 403,
-                'That is not a key request that you have permission to delete.'
+                'That is not a key that you have permission to delete.'
             );
         }
         
-        // If the Key Request has already been approved (and the resulting Key
-        // still exists)...
-        if (($keyRequest->status === KeyRequest::STATUS_APPROVED) &&
-            ($keyRequest->key instanceof Key)) {
+        // If the Key has already been approved...
+        if ($key->status === \Key::STATUS_APPROVED) {
             
-            // Don't let them delete the Key Request.
+            // Don't let them delete the Key.
             Yii::app()->user->setFlash(
                 'error',
                 sprintf(
                     '<strong>Error!</strong> You are not allowed to delete an '
-                    . 'approved key request when the resulting key still exists. '
-                    . 'Try <a href="%s">deleting the key</a> first, then (if '
-                    . 'necessary) you can delete this key request.',
+                    . 'approved key. Try <a href="%s">revoking the key</a> '
+                    . 'first, then (if necessary) you can delete this key.',
                     $this->createUrl('/key/details/', array(
-                        'id' => $keyRequest->key->key_id,
+                        'id' => $key->key_id,
                     ))
                 )
             );
             
-            // Send them back to the Key Request details page.
+            // Send them back to the Key details page.
             $this->redirect(array(
-                '/key-request/details/',
-                'id' => $keyRequest->key_request_id,
+                '/key/details/',
+                'id' => $key->key_id,
             ));
         }
         
         // If the form has been submitted (POSTed)...
         if (Yii::app()->request->isPostRequest) {
             
-            // Try to delete the KeyRequest. If successful...
-            if ($keyRequest->delete()) {
+            // Try to delete the Key. If successful...
+            if ($key->delete()) {
 
-                // Send a notification that the key request was deleted
+                // Send a notification that the key was deleted
                 // (if applicable).
-                $keyRequest->sendKeyRequestDeletionNotification();
+                $key->sendKeyDeletionNotification();
                 
                 // Record that in the log.
                 Yii::log(
-                    'KeyRequest deleted: ID ' . $keyRequest->key_request_id,
+                    'Key deleted: ID ' . $key->key_id,
                     CLogger::LEVEL_INFO,
                     __CLASS__ . '.' . __FUNCTION__
                 );
@@ -69,16 +66,16 @@ class KeyRequestController extends Controller
                 // Tell the user.
                 Yii::app()->user->setFlash(
                     'success',
-                    '<strong>Success!</strong> Key request deleted.'
+                    '<strong>Success!</strong> Key deleted.'
                 );
                 
             } else {
 
-                // If we failed to delete the key request, record that in the
+                // If we failed to delete the key, record that in the
                 // log.
                 Yii::log(
-                    'Key Request deletion FAILED: ID '
-                    . $keyRequest->key_request_id,
+                    'Key deletion FAILED: ID '
+                    . $key->key_id,
                     CLogger::LEVEL_ERROR,
                     __CLASS__ . '.' . __FUNCTION__
                 );
@@ -86,8 +83,8 @@ class KeyRequestController extends Controller
                 // Tell the user.
                 Yii::app()->user->setFlash(
                     'error',
-                    '<strong>Error!</strong> We were unable to delete that key '
-                    . 'request. It may have already been deleted.'
+                    '<strong>Error!</strong> We were unable to delete that '
+                    . 'key. It may have already been deleted.'
                 );
             }
             
@@ -98,7 +95,7 @@ class KeyRequestController extends Controller
         
         // Show the page.
         $this->render('delete', array(
-            'keyRequest' => $keyRequest,
+            'key' => $key,
         ));
     }
 
@@ -108,27 +105,27 @@ class KeyRequestController extends Controller
         /* @var $user User */
         $user = \Yii::app()->user->user;
         
-        // Try to get the specified Key Request.
-        /* @var $keyRequest KeyRequest */
-        $keyRequest = KeyRequest::model()->findByPk($id);
+        // Try to get the specified Key.
+        /* @var $key \Key */
+        $key = \Key::model()->findByPk($id);
         
-        // If the User does NOT have permission to see that KeyRequest, say so.
-        if ( ! $user->canSeeKeyRequest($keyRequest)) {
+        // If the User does NOT have permission to see that Key, say so.
+        if ( ! $user->canSeeKey($key)) {
             throw new CHttpException(
                 403,
-                'That is not a Key Request that you have permission to see.'
+                'That is not a Key that you have permission to see.'
             );
         }
         
-        // If the key request is still pending...
-        if ($keyRequest->status == KeyRequest::STATUS_PENDING) {
+        // If the key is still pending...
+        if ($key->status == \Key::STATUS_PENDING) {
 
             // If the form has been submitted (i.e. - POSTed)...
             if (Yii::app()->request->isPostRequest) {
 
                 // If the User does NOT have permission to process requests
                 // for keys to the corresponding API, say so.
-                if ( ! $user->hasAdminPrivilegesForApi($keyRequest->api)) {
+                if ( ! $user->hasAdminPrivilegesForApi($key->api)) {
                     throw new CHttpException(
                         403,
                         'You do not have permission to manage this API.'
@@ -136,41 +133,20 @@ class KeyRequestController extends Controller
                 }
 
                 // Record that the current user is the one that processed this
-                // key request.
-                $keyRequest->processed_by = Yii::app()->user->user->user_id;     
+                // key.
+                $key->processed_by = Yii::app()->user->user->user_id;     
 
                 // If the request was approved...
-                if (isset($_POST[KeyRequest::STATUS_APPROVED])) {
+                if (isset($_POST[\Key::STATUS_APPROVED])) {
                     
-                    // Grant the key.
-                    $createResults = Key::createKey(
-                        $keyRequest->api->api_id,
-                        $keyRequest->user->user_id,
-                        $keyRequest->key_request_id
-                    );
-                    
-                    // If successful...
-                    if ($createResults[0] === true) {
-
-                        // Record that the request was approved.
-                        $keyRequest->status = KeyRequest::STATUS_APPROVED;
-                        
-                        // Try to save those changes. If NOT successful...
-                        if ( ! $keyRequest->save()) {
-                            
-                            // Say so.
-                            Yii::app()->user->setFlash(
-                                'warning',
-                                '<strong>Warning!</strong> We successfully '
-                                . 'created that key, but were unable to mark '
-                                . 'that key request as having been approved.'
-                            );
-                        }
+                    // Try to approve the key.
+                    if ($key->approve(\Yii::app()->user->user)) {
 
                         // Redirect the user to the details page for that key.
+                        $key->refresh();
                         $this->redirect(array(
                             '/key/details/',
-                            'id' => $createResults[1]->key_id
+                            'id' => $key->key_id
                         ));  
                     }
                     // Otherwise...
@@ -189,47 +165,47 @@ class KeyRequestController extends Controller
                 else {
                     
                     // Record that fact.
-                    $keyRequest->status = KeyRequest::STATUS_DENIED;
+                    $key->status = \Key::STATUS_DENIED;
                         
                     // Try to save those changes. If NOT successful...
-                    if ( ! $keyRequest->save()) {
+                    if ( ! $key->save()) {
 
                         // Say so.
                         Yii::app()->user->setFlash(
                             'error',
                             '<strong>Error!</strong> We were unable to mark '
-                            . 'that key request as having been denied: <pre>'
-                            . print_r($keyRequest->getErrors(), true) . '</pre>'
+                            . 'that key as having been denied: <pre>'
+                            . print_r($key->getErrors(), true) . '</pre>'
                         );
                     }
 
-                    // Send the user to the details page for this Key Request.
+                    // Send the user to the details page for this Key.
                     $this->redirect(array(
-                        '/key-request/details/',
-                        'id' => $keyRequest->key_request_id
+                        '/key/details/',
+                        'id' => $key->key_id
                     ));
                 }
             }
         }
         
         // Get the list of action links that should be shown.
-        $actionLinks = LinksManager::getKeyRequestDetailsActionLinksForUser(
-            $keyRequest,
+        $actionLinks = LinksManager::getPendingKeyDetailsActionLinksForUser(
+            $key,
             $user
         );
         
         // Render the page.
         $this->render('details', array(
             'actionLinks' => $actionLinks,
-            'keyRequest' => $keyRequest,
+            'key' => $key,
         ));
     }
     
     public function actionIndex()
     {
-        // Get the list of all pending KeyRequests.
-        $allPendingKeyRequests = \KeyRequest::model()->findAllByAttributes(array(
-            'status' => \KeyRequest::STATUS_PENDING,
+        // Get the list of all pending Keys.
+        $allPendingKeys = \Key::model()->findAllByAttributes(array(
+            'status' => \Key::STATUS_PENDING,
         ));
         
         // Get the current user's model.
@@ -237,23 +213,23 @@ class KeyRequestController extends Controller
         $user = \Yii::app()->user->user;
         
         // Exclude those that the user is not allowed to see.
-        $keyRequestsToShow = array();
-        foreach ($allPendingKeyRequests as $keyRequest) {
-            if ($user->canSeeKeyRequest($keyRequest)) {
-                $keyRequestsToShow[] = $keyRequest;
+        $keysToShow = array();
+        foreach ($allPendingKeys as $key) {
+            if ($user->canSeeKey($key)) {
+                $keysToShow[] = $key;
             }
         }
         
         // Create a data provider for showing those in a gridview.
-        $keyRequestDataProvider = new CArrayDataProvider(
-            $keyRequestsToShow,
+        $keyDataProvider = new CArrayDataProvider(
+            $keysToShow,
             array(
-                'keyField' => 'key_request_id',
+                'keyField' => 'key_id',
             )
         );
         
         $this->render('index', array(
-            'keyRequestDataProvider' => $keyRequestDataProvider,
+            'keyDataProvider' => $keyDataProvider,
         ));
     }
     

@@ -221,7 +221,7 @@ class KeyController extends Controller
         $allKeyRequests = $user->keyRequests;
         $nonActiveKeyRequests = array();
         foreach ($allKeyRequests as $keyRequest) {
-            if ($keyRequest->status !== \KeyRequest::STATUS_APPROVED) {
+            if ($keyRequest->status !== \Key::STATUS_APPROVED) {
                 $nonActiveKeyRequests[] = $keyRequest;
             }
         }

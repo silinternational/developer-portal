@@ -672,7 +672,7 @@ class ApiController extends Controller
                 'join' => 'LEFT JOIN api ON t.api_id = api.api_id',
                 'params' => array(
                     ':code' => $code,
-                    ':status' => \KeyRequest::STATUS_PENDING,
+                    ':status' => \Key::STATUS_PENDING,
                 ),
             ),
         ));

@@ -288,14 +288,14 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetDashboardPendingKeyActionLinks_noKey()
+    public function testGetDashboardKeyActionLinks_noKey()
     {
         // Arrange:
         $key = null;
         $expected = array();
         
         // Act:
-        $actual = LinksManager::getDashboardPendingKeyActionLinks($key);
+        $actual = LinksManager::getDashboardKeyActionLinks($key);
         
         // Assert:
         $this->assertEquals(
@@ -305,7 +305,7 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetDashboardPendingKeyActionLinks_realKey()
+    public function testGetDashboardKeyActionLinks_realKey()
     {
         // Arrange:
         $key = $this->keys('pendingKeyUser6');
@@ -314,7 +314,7 @@ class LinksManagerTest extends CDbTestCase
         );
         
         // Act:
-        $actionLinks = LinksManager::getDashboardPendingKeyActionLinks(
+        $actionLinks = LinksManager::getDashboardKeyActionLinks(
             $key
         );
         $actualLinksTexts = array();
@@ -351,7 +351,7 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetDashboardPendingKeyActionLinks_canDeleteKey()
+    public function testGetDashboardKeyActionLinks_canDeleteKey()
     {
         // Arrange:
         $key = $this->keys('pendingKeyUser6');
@@ -378,7 +378,7 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetDashboardPendingKeyActionLinks_cannotDeleteKey()
+    public function testGetDashboardKeyActionLinks_cannotDeleteKey()
     {
         // Arrange:
         $key = $this->keys('pendingKeyUser6');

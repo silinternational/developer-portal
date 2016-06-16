@@ -1,16 +1,16 @@
 <?php
 /* @var $this KeyRequestController */
 /* @var $actionLinks ActionLink[] */
-/* @var $keyRequest KeyRequest */
+/* @var $key Key */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
     'Dashboard' => array('/dashboard/'),
     'Keys' => array('/key/'),
-    'Key Request Details',
+    'Key Details',
 );
 
-$this->pageTitle = 'Key Request Details';
+$this->pageTitle = 'Key Details';
 
 ?>
 <div class="row">
@@ -23,12 +23,12 @@ $this->pageTitle = 'Key Request Details';
                     echo sprintf(
                         '<a href="%s">%s</a>',
                         $this->createUrl('/user/details/', array(
-                            'id' => $keyRequest->user_id,
+                            'id' => $key->user_id,
                         )),
-                        CHtml::encode($keyRequest->user->display_name)
+                        CHtml::encode($key->user->display_name)
                     );
                 } else {
-                    echo CHtml::encode($keyRequest->user->display_name);
+                    echo CHtml::encode($key->user->display_name);
                 }
                 
                 ?>
@@ -37,40 +37,40 @@ $this->pageTitle = 'Key Request Details';
             <dt>Api</dt>
             <dd>
                 <a href="<?php echo $this->createUrl('/api/details/',
-                                   array('code' => $keyRequest->api->code)
+                                   array('code' => $key->api->code)
                                ); ?>" 
                    target="_blank"><?php
-                    echo CHtml::encode($keyRequest->api->display_name .
-                                       ' (' . $keyRequest->api->code . ')'); ?>
+                    echo CHtml::encode($key->api->display_name .
+                                       ' (' . $key->api->code . ')'); ?>
                 </a>
             </dd>
             
             <dt>Purpose</dt>
-            <dd><?php echo CHtml::encode($keyRequest->purpose); ?>&nbsp;</dd>
+            <dd><?php echo CHtml::encode($key->purpose); ?>&nbsp;</dd>
             
             <dt>Domain</dt>
-            <dd><?php echo CHtml::encode($keyRequest->domain); ?>&nbsp;</dd>
+            <dd><?php echo CHtml::encode($key->domain); ?>&nbsp;</dd>
             
             <dt>Status</dt>
-            <dd><?php echo $keyRequest->getStyledStatusHtml(); ?>&nbsp;</dd>
+            <dd><?php echo $key->getStyledStatusHtml(); ?>&nbsp;</dd>
             
             <dt>Created</dt>
-            <dd><?php echo Utils::getFriendlyDate($keyRequest->created); ?>&nbsp;</dd>
+            <dd><?php echo Utils::getFriendlyDate($key->created); ?>&nbsp;</dd>
 
             <dt>Updated</dt>
-            <dd><?php echo Utils::getFriendlyDate($keyRequest->updated); ?>&nbsp;</dd>
+            <dd><?php echo Utils::getFriendlyDate($key->updated); ?>&nbsp;</dd>
 
             <?php
             
-            // If the key request has been processed...
-            if ($keyRequest->processedBy) {
+            // If the key has been processed...
+            if ($key->processedBy) {
                 
                 // Show who processed it.
                 ?>
                 <dt>Processed by</dt>
                 <dd>
                     <?php
-                    echo CHtml::encode($keyRequest->processedBy->display_name);
+                    echo CHtml::encode($key->processedBy->display_name);
                     ?>
                 </dd>
                 <?php
@@ -82,30 +82,30 @@ $this->pageTitle = 'Key Request Details';
     <div class="span4">
         <?php
 
-        // If the request is still pending
+        // If the key is still pending
         //    AND
         // if the user has permission to grant/deny this request...
         $user = \Yii::app()->user->user;
-        if (($keyRequest->status == KeyRequest::STATUS_PENDING) &&
-            $user->hasAdminPrivilegesForApi($keyRequest->api)) {
+        if (($key->status == \Key::STATUS_PENDING) &&
+            $user->hasAdminPrivilegesForApi($key->api)) {
 
             // Provide a way for this admin user to grant/deny the request.
             ?>
             <h3>Actions</h3>
-            <p>What do you want to do with this key request? </p>
+            <p>What do you want to do with this key? </p>
             <?php $form=$this->beginWidget('CActiveForm'); ?>
                 <dl>
                     <dd>
                         <?php 
                         echo CHtml::submitButton('Grant a Key', 
-                                array('name' => KeyRequest::STATUS_APPROVED,
+                                array('name' => \Key::STATUS_APPROVED,
                                       'class' => 'btn btn-primary'));
                         ?>
                     </dd>
                     <dd>
                         <?php
                         echo CHtml::submitButton('Deny the Request',
-                                array('name' => KeyRequest::STATUS_DENIED,
+                                array('name' => \Key::STATUS_DENIED,
                                       'class' => 'btn btn-danger'));
                         ?>
                     </dd>

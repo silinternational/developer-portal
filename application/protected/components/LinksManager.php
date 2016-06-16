@@ -187,13 +187,13 @@ class LinksManager extends CComponent
     
     /**
      * Get the list of 'Actions' links that should be shown on the Dashboard
-     * for a card representing a pending Key.
+     * for a card representing a Key.
      * 
-     * @param Key $key The pending Key.
+     * @param Key $key The Key.
      * @return ActionLink[] The list of ActionLinks representing the links to
      *     include.
      */
-    public static function getDashboardPendingKeyActionLinks($key)
+    public static function getDashboardKeyActionLinks($key)
     {
         // If lacking the Key, return an empty array.
         if ( ! ($key instanceof Key)) {
@@ -203,7 +203,7 @@ class LinksManager extends CComponent
         // Set up an array to hold the list of links.
         $actionLinks = array();
         
-        // All a pending Key needs is a details link.
+        // All a Key needs is a details link.
         $actionLinks[] = new ActionLink(
             array(
                 '/key/details/',

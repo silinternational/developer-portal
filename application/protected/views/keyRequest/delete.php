@@ -1,18 +1,18 @@
 <?php
 /* @var $this KeyRequestController */
-/* @var $keyRequest KeyRequest */
+/* @var $key Key */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
     'Dashboard' => array('/dashboard/'),
-    'Key Request Details' => array(
-        '/key-request/details/',
-        'id' => $keyRequest->key_request_id,
+    'Key Details' => array(
+        '/key/details/',
+        'id' => $key->key_id,
     ),
-    'Delete Key Request',
+    'Delete Key',
 );
 
-$this->pageTitle = 'Delete Key Request';
+$this->pageTitle = 'Delete Key';
 
 ?>
 <div class="row">
@@ -23,10 +23,10 @@ $this->pageTitle = 'Delete Key Request';
                 <?php echo sprintf(
                     '<a href="%s">%s</a>',
                     $this->createUrl('/api/details/', array(
-                        'code' => $keyRequest->api->code,
+                        'code' => $key->api->code,
                     )),
                     CHtml::encode(
-                        $keyRequest->api->display_name . ' (' . $keyRequest->api->code . ')'
+                        $key->api->display_name . ' (' . $key->api->code . ')'
                     )
                 ); ?>
             </dd>
@@ -38,12 +38,12 @@ $this->pageTitle = 'Delete Key Request';
                     echo sprintf(
                         '<a href="%s">%s</a>',
                         $this->createUrl('/user/details/', array(
-                            'id' => $keyRequest->user_id,
+                            'id' => $key->user_id,
                         )),
-                        CHtml::encode($keyRequest->user->display_name)
+                        CHtml::encode($key->user->display_name)
                     );
                 } else {
-                    echo CHtml::encode($keyRequest->user->display_name);
+                    echo CHtml::encode($key->user->display_name);
                 }
                 ?>
             </dd>
@@ -51,21 +51,21 @@ $this->pageTitle = 'Delete Key Request';
             <dt>Purpose</dt>
             <dd>
                 <?php
-                echo CHtml::encode($keyRequest->purpose);
+                echo CHtml::encode($key->purpose);
                 ?>&nbsp;
             </dd>
 
             <dt>Domain</dt>
             <dd>
                 <?php
-                echo CHtml::encode($keyRequest->domain);
+                echo CHtml::encode($key->domain);
                 ?>&nbsp;
             </dd>
 
             <dt>Status</dt>
             <dd>
                 <?php
-                echo $keyRequest->getStyledStatusHtml();
+                echo $key->getStyledStatusHtml();
                 ?>&nbsp;
             </dd>
         </dl>
@@ -75,7 +75,7 @@ $this->pageTitle = 'Delete Key Request';
     <div class="span11 offset1">
         <?php $form = $this->beginWidget('CActiveForm'); ?>
 
-        <p>Do you really want to delete this key request? </p>
+        <p>Do you really want to delete this key? </p>
         <ul class="inline">
             <li>
                 <?php
@@ -85,8 +85,8 @@ $this->pageTitle = 'Delete Key Request';
                     'icon' => 'ban-circle',
                     'label' => 'NO - Cancel',
                     'url' => $this->createUrl(
-                        '/key-request/details/',
-                        array('id' => $keyRequest->key_request_id)
+                        '/key/details/',
+                        array('id' => $key->key_id)
                     ),
                 ));
 
