@@ -43,7 +43,7 @@ class Key extends KeyBase
                 'created,updated,requested_on',
                 'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => true,
+                'setOnEmpty' => false,
                 'on' => 'insert',
             ),
             array(
