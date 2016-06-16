@@ -1198,5 +1198,73 @@ class KeyTest extends DeveloperPortalTestCase
         //       fail.
     }
     
+    public function testStatusHasValidValue_no_emptyString()
+    {
+        // Arrange:
+        /* @var $key Key */
+        $key = $this->keys('key1');
+        $key->status = '';
+        
+        // Act:
+        $result = $key->validate(array('status'));
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Failed to reject a status of an empty string.'
+        );
+    }
+    
+    public function testStatusHasValidValue_no_null()
+    {
+        // Arrange:
+        /* @var $key Key */
+        $key = $this->keys('key1');
+        $key->status = null;
+        
+        // Act:
+        $result = $key->validate(array('status'));
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Failed to reject a status of null.'
+        );
+    }
+    
+    public function testStatusHasValidValue_no_otherString()
+    {
+        // Arrange:
+        /* @var $key Key */
+        $key = $this->keys('key1');
+        $key->status = 'asdf';
+        
+        // Act:
+        $result = $key->validate(array('status'));
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Failed to reject a made-up status.'
+        );
+    }
+    
+    public function testStatusHasValidValue_yes()
+    {
+        // Arrange:
+        /* @var $key Key */
+        $key = $this->keys('key1');
+        $key->status = \Key::STATUS_PENDING;
+        
+        // Act:
+        $result = $key->validate(array('status'));
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to accept a valid status value.'
+        );
+    }
+    
     // TODO: Set up more unit tests.
 }

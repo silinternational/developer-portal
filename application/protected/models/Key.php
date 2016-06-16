@@ -28,6 +28,13 @@ class Key extends KeyBase
                 'setOnEmpty' => true,
                 'on' => 'insert',
             ),
+            array(
+                'status',
+                'in',
+                'range' => self::getValidStatusValues(),
+                'allowEmpty' => false,
+                'message' => 'That is not a valid key status.',
+            ),
             array('processed_on', 'recordDateWhenProcessed'),
             array('api_id', 'onlyAllowOneKeyPerApi', 'on' => 'insert'),
         ), parent::rules());
