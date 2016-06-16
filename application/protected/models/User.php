@@ -759,15 +759,20 @@ class User extends UserBase
         return array(
             'apis' => array(self::HAS_MANY, 'Api', 'owner_id'),
             'events' => array(self::HAS_MANY, 'Event', 'user_id'),
-            
-            /**
-             * @todo This might no longer provide accurate information, since
-             *       it doesn't currently distinguish between requested and
-             *       granted keys (which it used to do when the only keys that
-             *       existed were those that had already been granted).
-             */
-            //'keyCount' => array(self::STAT, 'Key', 'user_id'),
-            
+            'approvedKeyCount' => array(
+                self::STAT,
+                'Key',
+                'user_id',
+                'condition' => 'status = :status',
+                'params' => array(':status' => \Key::STATUS_APPROVED),
+            ),
+            'pendingKeyCount' => array(
+                self::STAT,
+                'Key',
+                'user_id',
+                'condition' => 'status = :status',
+                'params' => array(':status' => \Key::STATUS_PENDING),
+            ),
             'keys' => array(self::HAS_MANY, 'Key', 'user_id'),
             'keysProcessed' => array(self::HAS_MANY, 'Key', 'processed_by'),
         );

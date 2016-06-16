@@ -289,4 +289,13 @@ return array(
         'auth_provider_user_identifier' => null,
         'verified_nonprofit' => 0,
     ),
+    'userWithOneApprovedKeyAndTwoPendingKeys' => array(
+        'user_id'       => 31,
+        'email'         => 'userWithOneApprovedKeyAndTwoPendingKeys@jaars.net',
+        'first_name'    => 'With One Approved Key',
+        'last_name'     => 'And Two Pending Keys',
+        'status'        => User::STATUS_ACTIVE,
+        'role'          => User::ROLE_USER,
+        'auth_provider' => 'Insite',
+    ),
 );

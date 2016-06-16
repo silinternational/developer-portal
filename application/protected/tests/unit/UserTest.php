@@ -99,6 +99,38 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testApprovedKeyCount_none()
+    {
+        // Arrange:
+        $user = $this->users('ownerThatDoesNotOwnAnyApisOrKeys');
+        
+        // Act:
+        $actual = $user->approvedKeyCount;
+        
+        // Assert:
+        $this->assertEquals(
+            0,
+            $actual,
+            'Incorrectly reported that a user with no approved keys has some.'
+        );
+    }
+    
+    public function testApprovedKeyCount_one()
+    {
+        // Arrange:
+        $user = $this->users('userWithOneApprovedKeyAndTwoPendingKeys');
+        
+        // Act:
+        $actual = $user->approvedKeyCount;
+        
+        // Assert:
+        $this->assertEquals(
+            1,
+            $actual,
+            'Failed to return correct number of approved keys for a user that has one.'
+        );
+    }
+    
     public function testBeforeDelete()
     {
         // Arrange:
@@ -1568,6 +1600,38 @@ class UserTest extends DeveloperPortalTestCase
         $this->assertFalse(
             $result,
             'Incorrectly reported that a user owns an API.'
+        );
+    }
+    
+    public function testPendingKeyCount_none()
+    {
+        // Arrange:
+        $user = $this->users('userWithNoPendingKeys');
+        
+        // Act:
+        $actual = $user->pendingKeyCount;
+        
+        // Assert:
+        $this->assertEquals(
+            0,
+            $actual,
+            'Incorrectly reported that a user with no pending keys has some.'
+        );
+    }
+    
+    public function testPendingKeyCount_two()
+    {
+        // Arrange:
+        $user = $this->users('userWithOneApprovedKeyAndTwoPendingKeys');
+        
+        // Act:
+        $actual = $user->pendingKeyCount;
+        
+        // Assert:
+        $this->assertEquals(
+            2,
+            $actual,
+            'Failed to return correct number of pending keys for a user that has two.'
         );
     }
 }
