@@ -28,9 +28,133 @@ class CostSchemeTest extends \CDbTestCase
         }
     }
     
-    public function testHasAtLeastOnePrice()
+    public function testHasAtLeastOnePrice_no_allNull()
     {
-        $this->markTestIncomplete('Test not yet written.');
+        // Arrange:
+        /* @var $costScheme \CostScheme */
+        $costScheme = $this->costSchemes('hasYearlyCommPriceAndPlanCode');
+        $costScheme->yearly_commercial_price = null;
+        $attribute = 'yearly_commercial_price';
+        $params = array(
+            'priceFields' => array(
+                'yearly_commercial_price',
+                'yearly_nonprofit_price',
+                'monthly_commercial_price',
+                'monthly_nonprofit_price',
+            ),
+        );
+        
+        // Act:
+        $costScheme->hasAtLeastOnePrice($attribute, $params);
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $costScheme->getErrors(),
+            'Failed to report error when all of the price fields are null.'
+        );
+    }
+    
+    public function testHasAtLeastOnePrice_no_mostNullOneNegative()
+    {
+        // Arrange:
+        /* @var $costScheme \CostScheme */
+        $costScheme = $this->costSchemes('hasYearlyCommPriceAndPlanCode');
+        $costScheme->yearly_commercial_price = -1;
+        $attribute = 'yearly_commercial_price';
+        $params = array(
+            'priceFields' => array(
+                'yearly_commercial_price',
+                'yearly_nonprofit_price',
+                'monthly_commercial_price',
+                'monthly_nonprofit_price',
+            ),
+        );
+
+        // Act:
+        $costScheme->hasAtLeastOnePrice($attribute, $params);
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $costScheme->getErrors(),
+            'Failed to report error when one price field is negative and the rest are null.'
+        );
+    }
+    
+    public function testHasAtLeastOnePrice_no_mostNullOneNonNumeric()
+    {
+        // Arrange:
+        /* @var $costScheme \CostScheme */
+        $costScheme = $this->costSchemes('hasYearlyCommPriceAndPlanCode');
+        $costScheme->yearly_commercial_price = '123abc'; // Alphanumeric, start with digits.
+        $attribute = 'yearly_commercial_price';
+        $params = array(
+            'priceFields' => array(
+                'yearly_commercial_price',
+                'yearly_nonprofit_price',
+                'monthly_commercial_price',
+                'monthly_nonprofit_price',
+            ),
+        );
+
+        // Act:
+        $costScheme->hasAtLeastOnePrice($attribute, $params);
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $costScheme->getErrors(),
+            'Failed to report error when one price field has a non-numeric value and the rest are null.'
+        );
+    }
+    
+    public function testHasAtLeastOnePrice_no_mostNullOneZero()
+    {
+        // Arrange:
+        /* @var $costScheme \CostScheme */
+        $costScheme = $this->costSchemes('hasYearlyCommPriceAndPlanCode');
+        $costScheme->yearly_commercial_price = 0;
+        $attribute = 'yearly_commercial_price';
+        $params = array(
+            'priceFields' => array(
+                'yearly_commercial_price',
+                'yearly_nonprofit_price',
+                'monthly_commercial_price',
+                'monthly_nonprofit_price',
+            ),
+        );
+
+        // Act:
+        $costScheme->hasAtLeastOnePrice($attribute, $params);
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $costScheme->getErrors(),
+            'Failed to report error when one price field is zero and the rest are null.'
+        );
+    }
+    
+    public function testHasAtLeastOnePrice_yes()
+    {
+        // Arrange:
+        /* @var $costScheme \CostScheme */
+        $costScheme = $this->costSchemes('hasYearlyCommPriceAndPlanCode');
+        $attribute = 'yearly_commercial_price';
+        $params = array(
+            'priceFields' => array(
+                'yearly_commercial_price',
+                'yearly_nonprofit_price',
+                'monthly_commercial_price',
+                'monthly_nonprofit_price',
+            ),
+        );
+
+        // Act:
+        $costScheme->hasAtLeastOnePrice($attribute, $params);
+        
+        // Assert:
+        $this->assertEmpty($costScheme->getErrors(), sprintf(
+            'Unexpectedly reported errors when at least one price field has a numeric value: %s',
+            print_r($costScheme->getErrors(), true)
+        ));
     }
     
     public function testHasBothOrNeither_has1st()
