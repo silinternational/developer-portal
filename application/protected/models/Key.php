@@ -11,6 +11,24 @@ class Key extends KeyBase
     const STATUS_PENDING = 'pending';
     const STATUS_REVOKED = 'revoked';
     
+    public function afterSave()
+    {
+        if ( ! parent::afterSave()) {
+            return false;
+        }
+        
+        if ($this->status === self::STATUS_PENDING) {
+            if ($this->isNewRecord) {
+                $this->notifyApiOwnerOfPendingRequest();
+            }
+        } elseif ($this->status === self::STATUS_DENIED) {
+            $this->notifyUserOfDeniedKey();
+        } elseif ($this->status === self::STATUS_REVOKED) {
+            $this->notifyUserOfRevokedKey();
+            $this->notifyApiOwnerOfRevokedKey();
+        }
+    }
+    
     public function rules()
     {
         return \CMap::mergeArray(array(
@@ -139,7 +157,8 @@ class Key extends KeyBase
             
             /**
              * @todo Figure out what to do in ApiAxle when a Key in our database
-             *       is denied.
+             *       is denied, and whether to do it in beforeSave() or
+             *       afterSave().
              */
             
             // Make sure the key does not still exist in ApiAxle.
@@ -149,7 +168,8 @@ class Key extends KeyBase
             
             /**
              * @todo Figure out what to do in ApiAxle (if anything) when a Key
-             *       in our database is pending.
+             *       in our database is pending, and whether to do it in
+             *       beforeSave() or afterSave().
              */
             
             // TEMP
@@ -174,16 +194,11 @@ class Key extends KeyBase
     
     public function afterDelete()
     {
-      parent::afterDelete();
-
-//      // If we know the key request for this key...
-//      if ($this->key_request_id !== null) {
-//
-//        // Delete the related key request as well.
-//        $delKeyRequests = KeyRequest::model()->deleteByPk(
-//            $this->key_request_id
-//        );
-//      }
+        if ( ! parent::afterDelete()) {
+            return false;
+        }
+        
+        $this->sendKeyDeletionNotification();
     }
     
     /**
