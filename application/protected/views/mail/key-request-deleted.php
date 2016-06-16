@@ -5,7 +5,7 @@
 /* @var $requestingUser User */
 ?>
 <p>
-    Hello <?php echo ($owner ? $owner->first_name : 'API Developer Portal administrator'); ?>,
+    Hello <?php echo ($owner ? CHtml::encode($owner->first_name) : 'API Developer Portal administrator'); ?>,
 </p>
 <p>
     <?php echo sprintf(
@@ -21,5 +21,5 @@
 </p>
 <p>
     Request deleted <?php echo Utils::getFriendlyDate('now'); ?> by <?php
-    echo Yii::app()->user->user->display_name; ?>.
+    echo CHtml::encode(Yii::app()->user->user->display_name); ?>.
 </p>

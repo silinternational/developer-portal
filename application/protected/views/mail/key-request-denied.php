@@ -5,7 +5,7 @@
 $key->refresh(); /** @todo Move this refresh() call out of the view file. */
 ?>
 <p>
-    Hello <?php echo $key->user->first_name; ?>,
+    Hello <?php echo CHtml::encode($key->user->first_name); ?>,
 </p>
 <p>
     Your request for a key to the <?php echo CHtml::encode(

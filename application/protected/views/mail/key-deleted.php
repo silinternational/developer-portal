@@ -1,8 +1,8 @@
 <p>
-    Hello <?php echo $key->user->first_name; ?>,
+    Hello <?php echo CHtml::encode($key->user->first_name); ?>,
 </p>
 <p>
-    Your API key for the <?php echo $api->display_name ?> API has been deleted.
+    Your API key for the <?php echo CHtml::encode($api->display_name); ?> API has been deleted.
     If you did not request this or believe this to be an error we recommend that 
     you login and request the key again.
 </p>
@@ -16,5 +16,5 @@
 </p>
 <p>
     Key deleted at <?php echo date(Yii::app()->params['friendlyDateFormat']); ?><br />
-    Key deleted by user <?php echo Yii::app()->user->user->display_name; ?>
+    Key deleted by user <?php echo CHtml::encode(Yii::app()->user->user->display_name); ?>
 </p>

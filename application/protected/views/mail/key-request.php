@@ -5,11 +5,11 @@
 /* @var $requestingUser User */
 ?>
 <p>
-    Hello <?php echo ($owner ? $owner->first_name : 'API Developer Portal administrator'); ?>,
+    Hello <?php echo ($owner ? CHtml::encode($owner->first_name) : 'API Developer Portal administrator'); ?>,
 </p>
 <p>
-    <?php echo $requestingUser->display_name; ?> has requested access to the 
-    <?php echo $api->display_name ?> API. 
+    <?php echo CHtml::encode($requestingUser->display_name); ?> has requested access to the 
+    <?php echo CHtml::encode($api->display_name); ?> API. 
     <?php
     echo sprintf(
         '<a href="%s" title="%s">Click here</a> to view and approve or reject '
