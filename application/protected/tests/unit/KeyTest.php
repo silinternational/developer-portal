@@ -617,6 +617,16 @@ class KeyTest extends DeveloperPortalTestCase
         $this->markTestIncomplete('Test not yet written.');
     }
     
+    public function testNotifyUserOfDeletedKey()
+    {
+        $this->markTestIncomplete('Test not yet written.');
+    }
+    
+    public function testNotifyUserOfDeniedKey()
+    {
+        $this->markTestIncomplete('Test not yet written.');
+    }
+    
     public function testNotifyUserOfRevokedKey()
     {
         $this->markTestIncomplete('Test not yet written.');

@@ -4,6 +4,9 @@ class WebUser extends CWebUser
 {
     private $_model = null;
     
+    /**
+     * @todo Remove references to access groups, since we no longer use those.
+     */
     public function getAccessGroups()
     {
         // Get the User model.

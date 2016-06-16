@@ -680,7 +680,7 @@ class User extends UserBase
     
     /**
      * Find out whether this User has an email address domain that has been
-     * invited to see this Api.
+     * invited to see this Api. This should be case-insensitive.
      * 
      * @param \Api $api The Api in question.
      * @return boolean
