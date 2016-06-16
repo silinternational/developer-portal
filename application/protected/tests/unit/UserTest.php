@@ -131,6 +131,75 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testAuthProviderRequired_emptyString()
+    {
+        // Arrange:
+        /* @var $user \User */
+        $user = $this->users('user1');
+        
+        // Pre-assert:
+        $this->assertTrue($user->validate(), sprintf(
+            'This test requires a user that has valid attributes: %s',
+            print_r($user->getErrors(), true)
+        ));
+        
+        // Act:
+        $user->auth_provider = '';
+        $result = $user->validate();
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Failed to reject an empty string as an auth_provider.'
+        );
+    }
+    
+    public function testAuthProviderRequired_false()
+    {
+        // Arrange:
+        /* @var $user \User */
+        $user = $this->users('user1');
+        
+        // Pre-assert:
+        $this->assertTrue($user->validate(), sprintf(
+            'This test requires a user that has valid attributes: %s',
+            print_r($user->getErrors(), true)
+        ));
+        
+        // Act:
+        $user->auth_provider = false;
+        $result = $user->validate();
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Failed to reject false as an auth_provider.'
+        );
+    }
+    
+    public function testAuthProviderRequired_null()
+    {
+        // Arrange:
+        /* @var $user \User */
+        $user = $this->users('user1');
+        
+        // Pre-assert:
+        $this->assertTrue($user->validate(), sprintf(
+            'This test requires a user that has valid attributes: %s',
+            print_r($user->getErrors(), true)
+        ));
+        
+        // Act:
+        $user->auth_provider = null;
+        $result = $user->validate();
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Failed to reject a null auth_provider.'
+        );
+    }
+    
     public function testBeforeDelete()
     {
         // Arrange:

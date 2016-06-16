@@ -739,6 +739,7 @@ class User extends UserBase
                 'setOnEmpty' => true,
                 'on' => 'insert',
             ),
+            array('auth_provider', 'required'),
         ), parent::rules());
     }
     
