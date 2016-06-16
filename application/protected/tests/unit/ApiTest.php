@@ -429,7 +429,7 @@ class ApiTest extends DeveloperPortalTestCase
     public function testGetPendingKeyCountBadgeHtml_hasBadgeValue()
     {
         // Arrange:
-        $api = $this->apis('apiWithTwoPendingKeyRequests');
+        $api = $this->apis('apiWithTwoPendingKeys');
         
         // Act:
         $result = $api->getPendingKeyCountBadgeHtml();
@@ -471,7 +471,7 @@ class ApiTest extends DeveloperPortalTestCase
     {
         // Arrange:
         /* @var $api Api */
-        $api = $this->apis('apiWithTwoPendingKeyRequests');
+        $api = $this->apis('apiWithTwoPendingKeys');
         
         // Act:
         $result = $api->getPendingKeyCountBadgeHtml();
@@ -488,7 +488,7 @@ class ApiTest extends DeveloperPortalTestCase
     {
         // Arrange:
         /* @var $api Api */
-        $api = $this->apis('apiWithZeroPendingKeyRequests');
+        $api = $this->apis('apiWithZeroPendingKeys');
         
         // Act:
         $result = $api->getPendingKeyCountBadgeHtml();
@@ -907,7 +907,7 @@ class ApiTest extends DeveloperPortalTestCase
     public function testPendingKeyCount()
     {
         // Arrange:
-        $api = $this->apis('apiWithTwoPendingKeyRequests');
+        $api = $this->apis('apiWithTwoPendingKeys');
         
         // Act:
         $actual = $api->pendingKeyCount;
@@ -916,7 +916,7 @@ class ApiTest extends DeveloperPortalTestCase
         $this->assertEquals(
             2,
             $actual,
-            'Failed to report the correct number of pending key requests for '
+            'Failed to report the correct number of pending keys for '
             . 'an Api.'
         );
     }

@@ -89,7 +89,7 @@ class User extends UserBase
      */
     public function isAuthorizedToApproveKey($key)
     {
-        // If no Key Request was given, say no.
+        // If no Key was given, say no.
         if ( ! ($key instanceof \Key)) {
             return false;
         }
@@ -201,15 +201,15 @@ class User extends UserBase
     }
     
     /**
-     * Find out whether this User is allowed to see the given KeyRequest.
+     * Find out whether this User is allowed to see the given Key.
      * 
-     * @param KeyRequest $keyRequest The KeyRequest in question.
-     * @return boolean Whether the user is allowed to see the KeyRequest.
+     * @param Key $key The Key in question.
+     * @return boolean Whether the user is allowed to see the Key.
      */
-    public function canSeeKeyRequest($keyRequest)
+    public function canSeeKey($key)
     {
-        // If NOT given a KeyRequest, say no
-        if ( ! ($keyRequest instanceof KeyRequest)) {
+        // If NOT given a Key, say no
+        if ( ! ($key instanceof Key)) {
             return false;
         }
         
@@ -218,17 +218,17 @@ class User extends UserBase
             return true;
         }
         
-        // If the user owns the API that the KeyRequest is for, say yes.
-        if ($this->isOwnerOfApi($keyRequest->api)) {
+        // If the user owns the API that the Key is for, say yes.
+        if ($this->isOwnerOfApi($key->api)) {
             return true;
         }
         
-        // If the user is the one requesting a Key via this KeyRequest, say yes.
-        if ($this->user_id === $keyRequest->user_id) {
+        // If the user is the one this Key belongs to, say yes.
+        if ($key->isOwnedBy($this)) {
             return true;
         }
         
-        // No one else is allowed to see the KeyRequest.
+        // No one else is allowed to see the Key.
         return false;
     }
     
@@ -287,7 +287,7 @@ class User extends UserBase
         return $domain;
     }
     
-    public function getKeyRequestsWithApiNames()
+    public function getKeysWithApiNames()
     {
         // Get the ID of the current user (as an integer).
         $currentUserId = (int)$this->user_id;
@@ -295,13 +295,13 @@ class User extends UserBase
         // If it's an invalid value, throw an exception.
         if ($currentUserId <= 0) {
             throw new \Exception(
-                'Cannot get Key Requests / APIs for this user because we do '
+                'Cannot get Keys / APIs for this user because we do '
                 . 'not know the user\'s ID.'
             );
         }
         
-        // Get all of this user's key requests, but also include the API names.
-        return \KeyRequest::model()->with('api')->findAllByAttributes(array(
+        // Get all of this user's keys, but also include the API names.
+        return \Key::model()->with('api')->findAllByAttributes(array(
             'user_id' => $currentUserId,
         ), array(
             'order' => 'api.display_name',

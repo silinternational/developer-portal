@@ -160,8 +160,7 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertFalse(
             $result,
-            'Incorrectly reported that a normal user could delete a key '
-            . 'request that was not theirs.'
+            'Incorrectly reported that a normal user could delete a key that was not theirs.'
         );
     }
 
@@ -414,103 +413,103 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testCanSeeKeyRequest_nullKeyRequest()
+    public function testCanSeeKey_nullKey()
     {
         // Arrange:
-        $keyRequest = null;
+        $key = null;
         $user = $this->users('userWithRoleOfAdmin');
         
         // Act:
-        $result = $user->canSeeKeyRequest($keyRequest);
+        $result = $user->canSeeKey($key);
         
         // Assert:
         $this->assertFalse(
             $result,
-            'Incorrectly reported that a User can see a null Key Request.'
+            'Incorrectly reported that a User can see a null Key.'
         );
     }
 
-    public function testCanSeeKeyRequest_adminUser()
+    public function testCanSeeKey_adminUser()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKeyRequestUser6');
+        $key = $this->keys('pendingKeyUser6');
         $user = $this->users('userWithRoleOfAdmin');
         
         // Act:
-        $result = $user->canSeeKeyRequest($keyRequest);
+        $result = $user->canSeeKey($key);
         
         // Assert:
         $this->assertTrue(
             $result,
             'Incorrectly reported that an admin User cannot see a particular '
-            . 'KeyRequest.'
+            . 'Key.'
         );
     }
 
-    public function testCanSeeKeyRequest_forOwnApi()
+    public function testCanSeeKey_forOwnApi()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKeyRequestForApiOwnedByUser18');
+        $key = $this->keys('pendingKeyForApiOwnedByUser18');
         $user = $this->users('user18');
         
         // Act:
-        $result = $user->canSeeKeyRequest($keyRequest);
+        $result = $user->canSeeKey($key);
         
         // Assert:
         $this->assertTrue(
             $result,
-            'Failed to report that a User can see a KeyRequest for an API that '
+            'Failed to report that a User can see a Key for an API that '
             . 'the User owns.'
         );
     }
 
-    public function testCanSeeKeyRequest_notForOwnApi()
+    public function testCanSeeKey_notForOwnApi()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKeyRequestForApiOwnedByUser18');
+        $key = $this->keys('pendingKeyForApiOwnedByUser18');
         $user = $this->users('userWithRoleOfOwner');
         
         // Act:
-        $result = $user->canSeeKeyRequest($keyRequest);
+        $result = $user->canSeeKey($key);
         
         // Assert:
         $this->assertFalse(
             $result,
             "Incorrectly reported that a User can see someone else's "
-            . "KeyRequest for an API that the User does NOT own."
+            . "Key for an API that the User does NOT own."
         );
     }
 
-    public function testCanSeeKeyRequest_ownKeyRequest()
+    public function testCanSeeKey_ownKey()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKeyRequestForApiOwnedByUser18');
-        $user = $this->users('userWithPendingKeyRequestForApiOwnedByUser18');
+        $key = $this->keys('pendingKeyForApiOwnedByUser18');
+        $user = $this->users('userWithPendingKeyForApiOwnedByUser18');
         
         // Act:
-        $result = $user->canSeeKeyRequest($keyRequest);
+        $result = $user->canSeeKey($key);
         
         // Assert:
         $this->assertTrue(
             $result,
-            'Failed to report that a User can see their own KeyRequest.'
+            'Failed to report that a User can see their own Key.'
         );
     }
 
-    public function testCanSeeKeyRequest_notOwnKeyRequest()
+    public function testCanSeeKey_notOwnKey()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKeyRequestForApiOwnedByUser18');
+        $key = $this->keys('pendingKeyForApiOwnedByUser18');
         $user = $this->users('userWithRoleOfUser');
         
         // Act:
-        $result = $user->canSeeKeyRequest($keyRequest);
+        $result = $user->canSeeKey($key);
         
         // Assert:
         $this->assertFalse(
             $result,
             "Incorrectly reported that a (developer) User can see someone "
-            . "else's KeyRequest."
+            . "else's Key."
         );
     }
 
@@ -707,32 +706,32 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testGetKeyRequestsWithApiNames_none()
+    public function testGetKeysWithApiNames_none()
     {
         // Arrange:
         $user = $this->users('userWithNoPendingKeys');
         
         // Act:
-        $keyRequests = $user->getKeyRequestsWithApiNames();
+        $keys = $user->getKeysWithApiNames();
         
         // Assert:
         $this->assertEmpty(
-            $keyRequests,
-            'Failed to return an empty array for the key requests of a user '
-            . 'that has no key requests.'
+            $keys,
+            'Failed to return an empty array for the keys of a user '
+            . 'that has no keys.'
         );
     }
     
-    public function testGetKeyRequestsWithApiNames_approved()
+    public function testGetKeysWithApiNames_approved()
     {
         // Arrange:
-        $user = $this->users('userWithApprovedKeyRequest');
+        $user = $this->users('userWithApprovedKey');
         
         // Act:
-        $keyRequests = $user->getKeyRequestsWithApiNames();
+        $keys = $user->getKeysWithApiNames();
         $foundOne = false;
-        foreach ($keyRequests as $keyRequest) {
-            if ($keyRequest->status === \KeyRequest::STATUS_APPROVED) {
+        foreach ($keys as $key) {
+            if ($key->status === \Key::STATUS_APPROVED) {
                 $foundOne = true;
             }
         }
@@ -740,21 +739,21 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertTrue(
             $foundOne,
-            'Failed to return an approved key request for a user that should '
+            'Failed to return an approved key for a user that should '
             . 'have one.'
         );
     }
     
-    public function testGetKeyRequestsWithApiNames_denied()
+    public function testGetKeysWithApiNames_denied()
     {
         // Arrange:
-        $user = $this->users('userWithDeniedKeyRequest');
+        $user = $this->users('userWithDeniedKey');
         
         // Act:
-        $keyRequests = $user->getKeyRequestsWithApiNames();
+        $keys = $user->getKeysWithApiNames();
         $foundOne = false;
-        foreach ($keyRequests as $keyRequest) {
-            if ($keyRequest->status === \KeyRequest::STATUS_DENIED) {
+        foreach ($keys as $key) {
+            if ($key->status === \Key::STATUS_DENIED) {
                 $foundOne = true;
             }
         }
@@ -762,21 +761,21 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertTrue(
             $foundOne,
-            'Failed to return a denied key request for a user that should '
+            'Failed to return a denied key  for a user that should '
             . 'have one.'
         );
     }
     
-    public function testGetKeyRequestsWithApiNames_pending()
+    public function testGetKeysWithApiNames_pending()
     {
         // Arrange:
-        $user = $this->users('userWithPendingKeyRequest');
+        $user = $this->users('userWithPendingKey');
         
         // Act:
-        $keyRequests = $user->getKeyRequestsWithApiNames();
+        $keys = $user->getKeysWithApiNames();
         $foundOne = false;
-        foreach ($keyRequests as $keyRequest) {
-            if ($keyRequest->status === \KeyRequest::STATUS_PENDING) {
+        foreach ($keys as $key) {
+            if ($key->status === \Key::STATUS_PENDING) {
                 $foundOne = true;
             }
         }
@@ -784,21 +783,21 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertTrue(
             $foundOne,
-            'Failed to return a pending key request for a user that should '
+            'Failed to return a pending key for a user that should '
             . 'have one.'
         );
     }
     
-    public function testGetKeyRequestsWithApiNames_revoked()
+    public function testGetKeysWithApiNames_revoked()
     {
         // Arrange:
-        $user = $this->users('userWithRevokedKeyRequest');
+        $user = $this->users('userWithRevokedKey');
         
         // Act:
-        $keyRequests = $user->getKeyRequestsWithApiNames();
+        $keys = $user->getKeysWithApiNames();
         $foundOne = false;
-        foreach ($keyRequests as $keyRequest) {
-            if ($keyRequest->status === \KeyRequest::STATUS_REVOKED) {
+        foreach ($keys as $key) {
+            if ($key->status === \Key::STATUS_REVOKED) {
                 $foundOne = true;
             }
         }
@@ -806,7 +805,7 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertTrue(
             $foundOne,
-            'Failed to return a revoked key request for a user that should '
+            'Failed to return a revoked key for a user that should '
             . 'have one.'
         );
     }
@@ -965,32 +964,20 @@ class UserTest extends DeveloperPortalTestCase
 	public function testHasApisRelationship()
     {
         // Confirm that the relationship is set up between the classes.
-        $user = new User();
-        $this->assertTrue(isset($user->apis),
-            'No way found to retrieve APIs owned by a User instance');
-    }
-    
-	public function testHasKeyRequestsRelationship()
-    {
-        // Confirm that the relationship is set up between the classes.
-        $user = new User();
-        $this->assertTrue(isset($user->keyRequests),
-            'No way found to retrieve KeyRequests from a User instance');
+        $this->assertClassHasRelation(new User(), 'apis', 'Api');
     }
     
 	public function testHasKeysRelationship()
     {
         // Confirm that the relationship is set up between the classes.
-        $user = new User();
-        $this->assertTrue(isset($user->keys),
-            'No way found to retrieve Keys from a User instance');
+        $this->assertClassHasRelation(new User(), 'keys', 'Key');
     }
     
     public function testGetActiveKeyToApi_noApiGiven()
     {
         // Arrange:
         $api = null;
-        $user = $this->users('userWithApprovedKeyRequest');
+        $user = $this->users('userWithApprovedKey');
         
         // Act:
         $result = $user->getActiveKeyToApi($api);
@@ -1002,11 +989,11 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testGetActiveKeyToApi_approvedKeyRequest()
+    public function testGetActiveKeyToApi_approvedKey()
     {
         // Arrange:
         $api = $this->apis('api2');
-        $user = $this->users('userWithApprovedKeyRequest');
+        $user = $this->users('userWithApprovedKey');
         
         // Act:
         $result = $user->getActiveKeyToApi($api);
@@ -1018,7 +1005,7 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testGetActiveKeyToApi_noKeyRequest()
+    public function testGetActiveKeyToApi_noKey()
     {
         // Arrange:
         $api = $this->apis('api2');
@@ -1031,15 +1018,15 @@ class UserTest extends DeveloperPortalTestCase
         $this->assertNull(
             $result,
             'Incorrectly indicated that a User has an active key to an Api '
-            . 'when they have neither a Key nor a KeyRequest.'
+            . 'when they do not have such a Key.'
         );
     }
     
-    public function testGetActiveKeyToApi_deniedKeyRequest()
+    public function testGetActiveKeyToApi_deniedKey()
     {
         // Arrange:
         $api = $this->apis('api2');
-        $user = $this->users('userWithDeniedKeyRequest');
+        $user = $this->users('userWithDeniedKey');
         
         // Act:
         $result = $user->getActiveKeyToApi($api);
@@ -1048,7 +1035,7 @@ class UserTest extends DeveloperPortalTestCase
         $this->assertNull(
             $result,
             'Incorrectly indicated that a User has an active key to an Api '
-            . 'when they only have a denied KeyRequest.'
+            . 'when they only have a denied Key.'
         );
     }
     
@@ -1056,7 +1043,7 @@ class UserTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $api = $this->apis('api2');
-        $user = $this->users('userWithPendingKeyRequest');
+        $user = $this->users('userWithPendingKey');
         
         // Act:
         $result = $user->getActiveKeyToApi($api);
@@ -1073,7 +1060,7 @@ class UserTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $api = $this->apis('api2');
-        $user = $this->users('userWithRevokedKeyRequest');
+        $user = $this->users('userWithRevokedKey');
         
         // Act:
         $result = $user->getActiveKeyToApi($api);
@@ -1177,7 +1164,7 @@ class UserTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $api = null;
-        $user = $this->users('userWithPendingKeyRequest');
+        $user = $this->users('userWithPendingKey');
         
         // Act:
         $result = $user->hasPendingKeyForApi($api);
@@ -1185,16 +1172,16 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertFalse(
             $result,
-            'Incorrectly reported that a User has a pending KeyRequest for a '
+            'Incorrectly reported that a User has a pending Key for a '
             . 'null API.'
         );
     }
     
-    public function testHasPendingKeyForApi_no_onlyHasApprovedKeyRequest()
+    public function testHasPendingKeyForApi_no_onlyHasApprovedKey()
     {
         // Arrange:
         $api = $this->apis('api2');
-        $user = $this->users('userWithApprovedKeyRequest');
+        $user = $this->users('userWithApprovedKey');
         
         // Act:
         $result = $user->hasPendingKeyForApi($api);
@@ -1202,12 +1189,12 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertFalse(
             $result,
-            'Incorrectly reported that a User has a pending KeyRequest for an '
-            . 'API when they only have an approved KeyRequest.'
+            'Incorrectly reported that a User has a pending Key for an '
+            . 'API when they only have an approved Key.'
         );
     }
     
-    public function testHasPendingKeyForApi_no_noKeyRequest()
+    public function testHasPendingKeyForApi_no_noKey()
     {
         // Arrange:
         $api = $this->apis('api2');
@@ -1219,16 +1206,16 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertFalse(
             $result,
-            'Incorrectly indicated that a User has a pending KeyRequest for an '
-            . 'Api when they have no KeyRequests.'
+            'Incorrectly indicated that a User has a pending Key for an '
+            . 'Api when they have no pending Keys.'
         );
     }
     
-    public function testHasPendingKeyForApi_no_onlyHasDeniedKeyRequest()
+    public function testHasPendingKeyForApi_no_onlyHasDeniedKey()
     {
         // Arrange:
         $api = $this->apis('api2');
-        $user = $this->users('userWithDeniedKeyRequest');
+        $user = $this->users('userWithDeniedKey');
         
         // Act:
         $result = $user->hasPendingKeyForApi($api);
@@ -1236,16 +1223,16 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertFalse(
             $result,
-            'Incorrectly reported that a User has a pending KeyRequest for an '
-            . 'API when they only have a denied KeyRequest.'
+            'Incorrectly reported that a User has a pending Key for an '
+            . 'API when they only have a denied Key.'
         );
     }
     
-    public function testHasPendingKeyForApi_yes_hasPendingKeyRequest()
+    public function testHasPendingKeyForApi_yes_hasPendingKey()
     {
         // Arrange:
         $api = $this->apis('api2');
-        $user = $this->users('userWithPendingKeyRequest');
+        $user = $this->users('userWithPendingKey');
         
         // Act:
         $result = $user->hasPendingKeyForApi($api);
@@ -1253,15 +1240,15 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertTrue(
             $result,
-            'Failed to report that a User has a pending KeyRequest to an Api.'
+            'Failed to report that a User has a pending Key to an Api.'
         );
     }
     
-    public function testHasPendingKeyForApi_no_onlyHasRevokedKeyRequest()
+    public function testHasPendingKeyForApi_no_onlyHasRevokedKey()
     {
         // Arrange:
         $api = $this->apis('api2');
-        $user = $this->users('userWithRevokedKeyRequest');
+        $user = $this->users('userWithRevokedKey');
         
         // Act:
         $result = $user->hasPendingKeyForApi($api);
@@ -1269,8 +1256,8 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertFalse(
             $result,
-            'Incorrectly indicated that a User has a pending KeyRequest for an '
-            . 'Api when they only have a revoked KeyRequest.'
+            'Incorrectly indicated that a User has a pending Key for an '
+            . 'Api when they only have a revoked Key.'
         );
     }
     

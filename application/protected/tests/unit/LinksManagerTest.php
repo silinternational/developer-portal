@@ -4,7 +4,7 @@ class LinksManagerTest extends CDbTestCase
 {
     public $fixtures = array(
         'apis' => 'Api',
-        'keyRequests' => 'KeyRequest',
+        'keys' => 'Key',
         'users' => 'User',
     );
     
@@ -288,34 +288,34 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetDashboardKeyRequestActionLinks_noKeyRequest()
+    public function testGetDashboardPendingKeyActionLinks_noKey()
     {
         // Arrange:
-        $keyRequest = null;
+        $key = null;
         $expected = array();
         
         // Act:
-        $actual = LinksManager::getDashboardKeyRequestActionLinks($keyRequest);
+        $actual = LinksManager::getDashboardPendingKeyActionLinks($key);
         
         // Assert:
         $this->assertEquals(
             $expected,
             $actual,
-            'Failed to return no ActionLinks when given a null KeyRequest.'
+            'Failed to return no ActionLinks when given a null Key.'
         );
     }
     
-    public function testGetDashboardKeyRequestActionLinks_realKeyRequest()
+    public function testGetDashboardPendingKeyActionLinks_realKey()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKeyRequestUser6');
+        $key = $this->keys('pendingKeyUser6');
         $expectedLinkTexts = array(
             'View Details',
         );
         
         // Act:
-        $actionLinks = LinksManager::getDashboardKeyRequestActionLinks(
-            $keyRequest
+        $actionLinks = LinksManager::getDashboardPendingKeyActionLinks(
+            $key
         );
         $actualLinksTexts = array();
         foreach ($actionLinks as $actionLink) {
@@ -330,16 +330,16 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetKeyRequestDetailsActionLinksForUser_noKeyRequest()
+    public function testGetPendingKeyDetailsActionLinksForUser_noKey()
     {
         // Arrange:
-        $keyRequest = null;
+        $key = null;
         $user = $this->users('userWithRoleOfAdmin');
         $expected = array();
         
         // Act:
-        $actual = LinksManager::getKeyRequestDetailsActionLinksForUser(
-            $keyRequest,
+        $actual = LinksManager::getPendingKeyDetailsActionLinksForUser(
+            $key,
             $user
         );
         
@@ -347,22 +347,22 @@ class LinksManagerTest extends CDbTestCase
         $this->assertEquals(
             $expected,
             $actual,
-            'Failed to return no ActionLinks when given a null KeyRequest.'
+            'Failed to return no ActionLinks when given a null Key.'
         );
     }
     
-    public function testGetDashboardKeyRequestActionLinks_canDeleteKeyRequest()
+    public function testGetDashboardPendingKeyActionLinks_canDeleteKey()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKeyRequestUser6');
+        $key = $this->keys('pendingKeyUser6');
         $user = $this->users('userWithRoleOfAdmin');
         $expectedLinkTexts = array(
             'Delete Key Request',
         );
         
         // Act:
-        $actionLinks = LinksManager::getKeyRequestDetailsActionLinksForUser(
-            $keyRequest,
+        $actionLinks = LinksManager::getPendingKeyDetailsActionLinksForUser(
+            $key,
             $user
         );
         $actualLinksTexts = array();
@@ -378,16 +378,16 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetDashboardKeyRequestActionLinks_cannotDeleteKeyRequest()
+    public function testGetDashboardPendingKeyActionLinks_cannotDeleteKey()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKeyRequestUser6');
+        $key = $this->keys('pendingKeyUser6');
         $user = $this->users('userWithNoPendingKeys');
         $expectedLinkTexts = array();
         
         // Act:
-        $actionLinks = LinksManager::getKeyRequestDetailsActionLinksForUser(
-            $keyRequest,
+        $actionLinks = LinksManager::getPendingKeyDetailsActionLinksForUser(
+            $key,
             $user
         );
         $actualLinksTexts = array();

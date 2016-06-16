@@ -144,10 +144,10 @@ return array(
         'created'         => '2016-06-07 15:08:12',
         'updated'         => '2016-06-07 15:08:12',
     ),
-    'apiWithTwoPendingKeyRequests'  => array(
+    'apiWithTwoPendingKeys'  => array(
         'api_id'          => 10,
         'code'            => 'two-pending',
-        'display_name'    => 'API With Two Pending Key Requests',
+        'display_name'    => 'API With Two Pending Keys',
         'endpoint'        => 'localhost',
         'default_path'    => '/two-pending',
         'queries_second'  => 10,
@@ -209,12 +209,12 @@ return array(
         'created'         => '2016-06-07 15:08:12',
         'updated'         => '2016-06-07 15:08:12',
     ),
-    'apiWithZeroPendingKeyRequests'  => array(
+    'apiWithZeroPendingKeys'  => array(
         'api_id'          => 14,
-        'code'            => 'zero-key-requests',
-        'display_name'    => 'API With Zero Pending Key Requests',
+        'code'            => 'zero-pending-keys',
+        'display_name'    => 'API With Zero Pending Keys',
         'endpoint'        => 'localhost',
-        'default_path'    => '/zero-key-requests',
+        'default_path'    => '/zero-pending-keys',
         'queries_second'  => 10,
         'queries_day'     => 1000,
         'endpoint_timeout'=> 10,
