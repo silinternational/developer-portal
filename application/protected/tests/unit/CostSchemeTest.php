@@ -33,8 +33,85 @@ class CostSchemeTest extends \CDbTestCase
         $this->markTestIncomplete('Test not yet written.');
     }
     
-    public function testHasBothOrNeither()
+    public function testHasBothOrNeither_has1st()
     {
-        $this->markTestIncomplete('Test not yet written.');
+        // Arrange:
+        /* @var $costScheme \CostScheme */
+        $costScheme = $this->costSchemes('hasYearlyCommPriceAndPlanCode');
+        $costScheme->yearly_commercial_plan_code = null;
+        $attribute = 'yearly_commercial_price';
+        $params = array(
+            'otherAttribute' => 'yearly_commercial_plan_code',
+        );
+        
+        // Act:
+        $costScheme->hasBothOrNeither($attribute, $params);
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $costScheme->getErrors(),
+            'Failed to report error when only the first attribute has a non-null value.'
+        );
+    }
+    
+    public function testHasBothOrNeither_has2nd()
+    {
+        // Arrange:
+        /* @var $costScheme \CostScheme */
+        $costScheme = $this->costSchemes('hasYearlyCommPriceAndPlanCode');
+        $costScheme->yearly_commercial_price = null;
+        $attribute = 'yearly_commercial_price';
+        $params = array(
+            'otherAttribute' => 'yearly_commercial_plan_code',
+        );
+        
+        // Act:
+        $costScheme->hasBothOrNeither($attribute, $params);
+        
+        // Assert:
+        $this->assertNotEmpty(
+            $costScheme->getErrors(),
+            'Failed to report error when only the second attribute has a non-null value.'
+        );
+    }
+    
+    public function testHasBothOrNeither_hasBoth()
+    {
+        // Arrange:
+        /* @var $costScheme \CostScheme */
+        $costScheme = $this->costSchemes('hasYearlyCommPriceAndPlanCode');
+        $attribute = 'yearly_commercial_price';
+        $params = array(
+            'otherAttribute' => 'yearly_commercial_plan_code',
+        );
+        
+        // Act:
+        $costScheme->hasBothOrNeither($attribute, $params);
+        
+        // Assert:
+        $this->assertEmpty($costScheme->getErrors(), sprintf(
+            'Unexpectedly reported errors when both attributes have a non-null value: %s',
+            print_r($costScheme->getErrors(), true)
+        ));
+    }
+    
+    public function testHasBothOrNeither_hasNeither()
+    {
+        // Arrange:
+        /* @var $costScheme \CostScheme */
+        $costScheme = $this->costSchemes('hasPriceAndPlanCodeForMonthlyCommNotYearlyComm');
+        $attribute = 'yearly_commercial_price';
+        $params = array(
+            'otherAttribute' => 'yearly_commercial_plan_code',
+        );
+        
+        // Act:
+        $costScheme->hasBothOrNeither($attribute, $params);
+        
+        // Assert:
+        $this->assertEmpty($costScheme->getErrors(), sprintf(
+            'Unexpectedly reported errors when neither attribute has a non-null value: %s',
+            print_r($costScheme->getErrors(), true)
+        ));
     }
 }
