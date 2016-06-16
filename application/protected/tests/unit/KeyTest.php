@@ -607,6 +607,21 @@ class KeyTest extends DeveloperPortalTestCase
         //       fail.
     }
     
+    public function testNotifyApiOwnerOfRevokedKey()
+    {
+        $this->markTestIncomplete('Test not yet written.');
+    }
+    
+    public function testNotifyUserOfApprovedKey()
+    {
+        $this->markTestIncomplete('Test not yet written.');
+    }
+    
+    public function testNotifyUserOfRevokedKey()
+    {
+        $this->markTestIncomplete('Test not yet written.');
+    }
+    
     public function testNotifyUserOfDeniedKey_sendIsCalled()
     {
         /**************************** Arrange: ********************************/

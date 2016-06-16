@@ -230,35 +230,7 @@ class Key extends KeyBase
         $this->secret = \Utils::getRandStr(128);
         
         if ($this->save()) {
-            
-            // If we are in an environment where we should send email
-            // notifications...
-            if (\Yii::app()->params['smtp'] !== false) {
-            
-                // If possible, include the API owner as Cc: on the email.
-                $cc = array();
-                if ($this->api->owner && $this->api->owner->email) {
-                    $cc[] = $this->api->owner->email;
-                }
-                
-                // Send an email notification.
-                $mail = \Utils::getMailer();
-                $mail->setView('key-created');
-                $mail->setTo($this->user->email);
-                $mail->setCc($cc);
-                $mail->setSubject(sprintf(
-                    'API key created for %s API',
-                    $this->api->display_name
-                ));
-                if (isset(\Yii::app()->params['mail']['bcc'])) {
-                    $mail->setBcc(\Yii::app()->params['mail']['bcc']);
-                }
-                $mail->setData(array(
-                    'key' => $this,
-                    'api' => $this->api,
-                ));
-                $mail->send();
-            }
+            $this->notifyUserOfApprovedKey();
             
             // Indicate success.
             return true;
@@ -270,8 +242,6 @@ class Key extends KeyBase
     public function beforeDelete()
     {
         parent::beforeDelete();
-        
-        $this->sendKeyDeletionNotification();
         
         global $ENABLE_AXLE;
         if(isset($ENABLE_AXLE) && !$ENABLE_AXLE){
@@ -643,6 +613,195 @@ class Key extends KeyBase
                         CLogger::LEVEL_WARNING
                     );
                 }
+            }
+        }
+    }
+    
+    /**
+     * Try to send a notification email to the Owner of an Api that a Key to
+     * their Api has been revoked.
+     * 
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function notifyApiOwnerOfRevokedKey(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params;
+        }
+        
+        // If we are in an environment where we should NOT send email
+        // notifications, then don't.
+        if ($appParams['mail'] === false) {
+            return;
+        }
+        
+        if ($this->api->owner && $this->api->owner->email) {
+
+            // Try to send them a notification email.
+            if ($mailer === null) {
+                $mailer = Utils::getMailer();
+            }
+            $mailer->setView('key-revoked-api-owner');
+            $mailer->setTo($this->api->owner->email);
+            $mailer->setSubject(sprintf(
+                'Key revoked for %s API',
+                $this->api->display_name
+            ));
+            if (isset($appParams['mail']['bcc'])) {
+                $mailer->setBcc($appParams['mail']['bcc']);
+            }
+            $mailer->setData(array(
+                'apiOwner' => $this->api->owner,
+                'api' => $this->api,
+                'key' => $this,
+                'keyOwner' => $this->user,
+            ));
+
+            // If unable to send the email, allow the process to
+            // continue but communicate the email failure somehow.
+            if ( ! $mailer->send()) {
+                \Yii::log(
+                    'Unable to send key-revoked notification email to API '
+                    . 'owner: ' . $mailer->ErrorInfo,
+                    CLogger::LEVEL_WARNING
+                );
+            }
+        }
+    }
+    
+    /**
+     * Try to send a notification email to the User that one of their pending
+     * Keys has been approved.
+     * 
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function notifyUserOfApprovedKey(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params;
+        }
+        
+        // If we are in an environment where we should NOT send email
+        // notifications, then don't.
+        if ($appParams['mail'] === false) {
+            return;
+        }
+        
+        if ($this->user && $this->user->email) {
+
+            // Try to send them a notification email.
+            if ($mailer === null) {
+                $mailer = Utils::getMailer();
+            }
+            $mailer->setView('key-approved');
+            $mailer->setTo($this->user->email);
+            $mailer->setSubject(sprintf(
+                'Key approved for %s API',
+                $this->api->display_name
+            ));
+            if (isset($appParams['mail']['bcc'])) {
+                $mailer->setBcc($appParams['mail']['bcc']);
+            }
+            $mailer->setData(array(
+                'key' => $this,
+                'api' => $this->api,
+                'user' => $this->user,
+            ));
+            
+            /**
+             * @todo Figure out whether we want to Cc: the API Owner on this
+             *       email. I think not, to avoid exposing their email address
+             *       to people without their consent.
+             */
+            //$cc = array();
+            //if ($this->api->owner && $this->api->owner->email) {
+            //    $cc[] = $this->api->owner->email;
+            //}
+            //$mailer->setCc($cc);
+
+            // If unable to send the email, allow the process to
+            // continue but communicate the email failure somehow.
+            if ( ! $mailer->send()) {
+                \Yii::log(
+                    'Unable to send key-approved notification email to user: '
+                    . $mailer->ErrorInfo,
+                    CLogger::LEVEL_WARNING
+                );
+            }
+        }
+    }
+    
+    /**
+     * Try to send a notification email to the User that one of their Keys has
+     * been revoked.
+     * 
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function notifyUserOfRevokedKey(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params;
+        }
+        
+        // If we are in an environment where we should NOT send email
+        // notifications, then don't.
+        if ($appParams['mail'] === false) {
+            return;
+        }
+        
+        if ($this->user && $this->user->email) {
+
+            // Try to send them a notification email.
+            if ($mailer === null) {
+                $mailer = Utils::getMailer();
+            }
+            $mailer->setView('key-revoked-user');
+            $mailer->setTo($this->user->email);
+            $mailer->setSubject(sprintf(
+                'Key revoked for %s API',
+                $this->api->display_name
+            ));
+            if (isset($appParams['mail']['bcc'])) {
+                $mailer->setBcc($appParams['mail']['bcc']);
+            }
+            $mailer->setData(array(
+                'key' => $this,
+                'api' => $this->api,
+                'user' => $this->user,
+            ));
+
+            // If unable to send the email, allow the process to
+            // continue but communicate the email failure somehow.
+            if ( ! $mailer->send()) {
+                \Yii::log(
+                    'Unable to send key-revoked notification email to user: '
+                    . $mailer->ErrorInfo,
+                    CLogger::LEVEL_WARNING
+                );
             }
         }
     }
