@@ -312,9 +312,9 @@ if ($user->hasOwnerPrivileges()) {
                 'class' => 'CLinkColumn',
                 'labelExpression' => 'sprintf('
                     . '"<span class=\"badge%s\" title=\"%s\">%s</span>",'
-                    . '($data->keyCount ? " badge-info" : "" ),'
+                    . '($data->approvedKeyCount ? " badge-info" : "" ),'
                     . '"Click for more information",'
-                    . '$data->keyCount'
+                    . '$data->approvedKeyCount'
                 . ')',
                 'urlExpression' => '\Yii::app()->createUrl('
                     . '"api/active-keys", '

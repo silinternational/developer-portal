@@ -888,19 +888,19 @@ class ApiTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testKeyCount()
+    public function testApprovedKeyCount()
     {
         // Arrange:
         $api = $this->apis('apiWithTwoKeys');
         
         // Act:
-        $actual = $api->keyCount;
+        $actual = $api->approvedKeyCount;
         
         // Assert:
         $this->assertEquals(
             2,
             $actual,
-            'Failed to report the correct number of keys for an Api.'
+            'Failed to report the correct number of (approved) keys for an Api.'
         );
     }
     

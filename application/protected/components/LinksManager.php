@@ -147,7 +147,7 @@ class LinksManager extends CComponent
         
         if ($user->hasAdminPrivilegesForApi($api)) {
             
-            if ($api->keyCount > 0) {
+            if ($api->approvedKeyCount > 0) {
                 $actionLinks[] = new ActionLink(
                     sprintf(
                         'mailto:%s?subject=%s&bcc=%s',

@@ -25,7 +25,7 @@ $this->pageTitle = 'Users';
                 array('name' => 'first_name', 'header' => 'First name'),
                 array('name' => 'last_name', 'header' => 'Last name'),
                 array('name' => 'email', 'header' => 'Email'),
-                array('name' => 'keyCount', 'header' => 'Keys'),
+                array('name' => 'approvedKeyCount', 'header' => 'Keys'),
                 array(
                     'name' => 'role',
                     'header' => 'Role',

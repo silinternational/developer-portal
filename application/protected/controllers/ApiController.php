@@ -427,7 +427,7 @@ class ApiController extends Controller
         if ($user->role === User::ROLE_ADMIN) {
             $apiList = new CActiveDataProvider('Api',array(
                 'criteria' => array(
-                    'with' => array('keyCount', 'pendingKeyCount'),
+                    'with' => array('approvedKeyCount', 'pendingKeyCount'),
                 ),
             ));
         } else {

@@ -145,7 +145,7 @@ class Api extends ApiBase
         $linkTarget = null
     ) {
         // Get the active key count (to avoid retrieving it multiple times).
-        $count = $this->keyCount;
+        $count = $this->approvedKeyCount;
         
         // Generate and return the HTML for a badge, highlighting it if the
         // pending key count is non-zero.
@@ -473,7 +473,7 @@ class Api extends ApiBase
     public function relations()
     {
         return array_merge(parent::relations(), array(
-            'keyCount' => array(
+            'approvedKeyCount' => array(
                 self::STAT,
                 'Key',
                 'api_id',

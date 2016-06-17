@@ -70,7 +70,7 @@ $this->pageSubtitle = 'Current Keys for this API';
 </div>
 <?php
 
-if ($api->keyCount > 0) {
+if ($api->approvedKeyCount > 0) {
     echo sprintf(
         '<a href="%s" class="btn space-after-icon"><i class="icon-%s"></i>%s</a>',
         sprintf(

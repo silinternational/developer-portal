@@ -95,7 +95,7 @@ class UserController extends Controller
     {
         $usersDataProvider = new CActiveDataProvider('User', array(
             'criteria' => array(
-                'with' => 'keyCount'
+                'with' => 'approvedKeyCount'
             )
         ));
 
