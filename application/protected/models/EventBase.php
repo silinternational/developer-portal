@@ -7,14 +7,16 @@
  * @property integer $event_id
  * @property integer $api_id
  * @property integer $key_id
- * @property integer $user_id
+ * @property integer $acting_user_id
  * @property string $description
  * @property string $created
+ * @property integer $affected_user_id
  *
  * The followings are the available model relations:
  * @property Api $api
  * @property Key $key
- * @property User $user
+ * @property User $actingUser
+ * @property User $affectedUser
  */
 class EventBase extends CActiveRecord
 {
@@ -35,11 +37,11 @@ class EventBase extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('description, created', 'required'),
-			array('api_id, key_id, user_id', 'numerical', 'integerOnly'=>true),
+			array('api_id, key_id, acting_user_id, affected_user_id', 'numerical', 'integerOnly'=>true),
 			array('description', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('event_id, api_id, key_id, user_id, description, created', 'safe', 'on'=>'search'),
+			array('event_id, api_id, key_id, acting_user_id, description, created, affected_user_id', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -53,7 +55,8 @@ class EventBase extends CActiveRecord
 		return array(
 			'api' => array(self::BELONGS_TO, 'Api', 'api_id'),
 			'key' => array(self::BELONGS_TO, 'Key', 'key_id'),
-			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
+			'actingUser' => array(self::BELONGS_TO, 'User', 'acting_user_id'),
+			'affectedUser' => array(self::BELONGS_TO, 'User', 'affected_user_id'),
 		);
 	}
 
@@ -66,9 +69,10 @@ class EventBase extends CActiveRecord
 			'event_id' => 'Event',
 			'api_id' => 'Api',
 			'key_id' => 'Key',
-			'user_id' => 'User',
+			'acting_user_id' => 'Acting User',
 			'description' => 'Description',
 			'created' => 'Created',
+			'affected_user_id' => 'Affected User',
 		);
 	}
 
@@ -93,9 +97,10 @@ class EventBase extends CActiveRecord
 		$criteria->compare('event_id',$this->event_id);
 		$criteria->compare('api_id',$this->api_id);
 		$criteria->compare('key_id',$this->key_id);
-		$criteria->compare('user_id',$this->user_id);
+		$criteria->compare('acting_user_id',$this->acting_user_id);
 		$criteria->compare('description',$this->description,true);
 		$criteria->compare('created',$this->created,true);
+		$criteria->compare('affected_user_id',$this->affected_user_id);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

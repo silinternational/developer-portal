@@ -759,7 +759,8 @@ class User extends UserBase
     {
         return array(
             'apis' => array(self::HAS_MANY, 'Api', 'owner_id'),
-            'events' => array(self::HAS_MANY, 'Event', 'user_id'),
+            'affectedByEvents' => array(self::HAS_MANY, 'Event', 'affected_user_id'),
+            'causedEvents' => array(self::HAS_MANY, 'Event', 'acting_user_id'),
             'approvedKeyCount' => array(
                 self::STAT,
                 'Key',

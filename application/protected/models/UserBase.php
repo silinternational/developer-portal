@@ -24,6 +24,7 @@
  * @property ApiVisibilityUser[] $apiVisibilityUsers
  * @property ApiVisibilityUser[] $apiVisibilityUsers1
  * @property Event[] $events
+ * @property Event[] $events1
  * @property Key[] $keys
  * @property Key[] $keys1
  */
@@ -70,7 +71,8 @@ class UserBase extends CActiveRecord
 			'apiVisibilityDomains' => array(self::HAS_MANY, 'ApiVisibilityDomain', 'invited_by_user_id'),
 			'apiVisibilityUsers' => array(self::HAS_MANY, 'ApiVisibilityUser', 'invited_by_user_id'),
 			'apiVisibilityUsers1' => array(self::HAS_MANY, 'ApiVisibilityUser', 'invited_user_id'),
-			'events' => array(self::HAS_MANY, 'Event', 'user_id'),
+			'events' => array(self::HAS_MANY, 'Event', 'acting_user_id'),
+			'events1' => array(self::HAS_MANY, 'Event', 'affected_user_id'),
 			'keys' => array(self::HAS_MANY, 'Key', 'processed_by'),
 			'keys1' => array(self::HAS_MANY, 'Key', 'user_id'),
 		);

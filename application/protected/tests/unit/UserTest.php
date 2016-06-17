@@ -76,6 +76,16 @@ class UserTest extends DeveloperPortalTestCase
         }
     }
     
+    public function testAffectedByEvents_none()
+    {
+        $this->markTestIncomplete('Test not yet written.');
+    }
+    
+    public function testAffectedByEvents_one()
+    {
+        $this->markTestIncomplete('Test not yet written.');
+    }
+    
     public function testApis()
     {
         // Arrange:
@@ -679,6 +689,16 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
 
+    public function testCausedEvents_none()
+    {
+        $this->markTestIncomplete('Test not yet written.');
+    }
+    
+    public function testCausedEvents_one()
+    {
+        $this->markTestIncomplete('Test not yet written.');
+    }
+    
     public function testConfirmRolesDiffer()
     {
         // Make sure the role constants differ (both in their values and
