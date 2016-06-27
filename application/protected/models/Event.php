@@ -23,4 +23,19 @@ class Event extends EventBase
     {
         return parent::model($className);
     }
+    
+    public function rules()
+    {
+        return \CMap::mergeArray(array(
+            array(
+                /* Always automatically calculate the 'created' value for new
+                 * Events, rather than letting the user specify it.  */
+                'created',
+                'default',
+                'value' => new CDbExpression('NOW()'),
+                'setOnEmpty' => false, // setOnEmpty means "only set when empty"
+                'on' => 'insert',
+            ),
+        ), parent::rules());
+    }
 }
