@@ -2,6 +2,11 @@
 
 use ApiAxle\Api\Api as AxleApi;
 
+/**
+ * Additional model relations (defined here, not in base class):
+ * @property int $approvedKeyCount
+ * @property int $pendingKeyCount
+ */
 class Api extends ApiBase
 {
     CONST APPROVAL_TYPE_AUTO = 'auto';
