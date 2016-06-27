@@ -28,6 +28,11 @@ class EventTest extends \CDbTestCase
         }
     }
     
+    public function testLog()
+    {
+        $this->markTestIncomplete('Test(s) not yet written.');
+    }
+    
     public function testRules_created_noValueGiven()
     {
         // Arrange:

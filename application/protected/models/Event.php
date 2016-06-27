@@ -12,6 +12,46 @@ class Event extends EventBase
             'api_id' => 'API',
         ));
     }
+    
+    /**
+     * Log an event to the database. The User ID of the current WebUser (if
+     * applicable) will also be recorded as the User who caused the event.
+     * 
+     * @param string $description Short who-did-what style of summary describing
+     *     what happened.<br>
+     *     EXAMPLES:<br>
+     *     'John Smith invited some_person@example.com to see the "Historical Records" API.'<br>
+     *     'Jane Doe updated the cost scheme for the "World Statistics" API.'
+     * @param int|null $apiId The ID of the Api (if applicable).
+     * @param int|null $keyId The ID of the Key (if applicable).
+     * @param int|null $affectedUserId The ID of the affected User (if
+     *     applicable, such as an existing User who was invited to see an Api).
+     */
+    public static function log(
+        $description,
+        $apiId = null,
+        $keyId = null,
+        $affectedUserId = null
+    ) {
+        $actingUserId = \Yii::app()->user->getUserId();
+        $event = new Event();
+        $event->attributes = array(
+            'api_id' => $apiId,
+            'key_id' => $keyId,
+            'acting_user_id' => $actingUserId,
+            'affected_user_id' => $affectedUserId,
+            'description' => $description,
+        );
+        if ($event->save()) {
+            \Yii::log($description, CLogger::LEVEL_WARNING);
+        } else {
+            \Yii::log(sprintf(
+                'Unable to log event: %s. Error: %s.',
+                $event->toJson(),
+                print_r($event->getErrors(), true)
+            ), CLogger::LEVEL_WARNING);
+        }
+    }
 
     /**
      * Returns the static model of the specified AR class.
@@ -37,5 +77,18 @@ class Event extends EventBase
                 'on' => 'insert',
             ),
         ), parent::rules());
+    }
+    
+    public function toJson()
+    {
+        return json_encode(array(
+            'description' => $this->description,
+            'created' => $this->created,
+            'event_id' => $this->event_id,
+            'api_id' => $this->api_id,
+            'key_id' => $this->key_id,
+            'acting_user_id' => $this->acting_user_id,
+            'affected_user_id' => $this->affected_user_id,
+        ));
     }
 }
