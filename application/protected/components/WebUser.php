@@ -117,6 +117,16 @@ class WebUser extends CWebUser
         return false;
     }
     
+    public function getUserId()
+    {
+        $user = $this->getModel();
+        if ($user !== null) {
+            return $user->user_id;
+        } else {
+            return null;
+        }
+    }
+    
     public function hasFlashes()
     {
         $flashes = $this->getFlashes(false);
