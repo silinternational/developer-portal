@@ -55,12 +55,28 @@ class User extends UserBase
             return false;
         }
         
-        if (count($this->events) > 0) {
-            $this->addError(
-                'user_id',
-                'We cannot delete this user because there are events in our log that reference this user.'
-            );
-            return false;
+        foreach ($this->affectedByEvents as $eventAffectingUser) {
+            $eventAffectingUser->affected_user_id = null;
+            if ( ! $eventAffectingUser->save()) {
+                $this->addError('user_id', sprintf(
+                    'We could not delete this User because we were not able to finish updating our records of events '
+                    . 'that affected the User: %s',
+                    print_r($eventAffectingUser->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        foreach ($this->causedEvents as $eventCausedByUser) {
+            $eventCausedByUser->acting_user_id = null;
+            if ( ! $eventCausedByUser->save()) {
+                $this->addError('user_id', sprintf(
+                    'We could not delete this User because we were not able to finish updating our records of events '
+                    . 'performed by the User: %s',
+                    print_r($eventCausedByUser->getErrors(), true)
+                ));
+                return false;
+            }
         }
         
         foreach ($this->apis as $api) {
