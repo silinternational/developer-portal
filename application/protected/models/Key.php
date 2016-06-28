@@ -13,9 +13,7 @@ class Key extends KeyBase
     
     public function afterSave()
     {
-        if ( ! parent::afterSave()) {
-            return false;
-        }
+        parent::afterSave();
         
         if ($this->status === self::STATUS_PENDING) {
             if ($this->isNewRecord) {
