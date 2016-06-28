@@ -14,6 +14,20 @@ class CostScheme extends CostSchemeBase
         ));
     }
     
+    public function afterSave()
+    {
+        parent::afterSave();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        
+        \Event::log(sprintf(
+            'Cost Scheme %s was %s%s.',
+            $this->cost_scheme_id,
+            ($this->isNewRecord ? 'created' : 'updated'),
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+        ));
+    }
+    
     /**
      * Validate that at least one of the price fields has a (non-zero) value.
      * 

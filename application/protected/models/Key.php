@@ -15,15 +15,30 @@ class Key extends KeyBase
     {
         parent::afterSave();
         
-        if ($this->status === self::STATUS_PENDING) {
-            if ($this->isNewRecord) {
-                $this->notifyApiOwnerOfPendingRequest();
+        try {
+            if ($this->status === self::STATUS_PENDING) {
+                if ($this->isNewRecord) {
+                    $this->notifyApiOwnerOfPendingRequest();
+                }
+            } elseif ($this->status === self::STATUS_DENIED) {
+                $this->notifyUserOfDeniedKey();
+            } elseif ($this->status === self::STATUS_REVOKED) {
+                $this->notifyUserOfRevokedKey();
+                $this->notifyApiOwnerOfRevokedKey();
             }
-        } elseif ($this->status === self::STATUS_DENIED) {
-            $this->notifyUserOfDeniedKey();
-        } elseif ($this->status === self::STATUS_REVOKED) {
-            $this->notifyUserOfRevokedKey();
-            $this->notifyApiOwnerOfRevokedKey();
+        } finally {
+            $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+            \Event::log(sprintf(
+                'Key %s (status: %s) for User %s (%s) to Api %s (%s) was %s%s.',
+                $this->key_id,
+                $this->status,
+                $this->user_id,
+                (isset($this->user) ? $this->user->getDisplayName() : ''),
+                $this->api_id,
+                (isset($this->api) ? $this->api->display_name : ''),
+                ($this->isNewRecord ? 'created' : 'updated'),
+                (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+            ), $this->api_id, $this->key_id, $this->user_id);
         }
     }
     
@@ -203,7 +218,7 @@ class Key extends KeyBase
             (isset($this->api) ? $this->api->display_name : ''),
             $this->api_id,
             (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-        ));
+        ), $this->api_id, $this->key_id, $this->user_id);
         
         $this->sendKeyDeletionNotification();
     }

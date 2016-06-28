@@ -35,16 +35,26 @@ class Api extends ApiBase
             $this->code,
             $this->api_id,
             (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-        ));
+        ), $this->api_id);
     }
     
     public function afterSave()
     {
         parent::afterSave();
         
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        
         // If this is a new API...
         if ($this->isNewRecord) {
-
+            
+            \Event::log(sprintf(
+                'The "%s" API (%s, ID %s) was created%s.',
+                $this->display_name,
+                $this->code,
+                $this->api_id,
+                (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+            ), $this->api_id);
+            
             // If we are NOT in an environment where we should send email
             // notifications, skip the rest of this.
             if (\Yii::app()->params['mail'] === false) {
@@ -81,6 +91,15 @@ class Api extends ApiBase
                     CLogger::LEVEL_WARNING
                 );
             }
+        } else {
+            
+            \Event::log(sprintf(
+                'The "%s" API (%s, ID %s) was updated%s.',
+                $this->display_name,
+                $this->code,
+                $this->api_id,
+                (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+            ), $this->api_id);
         }
     }
     

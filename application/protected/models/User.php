@@ -29,7 +29,22 @@ class User extends UserBase
             $this->getDisplayName(),
             $this->user_id,
             (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-        ));
+        ), null, null, $this->user_id);
+    }
+    
+    public function afterSave()
+    {
+        parent::afterSave();
+        
+        $nameOfCurrentWebUser = \Yii::app()->user->getDisplayName();
+        
+        \Event::log(sprintf(
+            'User %s (%s) was %s%s.',
+            $this->user_id,
+            $this->getDisplayName(),
+            ($this->isNewRecord ? 'added' : 'updated'),
+            (is_null($nameOfCurrentWebUser) ? '' : ' by ' . $nameOfCurrentWebUser)
+        ), null, null, $this->user_id);
     }
     
     public function beforeDelete()

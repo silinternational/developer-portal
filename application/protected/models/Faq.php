@@ -15,6 +15,21 @@ class Faq extends FaqBase
         ));
     }
     
+    public function afterSave()
+    {
+        parent::afterSave();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        
+        \Event::log(sprintf(
+            'Faq %s was %s%s (%s).',
+            $this->faq_id,
+            ($this->isNewRecord ? 'created' : 'updated'),
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser),
+            $this->question
+        ));
+    }
+    
     public function rules()
     {
         return \CMap::mergeArray(array(

@@ -8,12 +8,30 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
         \Event::log(sprintf(
-            'The ability for %s (user_id %s) to see the "%s" API (api_id %s) was deleted%s.',
+            'The ability for %s (User ID %s) to see the "%s" API (api_id %s) was deleted%s.',
             (isset($this->invitedUser) ? $this->invitedUser->getDisplayName() : 'a User'),
+            $this->invited_user_id,
             (isset($this->api) ? $this->api->display_name : ''),
             $this->api_id,
             (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-        ));
+        ), $this->api_id, null, $this->invited_user_id);
+    }
+    
+    public function afterSave()
+    {
+        parent::afterSave();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        
+        \Event::log(sprintf(
+            'The ability for %s%s to see the "%s" API (api_id %s) was %s%s.',
+            (isset($this->invited_user_id) ? $this->invitedUser->getDisplayName() : $this->invited_user_email),
+            (isset($this->invited_user_id) ? ' (User ID ' . $this->invited_user_id . ')' : ''),
+            (isset($this->api) ? $this->api->display_name : ''),
+            $this->api_id,
+            ($this->isNewRecord ? 'added' : 'updated'),
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+        ), $this->api_id, null, $this->invited_user_id);
     }
     
     /**

@@ -13,7 +13,23 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
             (isset($this->api) ? $this->api->display_name : ''),
             $this->api_id,
             (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-        ));
+        ), $this->api_id);
+    }
+    
+    public function afterSave()
+    {
+        parent::afterSave();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        
+        \Event::log(sprintf(
+            'The ability for "%s" Users to see the "%s" API (api_id %s) was %s%s.',
+            $this->domain,
+            (isset($this->api) ? $this->api->display_name : ''),
+            $this->api_id,
+            ($this->isNewRecord ? 'added' : 'updated'),
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+        ), $this->api_id);
     }
     
     /**

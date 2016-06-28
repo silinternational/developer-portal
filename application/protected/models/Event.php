@@ -16,6 +16,20 @@ class Event extends EventBase
         ));
     }
     
+    public function afterSave()
+    {
+        parent::afterSave();
+        
+        if ( ! $this->isNewRecord) {
+            $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+            \Event::log(sprintf(
+                'Event %s was updated%s.',
+                $this->event_id,
+                (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+            ));
+        }
+    }
+    
     /**
      * @return array customized attribute labels (name=>label)
      */
