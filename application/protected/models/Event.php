@@ -33,22 +33,31 @@ class Event extends EventBase
         $keyId = null,
         $affectedUserId = null
     ) {
-        $actingUserId = \Yii::app()->user->getUserId();
         $event = new Event();
-        $event->attributes = array(
-            'api_id' => $apiId,
-            'key_id' => $keyId,
-            'acting_user_id' => $actingUserId,
-            'affected_user_id' => $affectedUserId,
-            'description' => $description,
-        );
-        if ($event->save()) {
-            \Yii::log($description, CLogger::LEVEL_WARNING);
-        } else {
+        try {
+            $event->attributes = array(
+                'api_id' => $apiId,
+                'key_id' => $keyId,
+                'affected_user_id' => $affectedUserId,
+                'description' => $description,
+            );
+            $event->acting_user_id = \Yii::app()->user->getUserId();
+            
+            if ($event->save()) {
+                \Yii::log($description, CLogger::LEVEL_WARNING);
+            } else {
+                \Yii::log(sprintf(
+                    'Unable to log event: %s. Error: %s.',
+                    $event->toJson(),
+                    print_r($event->getErrors(), true)
+                ), CLogger::LEVEL_WARNING);
+            }
+        } catch (\Exception $exception) {
             \Yii::log(sprintf(
-                'Unable to log event: %s. Error: %s.',
+                'Unable to log event: %s. Exception (%s): %s.',
                 $event->toJson(),
-                print_r($event->getErrors(), true)
+                $exception->getCode(),
+                $exception->getMessage()
             ), CLogger::LEVEL_WARNING);
         }
     }
