@@ -33,18 +33,17 @@ class ApiController extends Controller
         }
         
         // Get the list of active keys for that API.
-        $activeKeys = new CActiveDataProvider('Key', array(
-            'criteria' => array(
-                'condition' => 'api_id = :api_id',
-                'params' => array(
-                    ':api_id' => $api->api_id,
-                ),
-            ),
-        ));
+        $activeKeys = array();
+        foreach ($api->keys as $key) {
+            if ($key->status === \Key::STATUS_APPROVED) {
+                $pendingKeys[] = $key;
+            }
+        }
+        $activeKeysDataProvider = new CArrayDataProvider($activeKeys);
         
         // Show the page.
         $this->render('activeKeys', array(
-            'activeKeys' => $activeKeys,
+            'activeKeysDataProvider' => $activeKeysDataProvider,
             'api' => $api,
         ));
     }
@@ -645,7 +644,7 @@ class ApiController extends Controller
         // Get a reference to the current website user's User model.
         $user = \Yii::app()->user->user;
         
-        // Prevent information about it from being seen by user's without
+        // Prevent information about it from being seen by users without
         // permission to see the specified API.
         if (( ! $api) || ( ! $api->isVisibleToUser($user))) {
             throw new CHttpException(
@@ -665,21 +664,18 @@ class ApiController extends Controller
             );
         }
         
-        // Get the list of pending key requests for that API.
-        $pendingKeyRequests = new CActiveDataProvider('KeyRequest', array(
-            'criteria' => array(
-                'condition' => 'api.code = :code AND status = :status',
-                'join' => 'LEFT JOIN api ON t.api_id = api.api_id',
-                'params' => array(
-                    ':code' => $code,
-                    ':status' => \Key::STATUS_PENDING,
-                ),
-            ),
-        ));
+        // Get the list of pending keys for that API.
+        $pendingKeys = array();
+        foreach ($api->keys as $key) {
+            if ($key->status === \Key::STATUS_PENDING) {
+                $pendingKeys[] = $key;
+            }
+        }
+        $pendingKeysDataProvider = new CArrayDataProvider($pendingKeys);
         
         // Show the page.
         $this->render('pendingKeys', array(
-            'pendingKeyRequests' => $pendingKeyRequests,
+            'pendingKeysDataProvider' => $pendingKeysDataProvider,
             'api' => $api,
         ));
     }

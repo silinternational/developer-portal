@@ -1,6 +1,6 @@
 <?php
 /* @var $this ApiController */
-/* @var $pendingKeys Key[] */
+/* @var $pendingKeysDataProvider CDataProvider */
 /* @var $api Api */
 
 // Set up the breadcrumbs.
@@ -21,7 +21,7 @@ $this->pageSubtitle = 'Pending Keys for this API';
 
         $this->widget('bootstrap.widgets.TbGridView', array(
             'type' => 'striped hover',
-            'dataProvider' => $pendingKeys,
+            'dataProvider' => $pendingKeysDataProvider,
             'template' => '{items}{pager}',
             //'filter' => new Key(),
             'columns' => array(

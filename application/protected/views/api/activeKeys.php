@@ -1,6 +1,6 @@
 <?php
 /* @var $this ApiController */
-/* @var $activeKeys Key[] */
+/* @var $activeKeysDataProvider CDataProvider */
 /* @var $api Api */
 
 // Set up the breadcrumbs.
@@ -21,7 +21,7 @@ $this->pageSubtitle = 'Current Keys for this API';
 
         $this->widget('bootstrap.widgets.TbGridView', array(
             'type' => 'striped hover',
-            'dataProvider' => $activeKeys,
+            'dataProvider' => $activeKeysDataProvider,
             'template' => '{items}{pager}',
             'columns' => array(
                 array(
