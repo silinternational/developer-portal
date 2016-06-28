@@ -630,12 +630,6 @@ class Api extends ApiBase
         }
         
         foreach ($this->events as $event) {
-            if ($event->api_id !== $this->api_id) {
-                throw new \Exception(
-                    'This Api\'s list of events included an Event that is not about this Api.',
-                    1467059353
-                );
-            }
             $event->api_id = null;
             if ( ! $event->save()) {
                 $this->addError('api_id', sprintf(
