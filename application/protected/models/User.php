@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Additional model relations (defined here, not in base class):
+ * @property int $approvedKeyCount
+ * @property int $pendingKeyCount
+ * @property int $keysProcessed
+ * @property \Event[] $affectedByEvents
+ * @property \Event[] $causedEvents
+ */
 class User extends UserBase 
 {
     const ROLE_USER = 'user';
