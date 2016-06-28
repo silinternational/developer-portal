@@ -194,9 +194,7 @@ class Key extends KeyBase
     
     public function afterDelete()
     {
-        if ( ! parent::afterDelete()) {
-            return false;
-        }
+        parent::afterDelete();
         
         $this->sendKeyDeletionNotification();
     }
