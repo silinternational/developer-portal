@@ -6,6 +6,7 @@ class UserTest extends DeveloperPortalTestCase
         'apis' => 'Api',
         'apiVisibilityDomains' => 'ApiVisibilityDomain',
         'apiVisibilityUsers' => 'ApiVisibilityUser',
+        'events' => 'Event',
         'keys' => 'Key',
         'users' => 'User',
     );
