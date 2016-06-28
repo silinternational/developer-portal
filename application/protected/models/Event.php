@@ -2,34 +2,6 @@
 
 class Event extends EventBase
 {
-    public function afterDelete()
-    {
-        parent::afterDelete();
-        
-        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-        \Event::log(sprintf(
-            'Event %s (from %s) was deleted%s: %s',
-            $this->event_id,
-            $this->created,
-            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser),
-            $this->description
-        ));
-    }
-    
-    public function afterSave()
-    {
-        parent::afterSave();
-        
-        if ( ! $this->isNewRecord) {
-            $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-            \Event::log(sprintf(
-                'Event %s was updated%s.',
-                $this->event_id,
-                (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-            ));
-        }
-    }
-    
     /**
      * @return array customized attribute labels (name=>label)
      */
