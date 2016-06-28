@@ -47,7 +47,7 @@ class User extends UserBase
         ), null, null, $this->user_id);
     }
     
-    public function beforeDelete()
+    protected function beforeDelete()
     {
         if ( ! parent::beforeDelete()) {
             return false;

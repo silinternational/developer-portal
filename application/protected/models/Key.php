@@ -276,7 +276,7 @@ class Key extends KeyBase
         }
     }
     
-    public function beforeDelete()
+    protected function beforeDelete()
     {
         parent::beforeDelete();
         

@@ -574,7 +574,7 @@ class Api extends ApiBase
         }
     }
     
-    public function beforeDelete()
+    protected function beforeDelete()
     {
         if ( ! parent::beforeDelete()) {
             return false;
