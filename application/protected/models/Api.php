@@ -24,6 +24,20 @@ class Api extends ApiBase
     CONST VISIBILITY_INVITATION = 'invitation';
     CONST VISIBILITY_PUBLIC = 'public';
     
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        \Event::log(sprintf(
+            'The "%s" API (%s, ID %s) was deleted%s.',
+            $this->display_name,
+            $this->code,
+            $this->api_id,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+        ));
+    }
+    
     public function afterSave()
     {
         parent::afterSave();
@@ -613,15 +627,6 @@ class Api extends ApiBase
                 return false;
             }
         }
-        
-        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-        \Event::log(sprintf(
-            'The "%s" API (%s, ID %s) was deleted%s.',
-            $this->display_name,
-            $this->code,
-            $this->api_id,
-            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-        ));
         
         global $ENABLE_AXLE;
         if(isset($ENABLE_AXLE) && !$ENABLE_AXLE){
