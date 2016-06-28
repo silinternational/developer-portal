@@ -51,13 +51,16 @@ class UserTest extends DeveloperPortalTestCase
                     print_r($keyProcessed->getErrors(), true)
                 ));
             }
-            $events = \Event::model()->findAllByAttributes(array(
-                'user_id' => $user->user_id,
-            ));
-            foreach ($events as $event) {
-                $this->assertTrue($event->delete(), sprintf(
+            foreach ($user->causedEvents as $eventCausedByUser) {
+                $this->assertTrue($eventCausedByUser->delete(), sprintf(
                     'Could not delete Event fixture: %s',
-                    print_r($event->getErrors(), true)
+                    print_r($eventCausedByUser->getErrors(), true)
+                ));
+            }
+            foreach ($user->affectedByEvents as $eventAffectingUser) {
+                $this->assertTrue($eventAffectingUser->delete(), sprintf(
+                    'Could not delete Event fixture: %s',
+                    print_r($eventAffectingUser->getErrors(), true)
                 ));
             }
             $this->assertTrue($user->delete(), sprintf(
