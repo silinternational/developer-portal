@@ -57,7 +57,7 @@ class WebUser extends CWebUser
         if (!$this->isGuest && $this->_model === null) {
             
             // Try to get the User model from the session.
-            $user = \Yii::app()->user->user;
+            $user = $this->getState('user');
             
             // If NOT successful, try to get it from the database.
             if ( ! ($user instanceof User)) {
