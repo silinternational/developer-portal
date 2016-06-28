@@ -282,8 +282,20 @@ class Key extends KeyBase
             return false;
         }
         
+        foreach ($this->events as $event) {
+            $event->key_id = null;
+            if ( ! $event->save()) {
+                $this->addError('api_id', sprintf(
+                    'We could not delete this Key because we were not able to finish updating the related event '
+                    . 'records: %s',
+                    print_r($event->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
         global $ENABLE_AXLE;
-        if(isset($ENABLE_AXLE) && !$ENABLE_AXLE){
+        if (isset($ENABLE_AXLE) && !$ENABLE_AXLE) {
             return true;
         }
         
