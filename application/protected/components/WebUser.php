@@ -117,6 +117,12 @@ class WebUser extends CWebUser
         return false;
     }
     
+    public function getDisplayName()
+    {
+        $user = $this->getModel();
+        return (is_null($user) ? null : $user->getDisplayName());
+    }
+    
     public function getUserId()
     {
         $user = $this->getModel();
