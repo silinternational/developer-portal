@@ -45,6 +45,9 @@ class ApiTest extends DeveloperPortalTestCase
         foreach ($this->apis as $fixtureName => $fixtureData) {
             /* @var $api \Api */
             $api = $this->apis($fixtureName);
+            \Key::model()->deleteAllByAttributes(array(
+                'api_id' => $api->api_id,
+            ));
             $this->assertTrue($api->delete(), sprintf(
                 'Could not delete api fixture %s: %s',
                 $fixtureName,
