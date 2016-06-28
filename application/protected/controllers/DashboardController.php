@@ -60,10 +60,10 @@ class DashboardController extends Controller
         /* @var $user \User */
         $user = \Yii::app()->user->user;
         
-        // Get the list of the APIs that the user either has a Key for or has
-        // a KeyRequest for. To do this, get the list of their KeyRequests, but
-        // include the names of the APIs.
-        $keyRequests = $user->getKeyRequestsWithApiNames();
+        // Get the list of the APIs that the user either has a Key for (of any
+        // status). To do this, get the list of their Keys, but include the
+        // names of the APIs.
+        $keys = $user->getKeysWithApiNames();
         
         // If we should include API Owner content on the dashboard...
         if ($user->hasOwnerPrivileges()) {
@@ -85,7 +85,7 @@ class DashboardController extends Controller
         // Show the page.
         $this->render('index', array(
             'user' => $user,
-            'keyRequests' => $keyRequests,
+            'keys' => $keys,
             'apisOwnedByUser' => $apisOwnedByUser,
             'currentInterval' => $interval,
             'chart' => $chart,
