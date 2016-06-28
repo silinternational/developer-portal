@@ -546,15 +546,78 @@ class Api extends ApiBase
         if ( ! parent::beforeDelete()) {
             return false;
         }
-
-        Key::model()->deleteAllByAttributes(array(
-            'api_id' => $this->api_id,
-        ));
-        ApiVisibilityDomain::model()->deleteAllByAttributes(array(
-            'api_id' => $this->api_id,
-        ));
-        ApiVisibilityUser::model()->deleteAllByAttributes(array(
-            'api_id' => $this->api_id,
+        
+        if ($this->approvedKeyCount > 0) {
+            $this->addError('api_id', sprintf(
+                'There %s still %s active %s to this API. Before you can delete this API, you must revoke all of '
+                . 'its active (aka. approved) keys.',
+                ($this->approvedKeyCount === 1 ? 'is' : 'are'),
+                $this->approvedKeyCount,
+                ($this->approvedKeyCount === 1 ? 'key' : 'keys')
+            ));
+            return false;
+        }
+        
+        foreach ($this->apiVisibilityDomains as $apiVisibilityDomain) {
+            if ( ! $apiVisibilityDomain->delete()) {
+                $this->addError('api_id', sprintf(
+                    'We could not delete this API because we were not able to finish deleting the records of what '
+                    . 'email domains are allowed to see this API: %s',
+                    print_r($apiVisibilityDomain->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        foreach ($this->apiVisibilityUsers as $apiVisibilityUser) {
+            if ( ! $apiVisibilityUser->delete()) {
+                $this->addError('api_id', sprintf(
+                    'We could not delete this API because we were not able to finish deleting the records of what '
+                    . 'users are allowed to see this API: %s',
+                    print_r($apiVisibilityUser->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        /* NOTE: The approved/active key count check (above) confirms that, by
+         *       this point, we know there are no active keys. That is why the
+         *       error message below refers to deleting the inactive keys.  */
+        foreach ($this->keys as $key) {
+            if ( ! $key->delete()) {
+                $this->addError('api_id', sprintf(
+                    'We could not delete this API because we were not able to finish deleting its inactive keys: %s',
+                    print_r($key->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        foreach ($this->events as $event) {
+            if ($event->api_id !== $this->api_id) {
+                throw new \Exception(
+                    'This Api\'s list of events included an Event that is not about this Api.',
+                    1467059353
+                );
+            }
+            $event->api_id = null;
+            if ( ! $event->save()) {
+                $this->addError('api_id', sprintf(
+                    'We could not delete this API because we were not able to finish updating the related event '
+                    . 'records: %s',
+                    print_r($event->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        \Event::log(sprintf(
+            'The "%s" API (%s, ID %s) was deleted%s.',
+            $this->display_name,
+            $this->code,
+            $this->api_id,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
         ));
         
         global $ENABLE_AXLE;
