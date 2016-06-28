@@ -19,6 +19,19 @@ class User extends UserBase
     
     protected $currentAccessGroups = null;
     
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        \Event::log(sprintf(
+            '%s (user_id %s) was deleted%s.',
+            $this->getDisplayName(),
+            $this->user_id,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+        ));
+    }
+    
     public function beforeDelete()
     {
         if ( ! parent::beforeDelete()) {

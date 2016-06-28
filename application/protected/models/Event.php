@@ -2,6 +2,20 @@
 
 class Event extends EventBase
 {
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        \Event::log(sprintf(
+            'Event %s (from %s) was deleted%s: %s',
+            $this->event_id,
+            $this->created,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser),
+            $this->description
+        ));
+    }
+    
     /**
      * @return array customized attribute labels (name=>label)
      */

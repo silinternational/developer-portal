@@ -2,6 +2,18 @@
 
 class CostScheme extends CostSchemeBase
 {
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        \Event::log(sprintf(
+            'Cost Scheme %s was deleted%s.',
+            $this->cost_scheme_id,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+        ));
+    }
+    
     /**
      * Validate that at least one of the price fields has a (non-zero) value.
      * 

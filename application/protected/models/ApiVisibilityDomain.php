@@ -2,6 +2,20 @@
 
 class ApiVisibilityDomain extends ApiVisibilityDomainBase
 {
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        \Event::log(sprintf(
+            'The ability for "%s" Users to see the "%s" API (api_id %s) was deleted%s.',
+            $this->domain,
+            (isset($this->api) ? $this->api->display_name : ''),
+            $this->api_id,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+        ));
+    }
+    
     /**
      * @return array customized attribute labels (name=>label)
      */

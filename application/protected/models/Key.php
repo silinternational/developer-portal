@@ -196,6 +196,17 @@ class Key extends KeyBase
     {
         parent::afterDelete();
         
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        \Event::log(sprintf(
+            '%s\'s (user_id %s) Key (key_id %s) to the "%s" API (api_id %s) was deleted%s.',
+            (isset($this->user) ? $this->user->getDisplayName() : 'A User'),
+            $this->user_id,
+            $this->key_id,
+            (isset($this->api) ? $this->api->display_name : ''),
+            $this->api_id,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+        ));
+        
         $this->sendKeyDeletionNotification();
     }
     

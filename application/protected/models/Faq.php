@@ -2,6 +2,19 @@
 
 class Faq extends FaqBase
 {
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        \Event::log(sprintf(
+            'Faq %s was deleted%s: %s',
+            $this->faq_id,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser),
+            $this->question
+        ));
+    }
+    
     public function rules()
     {
         return \CMap::mergeArray(array(

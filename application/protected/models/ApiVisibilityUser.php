@@ -2,6 +2,20 @@
 
 class ApiVisibilityUser extends ApiVisibilityUserBase
 {
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        \Event::log(sprintf(
+            'The ability for %s (user_id %s) to see the "%s" API (api_id %s) was deleted%s.',
+            (isset($this->invitedUser) ? $this->invitedUser->getDisplayName() : 'a User'),
+            (isset($this->api) ? $this->api->display_name : ''),
+            $this->api_id,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+        ));
+    }
+    
     /**
      * @return array customized attribute labels (name=>label)
      */
