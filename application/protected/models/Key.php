@@ -278,7 +278,9 @@ class Key extends KeyBase
     
     protected function beforeDelete()
     {
-        parent::beforeDelete();
+        if ( ! parent::beforeDelete()) {
+            return false;
+        }
         
         global $ENABLE_AXLE;
         if(isset($ENABLE_AXLE) && !$ENABLE_AXLE){
