@@ -548,12 +548,15 @@ class Api extends ApiBase
         }
         
         if ($this->approvedKeyCount > 0) {
+            /* NOTE: We are intentionally doing a loose comparison (==) for the
+             * key count because Yii returns integers as strings to be able to
+             * handle large integer values.  */
             $this->addError('api_id', sprintf(
                 'There %s still %s active %s to this API. Before you can delete this API, you must revoke all of '
                 . 'its active (aka. approved) keys.',
-                ($this->approvedKeyCount === 1 ? 'is' : 'are'),
+                ($this->approvedKeyCount == 1 ? 'is' : 'are'),
                 $this->approvedKeyCount,
-                ($this->approvedKeyCount === 1 ? 'key' : 'keys')
+                ($this->approvedKeyCount == 1 ? 'key' : 'keys')
             ));
             return false;
         }
