@@ -1064,7 +1064,7 @@ class Key extends KeyBase
         }
         
         // Try to send a notification email.
-        $mailer->setView('key-request-deleted');
+        $mailer->setView('pending-key-deleted');
         $mailer->setTo($sendToEmail);
         $mailer->setSubject(sprintf(
             'Key request (for %s API) deleted',
