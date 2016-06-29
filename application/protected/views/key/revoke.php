@@ -6,10 +6,10 @@
 $this->breadcrumbs = array(
     'Dashboard' => array('/dashboard/'),
     'Keys' => array('/key/'),
-    'Delete Key',
+    'Revoke Key',
 );
 
-$this->pageTitle = 'Delete Key';
+$this->pageTitle = 'Revoke Key';
 
 ?>
 <div class="row">
@@ -60,7 +60,7 @@ $this->pageTitle = 'Delete Key';
     <div class="span11 offset1">
         <?php $form = $this->beginWidget('CActiveForm'); ?>
 
-        <p>Do you really want to delete this key? </p>
+        <p>Do you really want to revoke this key? </p>
         <ul class="inline">
             <li>
                 <?php
@@ -83,7 +83,7 @@ $this->pageTitle = 'Delete Key';
                 $this->widget('bootstrap.widgets.TbButton', array(
                     'buttonType' => 'submit',
                     'icon' => 'remove',
-                    'label' => 'YES - Delete',
+                    'label' => 'YES - Revoke',
                     'type' => 'danger'
                 ));
 

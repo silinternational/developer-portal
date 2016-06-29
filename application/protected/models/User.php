@@ -163,28 +163,7 @@ class User extends UserBase
      */
     public function canDeleteKey($key)
     {
-        // If no Key was given, say no.
-        if ( ! ($key instanceof Key)) {
-            return false;
-        }
-        
-        // If the Key belongs to this user, say yes.
-        if ($key->isOwnedBy($this)) {
-            return true;
-        }
-        
-        // If the Key is for an API that belongs to this user, say yes.
-        if ($key->isToApiOwnedBy($this)) {
-            return true;
-        }
-        
-        // If the user is an admin, say yes.
-        if ($this->role === \User::ROLE_ADMIN) {
-            return true;
-        }
-        
-        // Otherwise, say no.
-        return false;
+        return $this->canRevokeKey($key) && $key->canBeDeleted();
     }
     
     /**
@@ -220,8 +199,7 @@ class User extends UserBase
     }
     
     /**
-     * Find out whether this user is allowed to revoke (aka. delete) the given
-     * Key.
+     * Find out whether this user is allowed to revoke the given Key.
      * 
      * @param Key $key The Key in question.
      * @return boolean
@@ -229,7 +207,7 @@ class User extends UserBase
     public function canRevokeKey($key)
     {
         // If no key was given, say no.
-        if ($key === null) {
+        if ( ! ($key instanceof Key)) {
             return false;
         }
         

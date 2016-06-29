@@ -237,6 +237,19 @@ class LinksManager extends CComponent
         // Set up an array to hold the list of links.
         $actionLinks = array();
         
+        // If the User can revoke the given Key, include that link.
+        if ($user->canRevokeKey($key)) {
+            
+            $actionLinks[] = new ActionLink(
+                array(
+                    '/key/revoke/',
+                    'id' => $key->key_id,
+                ),
+                'Revoke Key Request',
+                'remove'
+            );
+        }
+        
         // If the User can delete the given Key, include that link.
         if ($user->canDeleteKey($key)) {
             

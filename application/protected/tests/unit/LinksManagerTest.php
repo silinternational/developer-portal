@@ -351,13 +351,13 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetDashboardKeyActionLinks_canDeleteKey()
+    public function testGetDashboardKeyActionLinks_canRevokeKey()
     {
         // Arrange:
         $key = $this->keys('pendingKeyUser6');
         $user = $this->users('userWithRoleOfAdmin');
         $expectedLinkTexts = array(
-            'Delete Key Request',
+            'Revoke Key Request',
         );
         
         // Act:
@@ -378,7 +378,7 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetDashboardKeyActionLinks_cannotDeleteKey()
+    public function testGetDashboardKeyActionLinks_cannotRevokeKey()
     {
         // Arrange:
         $key = $this->keys('pendingKeyUser6');

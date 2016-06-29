@@ -25,9 +25,9 @@ class KeyController extends Controller
         /* @var $key Key */
         $key = \Key::model()->findByPk($id);
         
-        // If this is not a Key that the current User is allowed to
-        // delete/revoke, say so.
-        if ( ! $user->canRevokeKey($key)) {
+        // If this is not a Key that the current User is allowed to delete,
+        // say so.
+        if ( ! $user->canDeleteKey($key)) {
             throw new CHttpException(
                 403,
                 'That is not a Key that you have permission to delete.'
@@ -37,15 +37,12 @@ class KeyController extends Controller
         // If the form has been submitted (POSTed)...
         if (Yii::app()->request->isPostRequest) {
             
-            // Revoke the key, paying attention to the results.
-            $revokeResults = Key::revokeKey($key->key_id, $user);
-            
-            // If we were unable to delete that Key...
-            if ( ! $revokeResults[0]) {
+            // If unable to delete that Key...
+            if ( ! $key->delete()) {
                 
                 // Record that in the log.
                 Yii::log(
-                    'Key deletion/revokation FAILED: ID ' . $key->key_id,
+                    'Key deletion FAILED: ID ' . $key->key_id,
                     CLogger::LEVEL_ERROR,
                     __CLASS__ . '.' . __FUNCTION__
                 );
@@ -54,7 +51,7 @@ class KeyController extends Controller
                 Yii::app()->user->setFlash(
                     'error',
                     '<strong>Error!</strong> Unable to delete key: <pre>'
-                    . $revokeResults[1] . '</pre>'
+                    . print_r($key->getErrors(), true) . '</pre>'
                 );
             }
             // Otherwise...
@@ -62,21 +59,10 @@ class KeyController extends Controller
                 
                 // Record that in the log.
                 Yii::log(
-                    'Key deleted/revoked: ID ' . $key->key_id,
+                    'Key deleted: ID ' . $key->key_id,
                     CLogger::LEVEL_INFO,
                     __CLASS__ . '.' . __FUNCTION__
                 );
-                
-                // If the user deleting the key is the owner of the key...
-                if ($key->isOwnedBy($user)) {
-                    
-                    // Try to also delete the key request (because we don't need
-                    // any record of the key being revoked, since it wasn't
-                    // revoked, it was deleted).
-                    if ($key->keyRequest) {
-                        $key->keyRequest->delete();
-                    }
-                }
 
                 // Tell the user.
                 Yii::app()->user->setFlash(
@@ -229,6 +215,75 @@ class KeyController extends Controller
         $this->render('mine', array(
             'activeKeysDataProvider' => $activeKeysDataProvider,
             'nonActiveKeysDataProvider' => $nonActiveKeysDataProvider,
+        ));
+    }
+    
+    public function actionRevoke($id)
+    {
+        // Get a reference to the current website user's User model.
+        /* @var $user User */
+        $user = \Yii::app()->user->user;
+        
+        // Try to retrieve the specified Key's data.
+        /* @var $key Key */
+        $key = \Key::model()->findByPk($id);
+        
+        // If this is not a Key that the current User is allowed to revoke,
+        // say so.
+        if ( ! $user->canRevokeKey($key)) {
+            throw new CHttpException(
+                403,
+                'That is not a Key that you have permission to revoke.'
+            );
+        }
+        
+        // If the form has been submitted (POSTed)...
+        if (Yii::app()->request->isPostRequest) {
+            
+            // Revoke the key, paying attention to the results.
+            $revokeResults = Key::revokeKey($key->key_id, $user);
+            
+            // If we were unable to delete that Key...
+            if ( ! $revokeResults[0]) {
+                
+                // Record that in the log.
+                Yii::log(
+                    'Key revokation FAILED: ID ' . $key->key_id,
+                    CLogger::LEVEL_ERROR,
+                    __CLASS__ . '.' . __FUNCTION__
+                );
+
+                // Tell the user.
+                Yii::app()->user->setFlash(
+                    'error',
+                    '<strong>Error!</strong> Unable to revoke key: <pre>'
+                    . $revokeResults[1] . '</pre>'
+                );
+            }
+            // Otherwise...
+            else {
+                
+                // Record that in the log.
+                Yii::log(
+                    'Key revoked: ID ' . $key->key_id,
+                    CLogger::LEVEL_INFO,
+                    __CLASS__ . '.' . __FUNCTION__
+                );
+                
+                // Tell the user.
+                Yii::app()->user->setFlash(
+                    'success',
+                    '<strong>Success!</strong> Key revoked.'
+                );
+            }
+            
+            // Send the user back to the list of Keys.
+            $this->redirect(array('/key/'));
+        }
+        
+        // Show the page.
+        $this->render('revoke', array(
+            'key' => $key,
         ));
     }
 }

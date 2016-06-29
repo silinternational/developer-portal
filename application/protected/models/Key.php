@@ -309,6 +309,20 @@ class Key extends KeyBase
         return $this->deleteFromApiAxle();
     }
     
+    public function canBeDeleted()
+    {
+        /* Only allow deleting Keys that have already been "terminated" (for
+         * lack of a better word).  */
+        switch ($this->status) {
+            case \Key::STATUS_DENIED:
+            case \Key::STATUS_REVOKED:
+                return true;
+
+            default:
+                return false;
+        }
+    }
+    
     public function getStyledStatusHtml()
     {
         $cssClass = null;
