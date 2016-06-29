@@ -207,35 +207,28 @@ class KeyController extends Controller
         // Get the current user's model.
         $user = \Yii::app()->user->user;
         
-        // Get the list of the user's (active) keys (as a data provider for the
-        // view).
-        $activeKeysDataProvider = new CArrayDataProvider(
-            $user->keys,
-            array(
-                'keyField' => 'key_id',
-            )
-        );
-        
-        // Get the list of the user's non-active key requests (as a data
-        // provider for the view).
-        $allKeyRequests = $user->keyRequests;
-        $nonActiveKeyRequests = array();
-        foreach ($allKeyRequests as $keyRequest) {
-            if ($keyRequest->status !== \Key::STATUS_APPROVED) {
-                $nonActiveKeyRequests[] = $keyRequest;
+        // Get lists of the user's active and inactive keys (as data providers
+        // for the view).
+        $activeKeys = array();
+        $nonActiveKeys = array();
+        foreach ($user->keys as $key) {
+            if ($key->status === \Key::STATUS_APPROVED) {
+                $activeKeys[] = $key;
+            } else {
+                $nonActiveKeys[] = $key;
             }
         }
-        $nonActiveKeyRequestsDataProvider = new CArrayDataProvider(
-            $nonActiveKeyRequests,
-            array(
-                'keyField' => 'key_request_id',
-            )
-        );
+        $activeKeysDataProvider = new CArrayDataProvider($activeKeys, array(
+            'keyField' => 'key_id',
+        ));
+        $nonActiveKeysDataProvider = new CArrayDataProvider($nonActiveKeys, array(
+            'keyField' => 'key_id',
+        ));
 
         // Render the page.
         $this->render('mine', array(
             'activeKeysDataProvider' => $activeKeysDataProvider,
-            'nonActiveKeyRequestsDataProvider' => $nonActiveKeyRequestsDataProvider,
+            'nonActiveKeysDataProvider' => $nonActiveKeysDataProvider,
         ));
     }
 }

@@ -1,7 +1,7 @@
 <?php
 /* @var $this KeyController */
 /* @var $activeKeysDataProvider CDataProvider */
-/* @var $nonActiveKeyRequestsDataProvider CDataProvider */
+/* @var $nonActiveKeysDataProvider CDataProvider */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
@@ -58,11 +58,11 @@ $this->pageTitle = 'My Keys';
 </div>
 <div class="row">
     <div class="span12">
-        <h3>Key Requests</h3>
+        <h3>Requested Keys</h3>
         <?php
         $this->widget('bootstrap.widgets.TbGridView', array(
             'type' => 'striped hover',
-            'dataProvider' => $nonActiveKeyRequestsDataProvider,
+            'dataProvider' => $nonActiveKeysDataProvider,
             'template' => '{items}{pager}',
             'columns' => array(
                 array(

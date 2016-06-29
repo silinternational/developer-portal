@@ -804,9 +804,9 @@ class ApiController extends Controller
                         '<strong>Success!</strong> Key requested.'
                     );
                     
-                    // NOTE: The KeyRequest model's beforeSave method should
-                    //       have sent an email to the API Owner (if set) about
-                    //       the pending key request.
+                    // NOTE: The Key model's afterSave method should have sent
+                    //       an email to the API Owner (if set) about the
+                    //       pending key request.
                 }
 
                 // Send the user back to the API details page.
