@@ -1076,7 +1076,7 @@ class Key extends KeyBase
         $mailer->setData(array(
             'owner' => $this->api->owner,
             'api' => $this->api,
-            'keyRequest' => $this,
+            'pendingKey' => $this,
             'requestingUser' => $this->user,
         ));
 
@@ -1084,7 +1084,7 @@ class Key extends KeyBase
         // continue but communicate the email failure somehow.
         if ( ! $mailer->send()) {
             \Yii::log(
-                'Unable to send key request deletion email: '
+                'Unable to send pending-key deletion email: '
                 . $mailer->ErrorInfo,
                 CLogger::LEVEL_WARNING
             );
