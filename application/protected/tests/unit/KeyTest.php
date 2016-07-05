@@ -214,6 +214,144 @@ class KeyTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testCanBeDeletedBy_nullUser()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('deniedKeyUser5');
+        $user = null;
+        
+        // Act:
+        $result = $key->canBeDeletedBy($user);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a null user could delete a denied Key.'
+        );
+    }
+    
+    public function testCanBeDeletedBy_ownApprovedKey()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('approvedKey');
+        /* @var $user \User */
+        $user = $this->users('userWithApprovedKey');
+        
+        // Pre-assert:
+        $this->assertTrue(
+            $key->isOwnedBy($user),
+            'This test requires a Key owned by the given User.'
+        );
+        $this->assertEquals(
+            \Key::STATUS_APPROVED,
+            $key->status,
+            'This test requires an approved Key.'
+        );
+        
+        // Act:
+        $result = $key->canBeDeletedBy($user);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to report that a User could delete their own approved Key.'
+        );
+    }
+    
+    public function testCanBeDeletedBy_ownDeniedKey()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('deniedKeyUser5');
+        /* @var $user \User */
+        $user = $this->users('userWithDeniedKey');
+        
+        // Pre-assert:
+        $this->assertTrue(
+            $key->isOwnedBy($user),
+            'This test requires a Key owned by the given User.'
+        );
+        $this->assertEquals(
+            \Key::STATUS_DENIED,
+            $key->status,
+            'This test requires a denied Key.'
+        );
+        
+        // Act:
+        $result = $key->canBeDeletedBy($user);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to report that a User could delete their own denied Key.'
+        );
+    }
+    
+    public function testCanBeDeletedBy_ownPendingKey()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('pendingKeyUser6');
+        /* @var $user \User */
+        $user = $this->users('userWithPendingKey');
+        
+        // Pre-assert:
+        $this->assertTrue(
+            $key->isOwnedBy($user),
+            'This test requires a Key owned by the given User.'
+        );
+        $this->assertEquals(
+            \Key::STATUS_PENDING,
+            $key->status,
+            'This test requires a pending Key.'
+        );
+        
+        // Act:
+        $result = $key->canBeDeletedBy($user);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to report that a User could delete their own pending Key.'
+        );
+    }
+    
+    public function testCanBeDeletedBy_ownRevokedKey()
+    {
+        // Arrange:
+        /* @var $key \Key */
+        $key = $this->keys('revokedKeyUser7');
+        /* @var $user \User */
+        $user = $this->users('userWithRevokedKey');
+        
+        // Pre-assert:
+        $this->assertTrue(
+            $key->isOwnedBy($user),
+            'This test requires a Key owned by the given User.'
+        );
+        $this->assertEquals(
+            \Key::STATUS_REVOKED,
+            $key->status,
+            'This test requires a revoked Key.'
+        );
+        
+        // Act:
+        $result = $key->canBeDeletedBy($user);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to report that a User could delete their own revoked Key.'
+        );
+    }
+    
+    public function testCanBeDeletedBy()
+    {
+        $this->markTestIncomplete('Tests not yet written.');
+    }
+    
     public function testConfirmStatusesDiffer()
     {
         // Make sure the status constants have different values. (There aren't

@@ -298,4 +298,22 @@ return array(
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Insite',
     ),
+    'userWithDeniedKeyForApiOwnedByUser18' => array(
+        'user_id'       => 32,
+        'email'         => 'userWithDeniedKeyForApiOwnedByUser18@jaars.net',
+        'first_name'    => 'With Denied Key',
+        'last_name'     => 'For API Owned By User 18',
+        'status'        => User::STATUS_ACTIVE,
+        'role'          => User::ROLE_USER,
+        'auth_provider' => 'Insite',
+    ),
+    'userWithRevokedKeyForApiOwnedByUser18' => array(
+        'user_id'       => 33,
+        'email'         => 'userWithRevokedKeyForApiOwnedByUser18@jaars.net',
+        'first_name'    => 'With Revoked Key',
+        'last_name'     => 'For API Owned By User 18',
+        'status'        => User::STATUS_ACTIVE,
+        'role'          => User::ROLE_USER,
+        'auth_provider' => 'Insite',
+    ),
 );

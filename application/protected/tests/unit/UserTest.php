@@ -279,6 +279,24 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
 
+    public function testCanDeleteKey_approvedKeyForApiOwnedByUser()
+    {
+        // Arrange:
+        $key = $this->keys('keyToApiOwnedByUser18');
+        $user = $this->users('user18');
+        
+        // Act:
+        $result = $user->canDeleteKey($key);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a User can delete an approved Key (to '
+            . 'an Api that they own) that is not their own Key. Approved Keys '
+            . 'belonging to another User must first be revoked.'
+        );
+    }
+
     public function testCanDeleteKey_pendingKeyForApiOwnedByUser()
     {
         // Arrange:
@@ -289,44 +307,79 @@ class UserTest extends DeveloperPortalTestCase
         $result = $user->canDeleteKey($key);
         
         // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a User can delete a pending Key (to '
+            . 'an Api that they own) that is not their own Key. Pending Keys '
+            . 'belonging to another User must first be denied.'
+        );
+    }
+
+    public function testCanDeleteKey_deniedKeyForApiOwnedByUser()
+    {
+        // Arrange:
+        $key = $this->keys('deniedKeyForApiOwnedByUser18');
+        $user = $this->users('user18');
+        
+        // Act:
+        $result = $user->canDeleteKey($key);
+        
+        // Assert:
         $this->assertTrue(
             $result,
-            'Failed to report that a User can delete a Key for an Api '
+            'Failed to report that a User can delete a denied Key for an Api '
             . 'that they own.'
         );
     }
 
-    public function testCanDeleteKey_pendingKeyNotOwnedByUserToApiNotOwnedByUser()
+    public function testCanDeleteKey_revokedKeyForApiOwnedByUser()
+    {
+        // Arrange:
+        $key = $this->keys('revokedKeyForApiOwnedByUser18');
+        $user = $this->users('user18');
+        
+        // Act:
+        $result = $user->canDeleteKey($key);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to report that a User can delete a revoked Key for an Api '
+            . 'that they own.'
+        );
+    }
+
+    public function testCanRevokeKey_pendingKeyNotOwnedByUserToApiNotOwnedByUser()
     {
         // Arrange:
         $key = $this->keys('pendingKey1_apiWithTwoPendingKeys');
         $user = $this->users('ownerThatDoesNotOwnAnyApisOrKeys');
         
         // Act:
-        $result = $user->canDeleteKey($key);
+        $result = $user->canRevokeKey($key);
         
         // Assert:
         $this->assertFalse(
             $result,
-            'Incorrectly reported that a user with role "owner" could delete '
+            'Incorrectly reported that a user with role "owner" could revoke '
             . 'a Key that they do not own for an Api that they do not '
             . 'own.'
         );
     }
 
-    public function testCanDeleteKey_adminUser()
+    public function testCanRevokeKey_pendingKeyByAdminUser()
     {
         // Arrange:
         $key = $this->keys('pendingKey1_apiWithTwoPendingKeys');
         $user = $this->users('userWithRoleOfAdminButNoKeys');
         
         // Act:
-        $result = $user->canDeleteKey($key);
+        $result = $user->canRevokeKey($key);
         
         // Assert:
         $this->assertTrue(
             $result,
-            'Failed to report that an admin User can delete any Key.'
+            'Failed to report that an admin User can revoke any Key.'
         );
     }
     

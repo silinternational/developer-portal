@@ -163,7 +163,7 @@ class User extends UserBase
      */
     public function canDeleteKey($key)
     {
-        return $this->canRevokeKey($key) && $key->canBeDeleted();
+        return (($key instanceof \Key) && $key->canBeDeletedBy($this));
     }
     
     /**

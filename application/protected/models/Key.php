@@ -309,17 +309,42 @@ class Key extends KeyBase
         return $this->deleteFromApiAxle();
     }
     
-    public function canBeDeleted()
+    /**
+     * Whether the given User is allowed to delete this Key. This takes into
+     * account both the user's ownership (or lack thereof) of the Key and Api
+     * as well as the current status of the Key.
+     * 
+     * @param User $user
+     * @return boolean
+     */
+    public function canBeDeletedBy($user)
     {
-        /* Only allow deleting Keys that have already been "terminated" (for
-         * lack of a better word).  */
-        switch ($this->status) {
-            case \Key::STATUS_DENIED:
-            case \Key::STATUS_REVOKED:
-                return true;
+        if ( ! ($user instanceof \User)) {
+            return false;
+        }
+        
+        // Check all the normal ownership / admin details first.
+        if ( ! $user->canRevokeKey($this)) {
+            return false;
+        }
+        
+        if ($this->isOwnedBy($user)) {
+            
+            // Allow a User to delete their own Key regardless of status.
+            return true;
+            
+        } else {
+            
+            /* Only allow someone else to delete a User's Key if the Key has
+             * already been "terminated" (for lack of a better word).  */
+            switch ($this->status) {
+                case \Key::STATUS_DENIED:
+                case \Key::STATUS_REVOKED:
+                    return true;
 
-            default:
-                return false;
+                default:
+                    return false;
+            }
         }
     }
     
