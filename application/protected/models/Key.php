@@ -6,6 +6,8 @@ use ApiAxle\Api\Keyring as AxleKeyring;
 
 class Key extends KeyBase
 {
+    use Sil\DevPortal\components\ModelFindByPkTrait;
+    
     const STATUS_APPROVED = 'approved';
     const STATUS_DENIED = 'denied';
     const STATUS_PENDING = 'pending';

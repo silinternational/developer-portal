@@ -9,6 +9,8 @@ use ApiAxle\Api\Api as AxleApi;
  */
 class Api extends ApiBase
 {
+    use Sil\DevPortal\components\ModelFindByPkTrait;
+    
     CONST APPROVAL_TYPE_AUTO = 'auto';
     CONST APPROVAL_TYPE_OWNER = 'owner';
     

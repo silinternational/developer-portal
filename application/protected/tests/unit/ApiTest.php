@@ -170,6 +170,42 @@ class ApiTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testFindByPk_nullPkAfterInsert()
+    {
+        // Arrange:
+        /* Ensure that the MySQL/MariaDB sql_auto_is_null setting is on for this
+         * test. See http://stackoverflow.com/a/32396258/3813891 for details. */
+        \Yii::app()->getDb()->pdoInstance->exec('SET sql_auto_is_null = 1;');
+        $newApi = new Api();
+        $newApi->attributes = array(
+            'code' => 'test-1467819002',
+            'display_name' => 'Test 1467819002',
+            'endpoint' => 'local',
+            'default_path' => '/test-1467819002',
+            'queries_second' => 10,
+            'queries_day' => 1000,
+            'endpoint_timeout' => 10,
+        );
+        $insertResult = $newApi->save();
+        
+        // Pre-assert:
+        $this->assertTrue(
+            $insertResult,
+            'Failed to insert a new Api record as part of the setup for this '
+            . 'test: ' . print_r($newApi->getErrors(), true)
+        );
+        
+        // Act:
+        $result = \Api::model()->findByPk(null);
+        
+        // Assert:
+        $this->assertNull(
+            $result,
+            'Failed to return null when requesting a null primary key after '
+            . 'inserting a new record.'
+        );
+    }
+    
     public function testGenerateBadgeHtml_hasBadgeValue()
     {
         // Arrange:

@@ -2,6 +2,8 @@
 
 class ApiVisibilityUser extends ApiVisibilityUserBase
 {
+    use Sil\DevPortal\components\ModelFindByPkTrait;
+    
     public function afterDelete()
     {
         parent::afterDelete();

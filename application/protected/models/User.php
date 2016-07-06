@@ -10,6 +10,8 @@
  */
 class User extends UserBase 
 {
+    use Sil\DevPortal\components\ModelFindByPkTrait;
+    
     const ROLE_USER = 'user';
     const ROLE_OWNER = 'owner';
     const ROLE_ADMIN = 'admin';

@@ -2,6 +2,8 @@
 
 class Faq extends FaqBase
 {
+    use Sil\DevPortal\components\ModelFindByPkTrait;
+    
     public function afterDelete()
     {
         parent::afterDelete();
