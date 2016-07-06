@@ -939,12 +939,18 @@ class Key extends KeyBase
          *  - the Key instance or a string as an error message
          */
         
+        /* @var $key \Key */
         $key = Key::model()->findByPk($key_id);  
         if (is_null($key)) { return array(false, 'Bad key_id');}     
         
         //$seed = microtime() . $key->user_id;         
         $key->value = Utils::getRandStr();//hash('md5', $seed); // length 32 
         $key->secret = Utils::getRandStr(128);//hash('sha512', $seed); // length 128
+        
+        /* Also re-sync the Key's rate limits in case those settings have
+         * changed on the Api and this Key somehow failed to be updated.  */
+        $key->queries_day = $key->api->queries_day;
+        $key->queries_second = $key->api->queries_second;
 
         // Try to save the changes to the Key. If successful...
         if ($key->save()) {
