@@ -112,10 +112,16 @@ class Key extends KeyBase
                 $axleKeyring->create($keyringName);
             }
             
-            /* Get the current key (as it exists in the database) to see whether
-             * this key would already exist in ApiAxle.  */
-            $current = Key::model()->findByPk($this->key_id);
-            if ($current->value === null) {
+            /* Get the current key (if/as it exists in the database) to see
+             * whether this key would already exist in ApiAxle.  */
+            if ($this->key_id !== null) {
+                $current = Key::model()->findByPk($this->key_id);
+                $currentValue = (($current !== null) ? $current->value : null);
+            } else {
+                $currentValue = null; 
+            }
+            
+            if ($currentValue === null) {
                 try {
                     // Create new Key in ApiAxle.
                     $axleKey->create($this->value, $keyData);
@@ -132,36 +138,36 @@ class Key extends KeyBase
                     $this->addError('value',$e->getMessage());
                     return false;
                 }
-            } else {
-                try{
-                    if ($current->value != $this->value) {
-                        /*
-                         * Need to delete existing key and create new key
-                         */
-                        $axleKey->delete($current->value);
-                        $axleKey->create($this->value, $keyData);
-                        /**
-                         * Link key to keyring
-                         */
-                        $axleKeyring->linkKey($axleKey);
-                        /**
-                         * Link key to Api
-                         */
-                        $api = Api::model()->findByPk($this->api_id);
-                        $axleApi = new AxleApi(Yii::app()->params['apiaxle'], $api->code);
-                        $axleApi->linkKey($axleKey);
-                    } else {
-                        /**
-                        * Update Key in apiaxle
-                        */
-                        $axleKey->get($this->value);
-                        $axleKey->update($keyData);
-                    }
-                    return true;
-                } catch (\Exception $e) {
-                    $this->addError('value',$e->getMessage());
-                    return false;
+            }
+            
+            try {
+                if ($currentValue != $this->value) {
+                    /*
+                     * Need to delete existing key and create new key
+                     */
+                    $axleKey->delete($current->value);
+                    $axleKey->create($this->value, $keyData);
+                    /**
+                     * Link key to keyring
+                     */
+                    $axleKeyring->linkKey($axleKey);
+                    /**
+                     * Link key to Api
+                     */
+                    $api = Api::model()->findByPk($this->api_id);
+                    $axleApi = new AxleApi(Yii::app()->params['apiaxle'], $api->code);
+                    $axleApi->linkKey($axleKey);
+                } else {
+                    /**
+                    * Update Key in apiaxle
+                    */
+                    $axleKey->get($this->value);
+                    $axleKey->update($keyData);
                 }
+                return true;
+            } catch (\Exception $e) {
+                $this->addError('value',$e->getMessage());
+                return false;
             }
         } elseif ($this->status === \Key::STATUS_DENIED) {
             
