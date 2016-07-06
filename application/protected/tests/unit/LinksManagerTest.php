@@ -357,7 +357,7 @@ class LinksManagerTest extends CDbTestCase
         $key = $this->keys('pendingKeyUser6');
         $user = $this->users('userWithRoleOfAdmin');
         $expectedLinkTexts = array(
-            'Revoke Key Request',
+            'Revoke Key',
         );
         
         // Act:
