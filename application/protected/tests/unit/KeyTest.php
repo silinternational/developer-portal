@@ -1103,16 +1103,6 @@ class KeyTest extends DeveloperPortalTestCase
             'Key has wrong api_id'
         );
         $this->assertEquals(
-            $key->queries_second,
-            $results[1]->queries_second,
-            'Key has wrong queries_second'
-        );
-        $this->assertEquals(
-            $key->queries_day,
-            $results[1]->queries_day,
-            'Key has wrong queries_day'
-        );
-        $this->assertEquals(
             $key->created,
             $results[1]->created,
             'Key has wrong created datetime'
