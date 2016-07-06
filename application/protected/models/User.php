@@ -729,6 +729,8 @@ class User extends UserBase
     /**
      * Find out whether this User is the owner of the given Api.
      * 
+     * @todo Should this also check whether the user has a role of owner?
+     * 
      * @param Api $api The API in question.
      * @return boolean Whether the user is the owner of the API.
      */
