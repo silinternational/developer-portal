@@ -594,7 +594,7 @@ class Key extends KeyBase
     ) {
         // If not given the Yii app params, retrieve them.
         if ($appParams === null) {
-            $appParams = \Yii::app()->params;
+            $appParams = \Yii::app()->params->toArray();
         }
         
         // If we are in an environment where we should send email
@@ -609,10 +609,10 @@ class Key extends KeyBase
                 // that.
                 $sendToEmail = $this->api->owner->email;
                 
-            } elseif (isset(\Yii::app()->params['adminEmail'])) {
+            } elseif (isset($appParams['adminEmail'])) {
                 
                 // Otherwise, try to notify the admins.
-                $sendToEmail = \Yii::app()->params['adminEmail'];
+                $sendToEmail = $appParams['adminEmail'];
             }
 
             // If we have an email address to send the notification to...
@@ -668,7 +668,7 @@ class Key extends KeyBase
     ) {
         // If not given the Yii app params, retrieve them.
         if ($appParams === null) {
-            $appParams = \Yii::app()->params;
+            $appParams = \Yii::app()->params->toArray();
         }
         
         // If we are in an environment where we should send email
@@ -726,7 +726,7 @@ class Key extends KeyBase
     ) {
         // If not given the Yii app params, retrieve them.
         if ($appParams === null) {
-            $appParams = \Yii::app()->params;
+            $appParams = \Yii::app()->params->toArray();
         }
         
         // If we are in an environment where we should NOT send email
@@ -786,7 +786,7 @@ class Key extends KeyBase
     ) {
         // If not given the Yii app params, retrieve them.
         if ($appParams === null) {
-            $appParams = \Yii::app()->params;
+            $appParams = \Yii::app()->params->toArray();
         }
         
         // If we are in an environment where we should NOT send email
@@ -856,7 +856,7 @@ class Key extends KeyBase
     ) {
         // If not given the Yii app params, retrieve them.
         if ($appParams === null) {
-            $appParams = \Yii::app()->params;
+            $appParams = \Yii::app()->params->toArray();
         }
         
         // If we are in an environment where we should NOT send email
@@ -1188,7 +1188,7 @@ class Key extends KeyBase
     ) {
         // If not given the Yii app params, retrieve them.
         if ($appParams === null) {
-            $appParams = \Yii::app()->params;
+            $appParams = \Yii::app()->params->toArray();
         }
         
         // If we are in an environment where we should NOT send email
