@@ -671,7 +671,9 @@ class ApiController extends Controller
                 $pendingKeys[] = $key;
             }
         }
-        $pendingKeysDataProvider = new CArrayDataProvider($pendingKeys);
+        $pendingKeysDataProvider = new CArrayDataProvider($pendingKeys, array(
+            'keyField' => 'key_id',
+        ));
         
         // Show the page.
         $this->render('pendingKeys', array(
