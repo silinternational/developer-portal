@@ -1,5 +1,6 @@
 <?php
 /* @var $this ApiController */
+/* @var $key Key */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
@@ -33,17 +34,17 @@ $this->pageTitle = 'Request Key';
             'inlineErrors' => true,
         ));
         
-        echo $form->errorSummary($model);
+        echo $form->errorSummary($key);
         
         // Show the necessary input fields.
         ?>
         <label>
             <p>What do you intend to use this API for? </p>
-            <?php echo $form->textArea($model,'purpose'); ?>
+            <?php echo $form->textArea($key, 'purpose'); ?>
         </label>
         <label>
             <p>What url/domain do you plan to use this API on? </p>
-            <?php echo $form->textField($model,'domain'); ?>
+            <?php echo $form->textField($key, 'domain'); ?>
         </label>
         <?php
         

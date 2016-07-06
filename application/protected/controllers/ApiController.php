@@ -733,8 +733,9 @@ class ApiController extends Controller
 
             /* Retrieve ONLY the applicable pieces of data that we trust the
              * user to provide when requesting a Key.  */
-            $key->domain = $request->getPost('domain');
-            $key->purpose = $request->getPost('purpose');
+            $formData = $request->getPost('Key');
+            $key->domain = isset($formData['domain']) ? $formData['domain'] : null;
+            $key->purpose = isset($formData['purpose']) ? $formData['purpose'] : null;
             
             // Also record the extra data it needs (not submitted by the user).
             $key->user_id = $user->user_id;
@@ -822,7 +823,7 @@ class ApiController extends Controller
         // If we reach this point, show the Request Key page.
         $this->render('requestKey', array(
             'api' => $api,
-            'model' => $key,
+            'key' => $key,
         ));
     }
     
