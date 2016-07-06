@@ -102,6 +102,17 @@ class Api extends ApiBase
                 $this->api_id,
                 (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
             ), $this->api_id);
+            
+            try {
+                $this->updateKeysRateLimitsToMatch();
+            } catch (\Exception $e) {
+                \Yii::log(
+                    "Unable to update this Api's keys' rate limits to match "
+                    . "its current rate limits: "
+                    . $e->getMessage(),
+                    CLogger::LEVEL_WARNING
+                );
+            }
         }
     }
     
@@ -809,6 +820,33 @@ class Api extends ApiBase
      */
     public static function model($className = __CLASS__) {
         return parent::model($className);
+    }
+    
+    /**
+     * Update the rate limits (queries per second, queries per day) of any of
+     * this Api's Keys that do not already have the correct rate limits.
+     * 
+     * @throws \Exception
+     */
+    protected function updateKeysRateLimitsToMatch()
+    {
+        foreach ($this->keys as $key) {
+            if (($key->queries_day === $this->queries_day) &&
+                ($key->queries_second === $this->queries_second)) {
+                continue;
+            }
+            
+            $key->queries_day = $this->queries_day;
+            $key->queries_second = $this->queries_second;
+            if ( ! $key->save()) {
+                throw new \Exception(sprintf(
+                    'Failed to update Key %s\'s rate limits to match '
+                    . 'Api\'s rate limits: %s',
+                    $key->key_id,
+                    print_r($key->getErrors(), true)
+                ), 1467836607);
+            }
+        }
     }
     
     /**
