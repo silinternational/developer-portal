@@ -46,6 +46,10 @@ $this->pageTitle = 'Request Key';
             <p>What url/domain do you plan to use this API on? </p>
             <?php echo $form->textField($key, 'domain'); ?>
         </label>
+        <p class="muted">
+            <b>Note:</b> The owner of this API will be able to see your name and
+            email address if you request a key.
+        </p>
         <?php
         
         // Show the submit button.
