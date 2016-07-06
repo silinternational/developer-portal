@@ -32,13 +32,13 @@ $this->pageTitle = 'My Keys';
                     'header' => 'API'
                 ),
                 array(
-                    'name' => 'keyRequest.domain',
+                    'name' => 'domain',
                     'header' => 'Domain',
                     'htmlOptions' => array(
                         'style' => 'text-decoration: underline;',
                     ),
                 ),
-                array('name' => 'keyRequest.purpose', 'header' => 'Purpose'),
+                array('name' => 'purpose', 'header' => 'Purpose'),
                 array('name' => 'value', 'header' => 'Key'),
                 array(
                     'class' => 'ActionLinksColumn',
@@ -81,9 +81,9 @@ $this->pageTitle = 'My Keys';
                     'value' => '$data->getStyledStatusHtml()',
                 ),
                 array(
-                    'name' => 'created',
+                    'name' => 'requested_on',
                     'header' => 'Requested',
-                    'value' => 'Utils::getShortDate($data->created)',
+                    'value' => 'Utils::getShortDate($data->requested_on)',
                 ),
                 array(
                     'name' => 'domain',
@@ -100,7 +100,7 @@ $this->pageTitle = 'My Keys';
                         array(
                             'icon' => 'list',
                             'text' => 'Details',
-                            'urlPattern' => '/key-request/details/:key_request_id',
+                            'urlPattern' => '/key/details/:key_id',
                         ),
                     ),
                 ),
