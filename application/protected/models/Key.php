@@ -220,7 +220,7 @@ class Key extends KeyBase
             (isset($this->api) ? $this->api->display_name : ''),
             $this->api_id,
             (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-        ), $this->api_id, $this->key_id, $this->user_id);
+        ), $this->api_id, null, $this->user_id);
         
         $this->sendKeyDeletionNotification();
     }

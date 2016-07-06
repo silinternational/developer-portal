@@ -37,7 +37,7 @@ class Api extends ApiBase
             $this->code,
             $this->api_id,
             (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-        ), $this->api_id);
+        ));
     }
     
     public function afterSave()

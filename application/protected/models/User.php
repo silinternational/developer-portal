@@ -31,7 +31,7 @@ class User extends UserBase
             $this->getDisplayName(),
             $this->user_id,
             (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-        ), null, null, $this->user_id);
+        ));
     }
     
     public function afterSave()
