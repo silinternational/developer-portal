@@ -40,16 +40,16 @@ $this->pageSubtitle = 'Current Keys for this API';
                     'visible' => \Yii::app()->user->checkAccess('admin'),
                 ),
                 array(
-                    'header' => 'Created',
-                    'value' => 'Utils::getShortDate($data->created)'
+                    'header' => 'Granted on',
+                    'value' => 'Utils::getShortDate($data->processed_on)'
                 ),
                 array(
                     'header' => 'Domain',
-                    'value' => '($data->keyRequest ? $data->keyRequest->domain : "UNKNOWN")'
+                    'value' => '$data->domain'
                 ),
                 array(
                     'header' => 'Purpose',
-                    'value' => '($data->keyRequest ? $data->keyRequest->purpose : "UNKNOWN")'
+                    'value' => '$data->purpose'
                 ),
                 array(
                     'class' => 'ActionLinksColumn',

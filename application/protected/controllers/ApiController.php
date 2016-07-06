@@ -36,10 +36,12 @@ class ApiController extends Controller
         $activeKeys = array();
         foreach ($api->keys as $key) {
             if ($key->status === \Key::STATUS_APPROVED) {
-                $pendingKeys[] = $key;
+                $activeKeys[] = $key;
             }
         }
-        $activeKeysDataProvider = new CArrayDataProvider($activeKeys);
+        $activeKeysDataProvider = new CArrayDataProvider($activeKeys, array(
+            'keyField' => 'key_id',
+        ));
         
         // Show the page.
         $this->render('activeKeys', array(
