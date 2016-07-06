@@ -182,16 +182,6 @@ class Controller extends CController
                 ),
                 'roles' => array('owner'),
             ),
-            array( // Developers and Owners can see some KeyRequest information.
-                'allow',
-                'controllers' => array('keyRequest'),
-                'actions' => array(
-                    'delete',
-                    'details',
-                    'index',
-                ),
-                'roles' => array('owner', 'user'),
-            ),
             array( // Developers and Owners can view basic info about APIs.
                 'allow',
                 'controllers' => array('api'),
