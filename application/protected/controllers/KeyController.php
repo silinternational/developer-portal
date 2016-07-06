@@ -84,10 +84,12 @@ class KeyController extends Controller
     public function actionDetails($id)
     {
         // Get a reference to the current website user's User model.
+        /* @var $user \User */
         $user = \Yii::app()->user->user;
         
         // Try to retrieve the specified Key's data.
-        $key = \Key::model()->findByAttributes(array('key_id' => $id));
+        /* @var $key \Key */
+        $key = \Key::model()->findByPk($id);
         
         // Prevent access by users without permission to see this key.
         if (( ! $key) || ( ! $key->isVisibleToUser($user))) {
@@ -98,8 +100,94 @@ class KeyController extends Controller
             );
         }
         
+        if (Yii::app()->request->isPostRequest &&
+            ($key->status == \Key::STATUS_PENDING)) {
+            
+            // If the User does NOT have permission to process requests
+            // for keys to the corresponding API, say so.
+            if ( ! $user->hasAdminPrivilegesForApi($key->api)) {
+                throw new CHttpException(
+                    403,
+                    'You do not have permission to manage this API.'
+                );
+            }
+            
+            // Record that the current user is the one that processed this
+            // key.
+            $key->processed_by = $user->user_id;
+            
+            // If the request was approved...
+            if (isset($_POST[\Key::STATUS_APPROVED])) {
+                
+                // Try to approve the key.
+                if ($key->approve($user)) {
+                    
+                    // Update our local copy of this Key's data.
+                    $key->refresh();
+                    
+                    Yii::app()->user->setFlash(
+                        'success', 
+                        '<strong>Success!</strong> Key granted.'
+                    );
+                    
+                } else {
+                    Yii::app()->user->setFlash(
+                        'error', 
+                        '<strong>Error!</strong> We were unable to approve '
+                        . 'that key: <pre>'
+                        . \CHtml::encode(print_r($key->getErrors(), true)) . '</pre>'
+                    );
+                }
+                
+                $this->redirect(array(
+                    '/key/details/',
+                    'id' => $key->key_id
+                ));  
+            }
+            // Otherwise (i.e. - it was denied)...
+            else {
+
+                // Record that fact.
+                $key->status = \Key::STATUS_DENIED;
+
+                if ($key->save()) {
+                    
+                    // Update our local copy of this Key's data.
+                    $key->refresh();
+                    
+                    Yii::app()->user->setFlash(
+                        'success', 
+                        '<strong>Success!</strong> Key denied.'
+                    );
+                } else {
+                    Yii::app()->user->setFlash(
+                        'error',
+                        '<strong>Error!</strong> We were unable to mark '
+                        . 'that key as having been denied: <pre>'
+                        . print_r($key->getErrors(), true) . '</pre>'
+                    );
+                }
+
+                // Send the user to the details page for this Key.
+                $this->redirect(array(
+                    '/key/details/',
+                    'id' => $key->key_id
+                ));
+            }
+        }
+        
+        // Get the list of action links that should be shown.
+        $actionLinks = LinksManager::getPendingKeyDetailsActionLinksForUser(
+            $key,
+            $user
+        );
+        
         // Render the page.
-        $this->render('details', array('key' => $key));
+        $this->render('details', array(
+            'actionLinks' => $actionLinks,
+            'currentUser' => $user,
+            'key' => $key,
+        ));
     }
 
     public function actionIndex()
