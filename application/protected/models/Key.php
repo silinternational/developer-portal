@@ -1197,6 +1197,10 @@ class Key extends KeyBase
             return;
         }
         
+        if ($mailer === null) {
+            $mailer = Utils::getMailer();
+        }
+        
         if ($this->status === self::STATUS_PENDING) {
             $this->sendPendingKeyDeletionNotification(
                 $mailer,
