@@ -171,8 +171,11 @@ class Key extends KeyBase
              *       afterSave().
              */
             
-            // Make sure the key does not still exist in ApiAxle.
-            return $this->deleteFromApiAxle();
+            // Make sure the key does not exist in ApiAxle.
+            if ($this->value !== null) {
+                return $this->deleteFromApiAxle();
+            }
+            return true;
             
         } elseif ($this->status === \Key::STATUS_PENDING) {
             
@@ -299,11 +302,13 @@ class Key extends KeyBase
         /**
          * @todo We will probably only need to delete the key from Axle if it
          *       it was an approved key. Make sure we're deleting keys from Axle
-         *       when denied/revoked. Should we also just go ahead and re-try/confirm
+         *       when revoked. Should we also just go ahead and re-try/confirm
          *       that the key has been deleted from Axle at this point?
          */
-        
-        return $this->deleteFromApiAxle();
+        if ($this->value) {
+            return $this->deleteFromApiAxle();
+        }
+        return true;
     }
     
     /**
