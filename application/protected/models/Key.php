@@ -111,22 +111,21 @@ class Key extends KeyBase
             } catch (\Exception $e) {
                 $axleKeyring->create($keyringName);
             }
-
-            if ($this->getIsNewRecord()) {
+            
+            /* Get the current key (as it exists in the database) to see whether
+             * this key would already exist in ApiAxle.  */
+            $current = Key::model()->findByPk($this->key_id);
+            if ($current->value === null) {
                 try {
-                    /**
-                     * Create new Key in apiaxle
-                     */
-                    $axleKey->create($this->value,$keyData);
-                    /**
-                     * Link key to keyring
-                     */
+                    // Create new Key in ApiAxle.
+                    $axleKey->create($this->value, $keyData);
+                    
+                    // Link key to keyring.
                     $axleKeyring->linkKey($axleKey);
-                    /**
-                     * Link key to Api
-                     */
+                    
+                    // Link key to Api.
                     $api = Api::model()->findByPk($this->api_id);
-                    $axleApi = new AxleApi(Yii::app()->params['apiaxle'],$api->code);
+                    $axleApi = new AxleApi(Yii::app()->params['apiaxle'], $api->code);
                     $axleApi->linkKey($axleKey);
                     return true;
                 } catch (\Exception $e) {
@@ -135,11 +134,7 @@ class Key extends KeyBase
                 }
             } else {
                 try{
-                    /**
-                     * Get current key to check for key value change
-                     */
-                    $current = Key::model()->findByPk($this->key_id);
-                    if($current->value != $this->value){
+                    if ($current->value != $this->value) {
                         /*
                          * Need to delete existing key and create new key
                          */
