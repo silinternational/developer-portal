@@ -54,15 +54,24 @@ $this->pageTitle = 'Key Details';
             <dt>Status</dt>
             <dd><?php echo $key->getStyledStatusHtml(); ?>&nbsp;</dd>
             
-            <dt>Created</dt>
-            <dd><?php echo Utils::getFriendlyDate($key->created); ?>&nbsp;</dd>
+            <dt>Requested</dt>
+            <dd><?php echo Utils::getFriendlyDate($key->requested_on); ?>&nbsp;</dd>
 
-            <dt>Updated</dt>
-            <dd><?php echo Utils::getFriendlyDate($key->updated); ?>&nbsp;</dd>
+            <?php if ($key->processed_on || $key->processed_by): ?>
+                <dt>Processed</dt>
+                <dd>
+                    <?php if ($key->processed_on): ?>
+                        <div><?= Utils::getFriendlyDate($key->processed_on); ?></div>
+                    <?php endif; ?>
+                    <?php if ($key->processedBy): ?>
+                        <div><i>by <?= \CHtml::encode($key->processedBy->display_name); ?></i></div>
+                    <?php endif; ?>
+                </dd>
+            <?php endif; ?>
 
-            <?php if ($key->processedBy !== null): ?>
-                <dt>Processed by</dt>
-                <dd><?= \CHtml::encode($key->processedBy->display_name); ?></dd>
+            <?php if ($key->accepted_terms_on !== null): ?>
+                <dt>Processed on</dt>
+                <dd><?= Utils::getFriendlyDate($key->accepted_terms_on); ?></dd>
             <?php endif; ?>
         </dl>
     </div>
