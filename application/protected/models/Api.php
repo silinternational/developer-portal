@@ -556,12 +556,15 @@ class Api extends ApiBase
         );
         
         $axleApi = new AxleApi(Yii::app()->params['apiaxle']);
-        if($this->getIsNewRecord()){
+        if ($this->getIsNewRecord()) {
             try {
-                $axleApi->create($this->code,$apiData);
+                $axleApi->create($this->code, $apiData);
                 return true;
             } catch (\Exception $e) {
-                $this->addError('code','Failed to create new API on the proxy: '.$e->getMessage());
+                $this->addError(
+                    'code',
+                    'Failed to create new API on the proxy: ' . $e->getMessage()
+                );
                 return false;
             }
         } else {
@@ -570,7 +573,36 @@ class Api extends ApiBase
                 $axleApi->update($apiData);
                 return true;
             } catch (\Exception $e) {
-                $this->addError('code','Failed to update API on the proxy: '.$e->getMessage());
+                
+                // If the Api was not found, try recreating it.
+                $notFoundMessage = sprintf(
+                    'API returned error: Api \'%s\' not found.',
+                    $this->code
+                );
+                if (($e->getCode() == 201) && ($notFoundMessage === $e->getMessage())) {
+                    try {
+                        $axleApi->create($this->code, $apiData);
+                        \Event::log(sprintf(
+                            'The "%s" API (%s, ID %s) was re-added to ApiAxle%s.',
+                            $this->display_name,
+                            $this->code,
+                            $this->api_id,
+                            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+                        ), $this->api_id);
+                        return true;
+                    } catch (\Exception $e) {
+                        $this->addError(
+                            'code',
+                            'Failed to recreate API on the proxy: ' . $e->getMessage()
+                        );
+                        return false;
+                    }
+                }
+
+                $this->addError(
+                    'code',
+                    'Failed to update API on the proxy: ' . $e->getMessage()
+                );
                 return false;
             }
         }
