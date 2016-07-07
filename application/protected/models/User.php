@@ -108,7 +108,13 @@ class User extends UserBase
             }
         }
         
-        foreach ($this->affectedByEvents as $eventAffectingUser) {
+        /* NOTE: Simply using $this->affectedByEvents was retrieving a cached
+         *       list of Events, and so we were failing to update Events created
+         *       earlier in this beforeDelete() method.  */
+        $eventsAffectingUser = \Event::model()->findAllByAttributes(array(
+            'affected_user_id' => $this->user_id,
+        ));
+        foreach ($eventsAffectingUser as $eventAffectingUser) {
             $eventAffectingUser->affected_user_id = null;
             if ( ! $eventAffectingUser->save()) {
                 $this->addError('user_id', sprintf(
@@ -120,7 +126,12 @@ class User extends UserBase
             }
         }
         
-        foreach ($this->causedEvents as $eventCausedByUser) {
+        /* NOTE: Simply using $this->causedEvents fails to retrieve the most
+         *       current list of Events caused by this User.  */
+        $eventsCausedByUser = \Event::model()->findAllByAttributes(array(
+            'acting_user_id' => $this->user_id,
+        ));
+        foreach ($eventsCausedByUser as $eventCausedByUser) {
             $eventCausedByUser->acting_user_id = null;
             if ( ! $eventCausedByUser->save()) {
                 $this->addError('user_id', sprintf(
