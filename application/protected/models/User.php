@@ -85,6 +85,29 @@ class User extends UserBase
             return false;
         }
         
+        foreach ($this->apis as $api) {
+            $api->owner_id = null;
+            if ( ! $api->save()) {
+                $this->addError('user_id', sprintf(
+                    'We cannot delete this user because we could not finish removing them as the owner of their APIs '
+                    . '(though we may done so for some of their APIs): %s',
+                    print_r($api->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        foreach ($this->keys as $key) {
+            if ( ! $key->delete()) {
+                $this->addError('user_id', sprintf(
+                    'We cannot delete this user because we could not finish deleting the user\'s keys (though we may '
+                    . 'have deleted some of them): %s',
+                    print_r($key->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
         foreach ($this->affectedByEvents as $eventAffectingUser) {
             $eventAffectingUser->affected_user_id = null;
             if ( ! $eventAffectingUser->save()) {
@@ -104,29 +127,6 @@ class User extends UserBase
                     'We could not delete this User because we were not able to finish updating our records of events '
                     . 'performed by the User: %s',
                     print_r($eventCausedByUser->getErrors(), true)
-                ));
-                return false;
-            }
-        }
-        
-        foreach ($this->apis as $api) {
-            $api->owner_id = null;
-            if ( ! $api->save()) {
-                $this->addError('user_id', sprintf(
-                    'We cannot delete this user because we could not finish removing them as the owner of their APIs '
-                    . '(though we may done so for some of their APIs): %s',
-                    print_r($api->getErrors(), true)
-                ));
-                return false;
-            }
-        }
-        
-        foreach ($this->keys as $key) {
-            if ( ! $key->delete()) {
-                $this->addError('user_id', sprintf(
-                    'We cannot delete this user because we could not finish deleting the user\'s keys (though we may '
-                    . 'have deleted some of them): %s',
-                    print_r($key->getErrors(), true)
                 ));
                 return false;
             }
