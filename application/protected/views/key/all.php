@@ -5,10 +5,10 @@
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
     'Dashboard' => array('//dashboard/'),
-    'All Keys',
+    'Active Keys',
 );
 
-$this->pageTitle = 'All Keys';
+$this->pageTitle = 'Active Keys';
 $this->pageSubtitle = 'All active API keys';
 
 $this->widget('bootstrap.widgets.TbGridView', array(
