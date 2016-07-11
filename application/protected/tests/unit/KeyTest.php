@@ -395,6 +395,11 @@ class KeyTest extends DeveloperPortalTestCase
         }
     }
     
+    public function testGetChangesForLog()
+    {
+        $this->markTestIncomplete('Test(s) not yet written.');
+    }
+    
     public function testGetPendingKeysDataProvider_onlyIncludesPendingKeys()
     {
         // Arrange: (n/a)
@@ -786,6 +791,11 @@ class KeyTest extends DeveloperPortalTestCase
             $result,
             'Incorrectly reported that a key is visible to a null user.'
         );
+    }
+    
+    public function testLog()
+    {
+        $this->markTestIncomplete('Test(s) not yet written.');
     }
     
     public function testNotifyApiOwnerOfPendingRequest_sendIsCalled()

@@ -13,6 +13,8 @@ class Key extends KeyBase
     const STATUS_PENDING = 'pending';
     const STATUS_REVOKED = 'revoked';
     
+    protected $previousAttributeValues = null;
+    
     public function afterSave()
     {
         parent::afterSave();
@@ -29,18 +31,7 @@ class Key extends KeyBase
                 $this->notifyApiOwnerOfRevokedKey();
             }
         } finally {
-            $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-            \Event::log(sprintf(
-                'Key %s (status: %s) for User %s (%s) to Api %s (%s) was %s%s.',
-                $this->key_id,
-                $this->status,
-                $this->user_id,
-                (isset($this->user) ? $this->user->getDisplayName() : ''),
-                $this->api_id,
-                (isset($this->api) ? $this->api->display_name : ''),
-                ($this->isNewRecord ? 'created' : 'updated'),
-                (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-            ), $this->api_id, $this->key_id, $this->user_id);
+            $this->log(($this->isNewRecord ? 'created' : 'updated'));
         }
     }
     
@@ -75,6 +66,13 @@ class Key extends KeyBase
     
     public function beforeSave()
     {
+        $previousState = $this->findByPk($this->getPrimaryKey());
+        if ($previousState !== null) {
+            $this->previousAttributeValues = $previousState->attributes;
+        } else {
+            $this->previousAttributeValues = null;
+        }
+        
         if ( ! parent::beforeSave()) {
             return false;
         }
@@ -274,6 +272,7 @@ class Key extends KeyBase
         
         if ($this->save()) {
             $this->notifyUserOfApprovedKey();
+            $this->log('approved');
             
             // Indicate success.
             return true;
@@ -449,6 +448,41 @@ class Key extends KeyBase
     }
     
     /**
+     * Get an array (attribute name => new value) of differences between the
+     * given previous attribute values the current attribute values (for use
+     * in the log).
+     * 
+     * NOTE: Certain attribute will never be included in this, either for
+     *       security reasons (such as `secret`) or lack of usefulness (such as
+     *       `updated`).
+     * 
+     * @param array $oldAttributes
+     * @return array
+     */
+    protected function getChangesForLog($oldAttributes)
+    {
+        $attributesToSkip = array(
+            'created',
+            'processed_on',
+            'secret',
+            'updated',
+        );
+        $changes = array();
+        foreach ($this->attributes as $attributeName => $newValue) {
+            if (in_array($attributeName, $attributesToSkip)) {
+                continue;
+            }
+            if ( ! array_key_exists($attributeName, $oldAttributes)) {
+                continue;
+            }
+            if ($oldAttributes[$attributeName] !== $newValue) {
+                $changes[$attributeName] = $newValue;
+            }
+        }
+        return $changes;
+    }
+    
+    /**
      * Get usage data for this Key.
      * 
      * @param string $granularity The time interval (e.g. - 'second', 'minute',
@@ -604,6 +638,33 @@ class Key extends KeyBase
             . 'of ' . var_export($user->role, true) . '.',
             1420733488
         );
+    }
+    
+    /**
+     * Log that an event happened to this Key. Call this AFTER successfully
+     * saving changes to this model. When possible and where appropriate, the
+     * changed attributes (and their new values) will be included in the log.
+     * 
+     * @param string $pastTenseAction A single word (in the past tense)
+     *     describing what happened. Examples: requested, reset, approved
+     */
+    protected function log($pastTenseAction)
+    {
+        if ($this->previousAttributeValues !== null) {
+            $changes = $this->getChangesForLog($this->previousAttributeValues);
+        } else {
+            $changes = null;
+        }
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        
+        \Event::log(sprintf(
+            'Key %s was %s%s%s.',
+            $this->key_id,
+            $pastTenseAction,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser),
+            (is_null($changes) ? '' : ': ' . json_encode($changes))
+        ), $this->api_id, $this->key_id, $this->user_id);
     }
     
     /**
@@ -970,8 +1031,8 @@ class Key extends KeyBase
          */
         
         /* @var $key \Key */
-        $key = Key::model()->findByPk($key_id);  
-        if (is_null($key)) { return array(false, 'Bad key_id');}     
+        $key = \Key::model()->findByPk($key_id);  
+        if (is_null($key)) { return array(false, 'Bad key_id');}
         
         //$seed = microtime() . $key->user_id;         
         $key->value = Utils::getRandStr();//hash('md5', $seed); // length 32 
@@ -1003,6 +1064,8 @@ class Key extends KeyBase
                 ));
                 $mail->send();
             }
+            
+            $key->log('reset');
             
             // Indicate success, returning the Key's updated data as well.
             return array(true, $key);
@@ -1056,6 +1119,8 @@ class Key extends KeyBase
         
         if ($this->save()) {
             $this->sendKeyDeletionNotification();
+            
+            $key->log('revoked');
             
             // Indicate success.
             return true;
