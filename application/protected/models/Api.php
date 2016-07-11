@@ -829,7 +829,7 @@ class Api extends ApiBase
      * 
      * @throws \Exception
      */
-    protected function updateKeysRateLimitsToMatch()
+    public function updateKeysRateLimitsToMatch()
     {
         foreach ($this->keys as $key) {
             if (($key->queries_day === $this->queries_day) &&

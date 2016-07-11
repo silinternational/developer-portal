@@ -995,7 +995,54 @@ class ApiTest extends DeveloperPortalTestCase
     
     public function testUpdateKeysRateLimitsToMatch()
     {
-        $this->markTestIncomplete('Tests not yet written.');
+        // Arrange:
+        /* @var $api \Api */
+        $api = $this->apis('apiWithTwoKeys');
+        /* @var $key1 \Key */
+        $key1 = $api->keys[0];
+        $key1->queries_day += 1000;
+        $key1->queries_second += 10;
+        $key1UpdateResult = $key1->save();
+        /* @var $key2 \Key */
+        $key2 = $api->keys[1];
+        
+        // Pre-assert:
+        $this->assertTrue(
+            $key1UpdateResult,
+            'Failed up change a Key\'s rate limits as part of the setup for '
+            . 'this test: ' . print_r($key1->getErrors(), true)
+        );
+        $this->assertNotEquals($api->queries_day, $key1->queries_day);
+        $this->assertNotEquals($api->queries_second, $key1->queries_second);
+        $this->assertEquals($api->queries_day, $key2->queries_day);
+        $this->assertEquals($api->queries_second, $key2->queries_second);
+        
+        // Act:
+        $api->updateKeysRateLimitsToMatch();
+        
+        // Assert:
+        $key1->refresh();
+        $this->assertEquals(
+            $api->queries_day,
+            $key1->queries_day,
+            'Failed to set Key\'s queries_day back to match Api\'s.'
+        );
+        $this->assertEquals(
+            $api->queries_second,
+            $key1->queries_second,
+            'Failed to set Key\'s queries_second back to match Api\'s.'
+        );
+        $key2->refresh();
+        $this->assertEquals(
+            $api->queries_day,
+            $key2->queries_day,
+            'Already-matching Key\'s queries_day was (incorrectly) changed.'
+        );
+        $this->assertEquals(
+            $api->queries_second,
+            $key2->queries_second,
+            'Already-matching Key\'s queries_second was (incorrectly) changed.'
+        );
     }
     
     public function testValidateOwnerId_invalidOwnerId_0()
