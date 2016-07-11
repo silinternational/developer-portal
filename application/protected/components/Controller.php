@@ -194,6 +194,12 @@ class Controller extends CController
                 ),
                 'roles' => array('owner', 'user'),
             ),
+            array( // Owners can do certain things with keys.
+                'allow',
+                'controllers' => array('key'),
+                'actions' => array('revoke'),
+                'roles' => array('owner'),
+            ),
             array( // Developers and Owners can see some key information.
                 'allow',
                 'controllers' => array('key'),
