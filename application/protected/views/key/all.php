@@ -19,7 +19,7 @@ $this->widget('bootstrap.widgets.TbGridView', array(
     'columns' => array(
         array('name' => 'user.display_name', 'header' => 'User'),
         array('name' => 'api.display_name', 'header' => 'API'),
-        array('name' => 'key_request.purpose', 'header' => 'Purpose'),
+        array('name' => 'purpose', 'header' => 'Purpose'),
         array('name' => 'queries_second',
               'header' => '<span title="Queries Per Second">QPS</span>'),
         array('name' => 'queries_day',

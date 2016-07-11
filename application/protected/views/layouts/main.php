@@ -40,7 +40,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                 array(
                     'label' => 'Keys',
                     'url' => array('key/'),
-                    'active' => (($this->id == 'key') || ($this->id == 'keyRequest')),
+                    'active' => ($this->id == 'key'),
                     'visible' => ( ! (Yii::app()->user->isGuest || Yii::app()->user->checkAccess('admin'))),
                 ),
                 array(
@@ -63,7 +63,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                         ),
                     ),
                     'visible' => Yii::app()->user->role == 'admin',
-                    'active' => (($this->id == 'key') || ($this->id == 'keyRequest')),
+                    'active' => ($this->id == 'key'),
                 ),
                 array(
                     'label' => 'Users',

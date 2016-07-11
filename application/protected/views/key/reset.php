@@ -66,25 +66,37 @@ $this->pageTitle = 'Reset Key';
                 ?>
             </dd>
             
-            <?php
-            if ($key->keyRequest !== null) {
-                ?>
-                <dt>Purpose</dt>
-                <dd>
-                    <?php
-                    echo CHtml::encode($key->keyRequest->purpose);
-                    ?>&nbsp;
-                </dd>
+            <dt>Query rate limits</dt>
+            <dd>
+                <?= (int)$key->queries_second ?> / second<br />
+                <?= number_format((int)$key->queries_day) ?> / day
+            </dd>
 
-                <dt>Domain</dt>
+            <dt>Purpose</dt>
+            <dd><?php echo \CHtml::encode($key->purpose); ?>&nbsp;</dd>
+            
+            <dt>Domain</dt>
+            <dd><?php echo \CHtml::encode($key->domain); ?>&nbsp;</dd>
+            
+            <dt>Requested</dt>
+            <dd><?php echo Utils::getFriendlyDate($key->requested_on); ?>&nbsp;</dd>
+
+            <?php if ($key->processed_on || $key->processed_by): ?>
+                <dt>Processed</dt>
                 <dd>
-                    <?php
-                    echo CHtml::encode($key->keyRequest->domain);
-                    ?>&nbsp;
+                    <?php if ($key->processed_on): ?>
+                        <div><?= Utils::getFriendlyDate($key->processed_on); ?></div>
+                    <?php endif; ?>
+                    <?php if ($key->processedBy): ?>
+                        <div><i>by <?= \CHtml::encode($key->processedBy->display_name); ?></i></div>
+                    <?php endif; ?>
                 </dd>
-                <?php
-            }
-            ?>
+            <?php endif; ?>
+
+            <?php if ($key->accepted_terms_on !== null): ?>
+                <dt>Processed on</dt>
+                <dd><?= Utils::getFriendlyDate($key->accepted_terms_on); ?></dd>
+            <?php endif; ?>
         </dl>
     </div>
 </div>

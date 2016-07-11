@@ -162,7 +162,7 @@ if ($user->hasOwnerPrivileges()) {
         switch($key->status) {
           case \Key::STATUS_APPROVED:
 
-            // Assemble the info/links to show for this key/request/api.
+            // Assemble the info/links to show for this key/api.
             $cardActionLinksHtml = sprintf(
               '<div class="btn-group pull-right">'
               . '<button class="btn btn-small dropdown-toggle" data-toggle="dropdown">'
