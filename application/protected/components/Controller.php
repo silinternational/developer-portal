@@ -202,7 +202,6 @@ class Controller extends CController
                     'details',
                     'index',
                     'mine',
-                    'pending',
                     'reset',
                 ),
                 'roles' => array('owner', 'user'),

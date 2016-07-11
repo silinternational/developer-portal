@@ -380,26 +380,6 @@ class Key extends KeyBase
         ));
     }
     
-    /**
-     * Get the list of Keys that the given User can see.
-     * 
-     * @param \User $user The User in question.
-     * @return Key[] The list of pending Keys visible to that User.
-     */
-    public static function getPendingKeysVisibleTo($user)
-    {
-        $allPendingKeys = \Key::model()->findAllByAttributes(array(
-            'status' => \Key::STATUS_PENDING,
-        ));
-        $pendingKeysToShow = array();
-        foreach ($allPendingKeys as $pendingKey) {
-            if ($user->canSeeKey($pendingKey)) {
-                $pendingKeysToShow[] = $pendingKey;
-            }
-        }
-        return $pendingKeysToShow;
-    }
-    
     public function getStyledStatusHtml()
     {
         $cssClass = null;

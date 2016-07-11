@@ -206,27 +206,21 @@ class KeyController extends Controller
 
     public function actionPending()
     {
-        // Get a reference to the current website user's User model.
-        /* @var $user \User */
+        // Be extra certain that only admins can see this page.
         $user = \Yii::app()->user->user;
-        $userIsAdmin = $user->isAdmin();
-        
-        if ($userIsAdmin) {
-            // Get the list of all pending Keys.
-            $pendingKeysDataProvider = \Key::getPendingKeysDataProvider();
-        } else {
-            // Just get those that the user can see.
-            $pendingKeysDataProvider = new CArrayDataProvider(
-                \Key::getPendingKeysVisibleTo($user),
-                array(
-                    'keyField' => 'key_id',
-                )
+        if ( ! $user->isAdmin()) {
+            throw new CHttpException(
+                403,
+                'You are not authorized to perform this action.',
+                1468250367
             );
         }
         
+        // Get the list of all pending Keys.
+        $pendingKeysDataProvider = \Key::getPendingKeysDataProvider();
+        
         // Render the page.
         $this->render('pending', array(
-            'userIsAdmin' => $userIsAdmin,
             'pendingKeysDataProvider' => $pendingKeysDataProvider,
         ));
     }
