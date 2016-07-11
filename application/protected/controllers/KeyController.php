@@ -7,11 +7,11 @@ class KeyController extends Controller
     public function actionAll()
     {
         // Get the list of all active Keys.
-        $keysDataProvider = new CActiveDataProvider('Key');
+        $activeKeysDataProvider = \Key::getActiveKeysDataProvider();
         
         // Render the page.
         $this->render('all', array(
-            'keysDataProvider' => $keysDataProvider,
+            'activeKeysDataProvider' => $activeKeysDataProvider,
         ));
     }
     

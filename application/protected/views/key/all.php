@@ -1,6 +1,6 @@
 <?php
 /* @var $this KeyController */
-/* @var $keysDataProvider CDataProvider */
+/* @var $activeKeysDataProvider CDataProvider */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
@@ -13,7 +13,7 @@ $this->pageSubtitle = 'All active API keys';
 
 $this->widget('bootstrap.widgets.TbGridView', array(
     'type' => 'striped hover',
-    'dataProvider' => $keysDataProvider,
+    'dataProvider' => $activeKeysDataProvider,
     'template' => '{items}{pager}',
     //'filter' => new Key(),
     'columns' => array(
