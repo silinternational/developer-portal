@@ -554,7 +554,7 @@ class Api extends ApiBase
          * Before saving an Api object, we need to provision it on ApiAxle,
          * or update it of course.
          * 
-         * If the call to ApiAxle failes, the save will not go through
+         * If the call to ApiAxle fails, the save will not go through.
          */
         
         $apiData = array(
@@ -593,6 +593,7 @@ class Api extends ApiBase
                 if (($e->getCode() == 201) && ($notFoundMessage === $e->getMessage())) {
                     try {
                         $axleApi->create($this->code, $apiData);
+                        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
                         \Event::log(sprintf(
                             'The "%s" API (%s, ID %s) was re-added to ApiAxle%s.',
                             $this->display_name,
