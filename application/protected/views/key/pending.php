@@ -9,7 +9,11 @@ $this->breadcrumbs = array(
 );
 
 $this->pageTitle = 'Pending Keys';
-$this->pageSubtitle = 'All pending API keys';
+if ($userIsAdmin) {
+    $this->pageSubtitle = 'All pending API keys';
+} else {
+    $this->pageSubtitle = 'Pending API keys that you have permission to see';
+}
 
 $this->widget('bootstrap.widgets.TbGridView', array(
     'type' => 'striped hover',

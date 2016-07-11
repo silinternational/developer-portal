@@ -206,11 +206,27 @@ class KeyController extends Controller
 
     public function actionPending()
     {
-        // Get the list of all pending Keys.
-        $pendingKeysDataProvider = \Key::getPendingKeysDataProvider();
+        // Get a reference to the current website user's User model.
+        /* @var $user \User */
+        $user = \Yii::app()->user->user;
+        $userIsAdmin = $user->isAdmin();
+        
+        if ($userIsAdmin) {
+            // Get the list of all pending Keys.
+            $pendingKeysDataProvider = \Key::getPendingKeysDataProvider();
+        } else {
+            // Just get those that the user can see.
+            $pendingKeysDataProvider = new CArrayDataProvider(
+                \Key::getPendingKeysVisibleTo($user),
+                array(
+                    'keyField' => 'key_id',
+                )
+            );
+        }
         
         // Render the page.
         $this->render('pending', array(
+            'userIsAdmin' => $userIsAdmin,
             'pendingKeysDataProvider' => $pendingKeysDataProvider,
         ));
     }

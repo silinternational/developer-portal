@@ -431,6 +431,11 @@ class KeyTest extends DeveloperPortalTestCase
         }
     }
     
+    public function testGetPendingKeysVisibleTo()
+    {
+        $this->markTestIncomplete('Test(s) not yet written.');
+    }
+    
     public function testGetStyledStatusHtml_approved()
     {
         // Arrange:
