@@ -29,8 +29,8 @@
                   'url' => $this->createUrl('/api/'),
               ),
               array(
-                  'label' => 'All Active Keys',
-                  'url' => $this->createUrl('/key/all/'),
+                  'label' => 'Active Keys',
+                  'url' => $this->createUrl('/key/active/'),
                   'visible' => \Yii::app()->user->checkAccess('admin'),
               ),
               array(
@@ -39,7 +39,7 @@
                   'visible' => \Yii::app()->user->checkAccess('admin'),
               ),
               array(
-                  'label' => 'My API Keys',
+                  'label' => 'My Keys',
                   'url' => $this->createUrl('/key/mine/'),
               ),
               array(

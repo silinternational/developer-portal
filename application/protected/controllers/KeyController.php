@@ -4,13 +4,13 @@ class KeyController extends Controller
 {
     public $layout = '//layouts/one-column-with-title';
     
-    public function actionAll()
+    public function actionActive()
     {
         // Get the list of all active Keys.
         $activeKeysDataProvider = \Key::getActiveKeysDataProvider();
         
         // Render the page.
-        $this->render('all', array(
+        $this->render('active', array(
             'activeKeysDataProvider' => $activeKeysDataProvider,
         ));
     }
@@ -195,10 +195,10 @@ class KeyController extends Controller
         // Get a reference to the current website user's User model.
         $user = \Yii::app()->user->user;
         
-        // If the user is an admin, redirect them to the list of all keys.
+        // If the user is an admin, redirect them to the list of active keys.
         // Otherwise redirect them to the list of their keys.
         if ($user->role === \User::ROLE_ADMIN) {
-            $this->redirect(array('/key/all'));
+            $this->redirect(array('/key/active'));
         } else {
             $this->redirect(array('/key/mine'));
         }

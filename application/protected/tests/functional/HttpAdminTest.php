@@ -156,11 +156,11 @@ class HttpAdminTest extends CDbTestCase
         
     }
     
-    public function testKeyAll()
+    public function testKeyActive()
     {
         $this->assertContentPiecesFoundOnPage(
             array('All Keys'),
-            '/key/all/'
+            '/key/active/'
         );
     }
 

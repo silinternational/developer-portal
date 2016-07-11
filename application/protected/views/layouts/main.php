@@ -48,8 +48,8 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'items' => array(
                         array(
                             'label' => 'Active Keys',
-                            'url' => array('/key/all/'),
-                            'active' => ($this->route == 'key/all'),
+                            'url' => array('/key/active/'),
+                            'active' => ($this->route == 'key/active'),
                         ),
                         array(
                             'label' => 'Pending Keys',
