@@ -356,6 +356,18 @@ class Key extends KeyBase
         }
     }
     
+    public static function getActiveKeysDataProvider()
+    {
+        return new \CActiveDataProvider('Key', array(
+            'criteria' => array(
+                'condition' => 'status = :status',
+                'params' => array(
+                    ':status' => \Key::STATUS_APPROVED,
+                ),
+            ),
+        ));
+    }
+    
     public function getStyledStatusHtml()
     {
         $cssClass = null;

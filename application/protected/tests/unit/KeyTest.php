@@ -359,6 +359,42 @@ class KeyTest extends DeveloperPortalTestCase
         $this->confirmConstantsDiffer('Key', 'STATUS_');
     }
     
+    public function testGetActiveKeysDataProvider_onlyIncludesActiveKeys()
+    {
+        // Arrange: (n/a)
+        
+        // Act:
+        $activeKeysDataProvider = \Key::getActiveKeysDataProvider();
+        
+        // Assert:
+        foreach ($activeKeysDataProvider->getData() as $key) {
+            /* @var $key \Key */
+            $this->assertSame($key->status, \Key::STATUS_APPROVED);
+        }
+    }
+    
+    public function testGetActiveKeysDataProvider_includesAllActiveKeys()
+    {
+        // Arrange:
+        $keysFixtureData = $this->keys;
+        
+        // Act:
+        $activeKeysDataProvider = \Key::getActiveKeysDataProvider();
+        
+        // Assert:
+        $activeKeysFromDP = $activeKeysDataProvider->getData();
+        $activeKeyIdsFromDP = array();
+        foreach ($activeKeysFromDP as $activeKeyFromDP) {
+            $activeKeyIdsFromDP[] = $activeKeyFromDP->key_id;
+        }
+        foreach ($keysFixtureData as $fixtureName => $fixtureData) {
+            if ($fixtureData['status'] === \Key::STATUS_APPROVED) {
+                $key = $this->keys($fixtureName);
+                $this->assertContains($key->key_id, $activeKeyIdsFromDP);
+            }
+        }
+    }
+    
     public function testGetStyledStatusHtml_approved()
     {
         // Arrange:
