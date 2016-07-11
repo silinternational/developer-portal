@@ -395,6 +395,42 @@ class KeyTest extends DeveloperPortalTestCase
         }
     }
     
+    public function testGetPendingKeysDataProvider_onlyIncludesPendingKeys()
+    {
+        // Arrange: (n/a)
+        
+        // Act:
+        $pendingKeysDataProvider = \Key::getPendingKeysDataProvider();
+        
+        // Assert:
+        foreach ($pendingKeysDataProvider->getData() as $key) {
+            /* @var $key \Key */
+            $this->assertSame($key->status, \Key::STATUS_PENDING);
+        }
+    }
+    
+    public function testGetPendingKeysDataProvider_includesAllPendingKeys()
+    {
+        // Arrange:
+        $keysFixtureData = $this->keys;
+        
+        // Act:
+        $pendingKeysDataProvider = \Key::getPendingKeysDataProvider();
+        
+        // Assert:
+        $pendingKeysFromDP = $pendingKeysDataProvider->getData();
+        $pendingKeyIdsFromDP = array();
+        foreach ($pendingKeysFromDP as $pendingKeyFromDP) {
+            $pendingKeyIdsFromDP[] = $pendingKeyFromDP->key_id;
+        }
+        foreach ($keysFixtureData as $fixtureName => $fixtureData) {
+            if ($fixtureData['status'] === \Key::STATUS_PENDING) {
+                $key = $this->keys($fixtureName);
+                $this->assertContains($key->key_id, $pendingKeyIdsFromDP);
+            }
+        }
+    }
+    
     public function testGetStyledStatusHtml_approved()
     {
         // Arrange:

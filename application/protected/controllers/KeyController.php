@@ -204,6 +204,17 @@ class KeyController extends Controller
         }
     }
 
+    public function actionPending()
+    {
+        // Get the list of all pending Keys.
+        $pendingKeysDataProvider = \Key::getPendingKeysDataProvider();
+        
+        // Render the page.
+        $this->render('pending', array(
+            'pendingKeysDataProvider' => $pendingKeysDataProvider,
+        ));
+    }
+    
     public function actionReset($id)
     {
         // Get a reference to the current website user's User model.

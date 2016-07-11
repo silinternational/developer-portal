@@ -53,8 +53,8 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                         ),
                         array(
                             'label' => 'Pending Keys',
-                            'url' => array('/key-request/'),
-                            'active' => ($this->route == 'keyRequest/index'),
+                            'url' => array('/key/pending/'),
+                            'active' => ($this->route == 'key/pending'),
                         ),
                         array(
                             'label' => 'My Keys',

@@ -368,6 +368,18 @@ class Key extends KeyBase
         ));
     }
     
+    public static function getPendingKeysDataProvider()
+    {
+        return new \CActiveDataProvider('Key', array(
+            'criteria' => array(
+                'condition' => 'status = :status',
+                'params' => array(
+                    ':status' => \Key::STATUS_PENDING,
+                ),
+            ),
+        ));
+    }
+    
     public function getStyledStatusHtml()
     {
         $cssClass = null;

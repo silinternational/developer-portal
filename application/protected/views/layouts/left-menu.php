@@ -34,8 +34,8 @@
                   'visible' => \Yii::app()->user->checkAccess('admin'),
               ),
               array(
-                  'label' => 'Pending Key Requests',
-                  'url' => $this->createUrl('/key-request/'),
+                  'label' => 'Pending Keys',
+                  'url' => $this->createUrl('/key/pending/'),
                   'visible' => \Yii::app()->user->checkAccess('admin'),
               ),
               array(
