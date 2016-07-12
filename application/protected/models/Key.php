@@ -143,7 +143,7 @@ class Key extends KeyBase
                     /*
                      * Need to delete existing key and create new key
                      */
-                    $axleKey->delete($current->value);
+                    $axleKey->delete($currentValue);
                     $axleKey->create($this->value, $keyData);
                     /**
                      * Link key to keyring
