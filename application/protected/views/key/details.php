@@ -1,8 +1,8 @@
 <?php
-/* @var $this KeyController */
-/* @var $actionLinks ActionLink[] */
-/* @var $key Key */
-/* @var $currentUser User */
+/* @var $this \KeyController */
+/* @var $actionLinks \ActionLink[] */
+/* @var $key \Key */
+/* @var $currentUser \User */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
@@ -16,64 +16,12 @@ $this->pageTitle = 'Key Details';
 ?>
 <div class="row">
     <div class="span7">
-
-        <dl class="dl-horizontal">
-            <dt>User</dt>
-            <dd><?php
-                if ($currentUser->isAdmin()) {
-                    echo sprintf(
-                        '<a href="%s">%s</a>',
-                        $this->createUrl('/user/details/', array(
-                            'id' => $key->user_id,
-                        )),
-                        \CHtml::encode($key->user->display_name)
-                    );
-                } else {
-                    echo \CHtml::encode($key->user->display_name);
-                }
-                
-                ?>
-            </dd>
-            
-            <dt>API</dt>
-            <dd><?= sprintf(
-                '<a href="%s">%s</a> (<span class="fixed">%s</span>)&nbsp;',
-                $this->createUrl('/api/details/', array(
-                    'code' => $key->api->code,
-                )),
-                \CHtml::encode($key->api->display_name),
-                \CHtml::encode($key->api->code)
-            ); ?></dd>
-            
-            <dt>Purpose</dt>
-            <dd><?php echo \CHtml::encode($key->purpose); ?>&nbsp;</dd>
-            
-            <dt>Domain</dt>
-            <dd><?php echo \CHtml::encode($key->domain); ?>&nbsp;</dd>
-            
-            <dt>Status</dt>
-            <dd><?php echo $key->getStyledStatusHtml(); ?>&nbsp;</dd>
-            
-            <dt>Requested</dt>
-            <dd><?php echo Utils::getFriendlyDate($key->requested_on); ?>&nbsp;</dd>
-
-            <?php if ($key->processed_on || $key->processed_by): ?>
-                <dt>Processed</dt>
-                <dd>
-                    <?php if ($key->processed_on): ?>
-                        <div><?= Utils::getFriendlyDate($key->processed_on); ?></div>
-                    <?php endif; ?>
-                    <?php if ($key->processedBy): ?>
-                        <div><i>by <?= \CHtml::encode($key->processedBy->display_name); ?></i></div>
-                    <?php endif; ?>
-                </dd>
-            <?php endif; ?>
-
-            <?php if ($key->accepted_terms_on !== null): ?>
-                <dt>Processed on</dt>
-                <dd><?= Utils::getFriendlyDate($key->accepted_terms_on); ?></dd>
-            <?php endif; ?>
-        </dl>
+        <?php
+        $this->renderPartial('//partials/key-info', array(
+            'key' => $key,
+            'currentUser' => $currentUser,
+        ));
+        ?>
     </div>
     <div class="span4">
         <?php

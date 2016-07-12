@@ -294,6 +294,7 @@ class KeyController extends Controller
         
         // Show the page.
         $this->render('reset', array(
+            'currentUser' => $currentUser,
             'key' => $key,
         ));
     }
@@ -393,6 +394,7 @@ class KeyController extends Controller
         
         // Show the page.
         $this->render('revoke', array(
+            'currentUser' => $currentUser,
             'key' => $key,
         ));
     }
