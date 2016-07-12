@@ -1,7 +1,7 @@
 <?php
 /* @var $this \KeyController */
 /* @var $key \Key */
-/* @var $user \User */
+/* @var $currentUser \User */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
@@ -18,7 +18,7 @@ $this->pageTitle = 'Delete Key';
         <?php
         $this->renderPartial('//partials/key-info', array(
             'key' => $key,
-            'currentUser' => $user,
+            'currentUser' => $currentUser,
         ));
         ?>
     </div>

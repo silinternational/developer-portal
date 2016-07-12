@@ -18,8 +18,8 @@ class KeyController extends Controller
     public function actionDelete($id)
     {
         // Get a reference to the current website user's User model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Try to retrieve the specified Key's data.
         /* @var $key Key */
@@ -27,7 +27,7 @@ class KeyController extends Controller
         
         // If this is not a Key that the current User is allowed to delete,
         // say so.
-        if ( ! $user->canDeleteKey($key)) {
+        if ( ! $currentUser->canDeleteKey($key)) {
             throw new CHttpException(
                 403,
                 'That is not a Key that you have permission to delete.'
@@ -78,7 +78,7 @@ class KeyController extends Controller
         // Show the page.
         $this->render('delete', array(
             'key' => $key,
-            'user' => $user,
+            'currentUser' => $currentUser,
         ));
     }
 
