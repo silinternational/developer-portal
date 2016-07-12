@@ -85,15 +85,15 @@ class KeyController extends Controller
     public function actionDetails($id)
     {
         // Get a reference to the current website user's User model.
-        /* @var $user \User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser \User */
+        $currentUser = \Yii::app()->user->user;
         
         // Try to retrieve the specified Key's data.
         /* @var $key \Key */
         $key = \Key::model()->findByPk($id);
         
         // Prevent access by users without permission to see this key.
-        if (( ! $key) || ( ! $key->isVisibleToUser($user))) {
+        if (( ! $key) || ( ! $key->isVisibleToUser($currentUser))) {
             throw new CHttpException(
                 404,
                 'Either there is no key with an ID of ' . $id . ' or you do '
@@ -106,7 +106,7 @@ class KeyController extends Controller
             
             // If the User does NOT have permission to process requests
             // for keys to the corresponding API, say so.
-            if ( ! $user->hasAdminPrivilegesForApi($key->api)) {
+            if ( ! $currentUser->hasAdminPrivilegesForApi($key->api)) {
                 throw new CHttpException(
                     403,
                     'You do not have permission to manage this API.'
@@ -115,13 +115,13 @@ class KeyController extends Controller
             
             // Record that the current user is the one that processed this
             // key.
-            $key->processed_by = $user->user_id;
+            $key->processed_by = $currentUser->user_id;
             
             // If the request was approved...
             if (isset($_POST[\Key::STATUS_APPROVED])) {
                 
                 // Try to approve the key.
-                if ($key->approve($user)) {
+                if ($key->approve($currentUser)) {
                     
                     // Update our local copy of this Key's data.
                     $key->refresh();
@@ -180,13 +180,13 @@ class KeyController extends Controller
         // Get the list of action links that should be shown.
         $actionLinks = LinksManager::getPendingKeyDetailsActionLinksForUser(
             $key,
-            $user
+            $currentUser
         );
         
         // Render the page.
         $this->render('details', array(
             'actionLinks' => $actionLinks,
-            'currentUser' => $user,
+            'currentUser' => $currentUser,
             'key' => $key,
         ));
     }
@@ -194,11 +194,11 @@ class KeyController extends Controller
     public function actionIndex()
     {
         // Get a reference to the current website user's User model.
-        $user = \Yii::app()->user->user;
+        $currentUser = \Yii::app()->user->user;
         
         // If the user is an admin, redirect them to the list of active keys.
         // Otherwise redirect them to the list of their keys.
-        if ($user->role === \User::ROLE_ADMIN) {
+        if ($currentUser->role === \User::ROLE_ADMIN) {
             $this->redirect(array('/key/active'));
         } else {
             $this->redirect(array('/key/mine'));
@@ -208,8 +208,8 @@ class KeyController extends Controller
     public function actionPending()
     {
         // Be extra certain that only admins can see this page.
-        $user = \Yii::app()->user->user;
-        if ( ! $user->isAdmin()) {
+        $currentUser = \Yii::app()->user->user;
+        if ( ! $currentUser->isAdmin()) {
             throw new CHttpException(
                 403,
                 'You are not authorized to perform this action.',
@@ -229,8 +229,8 @@ class KeyController extends Controller
     public function actionReset($id)
     {
         // Get a reference to the current website user's User model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Try to retrieve the specified Key's data.
         /* @var $key Key */
@@ -238,7 +238,7 @@ class KeyController extends Controller
         
         // If this is not a Key that the current User is allowed to reset, say
         // so.
-        if ( ! $user->canResetKey($key)) {
+        if ( ! $currentUser->canResetKey($key)) {
             throw new CHttpException(
                 403,
                 'That is not a Key that you have permission to reset.'
@@ -301,13 +301,13 @@ class KeyController extends Controller
     public function actionMine()
     {
         // Get the current user's model.
-        $user = \Yii::app()->user->user;
+        $currentUser = \Yii::app()->user->user;
         
         // Get lists of the user's active and inactive keys (as data providers
         // for the view).
         $activeKeys = array();
         $nonActiveKeys = array();
-        foreach ($user->keys as $key) {
+        foreach ($currentUser->keys as $key) {
             if ($key->status === \Key::STATUS_APPROVED) {
                 $activeKeys[] = $key;
             } else {
@@ -331,8 +331,8 @@ class KeyController extends Controller
     public function actionRevoke($id)
     {
         // Get a reference to the current website user's User model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Try to retrieve the specified Key's data.
         /* @var $key Key */
@@ -340,7 +340,7 @@ class KeyController extends Controller
         
         // If this is not a Key that the current User is allowed to revoke,
         // say so.
-        if ( ! $user->canRevokeKey($key)) {
+        if ( ! $currentUser->canRevokeKey($key)) {
             throw new CHttpException(
                 403,
                 'That is not a Key that you have permission to revoke.'
@@ -351,7 +351,7 @@ class KeyController extends Controller
         if (Yii::app()->request->isPostRequest) {
             
             // Revoke the key, paying attention to the results.
-            $revokeResults = Key::revokeKey($key->key_id, $user);
+            $revokeResults = Key::revokeKey($key->key_id, $currentUser);
             
             // If we were unable to delete that Key...
             if ( ! $revokeResults[0]) {
