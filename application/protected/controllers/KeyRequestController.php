@@ -7,8 +7,8 @@ class KeyRequestController extends Controller
     public function actionDelete($id)
     {
         // Get a reference to the current website user's User model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Try to retrieve the specified Key's data.
         /* @var $key Key */
@@ -16,7 +16,7 @@ class KeyRequestController extends Controller
         
         // If this is not a Key that the current User is allowed to
         // delete, say so.
-        if ( ! $user->canDeleteKey($key)) {
+        if ( ! $currentUser->canDeleteKey($key)) {
             throw new CHttpException(
                 403,
                 'That is not a key that you have permission to delete.'
@@ -102,15 +102,15 @@ class KeyRequestController extends Controller
     public function actionDetails($id)
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Try to get the specified Key.
         /* @var $key \Key */
         $key = \Key::model()->findByPk($id);
         
         // If the User does NOT have permission to see that Key, say so.
-        if ( ! $user->canSeeKey($key)) {
+        if ( ! $currentUser->canSeeKey($key)) {
             throw new CHttpException(
                 403,
                 'That is not a Key that you have permission to see.'
@@ -125,7 +125,7 @@ class KeyRequestController extends Controller
 
                 // If the User does NOT have permission to process requests
                 // for keys to the corresponding API, say so.
-                if ( ! $user->hasAdminPrivilegesForApi($key->api)) {
+                if ( ! $currentUser->hasAdminPrivilegesForApi($key->api)) {
                     throw new CHttpException(
                         403,
                         'You do not have permission to manage this API.'
@@ -191,7 +191,7 @@ class KeyRequestController extends Controller
         // Get the list of action links that should be shown.
         $actionLinks = LinksManager::getPendingKeyDetailsActionLinksForUser(
             $key,
-            $user
+            $currentUser
         );
         
         // Render the page.
@@ -209,13 +209,13 @@ class KeyRequestController extends Controller
         ));
         
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Exclude those that the user is not allowed to see.
         $keysToShow = array();
         foreach ($allPendingKeys as $key) {
-            if ($user->canSeeKey($key)) {
+            if ($currentUser->canSeeKey($key)) {
                 $keysToShow[] = $key;
             }
         }

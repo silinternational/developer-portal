@@ -10,11 +10,11 @@ class ApiController extends Controller
         $api = \Api::model()->findByAttributes(array('code' => $code));
         
         // Get a reference to the current website user's User model.
-        $user = \Yii::app()->user->user;
+        $currentUser = \Yii::app()->user->user;
         
         // Prevent information about it from being seen by user's without
         // permission to see the specified API.
-        if (( ! $api) || ( ! $api->isVisibleToUser($user))) {
+        if (( ! $api) || ( ! $api->isVisibleToUser($currentUser))) {
             throw new CHttpException(
                 404,
                 'Either there is no "' . $code . '" API or you do not have '
@@ -24,7 +24,7 @@ class ApiController extends Controller
         
         // Prevent this list of keys from being seen by anyone who is not
         // authorized to see them.
-        if (( ! ($user instanceof User)) || ( ! $user->canSeeKeysForApi($api))) {
+        if (( ! ($currentUser instanceof User)) || ( ! $currentUser->canSeeKeysForApi($api))) {
             throw new CHttpException(
                 403,
                 'You do not have permission to see its list of active keys for '
@@ -61,15 +61,15 @@ class ApiController extends Controller
     public function actionAdd()
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Set up to add an API.
         /* @var $api Api */
         $api = new Api;
         
         // Record the current user as the owner.
-        $api->owner_id = $user->user_id;
+        $api->owner_id = $currentUser->user_id;
 
         // Get the form object.
         $form = new YbHorizForm('application.views.forms.apiForm', $api);
@@ -78,10 +78,10 @@ class ApiController extends Controller
         if ($form->submitted('yt0')) {
 
             // If the user making this change is NOT an admin...
-            if ($user->role !== \User::ROLE_ADMIN) {
+            if ($currentUser->role !== \User::ROLE_ADMIN) {
 
                 // Make sure they are still set as the owner.
-                $api->owner_id = $user->user_id;
+                $api->owner_id = $currentUser->user_id;
             }
             
             // If the data passes validation...
@@ -131,15 +131,15 @@ class ApiController extends Controller
     public function actionDelete($code)
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Get the API by the code name.
         /* @var $api Api */
         $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If that is NOT an Api that the User has permission to manage, say so.
-        if ( ! $user->hasAdminPrivilegesForApi($api)) {
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
             throw new CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'
@@ -228,8 +228,8 @@ class ApiController extends Controller
     public function actionDetails($code)
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Get the API by the code name.
         /* @var $api Api */
@@ -238,7 +238,7 @@ class ApiController extends Controller
         // If no such Api was found 
         //    OR
         // if the Api isn't visible to the current user... say so.
-        if (($api === null) || ( ! $api->isVisibleToUser($user))) {
+        if (($api === null) || ( ! $api->isVisibleToUser($currentUser))) {
             throw new CHttpException(
                 404,
                 'Either there is no "' . $code . '" API or you do not have '
@@ -249,7 +249,7 @@ class ApiController extends Controller
         // Get the list of action links that should be shown.
         $actionLinks = LinksManager::getApiDetailsActionLinksForUser(
             $api,
-            $user
+            $currentUser
         );
         
         // Render the page.
@@ -262,15 +262,15 @@ class ApiController extends Controller
     public function actionDocsEdit($code)
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Get the API by the code name.
         /* @var $api Api */
         $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If that is NOT an Api that the User has permission to manage, say so.
-        if ( ! $user->hasAdminPrivilegesForApi($api)) {
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
             throw new CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'
@@ -288,7 +288,7 @@ class ApiController extends Controller
         if ($form->submitted('yt0')) {
 
             // If the user making this change is NOT an admin...
-            if ($user->role !== \User::ROLE_ADMIN) {
+            if ($currentUser->role !== \User::ROLE_ADMIN) {
 
                 // Make sure they didn't change the owner_id.
                 $api->owner_id = $apiOwnerId;
@@ -343,15 +343,15 @@ class ApiController extends Controller
     public function actionEdit($code)
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Get the API by the code name.
         /* @var $api Api */
         $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If that is NOT an Api that the User has permission to manage, say so.
-        if ( ! $user->hasAdminPrivilegesForApi($api)) {
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
             throw new CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'
@@ -369,7 +369,7 @@ class ApiController extends Controller
         if ($form->submitted('yt0')) {
             
             // If the user making this change is NOT an admin...
-            if ($user->role !== \User::ROLE_ADMIN) {
+            if ($currentUser->role !== \User::ROLE_ADMIN) {
 
                 // Make sure they didn't change the owner_id.
                 $api->owner_id = $apiOwnerId;
@@ -422,10 +422,10 @@ class ApiController extends Controller
     public function actionIndex()
     {
         // Get the current user's model.
-        $user = \Yii::app()->user->user;
+        $currentUser = \Yii::app()->user->user;
         
         // If the user is an admin, get the list of all APIs.
-        if ($user->role === User::ROLE_ADMIN) {
+        if ($currentUser->role === User::ROLE_ADMIN) {
             $apiList = new CActiveDataProvider('Api',array(
                 'criteria' => array(
                     'with' => array('approvedKeyCount', 'pendingKeyCount'),
@@ -438,7 +438,7 @@ class ApiController extends Controller
             $visibleApis = array();
             $allApis = Api::model()->findAll();
             foreach ($allApis as $api) {
-                if ($api->isVisibleToUser($user)) {
+                if ($api->isVisibleToUser($currentUser)) {
                     $visibleApis[] = $api;
                 }
             }
@@ -455,7 +455,7 @@ class ApiController extends Controller
         // Render the page.
         $this->render('index', array(
             'apiList' => $apiList,
-            'user' => $user,
+            'user' => $currentUser,
         ));
     }
 
@@ -644,11 +644,11 @@ class ApiController extends Controller
         $api = \Api::model()->findByAttributes(array('code' => $code));
         
         // Get a reference to the current website user's User model.
-        $user = \Yii::app()->user->user;
+        $currentUser = \Yii::app()->user->user;
         
         // Prevent information about it from being seen by users without
         // permission to see the specified API.
-        if (( ! $api) || ( ! $api->isVisibleToUser($user))) {
+        if (( ! $api) || ( ! $api->isVisibleToUser($currentUser))) {
             throw new CHttpException(
                 404,
                 'Either there is no "' . $code . '" API or you do not have '
@@ -658,7 +658,7 @@ class ApiController extends Controller
         
         // Prevent this list of keys from being seen by anyone who is not
         // authorized to see them.
-        if (( ! ($user instanceof User)) || ( ! $user->canSeeKeysForApi($api))) {
+        if (( ! ($currentUser instanceof User)) || ( ! $currentUser->canSeeKeysForApi($api))) {
             throw new CHttpException(
                 403,
                 'You do not have permission to see the list of pending keys '
@@ -691,30 +691,30 @@ class ApiController extends Controller
         $api = Api::model()->findByAttributes(array('code' => $code));
 
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // If the user already has an active key to this API, show its details
         // instead.
-        if ($user->hasActiveKeyToApi($api)) {
+        if ($currentUser->hasActiveKeyToApi($api)) {
             \Yii::app()->user->setFlash('info', sprintf(
                 '<strong>Note:</strong> You already have the following key '
                 . 'to the %s API.',
                 $api->display_name
             ));
-            $activeKey = $user->getActiveKeyToApi($api);
+            $activeKey = $currentUser->getActiveKeyToApi($api);
             $this->redirect(array('/key/details/', 'id' => $activeKey->key_id));
         }
 
         // If the user already has a pending key for this API, show its details
         // instead.
-        if ($user->hasPendingKeyForApi($api)) {
+        if ($currentUser->hasPendingKeyForApi($api)) {
             \Yii::app()->user->setFlash('info', sprintf(
                 '<strong>Note:</strong> You already have the following '
                 . 'pending key for the %s API.',
                 $api->display_name
             ));
-            $pendingKey = $user->getPendingKeyForApi($api);
+            $pendingKey = $currentUser->getPendingKeyForApi($api);
             $this->redirect(array(
                 '/key/details/',
                 'id' => $pendingKey->key_id,
@@ -730,7 +730,7 @@ class ApiController extends Controller
             
             /**
              * @todo Refactor the following to something like...
-             *     $key = $user->requestKeyForApi($api, $domain, $purpose);
+             *     $key = $currentUser->requestKeyForApi($api, $domain, $purpose);
              */
 
             /* Retrieve ONLY the applicable pieces of data that we trust the
@@ -740,7 +740,7 @@ class ApiController extends Controller
             $key->purpose = isset($formData['purpose']) ? $formData['purpose'] : null;
             
             // Also record the extra data it needs (not submitted by the user).
-            $key->user_id = $user->user_id;
+            $key->user_id = $currentUser->user_id;
             $key->api_id = $api->api_id;
             $key->status = Key::STATUS_PENDING;
             $key->queries_day = $api->queries_day;
@@ -758,7 +758,7 @@ class ApiController extends Controller
                         // If not successful, record that in the log.
                         Yii::log(
                             'Key request auto-approval FAILED: User ID '
-                            . $user->user_id . ', API ID ' . $api->api_id,
+                            . $currentUser->user_id . ', API ID ' . $api->api_id,
                             CLogger::LEVEL_ERROR,
                             __CLASS__ . '.' . __FUNCTION__
                         );
@@ -776,7 +776,7 @@ class ApiController extends Controller
                         // Record that in the log.
                         Yii::log(
                             'Key request auto-approved: User ID '
-                            . $user->user_id . ', API ID ' . $api->api_id
+                            . $currentUser->user_id . ', API ID ' . $api->api_id
                             . ', Key ID ' . $key->key_id,
                             CLogger::LEVEL_INFO,
                             __CLASS__ . '.' . __FUNCTION__
@@ -797,7 +797,7 @@ class ApiController extends Controller
 
                     // Record that in the log.
                     Yii::log(
-                        'Key requested: User ID ' . $user->user_id . ', API ID '
+                        'Key requested: User ID ' . $currentUser->user_id . ', API ID '
                         . $api->api_id,
                         CLogger::LEVEL_INFO,
                         __CLASS__ . '.' . __FUNCTION__
@@ -832,15 +832,15 @@ class ApiController extends Controller
     public function actionUsage($code)
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Get the API by the code name.
         /* @var $api Api */
         $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If that is NOT an Api that the User has permission to manage, say so.
-        if ( ! $user->hasAdminPrivilegesForApi($api)) {
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
             throw new CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'

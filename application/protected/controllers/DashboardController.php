@@ -17,11 +17,11 @@ class DashboardController extends Controller
         $interval = $this->getIntervalToShow();
         
         // Get the user model.
-        /* @var $user \User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser \User */
+        $currentUser = \Yii::app()->user->user;
         
         // If we should include API Owner content on the dashboard...
-        if ($user->hasOwnerPrivileges()) {
+        if ($currentUser->hasOwnerPrivileges()) {
             
             // Get the identifier for which chart to show (the user's keys'
             // usage, or usage of the user's APIs).
@@ -35,13 +35,13 @@ class DashboardController extends Controller
 
         // Get the appropriate set of usage data for the chart.
         if ($chart === self::CHART_MY_KEYS) {
-            $usageStats = $user->getUsageStatsForKeys($interval);
+            $usageStats = $currentUser->getUsageStatsForKeys($interval);
         } elseif ($chart === self::CHART_ALL_APIS) {
-            $usageStats = $user->getUsageStatsForAllApis($interval);
+            $usageStats = $currentUser->getUsageStatsForAllApis($interval);
         } elseif ($chart === self::CHART_TOTALS) {
-            $usageStats = $user->getUsageStatsTotals($interval);
+            $usageStats = $currentUser->getUsageStatsTotals($interval);
         } else {
-            $usageStats = $user->getUsageStatsForApis($interval);
+            $usageStats = $currentUser->getUsageStatsForApis($interval);
         }
         
         $this->renderPartial('usage-chart', [
@@ -57,23 +57,23 @@ class DashboardController extends Controller
         $interval = $this->getIntervalToShow();
         
         // Get the user model.
-        /* @var $user \User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser \User */
+        $currentUser = \Yii::app()->user->user;
         
         // Get the list of the APIs that the user either has a Key for (of any
         // status). To do this, get the list of their Keys, but include the
         // names of the APIs.
-        $keys = $user->getKeysWithApiNames();
+        $keys = $currentUser->getKeysWithApiNames();
         
         // If we should include API Owner content on the dashboard...
-        if ($user->hasOwnerPrivileges()) {
+        if ($currentUser->hasOwnerPrivileges()) {
             
             // Get the identifier for which chart to show (the user's keys'
             // usage, or usage of the user's APIs).
             $chart = \Yii::app()->request->getParam('chart', $defaultChart);
 
             // Get the list of APIs that this user owns.
-            $apisOwnedByUser = $user->apis;
+            $apisOwnedByUser = $currentUser->apis;
             
         } else {
             
@@ -84,7 +84,7 @@ class DashboardController extends Controller
         
         // Show the page.
         $this->render('index', array(
-            'user' => $user,
+            'user' => $currentUser,
             'keys' => $keys,
             'apisOwnedByUser' => $apisOwnedByUser,
             'currentInterval' => $interval,
