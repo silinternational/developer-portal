@@ -1120,7 +1120,7 @@ class Key extends KeyBase
         if ($this->save()) {
             $this->sendKeyDeletionNotification();
             
-            $key->log('revoked');
+            $this->log('revoked');
             
             // Indicate success.
             return true;
