@@ -58,6 +58,11 @@
                   'label' => 'FAQs',
                   'url' => $this->createUrl('/faq/'),
               ),
+              array(
+                  'label' => 'Event Log',
+                  'url' => $this->createUrl('/event/'),
+                  'visible' => \Yii::app()->user->checkAccess('admin'),
+              ),
           ),
       ));
       

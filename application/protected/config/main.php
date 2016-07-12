@@ -168,6 +168,7 @@ return array(
 
         'friendlyDateFormat' => 'F j, Y, g:ia (T)',
         'shortDateFormat'    => 'm/d/y',
+        'shortDateTimeFormat' => 'n/j/y g:ia',
         'allInsiteUsersGroup' => 'grp_custgrp_po-sil_cg-641',
         'apiProxyProtocol' => 'https',
         'apiProxyDomain' => '.api.sil.org',

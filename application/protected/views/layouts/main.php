@@ -83,6 +83,12 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'active' => ($this->id == 'faq'),
                     'visible' => ( ! Yii::app()->user->isGuest),
                 ),
+                array(
+                    'label' => 'Event Log',
+                    'url' => array('/event/'),
+                    'active' => ($this->id == 'event'),
+                    'visible' => Yii::app()->user->checkAccess('admin'),
+                ),
             ),
         ),
         (
