@@ -1,6 +1,7 @@
 <?php
-/* @var $this KeyController */
-/* @var $key Key */
+/* @var $this \KeyController */
+/* @var $key \Key */
+/* @var $user \User */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
@@ -14,46 +15,12 @@ $this->pageTitle = 'Delete Key';
 ?>
 <div class="row">
     <div class="span12">
-        <dl class="dl-horizontal">
-            <dt>API</dt>
-            <dd>
-                <?php echo sprintf(
-                    '<a href="%s">%s</a>',
-                    $this->createUrl('/api/details/', array(
-                        'code' => $key->api->code,
-                    )),
-                    CHtml::encode(
-                        $key->api->display_name . ' (' . $key->api->code . ')'
-                    )
-                ); ?>
-            </dd>
-            
-            <dt>User</dt>
-            <dd>
-                <?php
-                if (\Yii::app()->user->checkAccess('admin')) {
-                    echo sprintf(
-                        '<a href="%s">%s</a>',
-                        $this->createUrl('/user/details/', array(
-                            'id' => $key->user_id,
-                        )),
-                        CHtml::encode($key->user->display_name)
-                    );
-                } else {
-                    echo CHtml::encode($key->user->display_name);
-                }
-                ?>
-            </dd>
-
-            <dt>Value</dt>
-            <dd><?php echo CHtml::encode($key->value); ?>&nbsp;</dd>
-            
-            <dt>Purpose</dt>
-            <dd><?php echo CHtml::encode($key->purpose); ?>&nbsp;</dd>
-
-            <dt>Domain</dt>
-            <dd><?php echo CHtml::encode($key->domain); ?>&nbsp;</dd>
-        </dl>
+        <?php
+        $this->renderPartial('//partials/key-info', array(
+            'key' => $key,
+            'currentUser' => $user,
+        ));
+        ?>
     </div>
 </div>
 <div class="row">

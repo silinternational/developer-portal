@@ -78,6 +78,7 @@ class KeyController extends Controller
         // Show the page.
         $this->render('delete', array(
             'key' => $key,
+            'user' => $user,
         ));
     }
 
