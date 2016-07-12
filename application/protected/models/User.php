@@ -489,6 +489,7 @@ class User extends UserBase
     {
         // Get all of this user's Keys.
         $keys = \Key::model()->with('api')->findAllByAttributes(array(
+            'status' => \Key::STATUS_APPROVED,
             'user_id' => $this->user_id,
         ), array(
             'order' => 'api.display_name',
