@@ -15,9 +15,7 @@ if ($currentUser->canSeeKey($key)) {
                     $this->createUrl('/api/details/', array(
                         'code' => $key->api->code,
                     )),
-                    \CHtml::encode(
-                        $key->api->display_name . ' (' . $key->api->code . ')'
-                    )
+                    \CHtml::encode($key->api->display_name)
                 );
             } else {
                 \CHtml::encode($key->api->display_name);
@@ -43,7 +41,6 @@ if ($currentUser->canSeeKey($key)) {
         </dd>
         
         <?php if ($key->status === \Key::STATUS_APPROVED): ?>
-            
             <dt>Value</dt>
             <dd><?= \CHtml::encode($key->value); ?>&nbsp;</dd>
             
@@ -64,12 +61,6 @@ if ($currentUser->canSeeKey($key)) {
                 }
                 ?>
             </dd>
-            
-        <?php else: ?>
-            
-            <dt>Status</dt>
-            <dd><?= $key->getStyledStatusHtml(); ?>&nbsp;</dd>
-            
         <?php endif;?>
         
         <dt>Query rate limits</dt>
@@ -83,6 +74,9 @@ if ($currentUser->canSeeKey($key)) {
         
         <dt>Domain</dt>
         <dd><?= \CHtml::encode($key->domain); ?>&nbsp;</dd>
+        
+        <dt>Status</dt>
+        <dd><?= $key->getStyledStatusHtml(); ?>&nbsp;</dd>
         
         <dt>Requested</dt>
         <dd><?= Utils::getFriendlyDate($key->requested_on); ?>&nbsp;</dd>
