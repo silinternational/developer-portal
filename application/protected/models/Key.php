@@ -330,20 +330,16 @@ class Key extends KeyBase
             return false;
         }
         
-        // Check all the normal ownership / admin details first.
-        if ( ! $user->canRevokeKey($this)) {
-            return false;
-        }
-        
         if ($this->isOwnedBy($user)) {
             
             // Allow a User to delete their own Key regardless of status.
             return true;
             
-        } else {
+        } elseif ($this->isToApiOwnedBy($user) || $user->isAdmin()) {
             
-            /* Only allow someone else to delete a User's Key if the Key has
-             * already been "terminated" (for lack of a better word).  */
+            /* Only allow someone else to delete a User's Key if they have the
+             * appropriate authority and the Key has already been "terminated"
+             * (for lack of a better word).  */
             switch ($this->status) {
                 case \Key::STATUS_DENIED:
                 case \Key::STATUS_REVOKED:
