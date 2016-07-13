@@ -189,7 +189,7 @@ class KeyRequestController extends Controller
         }
         
         // Get the list of action links that should be shown.
-        $actionLinks = LinksManager::getPendingKeyDetailsActionLinksForUser(
+        $actionLinks = LinksManager::getKeyDetailsActionLinksForUser(
             $key,
             $currentUser
         );

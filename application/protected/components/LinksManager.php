@@ -217,15 +217,15 @@ class LinksManager extends CComponent
     }
     
     /**
-     * Get the list of 'Actions' links that should for shown on the pending Key
-     * details page for the given Key and User.
+     * Get the list of 'Actions' links that should for shown on the Key details
+     * page for the given Key and User.
      * 
-     * @param Key $key The pending Key whose details are being viewed.
+     * @param Key $key The Key whose details are being viewed.
      * @param User $user The User viewing the page.
      * @return ActionLink[] The list of ActionLinks representing the links to
      *     include.
      */
-    public static function getPendingKeyDetailsActionLinksForUser($key, $user)
+    public static function getKeyDetailsActionLinksForUser($key, $user)
     {
         // If lacking either the Key or the User, return an empty array.
         if ( ! ($key instanceof Key)) {
@@ -237,30 +237,25 @@ class LinksManager extends CComponent
         // Set up an array to hold the list of links.
         $actionLinks = array();
         
-        if ( ! $key->isOwnedBy($user)) {
-            if ($user->canRevokeKey($key)) {
-
-                $actionLinks[] = new ActionLink(
-                    array(
-                        '/key/revoke/',
-                        'id' => $key->key_id,
-                    ),
-                    'Revoke Key',
-                    'remove'
-                );
-            }
-        } else {
-            if ($user->canDeleteKey($key)) {
-
-                $actionLinks[] = new ActionLink(
-                    array(
-                        '/key/delete/',
-                        'id' => $key->key_id,
-                    ),
-                    'Delete Key',
-                    'remove'
-                );
-            }
+        if ($user->canResetKey($key)) {
+            $actionLinks[] = new ActionLink(array(
+                '/key/reset/',
+                'id' => $key->key_id,
+            ), 'Reset Key', 'refresh');
+        }
+        
+        if ($user->canDeleteKey($key)) {
+            $actionLinks[] = new ActionLink(array(
+                '/key/delete/',
+                'id' => $key->key_id,
+            ), 'Delete Key', 'remove');
+        }
+        
+        if ($user->canRevokeKey($key)) {
+            $actionLinks[] = new ActionLink(array(
+                '/key/revoke/',
+                'id' => $key->key_id,
+            ), 'Revoke Key', 'remove');
         }
         
         return $actionLinks;

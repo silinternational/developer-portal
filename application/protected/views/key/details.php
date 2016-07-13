@@ -59,7 +59,7 @@ $this->pageTitle = 'Key Details';
             
             // Otherwise, show any (normal) action links.
             echo LinksManager::generateActionsDropdownHtml(
-                LinksManager::getPendingKeyDetailsActionLinksForUser($key, $currentUser)
+                LinksManager::getKeyDetailsActionLinksForUser($key, $currentUser)
             );
         }
 

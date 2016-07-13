@@ -330,7 +330,7 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetPendingKeyDetailsActionLinksForUser_noKey()
+    public function testGetKeyDetailsActionLinksForUser_noKey()
     {
         // Arrange:
         $key = null;
@@ -338,7 +338,7 @@ class LinksManagerTest extends CDbTestCase
         $expected = array();
         
         // Act:
-        $actual = LinksManager::getPendingKeyDetailsActionLinksForUser(
+        $actual = LinksManager::getKeyDetailsActionLinksForUser(
             $key,
             $user
         );
@@ -361,7 +361,7 @@ class LinksManagerTest extends CDbTestCase
         );
         
         // Act:
-        $actionLinks = LinksManager::getPendingKeyDetailsActionLinksForUser(
+        $actionLinks = LinksManager::getKeyDetailsActionLinksForUser(
             $key,
             $user
         );
@@ -386,7 +386,7 @@ class LinksManagerTest extends CDbTestCase
         $expectedLinkTexts = array();
         
         // Act:
-        $actionLinks = LinksManager::getPendingKeyDetailsActionLinksForUser(
+        $actionLinks = LinksManager::getKeyDetailsActionLinksForUser(
             $key,
             $user
         );
