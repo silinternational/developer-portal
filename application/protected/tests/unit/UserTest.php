@@ -349,10 +349,10 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
 
-    public function testCanRevokeKey_pendingKeyNotOwnedByUserToApiNotOwnedByUser()
+    public function testCanRevokeKey_approvedKeyNotOwnedByUserToApiNotOwnedByUser()
     {
         // Arrange:
-        $key = $this->keys('pendingKey1_apiWithTwoPendingKeys');
+        $key = $this->keys('approvedKey');
         $user = $this->users('ownerThatDoesNotOwnAnyApisOrKeys');
         
         // Act:
@@ -377,9 +377,9 @@ class UserTest extends DeveloperPortalTestCase
         $result = $user->canRevokeKey($key);
         
         // Assert:
-        $this->assertTrue(
+        $this->assertFalse(
             $result,
-            'Failed to report that an admin User can revoke any Key.'
+            'Incorrectly reported that a pending Key can be revoked.'
         );
     }
     
@@ -508,9 +508,9 @@ class UserTest extends DeveloperPortalTestCase
         $result = $user->canRevokeKey($key);
         
         // Assert:
-        $this->assertTrue(
+        $this->assertFalse(
             $result,
-            'Failed to report that a User can revoke their own Key.'
+            'Incorrectly reported that a User can revoke their own Key.'
         );
     }
 
@@ -565,10 +565,10 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
 
-    public function testCanRevokeKey_adminUser()
+    public function testCanRevokeKey_approvedKeyByAdminUser()
     {
         // Arrange:
-        $key = $this->keys('key1');
+        $key = $this->keys('approvedKey');
         $user = $this->users('userWithRoleOfAdminButNoKeys');
         
         // Act:
@@ -577,7 +577,7 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertTrue(
             $result,
-            'Failed to report that an admin User can revoke any Key.'
+            'Failed to report that an admin User can revoke any (approved) Key.'
         );
     }
     

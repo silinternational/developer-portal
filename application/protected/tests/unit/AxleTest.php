@@ -113,7 +113,8 @@ class AxleTest extends DeveloperPortalTestCase
     public function testAxleCreateResetAndRevokeKey()
     {
         // Arrange:
-        $user = $this->users('userWithRoleOfUser');
+        $normalUser = $this->users('userWithRoleOfUser');
+        $adminUser = $this->users('userWithRoleOfAdmin');
         $api = new \Api();
         $api->setAttributes(array(
             'code' => 'test-' . str_replace('.', '', microtime(true)),
@@ -134,7 +135,7 @@ class AxleTest extends DeveloperPortalTestCase
         );
         $key = new \Key();
         $key->setAttributes(array(
-            'user_id' => $user->user_id,
+            'user_id' => $normalUser->user_id,
             'api_id' => $api->api_id,
             'queries_second' => $api->queries_second,
             'queries_day' => $api->queries_day,
@@ -147,7 +148,7 @@ class AxleTest extends DeveloperPortalTestCase
         ));
         
         // Act (create):
-        $approveKeyResult = $key->approve($user);
+        $approveKeyResult = $key->approve($normalUser);
         
         // Assert (create):
         $this->assertTrue(
@@ -206,7 +207,7 @@ class AxleTest extends DeveloperPortalTestCase
         );
         
         // Act (revoke):
-        $revokeKeyResult = \Key::revokeKey($key->key_id, $user);
+        $revokeKeyResult = \Key::revokeKey($key->key_id, $adminUser);
         
         // Assert (revoke):
         $key->refresh();

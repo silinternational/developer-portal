@@ -1201,11 +1201,16 @@ class KeyTest extends DeveloperPortalTestCase
         // Arrange:
         /* @var $key \Key */
         $key = $this->keys('approvedKey');
+        $user = $this->users('userWithRoleOfAdmin');
         
         // Act:
-        $key->revoke($key->user);
+        $result = $key->revoke($user);
         
         // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to revoke key: ' . print_r($key->getErrors(), true)
+        );
         $key->refresh();
         $this->assertEquals(
             \Key::STATUS_REVOKED,
@@ -1335,23 +1340,9 @@ class KeyTest extends DeveloperPortalTestCase
         $result = $key->revoke($revokingUser);
         
         // Assert:
-        $this->assertTrue(
+        $this->assertFalse(
             $result,
-            'Failed to let a User revoke one of their own Keys.'
-        );
-        $key->refresh();
-        $this->assertSame(
-            \Key::STATUS_REVOKED,
-            $key->status,
-            'Failed to set the Key as revoked.'
-        );
-        $this->assertNotEmpty(
-            $key->value,
-            'Incorrectly removed the Key\'s value when revoking it.'
-        );
-        $this->assertEmpty(
-            $key->secret,
-            'Failed to remove the Key\'s secret when revoking it.'
+            'Incorrectly allowed a User to revoke one of their Keys.'
         );
     }
     

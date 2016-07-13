@@ -351,14 +351,12 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetDashboardKeyActionLinks_canRevokeKey()
+    public function testGetKeyDetailsActionLinksForUser_canRevokeKey()
     {
         // Arrange:
-        $key = $this->keys('pendingKeyUser6');
+        $key = $this->keys('approvedKey');
         $user = $this->users('userWithRoleOfAdmin');
-        $expectedLinkTexts = array(
-            'Revoke Key',
-        );
+        $expectedLinkText = 'Revoke Key';
         
         // Act:
         $actionLinks = LinksManager::getKeyDetailsActionLinksForUser(
@@ -371,10 +369,10 @@ class LinksManagerTest extends CDbTestCase
         }
         
         // Assert:
-        $this->assertEquals(
-            $expectedLinkTexts,
+        $this->assertContains(
+            $expectedLinkText,
             $actualLinksTexts,
-            'Failed to include the correct link (based on link text).'
+            'Failed to include a link to revoke the Key (based on link text).'
         );
     }
     
