@@ -466,10 +466,10 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
 
-    public function testCanResetKey_adminUser()
+    public function testCanResetKey_adminUserCanResetAnyApprovedKey()
     {
         // Arrange:
-        $key = $this->keys('key1');
+        $key = $this->keys('approvedKey');
         $user = $this->users('userWithRoleOfAdminButNoKeys');
         
         // Act:
