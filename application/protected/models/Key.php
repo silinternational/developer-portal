@@ -1017,7 +1017,12 @@ class Key extends KeyBase
         return ($this->api->approval_type !== \Api::APPROVAL_TYPE_AUTO);
     }
     
-    public static function resetKey($key_id) {
+    /**
+     * @todo Refactor this to ensure that the User trying to reset this Key is
+     *       actually allowed to do so. See revokeKey() for an example.
+     */
+    public static function resetKey($key_id)
+    {
         /**
          * Updates a Key instance with a new value and secret.
          * 
