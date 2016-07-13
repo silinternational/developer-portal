@@ -30,7 +30,7 @@ class KeyController extends Controller
         if ( ! $currentUser->canDeleteKey($key)) {
             throw new CHttpException(
                 403,
-                'That is not a Key that you have permission to delete.'
+                'That is not a key that you have permission to delete.'
             );
         }
         
