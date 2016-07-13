@@ -4,6 +4,9 @@ class WebUser extends CWebUser
 {
     private $_model = null;
     
+    /**
+     * @todo Remove references to access groups, since we no longer use those.
+     */
     public function getAccessGroups()
     {
         // Get the User model.
@@ -54,7 +57,7 @@ class WebUser extends CWebUser
         if (!$this->isGuest && $this->_model === null) {
             
             // Try to get the User model from the session.
-            $user = \Yii::app()->user->user;
+            $user = $this->getState('user');
             
             // If NOT successful, try to get it from the database.
             if ( ! ($user instanceof User)) {
@@ -112,6 +115,22 @@ class WebUser extends CWebUser
         
         // Otherwise block them.
         return false;
+    }
+    
+    public function getDisplayName()
+    {
+        $user = $this->getModel();
+        return (is_null($user) ? null : $user->getDisplayName());
+    }
+    
+    public function getUserId()
+    {
+        $user = $this->getModel();
+        if ($user !== null) {
+            return $user->user_id;
+        } else {
+            return null;
+        }
     }
     
     public function hasFlashes()

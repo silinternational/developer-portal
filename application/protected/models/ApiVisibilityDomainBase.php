@@ -1,33 +1,28 @@
 <?php
 
 /**
- * This is the model class for table "key_request".
+ * This is the model class for table "api_visibility_domain".
  *
- * The followings are the available columns in table 'key_request':
- * @property integer $key_request_id
- * @property integer $user_id
+ * The followings are the available columns in table 'api_visibility_domain':
+ * @property integer $api_visibility_domain_id
  * @property integer $api_id
- * @property string $status
+ * @property string $domain
+ * @property integer $invited_by_user_id
  * @property string $created
  * @property string $updated
- * @property integer $processed_by
- * @property string $purpose
- * @property string $domain
  *
  * The followings are the available model relations:
- * @property Key[] $keys
- * @property User $processedBy
  * @property Api $api
- * @property User $user
+ * @property User $invitedByUser
  */
-class KeyRequestBase extends CActiveRecord
+class ApiVisibilityDomainBase extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'key_request';
+		return 'api_visibility_domain';
 	}
 
 	/**
@@ -38,14 +33,12 @@ class KeyRequestBase extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('user_id, api_id, status, purpose, domain', 'required'),
-			array('user_id, api_id, processed_by', 'numerical', 'integerOnly'=>true),
-			array('status', 'length', 'max'=>32),
-			array('purpose, domain', 'length', 'max'=>255),
-			array('created, updated', 'safe'),
+			array('api_id, domain, invited_by_user_id, created, updated', 'required'),
+			array('api_id, invited_by_user_id', 'numerical', 'integerOnly'=>true),
+			array('domain', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('key_request_id, user_id, api_id, status, created, updated, processed_by, purpose, domain', 'safe', 'on'=>'search'),
+			array('api_visibility_domain_id, api_id, domain, invited_by_user_id, created, updated', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -57,10 +50,8 @@ class KeyRequestBase extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'keys' => array(self::HAS_MANY, 'Key', 'key_request_id'),
-			'processedBy' => array(self::BELONGS_TO, 'User', 'processed_by'),
 			'api' => array(self::BELONGS_TO, 'Api', 'api_id'),
-			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
+			'invitedByUser' => array(self::BELONGS_TO, 'User', 'invited_by_user_id'),
 		);
 	}
 
@@ -70,15 +61,12 @@ class KeyRequestBase extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'key_request_id' => 'Key Request',
-			'user_id' => 'User',
+			'api_visibility_domain_id' => 'Api Visibility Domain',
 			'api_id' => 'Api',
-			'status' => 'Status',
+			'domain' => 'Domain',
+			'invited_by_user_id' => 'Invited By User',
 			'created' => 'Created',
 			'updated' => 'Updated',
-			'processed_by' => 'Processed By',
-			'purpose' => 'Purpose',
-			'domain' => 'Domain',
 		);
 	}
 
@@ -100,15 +88,12 @@ class KeyRequestBase extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('key_request_id',$this->key_request_id);
-		$criteria->compare('user_id',$this->user_id);
+		$criteria->compare('api_visibility_domain_id',$this->api_visibility_domain_id);
 		$criteria->compare('api_id',$this->api_id);
-		$criteria->compare('status',$this->status,true);
+		$criteria->compare('domain',$this->domain,true);
+		$criteria->compare('invited_by_user_id',$this->invited_by_user_id);
 		$criteria->compare('created',$this->created,true);
 		$criteria->compare('updated',$this->updated,true);
-		$criteria->compare('processed_by',$this->processed_by);
-		$criteria->compare('purpose',$this->purpose,true);
-		$criteria->compare('domain',$this->domain,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -119,7 +104,7 @@ class KeyRequestBase extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return KeyRequestBase the static model class
+	 * @return ApiVisibilityDomainBase the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

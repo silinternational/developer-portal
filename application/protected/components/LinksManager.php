@@ -147,7 +147,7 @@ class LinksManager extends CComponent
         
         if ($user->hasAdminPrivilegesForApi($api)) {
             
-            if ($api->keyCount > 0) {
+            if ($api->approvedKeyCount > 0) {
                 $actionLinks[] = new ActionLink(
                     sprintf(
                         'mailto:%s?subject=%s&bcc=%s',
@@ -186,28 +186,28 @@ class LinksManager extends CComponent
     }
     
     /**
-     * Get the list of 'Actions' links that should for shown on the Dashboard
-     * for a card representing a KeyRequest.
+     * Get the list of 'Actions' links that should be shown on the Dashboard
+     * for a card representing a Key.
      * 
-     * @param KeyRequest $keyRequest The KeyRequest.
+     * @param Key $key The Key.
      * @return ActionLink[] The list of ActionLinks representing the links to
      *     include.
      */
-    public static function getDashboardKeyRequestActionLinks($keyRequest)
+    public static function getDashboardKeyActionLinks($key)
     {
-        // If lacking the KeyRequest, return an empty array.
-        if ( ! ($keyRequest instanceof KeyRequest)) {
+        // If lacking the Key, return an empty array.
+        if ( ! ($key instanceof Key)) {
             return array();
         }
         
         // Set up an array to hold the list of links.
         $actionLinks = array();
         
-        // All a KeyRequest needs is a details link.
+        // All a Key needs is a details link.
         $actionLinks[] = new ActionLink(
             array(
-                '/key-request/details/',
-                'id' => $keyRequest->key_request_id,
+                '/key/details/',
+                'id' => $key->key_id,
             ),
             'View Details',
             'list'
@@ -217,21 +217,18 @@ class LinksManager extends CComponent
     }
     
     /**
-     * Get the list of 'Actions' links that should for shown on the Key Request
-     * details page for the given KeyRequest and User.
+     * Get the list of 'Actions' links that should for shown on the Key details
+     * page for the given Key and User.
      * 
-     * @param KeyRequest $keyRequest The KeyRequest whose details are being
-     *     viewed.
+     * @param Key $key The Key whose details are being viewed.
      * @param User $user The User viewing the page.
      * @return ActionLink[] The list of ActionLinks representing the links to
      *     include.
      */
-    public static function getKeyRequestDetailsActionLinksForUser(
-        $keyRequest,
-        $user
-    ) {
-        // If lacking either the KeyRequest or the User, return an empty array.
-        if ( ! ($keyRequest instanceof KeyRequest)) {
+    public static function getKeyDetailsActionLinksForUser($key, $user)
+    {
+        // If lacking either the Key or the User, return an empty array.
+        if ( ! ($key instanceof Key)) {
             return array();
         } elseif ( ! ($user instanceof User)) {
             return array();
@@ -240,17 +237,25 @@ class LinksManager extends CComponent
         // Set up an array to hold the list of links.
         $actionLinks = array();
         
-        // If the User can delete the given KeyRequest, include that link.
-        if ($user->canDeleteKeyRequest($keyRequest)) {
-            
-            $actionLinks[] = new ActionLink(
-                array(
-                    '/key-request/delete/',
-                    'id' => $keyRequest->key_request_id,
-                ),
-                'Delete Key Request',
-                'remove'
-            );
+        if ($user->canResetKey($key)) {
+            $actionLinks[] = new ActionLink(array(
+                '/key/reset/',
+                'id' => $key->key_id,
+            ), 'Reset Key', 'refresh');
+        }
+        
+        if ($user->canDeleteKey($key)) {
+            $actionLinks[] = new ActionLink(array(
+                '/key/delete/',
+                'id' => $key->key_id,
+            ), 'Delete Key', 'remove');
+        }
+        
+        if ($user->canRevokeKey($key)) {
+            $actionLinks[] = new ActionLink(array(
+                '/key/revoke/',
+                'id' => $key->key_id,
+            ), 'Revoke Key', 'remove');
         }
         
         return $actionLinks;

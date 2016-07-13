@@ -178,6 +178,35 @@ Rand_Gen_Loop:
     }
     
     /**
+     * Convert the given time string to a date in the short date-with-time
+     * format (as defined in our config settings). Unless it specifies a
+     * timezone (or is a timestamp), it is assumed to be in UTC time. For more
+     * information, see http://php.net/manual/en/datetime.construct.php
+     * 
+     * @param string $timeStr A string representing some point in time.
+     * @return string A short display of that date-time.
+     */
+    public static function getShortDateTime($timeStr)
+    {
+        // Create a DateTime object from the given string.
+        $utcTimezone = new DateTimeZone('UTC');
+        $dateTime = new DateTime($timeStr, $utcTimezone);
+        
+        // Convert it to the desired timezone.
+        $targetTimezone = new DateTimeZone(date_default_timezone_get());
+        $dateTime->setTimezone($targetTimezone);
+        
+        // Get the date format string to use.
+        $shortDateFormat = 'n/j/y';
+        if (isset(Yii::app()->params['shortDateTimeFormat'])) {
+            $shortDateFormat = Yii::app()->params['shortDateTimeFormat'];
+        }
+        
+        // Format the given date/time and return the resulting string.
+        return $dateTime->format($shortDateFormat);
+    }
+    
+    /**
      * Function loads the protected/data/version.txt file and parses out
      * application version number and build date and returns as an indexed
      * array

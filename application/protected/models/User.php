@@ -1,7 +1,17 @@
 <?php
 
+/**
+ * Additional model relations (defined here, not in base class):
+ * @property int $approvedKeyCount
+ * @property int $pendingKeyCount
+ * @property int $keysProcessed
+ * @property \Event[] $affectedByEvents
+ * @property \Event[] $causedEvents
+ */
 class User extends UserBase 
 {
+    use Sil\DevPortal\components\ModelFindByPkTrait;
+    
     const ROLE_USER = 'user';
     const ROLE_OWNER = 'owner';
     const ROLE_ADMIN = 'admin';
@@ -11,36 +21,162 @@ class User extends UserBase
     
     protected $currentAccessGroups = null;
     
-    /**
-     * Find out whether this user is allowed to delete the given KeyRequest.
-     * 
-     * @param KeyRequest $keyRequest The KeyRequest in question.
-     * @return boolean
-     */
-    public function canDeleteKeyRequest($keyRequest)
+    public function afterDelete()
     {
-        // If no Key Request was given, say no.
-        if ( ! ($keyRequest instanceof KeyRequest)) {
+        parent::afterDelete();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        \Event::log(sprintf(
+            '%s (user_id %s) was deleted%s.',
+            $this->getDisplayName(),
+            $this->user_id,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+        ));
+    }
+    
+    public function afterSave()
+    {
+        parent::afterSave();
+        
+        $nameOfCurrentWebUser = \Yii::app()->user->getDisplayName();
+        
+        \Event::log(sprintf(
+            'User %s (%s) was %s%s.',
+            $this->user_id,
+            $this->getDisplayName(),
+            ($this->isNewRecord ? 'added' : 'updated'),
+            (is_null($nameOfCurrentWebUser) ? '' : ' by ' . $nameOfCurrentWebUser)
+        ), null, null, $this->user_id);
+    }
+    
+    protected function beforeDelete()
+    {
+        if ( ! parent::beforeDelete()) {
             return false;
         }
         
-        // If the Key Request belongs to this user, say yes.
-        if ($keyRequest->isOwnedBy($this)) {
-            return true;
+        $apiVisibilityDomainsGranted = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+            'invited_by_user_id' => $this->user_id,
+        ));
+        if (count($apiVisibilityDomainsGranted) > 0) {
+            $this->addError(
+                'user_id',
+                'We cannot delete this user because they are responsible for the ability for a domain to see an API.'
+            );
+            return false;
         }
         
-        // If the Key Request is for an API that belongs to this user, say yes.
-        if ($keyRequest->isForApiOwnedBy($this)) {
-            return true;
+        $apiVisibilityUsersGranted = \ApiVisibilityUser::model()->findAllByAttributes(array(
+            'invited_by_user_id' => $this->user_id,
+        ));
+        if (count($apiVisibilityUsersGranted) > 0) {
+            $this->addError(
+                'user_id',
+                'We cannot delete this user because they are responsible for the ability for a user to see an API.'
+            );
+            return false;
         }
         
-        // If the user is an admin, say yes.
-        if ($this->role === \User::ROLE_ADMIN) {
+        if (count($this->keysProcessed) > 0) {
+            $this->addError(
+                'user_id',
+                'We cannot delete this user because they are recorded as having processed at least one key.'
+            );
+            return false;
+        }
+        
+        foreach ($this->apis as $api) {
+            $api->owner_id = null;
+            if ( ! $api->save()) {
+                $this->addError('user_id', sprintf(
+                    'We cannot delete this user because we could not finish removing them as the owner of their APIs '
+                    . '(though we may done so for some of their APIs): %s',
+                    print_r($api->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        foreach ($this->keys as $key) {
+            if ( ! $key->delete()) {
+                $this->addError('user_id', sprintf(
+                    'We cannot delete this user because we could not finish deleting the user\'s keys (though we may '
+                    . 'have deleted some of them): %s',
+                    print_r($key->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        /* NOTE: Simply using $this->affectedByEvents was retrieving a cached
+         *       list of Events, and so we were failing to update Events created
+         *       earlier in this beforeDelete() method.  */
+        $eventsAffectingUser = \Event::model()->findAllByAttributes(array(
+            'affected_user_id' => $this->user_id,
+        ));
+        foreach ($eventsAffectingUser as $eventAffectingUser) {
+            $eventAffectingUser->affected_user_id = null;
+            if ( ! $eventAffectingUser->save()) {
+                $this->addError('user_id', sprintf(
+                    'We could not delete this User because we were not able to finish updating our records of events '
+                    . 'that affected the User: %s',
+                    print_r($eventAffectingUser->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        /* NOTE: Simply using $this->causedEvents fails to retrieve the most
+         *       current list of Events caused by this User.  */
+        $eventsCausedByUser = \Event::model()->findAllByAttributes(array(
+            'acting_user_id' => $this->user_id,
+        ));
+        foreach ($eventsCausedByUser as $eventCausedByUser) {
+            $eventCausedByUser->acting_user_id = null;
+            if ( ! $eventCausedByUser->save()) {
+                $this->addError('user_id', sprintf(
+                    'We could not delete this User because we were not able to finish updating our records of events '
+                    . 'performed by the User: %s',
+                    print_r($eventCausedByUser->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Find out whether this User is allowed to approve the given (pending) Key.
+     * 
+     * @param \Key $key The (pending) Key to be approved.
+     * @return boolean
+     */
+    public function isAuthorizedToApproveKey($key)
+    {
+        // If no Key was given, say no.
+        if ( ! ($key instanceof \Key)) {
+            return false;
+        }
+        
+        // If the Key is for an API that belongs to this user, say yes.
+        if ($key->isToApiOwnedBy($this)) {
             return true;
         }
         
         // Otherwise, say no.
         return false;
+    }
+    
+    /**
+     * Find out whether this user is allowed to delete the given Key.
+     * 
+     * @param Key $key The Key in question.
+     * @return boolean
+     */
+    public function canDeleteKey($key)
+    {
+        return (($key instanceof \Key) && $key->canBeDeletedBy($this));
     }
     
     /**
@@ -56,6 +192,10 @@ class User extends UserBase
             return false;
         }
         
+        if ($key->status !== \Key::STATUS_APPROVED) {
+            return false;
+        }
+        
         // If the key belongs to this user, say yes.
         if ($key->isOwnedBy($this)) {
             return true;
@@ -76,8 +216,7 @@ class User extends UserBase
     }
     
     /**
-     * Find out whether this user is allowed to revoke (aka. delete) the given
-     * Key.
+     * Find out whether this user is allowed to revoke the given Key.
      * 
      * @param Key $key The Key in question.
      * @return boolean
@@ -85,13 +224,17 @@ class User extends UserBase
     public function canRevokeKey($key)
     {
         // If no key was given, say no.
-        if ($key === null) {
+        if ( ! ($key instanceof Key)) {
             return false;
         }
         
-        // If the key belongs to this user, say yes.
+        if ($key->status !== \Key::STATUS_APPROVED) {
+            return false;
+        }
+        
+        // A user cannot revoke their own key (just reset/delete it).
         if ($key->isOwnedBy($this)) {
-            return true;
+            return false;
         }
         
         // If the key is to an API that belongs to this user, say yes.
@@ -109,15 +252,15 @@ class User extends UserBase
     }
     
     /**
-     * Find out whether this User is allowed to see the given KeyRequest.
+     * Find out whether this User is allowed to see the given Key.
      * 
-     * @param KeyRequest $keyRequest The KeyRequest in question.
-     * @return boolean Whether the user is allowed to see the KeyRequest.
+     * @param Key $key The Key in question.
+     * @return boolean Whether the user is allowed to see the Key.
      */
-    public function canSeeKeyRequest($keyRequest)
+    public function canSeeKey($key)
     {
-        // If NOT given a KeyRequest, say no
-        if ( ! ($keyRequest instanceof KeyRequest)) {
+        // If NOT given a Key, say no
+        if ( ! ($key instanceof Key)) {
             return false;
         }
         
@@ -126,17 +269,17 @@ class User extends UserBase
             return true;
         }
         
-        // If the user owns the API that the KeyRequest is for, say yes.
-        if ($this->isOwnerOfApi($keyRequest->api)) {
+        // If the user owns the API that the Key is for, say yes.
+        if ($this->isOwnerOfApi($key->api)) {
             return true;
         }
         
-        // If the user is the one requesting a Key via this KeyRequest, say yes.
-        if ($this->user_id === $keyRequest->user_id) {
+        // If the user is the one this Key belongs to, say yes.
+        if ($key->isOwnedBy($this)) {
             return true;
         }
         
-        // No one else is allowed to see the KeyRequest.
+        // No one else is allowed to see the Key.
         return false;
     }
     
@@ -178,7 +321,24 @@ class User extends UserBase
         return $this->currentAccessGroups ?: array();
     }
     
-    public function getKeyRequestsWithApiNames()
+    /**
+     * Get a display name for the User. If no explicit display name has been
+     * set, combine the first and last names and use that.
+     * 
+     * @return string A display name for this User
+     */
+    public function getDisplayName()
+    {
+        return ($this->display_name ?: $this->first_name . ' ' . $this->last_name);
+    }
+    
+    public function getEmailAddressDomain()
+    {
+        list(, $domain) = explode('@', $this->email);
+        return $domain;
+    }
+    
+    public function getKeysWithApiNames()
     {
         // Get the ID of the current user (as an integer).
         $currentUserId = (int)$this->user_id;
@@ -186,13 +346,13 @@ class User extends UserBase
         // If it's an invalid value, throw an exception.
         if ($currentUserId <= 0) {
             throw new \Exception(
-                'Cannot get Key Requests / APIs for this user because we do '
+                'Cannot get Keys / APIs for this user because we do '
                 . 'not know the user\'s ID.'
             );
         }
         
-        // Get all of this user's key requests, but also include the API names.
-        return \KeyRequest::model()->with('api')->findAllByAttributes(array(
+        // Get all of this user's keys, but also include the API names.
+        return \Key::model()->with('api')->findAllByAttributes(array(
             'user_id' => $currentUserId,
         ), array(
             'order' => 'api.display_name',
@@ -208,25 +368,25 @@ class User extends UserBase
         );
     }
     
-	/**
-	 * Convert a role value to a user-friendly string.
+    /**
+     * Convert a role value to a user-friendly string.
      * 
-	 * @param mixed $roleValue The role value to be converted to a user-friendly
+     * @param mixed $roleValue The role value to be converted to a user-friendly
      *     string. Should be equal to the value of one of the User class's
      *     constants whose name begins with "ROLE_".
-	 * @return (string|null) The string, or null if that role value is unknown.
-	 */
+     * @return (string|null) The string, or null if that role value is unknown.
+     */
     public static function getRoleString($roleValue)
     {
-		// Get the array of roles.
-		$roles = User::getRoles();
-		
-		// Return the one associated with the given value (if any).
-		if (isset($roles[$roleValue])) {
-			return $roles[$roleValue];
-		} else {
-			return null;
-		}
+        // Get the array of roles.
+        $roles = User::getRoles();
+        
+        // Return the one associated with the given value (if any).
+        if (isset($roles[$roleValue])) {
+            return $roles[$roleValue];
+        } else {
+            return null;
+        }
     }
     
     public static function getStatuses()
@@ -237,26 +397,26 @@ class User extends UserBase
         );
     }
     
-	/**
-	 * Convert a status value to a user-friendly string.
+    /**
+     * Convert a status value to a user-friendly string.
      * 
-	 * @param mixed $statusValue The status value to be converted to a
-	 *     user-friendly string. Should be equal to the value of one of the User
-	 *     class's constants whose name begins with "STATUS_".
-	 * @return (string|null) The string, or null if that status value is
-	 *     unknown.
-	 */
+     * @param mixed $statusValue The status value to be converted to a
+     *     user-friendly string. Should be equal to the value of one of the User
+     *     class's constants whose name begins with "STATUS_".
+     * @return (string|null) The string, or null if that status value is
+     *     unknown.
+     */
     public static function getStatusString($statusValue)
     {
-		// Get the array of statuses.
-		$statuses = User::getStatuses();
-		
-		// Return the one associated with the given value (if any).
-		if (isset($statuses[$statusValue])) {
-			return $statuses[$statusValue];
-		} else {
-			return null;
-		}
+        // Get the array of statuses.
+        $statuses = User::getStatuses();
+        
+        // Return the one associated with the given value (if any).
+        if (isset($statuses[$statusValue])) {
+            return $statuses[$statusValue];
+        } else {
+            return null;
+        }
     }
     
     /**
@@ -337,6 +497,7 @@ class User extends UserBase
     {
         // Get all of this user's Keys.
         $keys = \Key::model()->with('api')->findAllByAttributes(array(
+            'status' => \Key::STATUS_APPROVED,
             'user_id' => $this->user_id,
         ), array(
             'order' => 'api.display_name',
@@ -408,6 +569,27 @@ class User extends UserBase
     }
     
     /**
+     * Retrieve the User's active (i.e. - approved, not revoked) Key to the
+     * given Api (if any such Key exists).
+     * 
+     * @param Api $api The Api in question.
+     * @return \Key|null The Key, or null if it doesn't exist.
+     */
+    public function getActiveKeyToApi($api)
+    {
+        // If not given an API, return null.
+        if ( ! ($api instanceof Api)) {
+            return null;
+        }
+        
+        return \Key::model()->findByAttributes(array(
+            'api_id' => $api->api_id,
+            'user_id' => $this->user_id,
+            'status' => \Key::STATUS_APPROVED,
+        ));
+    }
+    
+    /**
      * Find out whether the User has an active (i.e. - approved, not revoked)
      * Key to the given Api.
      * 
@@ -416,19 +598,7 @@ class User extends UserBase
      */
     public function hasActiveKeyToApi($api)
     {
-        // If not given an API, return false.
-        if ( ! ($api instanceof Api)) {
-            return false;
-        }
-        
-        // See if there's an active key for this user and API.
-        $result = \Key::model()->findByAttributes(array(
-            'api_id' => $api->api_id,
-            'user_id' => $this->user_id,
-        ));
-        
-        // Indicate whethere there was such a key.
-        return ($result !== null);
+        return ($this->getActiveKeyToApi($api) !== null);
     }
     
     /**
@@ -469,27 +639,34 @@ class User extends UserBase
     }
     
     /**
-     * Find out whether the User has a pending KeyRequest for the given Api.
+     * Retrieve the User's pending Key (if such a Key exists) for the given Api.
+     * 
+     * @param Api $api The Api in question.
+     * @return \Key|null The pending Key, or null if no such Key exists.
+     */
+    public function getPendingKeyForApi($api)
+    {
+        // If not given an API, return null.
+        if ( ! ($api instanceof Api)) {
+            return null;
+        }
+        
+        return \Key::model()->findByAttributes(array(
+            'api_id' => $api->api_id,
+            'user_id' => $this->user_id,
+            'status' => \Key::STATUS_PENDING,
+        ));
+    }
+    
+    /**
+     * Find out whether the User has a pending Key for the given Api.
      * 
      * @param Api $api The Api in question.
      * @return boolean True if so, otherwise false.
      */
-    public function hasPendingKeyRequestForApi($api)
+    public function hasPendingKeyForApi($api)
     {
-        // If not given an API, return false.
-        if ( ! ($api instanceof Api)) {
-            return false;
-        }
-        
-        // See if there's a pending key request for this user and API.
-        $keyRequest = \KeyRequest::model()->findByAttributes(array(
-            'api_id' => $api->api_id,
-            'user_id' => $this->user_id,
-            'status' => \KeyRequest::STATUS_PENDING,
-        ));
-        
-        // Indicate whethere there was such a key request.
-        return ($keyRequest !== null);
+        return ($this->getPendingKeyForApi($api) !== null);
     }
     
     /**
@@ -539,7 +716,40 @@ class User extends UserBase
     }
     
     /**
+     * Find out whether this User has been individually invited to see this Api.
+     * 
+     * @param \Api $api The Api in question.
+     * @return boolean
+     */
+    public function isIndividuallyInvitedToSeeApi($api)
+    {
+        $apiVisibilityUser = \ApiVisibilityUser::model()->findByAttributes(array(
+            'api_id' => $api->api_id,
+            'invited_user_id' => $this->user_id,
+        ));
+        return ($apiVisibilityUser !== null);
+    }
+    
+    /**
+     * Find out whether this User has an email address domain that has been
+     * invited to see this Api. This should be case-insensitive.
+     * 
+     * @param \Api $api The Api in question.
+     * @return boolean
+     */
+    public function isInvitedByDomainToSeeApi($api)
+    {
+        $apiVisibilityDomain = \ApiVisibilityDomain::model()->findByAttributes(array(
+            'api_id' => $api->api_id,
+            'domain' => $this->getEmailAddressDomain(),
+        ));
+        return ($apiVisibilityDomain !== null);
+    }
+    
+    /**
      * Find out whether this User is the owner of the given Api.
+     * 
+     * @todo Should this also check whether the user has a role of owner?
      * 
      * @param Api $api The API in question.
      * @return boolean Whether the user is the owner of the API.
@@ -567,37 +777,62 @@ class User extends UserBase
     
     public function rules()
     {
-        $rules = parent::rules();
-        $newRules = array_merge($rules, array(
-            array('updated', 'default',
+        return \CMap::mergeArray(array(
+            array('email', 'email'),
+            array(
+                'updated',
+                'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => false, 'on' => 'update'),
-            array('created', 'default',
+                'setOnEmpty' => false,
+                'on' => 'update',
+            ),
+            array(
+                'created,updated',
+                'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => true, 'on' => 'insert')
-        ));
-        
-        return $newRules;
+                'setOnEmpty' => true,
+                'on' => 'insert',
+            ),
+            array('auth_provider', 'required'),
+        ), parent::rules());
     }
     
-	/**
+    /**
      * NOTE: We are completely overriding (and ignoring) the base class's
      *       relations definition.  This is because Gii autogenerates them
      *       incorrectly due to not understanding the two possible relationships
-     *       between Key Requests and Users (requested by vs. processed by).
-     * 
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		return array(
-			'apis' => array(self::HAS_MANY, 'Api', 'owner_id'),
-            'keyCount' => array(self::STAT, 'Key', 'user_id'),
-			'keyRequests' => array(self::HAS_MANY, 'KeyRequest', 'user_id'),
-			'keyRequestsProcessed' => array(self::HAS_MANY, 'KeyRequest', 'processed_by'),
-			'keys' => array(self::HAS_MANY, 'Key', 'user_id'),
-		);
-	}
+     *       between Keys and Users (requested by vs. processed by) and between
+     *       Users and ApiVisibilityUser/ApiVisibilityDomain. Those latter
+     *       relations we simply do not define here at all, leaving those
+     *       objects to be retrieve via static model functions (such as
+     *       findByAttributes).
+     *
+     * @return array relational rules.
+     */
+    public function relations()
+    {
+        return array(
+            'apis' => array(self::HAS_MANY, 'Api', 'owner_id'),
+            'affectedByEvents' => array(self::HAS_MANY, 'Event', 'affected_user_id'),
+            'causedEvents' => array(self::HAS_MANY, 'Event', 'acting_user_id'),
+            'approvedKeyCount' => array(
+                self::STAT,
+                'Key',
+                'user_id',
+                'condition' => 'status = :status',
+                'params' => array(':status' => \Key::STATUS_APPROVED),
+            ),
+            'pendingKeyCount' => array(
+                self::STAT,
+                'Key',
+                'user_id',
+                'condition' => 'status = :status',
+                'params' => array(':status' => \Key::STATUS_PENDING),
+            ),
+            'keys' => array(self::HAS_MANY, 'Key', 'user_id'),
+            'keysProcessed' => array(self::HAS_MANY, 'Key', 'processed_by'),
+        );
+    }
     
     /**
      * Set the list of access groups that this User is in.

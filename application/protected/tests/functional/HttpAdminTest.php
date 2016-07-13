@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test accesing the pages of the website as a UnitTestUser.
+ * Test accessing the pages of the website as a UnitTestUser.
  */
 class HttpAdminTest extends CDbTestCase
 {
@@ -10,7 +10,6 @@ class HttpAdminTest extends CDbTestCase
         'faqs' => 'Faq',
         'users' => 'User',
         'keys' => 'Key',
-        'keyRequests' => 'KeyRequest',
     );
 
     private function get_client($uri, $redirects = 1, $timeout = 10)
@@ -42,10 +41,15 @@ class HttpAdminTest extends CDbTestCase
         Yii::import('ext.httpclient.*');
         $uri = Yii::app()->createAbsoluteUrl($route, $params);
         $client = $this->get_client($uri);
-        $client->setHeaders('x-http-environment-override', 'testing');
+        //$client->setHeaders('x-http-environment-override', 'testing');
 
         // Make the request and check the HTTP status code.
         $response = $client->request();
+        if ($this->isLoginRedirect($response)) {
+            $this->login();
+            $response = $client->request();
+        }
+        die(var_dump($response));
         $actualStatusCode = $response->getStatus();
         $this->assertEquals(
             $expectedStatusCode,
@@ -85,14 +89,11 @@ class HttpAdminTest extends CDbTestCase
         $expectedRedirectParams = array(),
         $expectedStatusCode = 301
     ) {
-        // Prepare to make the URL request.
-        Yii::import('ext.httpclient.*');
-        $uri = Yii::app()->createAbsoluteUrl($requestRoute, $requestParams);
-        $client = $this->get_client($uri);
-        $client->setHeaders('x-http-environment-override', 'testing');
-
-        // Make the request and check the HTTP status code.
-        $response = $client->request();
+        // Make the (authenticated) request and check the HTTP status code.
+        $response = $this->makeAuthenticatedRequest(
+            $requestRoute,
+            $requestParams
+        );
         $actualStatusCode = $response->getStatus();
         $this->assertEquals(
             $expectedStatusCode,
@@ -113,20 +114,53 @@ class HttpAdminTest extends CDbTestCase
         );
     }
     
-    public function testPortalRedirect()
+    protected function makeAuthenticatedRequest($requestRoute, $requestParams)
     {
-        $this->assertPageReturnsRedirect(
-            '/portal/',
-            array(),
-            '/dashboard/'
-        );
-    }
+        // Prepare to make the URL request.
+        Yii::import('ext.httpclient.*');
+        $uri = Yii::app()->createAbsoluteUrl($requestRoute, $requestParams);
+        $client = $this->get_client($uri);
+        //$client->setHeaders('x-http-environment-override', 'testing');
 
-    public function testKeyAll()
+        // Make the request and check the HTTP status code.
+        $response = $client->request();
+        if ($this->isLoginRedirect($response)) {
+            $this->login($client);
+            $response = $client->request();
+        }
+        return $response;
+    }
+    
+    /**
+     * Determine whether the given response was a login redirect.
+     * 
+     * @param EHttpResponse $response
+     * @throws EHttpClientException
+     */
+    protected function isLoginRedirect($response)
+    {
+        $loginUrl = \Yii::app()->createAbsoluteUrl('auth/login');
+        if ($response->getHeader('Location') === $loginUrl) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Log this client into the website.
+     * 
+     * @param EHttpClient $client
+     */
+    protected function login($client)
+    {
+        
+    }
+    
+    public function testKeyActive()
     {
         $this->assertContentPiecesFoundOnPage(
             array('All Keys'),
-            '/key/all/'
+            '/key/active/'
         );
     }
 
@@ -148,65 +182,6 @@ class HttpAdminTest extends CDbTestCase
         );
     }
 
-    public function testKeyDetails()
-    {
-        $this->assertContentPiecesFoundOnPage(
-            array('Key Details'),
-            '/key/details/',
-            array('id' => 1)
-        );
-    }
-
-    public function testPortalKeyDetailsRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/portal/key-details/',
-            array('id' => 1),
-            '/key/details/',
-            array('id' => 1)
-        );
-    }
-
-    public function testPortalKeysRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/portal/keys/',
-            array(),
-            '/key/mine/'
-        );
-    }
-
-    public function testPortalKeyResetRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/portal/reset-key/',
-            array('id' => 1),
-            '/key/reset/',
-            array('id' => 1)
-        );
-    }
-
-    public function testPortalKeyDeleteRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/portal/delete-key/',
-            array('id' => 1),
-            '/key/delete/',
-            array('id' => 1)
-        );
-    }
-
-    public function testPortalRequestKeyRedirect()
-    {
-        $api = $this->apis('api1');
-        $this->assertPageReturnsRedirect(
-            '/portal/request-key/',
-            array('id' => $api->api_id),
-            '/api/request-key/',
-            array('code' => $api->code)
-        );
-    }
-
     public function testApi()
     {
         $this->assertContentPiecesFoundOnPage(
@@ -217,7 +192,7 @@ class HttpAdminTest extends CDbTestCase
 
     public function testApiActiveKeys()
     {
-        $api = $this->apis('apiWithTwoPendingKeyRequests');
+        $api = $this->apis('apiWithTwoPendingKeys');
         $this->assertContentPiecesFoundOnPage(
             array('Active Keys'),
             '/api/active-keys/',
@@ -227,7 +202,7 @@ class HttpAdminTest extends CDbTestCase
 
     public function testApiPendingKeys()
     {
-        $api = $this->apis('apiWithTwoPendingKeyRequests');
+        $api = $this->apis('apiWithTwoPendingKeys');
         $this->assertContentPiecesFoundOnPage(
             array('Pending Keys'),
             '/api/pending-keys/',
@@ -262,87 +237,6 @@ class HttpAdminTest extends CDbTestCase
         );
     }
 
-    public function testPortalApisRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/portal/apis/',
-            array(),
-            '/api/'
-        );
-    }
-
-    public function testPortalApiDetailsRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/portal/api-details/',
-            array('code' => 'auto'),
-            '/api/details/',
-            array('code' => 'auto')
-        );
-    }
-
-    public function testPortalApiDocsRedirect()
-    {
-        $api = $this->apis('api4');
-        $this->assertPageReturnsRedirect(
-            '/portal/api-docs/',
-            array('code' => $api->code),
-            '/api/details/',
-            array('code' => $api->code)
-        );
-    }
-
-    public function testPortalApiUsageRedirect()
-    {
-        $api = $this->apis('api4');
-        $this->assertPageReturnsRedirect(
-            '/portal/api-usage/',
-            array('code' => $api->code),
-            '/api/usage/',
-            array('code' => $api->code)
-        );
-    }
-
-    public function testAdminRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/admin/',
-            array(),
-            '/dashboard/'
-        );
-    }
-
-    public function testAdminApisRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/admin/apis/',
-            array(),
-            '/api/'
-        );
-    }
-
-    public function testAdminApiDetailsRedirect()
-    {
-        $api = $this->apis('api4');
-        $this->assertPageReturnsRedirect(
-            '/admin/api-details/',
-            array('code' => $api->code),
-            '/api/details/',
-            array('code' => $api->code)
-        );
-    }
-
-    public function testAdminApiDocsEditRedirect()
-    {
-        $api = $this->apis('api4');
-        $this->assertPageReturnsRedirect(
-            '/admin/api-docs-edit/',
-            array('id' => $api->api_id),
-            '/api/docs-edit/',
-            array('code' => $api->code)
-        );
-    }
-
     public function testApiDocsEdit()
     {
         $api = $this->apis('api4');
@@ -363,17 +257,6 @@ class HttpAdminTest extends CDbTestCase
         );
     }
 
-    public function testAdminApiEditRedirect()
-    {
-        $api = $this->apis('api4');
-        $this->assertPageReturnsRedirect(
-            '/admin/api-edit/',
-            array('id' => $api->api_id),
-            '/api/edit/',
-            array('code' => $api->code)
-        );
-    }
-
     public function testApiEdit()
     {
         $api = $this->apis('api4');
@@ -384,47 +267,11 @@ class HttpAdminTest extends CDbTestCase
         );
     }
 
-    public function testAdminApiAddRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/admin/api-add/',
-            array(),
-            '/api/add/'
-        );
-    }
-
     public function testApiAdd()
     {
         $this->assertContentPiecesFoundOnPage(
             array('Publish a new API'),
             '/api/add/'
-        );
-    }
-
-    public function testAdminFaqAddRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/admin/faq-add/',
-            array(),
-            '/faq/add/'
-        );
-    }
-
-    public function testAdminFaqsRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/admin/faqs/',
-            array(),
-            '/faq/'
-        );
-    }
-
-    public function testPortalFaqsRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/portal/faqs/',
-            array(),
-            '/faq/'
         );
     }
 
@@ -449,39 +296,6 @@ class HttpAdminTest extends CDbTestCase
         $this->assertContentPiecesFoundOnPage(
             array('Frequently Asked Questions'),
             '/faq/'
-        );
-    }
-
-    public function testAdminFaqDetailsRedirect()
-    {
-        $faq = $this->faqs('faq1');
-        $this->assertPageReturnsRedirect(
-            '/admin/faq-details/',
-            array('id' => $faq->faq_id),
-            '/faq/details/',
-            array('id' => $faq->faq_id)
-        );
-    }
-
-    public function testAdminFaqEditRedirect()
-    {
-        $faq = $this->faqs('faq1');
-        $this->assertPageReturnsRedirect(
-            '/admin/faq-edit/',
-            array('id' => $faq->faq_id),
-            '/faq/edit/',
-            array('id' => $faq->faq_id)
-        );
-    }
-
-    public function testPortalFaqDetailsRedirect()
-    {
-        $faq = $this->faqs('faq1');
-        $this->assertPageReturnsRedirect(
-            '/portal/faq-details/',
-            array('id' => $faq->faq_id),
-            '/faq/details/',
-            array('id' => $faq->faq_id)
         );
     }
 
@@ -522,36 +336,6 @@ class HttpAdminTest extends CDbTestCase
         );
     }
 
-    public function testAdminApiDeleteRedirect()
-    {
-        $api = $this->apis('api4');
-        $this->assertPageReturnsRedirect(
-            '/admin/api-delete/',
-            array('id' => $api->api_id),
-            '/api/delete/',
-            array('code' => $api->code)
-        );
-    }
-
-    public function testAdminKeysRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/admin/keys/',
-            array(),
-            '/key/all/'
-        );
-    }
-
-    public function testAdminKeyDetailsRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/admin/key-details',
-            array('id' => 1),
-            '/key/details/',
-            array('id' => 1)
-        );
-    }
-
     public function testKeyReset()
     {
         $key = $this->keys('key1');
@@ -559,16 +343,6 @@ class HttpAdminTest extends CDbTestCase
             array('Reset Key'),
             '/key/reset/',
             array('id' => $key->key_id)
-        );
-    }
-
-    public function testAdminKeyResetRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/admin/reset-key',
-            array('id' => 1),
-            '/key/reset/',
-            array('id' => 1)
         );
     }
 
@@ -582,91 +356,31 @@ class HttpAdminTest extends CDbTestCase
         );
     }
 
-    public function testAdminKeyRevokeRedirect()
+    public function testKey()
     {
-        $this->assertPageReturnsRedirect(
-            '/admin/revoke-key',
-            array('id' => 1),
+        $this->assertContentPiecesFoundOnPage(
+            array('Pending Keys'),
+            '/key/'
+        );
+    }
+
+    public function testKeyDelete_pending()
+    {
+        $key = $this->keys('pendingKeyUser6');
+        $this->assertContentPiecesFoundOnPage(
+            array('Delete Key'),
             '/key/delete/',
-            array('id' => 1)
+            array('id' => $key->key_id)
         );
     }
 
-    public function testKeyRequest()
+    public function testKeyDetails()
     {
+        $key = $this->keys('key1');
         $this->assertContentPiecesFoundOnPage(
-            array('Pending Key Requests'),
-            '/key-request/'
-        );
-    }
-
-    public function testAdminKeyRequestsRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/admin/key-requests/',
-            array(),
-            '/key-request/'
-        );
-    }
-
-    public function testPortalKeyRequestsRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/portal/key-requests/',
-            array(),
-            '/key-request/'
-        );
-    }
-
-    public function testKeyRequestDelete_approvedRedirect()
-    {
-        $keyRequest = $this->keyRequests('approvedKeyRequestUser4');
-        $this->assertPageReturnsRedirect(
-            '/key-request/delete/',
-            array('id' => $keyRequest->key_request_id),
-            '/key-request/details/',
-            array('id' => $keyRequest->key_request_id),
-            302
-        );
-    }
-
-    public function testKeyRequestDelete_pending()
-    {
-        $keyRequest = $this->keyRequests('pendingKeyRequestUser6');
-        $this->assertContentPiecesFoundOnPage(
-            array('Delete Key Request'),
-            '/key-request/delete/',
-            array('id' => $keyRequest->key_request_id)
-        );
-    }
-
-    public function testKeyRequestDetails()
-    {
-        $keyRequest = $this->keyRequests('keyRequest1');
-        $this->assertContentPiecesFoundOnPage(
-            array('Key Request Details'),
-            '/key-request/details/',
-            array('id' => $keyRequest->key_request_id)
-        );
-    }
-
-    public function testAdminKeyRequestDetailsRedirect()
-    {
-        $keyRequest = $this->keyRequests('keyRequest1');
-        $this->assertPageReturnsRedirect(
-            '/admin/key-request-details/',
-            array('id' => $keyRequest->key_request_id),
-            '/key-request/details/',
-            array('id' => $keyRequest->key_request_id)
-        );
-    }
-
-    public function testAdminUsersRedirect()
-    {
-        $this->assertPageReturnsRedirect(
-            '/admin/users/',
-            array(),
-            '/user/'
+            array('Key Details'),
+            '/key/details/',
+            array('id' => $key->key_id)
         );
     }
 
@@ -684,28 +398,6 @@ class HttpAdminTest extends CDbTestCase
         $this->assertContentPiecesFoundOnPage(
             array('User Details'),
             '/user/details/',
-            array('id' => $user->user_id)
-        );
-    }
-
-    public function testAdminUserDetailsRedirect()
-    {
-        $user = $this->users('user1');
-        $this->assertPageReturnsRedirect(
-            '/admin/user-details/',
-            array('id' => $user->user_id),
-            '/user/details/',
-            array('id' => $user->user_id)
-        );
-    }
-
-    public function testAdminUserEditRedirect()
-    {
-        $user = $this->users('user1');
-        $this->assertPageReturnsRedirect(
-            '/admin/user-edit/',
-            array('id' => $user->user_id),
-            '/user/edit/',
             array('id' => $user->user_id)
         );
     }

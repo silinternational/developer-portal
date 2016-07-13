@@ -87,20 +87,12 @@ return array(
             ),
             'type' => 'text',
         ),
-        'access_type' => array(
+        'visibility' => array(
             'type' => 'dropdownlist',
             'data' => array_merge(
                 array('' => '-- Select one: --'),
-                Api::getAccessTypes()
+                Api::getVisibilityDescriptions()
             ),
-        ),
-        'access_options' => array(
-            'htmlOptions' => array(
-                'hint' => '<i class="icon-info-sign"></i> Enter one or more ' .
-                          'Insite access groups separated by commas.',
-                'class' => 'input-xxlarge',
-            ),
-            'type' => 'text',
         ),
         'approval_type' => array(
             'type' => 'dropdownlist',
@@ -109,11 +101,20 @@ return array(
                 Api::getApprovalTypes()
             ),
         ),
-        'support' => array(
+        'technical_support' => array(
             'htmlOptions' => array(
                 'hint' => '<i class="icon-info-sign"></i> Enter a website, ' .
                           'email address, phone number, or some other way ' .
-                          'for developers using this API to seek support.',
+                          'for people to get technical support for API.',
+                'class' => 'input-xxlarge',
+            ),
+            'type' => 'text',
+        ),
+        'customer_support' => array(
+            'htmlOptions' => array(
+                'hint' => '<i class="icon-info-sign"></i> Enter a website, ' .
+                          'email address, phone number, or some other way ' .
+                          'for people to get customer support for API.',
                 'class' => 'input-xxlarge',
             ),
             'type' => 'text',

@@ -10,11 +10,11 @@ class ApiController extends Controller
         $api = \Api::model()->findByAttributes(array('code' => $code));
         
         // Get a reference to the current website user's User model.
-        $user = \Yii::app()->user->user;
+        $currentUser = \Yii::app()->user->user;
         
         // Prevent information about it from being seen by user's without
         // permission to see the specified API.
-        if (( ! $api) || ( ! $api->isVisibleToUser($user))) {
+        if (( ! $api) || ( ! $api->isVisibleToUser($currentUser))) {
             throw new CHttpException(
                 404,
                 'Either there is no "' . $code . '" API or you do not have '
@@ -24,7 +24,7 @@ class ApiController extends Controller
         
         // Prevent this list of keys from being seen by anyone who is not
         // authorized to see them.
-        if (( ! ($user instanceof User)) || ( ! $user->canSeeKeysForApi($api))) {
+        if (( ! ($currentUser instanceof User)) || ( ! $currentUser->canSeeKeysForApi($api))) {
             throw new CHttpException(
                 403,
                 'You do not have permission to see its list of active keys for '
@@ -33,18 +33,19 @@ class ApiController extends Controller
         }
         
         // Get the list of active keys for that API.
-        $activeKeys = new CActiveDataProvider('Key', array(
-            'criteria' => array(
-                'condition' => 'api_id = :api_id',
-                'params' => array(
-                    ':api_id' => $api->api_id,
-                ),
-            ),
+        $activeKeys = array();
+        foreach ($api->keys as $key) {
+            if ($key->status === \Key::STATUS_APPROVED) {
+                $activeKeys[] = $key;
+            }
+        }
+        $activeKeysDataProvider = new CArrayDataProvider($activeKeys, array(
+            'keyField' => 'key_id',
         ));
         
         // Show the page.
         $this->render('activeKeys', array(
-            'activeKeys' => $activeKeys,
+            'activeKeysDataProvider' => $activeKeysDataProvider,
             'api' => $api,
         ));
     }
@@ -60,15 +61,15 @@ class ApiController extends Controller
     public function actionAdd()
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Set up to add an API.
         /* @var $api Api */
         $api = new Api;
         
         // Record the current user as the owner.
-        $api->owner_id = $user->user_id;
+        $api->owner_id = $currentUser->user_id;
 
         // Get the form object.
         $form = new YbHorizForm('application.views.forms.apiForm', $api);
@@ -77,10 +78,10 @@ class ApiController extends Controller
         if ($form->submitted('yt0')) {
 
             // If the user making this change is NOT an admin...
-            if ($user->role !== \User::ROLE_ADMIN) {
+            if ($currentUser->role !== \User::ROLE_ADMIN) {
 
                 // Make sure they are still set as the owner.
-                $api->owner_id = $user->user_id;
+                $api->owner_id = $currentUser->user_id;
             }
             
             // If the data passes validation...
@@ -130,15 +131,15 @@ class ApiController extends Controller
     public function actionDelete($code)
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Get the API by the code name.
         /* @var $api Api */
         $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If that is NOT an Api that the User has permission to manage, say so.
-        if ( ! $user->hasAdminPrivilegesForApi($api)) {
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
             throw new CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'
@@ -227,8 +228,8 @@ class ApiController extends Controller
     public function actionDetails($code)
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Get the API by the code name.
         /* @var $api Api */
@@ -237,7 +238,7 @@ class ApiController extends Controller
         // If no such Api was found 
         //    OR
         // if the Api isn't visible to the current user... say so.
-        if (($api === null) || ( ! $api->isVisibleToUser($user))) {
+        if (($api === null) || ( ! $api->isVisibleToUser($currentUser))) {
             throw new CHttpException(
                 404,
                 'Either there is no "' . $code . '" API or you do not have '
@@ -248,7 +249,7 @@ class ApiController extends Controller
         // Get the list of action links that should be shown.
         $actionLinks = LinksManager::getApiDetailsActionLinksForUser(
             $api,
-            $user
+            $currentUser
         );
         
         // Render the page.
@@ -261,15 +262,15 @@ class ApiController extends Controller
     public function actionDocsEdit($code)
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Get the API by the code name.
         /* @var $api Api */
         $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If that is NOT an Api that the User has permission to manage, say so.
-        if ( ! $user->hasAdminPrivilegesForApi($api)) {
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
             throw new CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'
@@ -287,7 +288,7 @@ class ApiController extends Controller
         if ($form->submitted('yt0')) {
 
             // If the user making this change is NOT an admin...
-            if ($user->role !== \User::ROLE_ADMIN) {
+            if ($currentUser->role !== \User::ROLE_ADMIN) {
 
                 // Make sure they didn't change the owner_id.
                 $api->owner_id = $apiOwnerId;
@@ -342,15 +343,15 @@ class ApiController extends Controller
     public function actionEdit($code)
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Get the API by the code name.
         /* @var $api Api */
         $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If that is NOT an Api that the User has permission to manage, say so.
-        if ( ! $user->hasAdminPrivilegesForApi($api)) {
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
             throw new CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'
@@ -368,7 +369,7 @@ class ApiController extends Controller
         if ($form->submitted('yt0')) {
             
             // If the user making this change is NOT an admin...
-            if ($user->role !== \User::ROLE_ADMIN) {
+            if ($currentUser->role !== \User::ROLE_ADMIN) {
 
                 // Make sure they didn't change the owner_id.
                 $api->owner_id = $apiOwnerId;
@@ -421,13 +422,13 @@ class ApiController extends Controller
     public function actionIndex()
     {
         // Get the current user's model.
-        $user = \Yii::app()->user->user;
+        $currentUser = \Yii::app()->user->user;
         
         // If the user is an admin, get the list of all APIs.
-        if ($user->role === User::ROLE_ADMIN) {
+        if ($currentUser->role === User::ROLE_ADMIN) {
             $apiList = new CActiveDataProvider('Api',array(
                 'criteria' => array(
-                    'with' => array('keyCount', 'pendingKeyCount'),
+                    'with' => array('approvedKeyCount', 'pendingKeyCount'),
                 ),
             ));
         } else {
@@ -437,7 +438,7 @@ class ApiController extends Controller
             $visibleApis = array();
             $allApis = Api::model()->findAll();
             foreach ($allApis as $api) {
-                if ($api->isVisibleToUser($user)) {
+                if ($api->isVisibleToUser($currentUser)) {
                     $visibleApis[] = $api;
                 }
             }
@@ -454,7 +455,7 @@ class ApiController extends Controller
         // Render the page.
         $this->render('index', array(
             'apiList' => $apiList,
-            'user' => $user,
+            'user' => $currentUser,
         ));
     }
 
@@ -643,11 +644,11 @@ class ApiController extends Controller
         $api = \Api::model()->findByAttributes(array('code' => $code));
         
         // Get a reference to the current website user's User model.
-        $user = \Yii::app()->user->user;
+        $currentUser = \Yii::app()->user->user;
         
-        // Prevent information about it from being seen by user's without
+        // Prevent information about it from being seen by users without
         // permission to see the specified API.
-        if (( ! $api) || ( ! $api->isVisibleToUser($user))) {
+        if (( ! $api) || ( ! $api->isVisibleToUser($currentUser))) {
             throw new CHttpException(
                 404,
                 'Either there is no "' . $code . '" API or you do not have '
@@ -657,7 +658,7 @@ class ApiController extends Controller
         
         // Prevent this list of keys from being seen by anyone who is not
         // authorized to see them.
-        if (( ! ($user instanceof User)) || ( ! $user->canSeeKeysForApi($api))) {
+        if (( ! ($currentUser instanceof User)) || ( ! $currentUser->canSeeKeysForApi($api))) {
             throw new CHttpException(
                 403,
                 'You do not have permission to see the list of pending keys '
@@ -665,21 +666,20 @@ class ApiController extends Controller
             );
         }
         
-        // Get the list of pending key requests for that API.
-        $pendingKeyRequests = new CActiveDataProvider('KeyRequest', array(
-            'criteria' => array(
-                'condition' => 'api.code = :code AND status = :status',
-                'join' => 'LEFT JOIN api ON t.api_id = api.api_id',
-                'params' => array(
-                    ':code' => $code,
-                    ':status' => \KeyRequest::STATUS_PENDING,
-                ),
-            ),
+        // Get the list of pending keys for that API.
+        $pendingKeys = array();
+        foreach ($api->keys as $key) {
+            if ($key->status === \Key::STATUS_PENDING) {
+                $pendingKeys[] = $key;
+            }
+        }
+        $pendingKeysDataProvider = new CArrayDataProvider($pendingKeys, array(
+            'keyField' => 'key_id',
         ));
         
         // Show the page.
         $this->render('pendingKeys', array(
-            'pendingKeyRequests' => $pendingKeyRequests,
+            'pendingKeysDataProvider' => $pendingKeysDataProvider,
             'api' => $api,
         ));
     }
@@ -691,98 +691,74 @@ class ApiController extends Controller
         $api = Api::model()->findByAttributes(array('code' => $code));
 
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // If the user already has an active key to this API, show its details
         // instead.
-        if ($user->hasActiveKeyToApi($api)) {
-            \Yii::app()->user->setFlash(
-                'info',
-                sprintf(
-                    '<strong>Note:</strong> You already have the following key '
-                    . 'to the %s API.',
-                    $api->display_name
-                )
-            );
-            $key = \Key::model()->findByAttributes(array(
-                'api_id' => $api->api_id,
-                'user_id' => $user->user_id,
+        if ($currentUser->hasActiveKeyToApi($api)) {
+            \Yii::app()->user->setFlash('info', sprintf(
+                '<strong>Note:</strong> You already have the following key '
+                . 'to the %s API.',
+                $api->display_name
             ));
-            $this->redirect(array('/key/details/', 'id' => $key->key_id));
+            $activeKey = $currentUser->getActiveKeyToApi($api);
+            $this->redirect(array('/key/details/', 'id' => $activeKey->key_id));
         }
 
-        // If the user already has a pending key request for this API, show its
-        // details instead.
-        if ($user->hasPendingKeyRequestForApi($api)) {
-            \Yii::app()->user->setFlash(
-                'info',
-                sprintf(
-                    '<strong>Note:</strong> You already have the following '
-                    . 'pending key request for the %s API.',
-                    $api->display_name
-                )
-            );
-            $keyRequest = \KeyRequest::model()->findByAttributes(array(
-                'api_id' => $api->api_id,
-                'user_id' => $user->user_id,
-                'status' => \KeyRequest::STATUS_PENDING,
+        // If the user already has a pending key for this API, show its details
+        // instead.
+        if ($currentUser->hasPendingKeyForApi($api)) {
+            \Yii::app()->user->setFlash('info', sprintf(
+                '<strong>Note:</strong> You already have the following '
+                . 'pending key for the %s API.',
+                $api->display_name
             ));
+            $pendingKey = $currentUser->getPendingKeyForApi($api);
             $this->redirect(array(
-                '/key-request/details/',
-                'id' => $keyRequest->key_request_id,
+                '/key/details/',
+                'id' => $pendingKey->key_id,
             ));
         }
-
-        // Create a new KeyRequest object.
-        $model = new KeyRequest;
+        
+        // Create a new (pending) Key object.
+        $key = new Key();
         
         // If the form has been submitted...
-        if (isset($_POST['KeyRequest'])) {
+        $request = \Yii::app()->getRequest();
+        if ($request->isPostRequest) {
             
-            // Record the submitted form data into the new KeyRequest object.
-            $model->attributes = $_POST['KeyRequest'];
+            /**
+             * @todo Refactor the following to something like...
+             *     $key = $currentUser->requestKeyForApi($api, $domain, $purpose);
+             */
+
+            /* Retrieve ONLY the applicable pieces of data that we trust the
+             * user to provide when requesting a Key.  */
+            $formData = $request->getPost('Key');
+            $key->domain = isset($formData['domain']) ? $formData['domain'] : null;
+            $key->purpose = isset($formData['purpose']) ? $formData['purpose'] : null;
             
-            // Also record the extra data it needs.
-            $model->user_id = $user->user_id;
-            $model->api_id = $api->api_id;
-            $model->status = KeyRequest::STATUS_PENDING;
+            // Also record the extra data it needs (not submitted by the user).
+            $key->user_id = $currentUser->user_id;
+            $key->api_id = $api->api_id;
+            $key->status = Key::STATUS_PENDING;
+            $key->queries_day = $api->queries_day;
+            $key->queries_second = $api->queries_second;
             
             // If the form submission was valid...
-            if ($model->validate()) {
+            if ($key->validate()) {
                 
                 // If this API is set to auto-approve key requests...
-                if ($api->approval_type == API::APPROVAL_TYPE_AUTO) {
+                if ( ! $key->requiresApproval()) {
                     
-                    // Record a few more details into the Key Request object.
-                    $model->status = KeyRequest::STATUS_APPROVED;
-                    $model->processed_by = $user->user_id;
-                    
-                    // Try to save this new Key Request to the database.
-                    if ( ! $model->save()) {
-                        throw new \Exception(
-                            sprintf(
-                                'Unable to create a key request. (Error: %s).',
-                                var_export($model->getErrors(), true)
-                            ),
-                            1418849904
-                        );
-                    }
-                    
-                    // Attempt to create the requested Key.
-                    $createResults = Key::createKey(
-                        $api->api_id,
-                        $user->user_id,
-                        $model->key_request_id
-                    );
-                    
-                    // If we FAILED to create the new Key...
-                    if ( ! $createResults[0]) {
+                    // Try to approve this pending (i.e. - requested) Key.
+                    if ( ! $key->approve()) {
                         
-                        // Record that in the log.
+                        // If not successful, record that in the log.
                         Yii::log(
                             'Key request auto-approval FAILED: User ID '
-                            . $user->user_id . ', API ID ' . $api->api_id,
+                            . $currentUser->user_id . ', API ID ' . $api->api_id,
                             CLogger::LEVEL_ERROR,
                             __CLASS__ . '.' . __FUNCTION__
                         );
@@ -791,7 +767,7 @@ class ApiController extends Controller
                         Yii::app()->user->setFlash(
                             'error',
                             '<strong>Error!</strong> Unable to create key: '
-                            . '<br />' .  $createResults[1]
+                            . '<br />' .  print_r($key->getErrors(), true)
                         );
                     }
                     // Otherwise...
@@ -800,8 +776,8 @@ class ApiController extends Controller
                         // Record that in the log.
                         Yii::log(
                             'Key request auto-approved: User ID '
-                            . $user->user_id . ', API ID ' . $api->api_id
-                            . ', Key ID ' . $createResults[1]->key_id,
+                            . $currentUser->user_id . ', API ID ' . $api->api_id
+                            . ', Key ID ' . $key->key_id,
                             CLogger::LEVEL_INFO,
                             __CLASS__ . '.' . __FUNCTION__
                         );
@@ -816,12 +792,12 @@ class ApiController extends Controller
                 // Otherwise (i.e. - this API is NOT set to auto-approve)...
                 else {
                     
-                    // Save the new Key Request to the database.
-                    $model->save();
+                    // Save the new pending Key to the database.
+                    $key->save();
 
                     // Record that in the log.
                     Yii::log(
-                        'Key requested: User ID ' . $user->user_id . ', API ID '
+                        'Key requested: User ID ' . $currentUser->user_id . ', API ID '
                         . $api->api_id,
                         CLogger::LEVEL_INFO,
                         __CLASS__ . '.' . __FUNCTION__
@@ -833,9 +809,9 @@ class ApiController extends Controller
                         '<strong>Success!</strong> Key requested.'
                     );
                     
-                    // NOTE: The KeyRequest model's beforeSave method should
-                    //       have sent an email to the API Owner (if set) about
-                    //       the pending key request.
+                    // NOTE: The Key model's afterSave method should have sent
+                    //       an email to the API Owner (if set) about the
+                    //       pending key request.
                 }
 
                 // Send the user back to the API details page.
@@ -849,22 +825,22 @@ class ApiController extends Controller
         // If we reach this point, show the Request Key page.
         $this->render('requestKey', array(
             'api' => $api,
-            'model' => $model,
+            'key' => $key,
         ));
     }
     
     public function actionUsage($code)
     {
         // Get the current user's model.
-        /* @var $user User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // Get the API by the code name.
         /* @var $api Api */
         $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If that is NOT an Api that the User has permission to manage, say so.
-        if ( ! $user->hasAdminPrivilegesForApi($api)) {
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
             throw new CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'

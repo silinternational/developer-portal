@@ -110,12 +110,12 @@ class AuthController extends Controller
     
     public function actionLogout()
     {
-        $user = \Yii::app()->user;
-        $authType = $user->getAuthType();
-        $authProvider = $user->getAuthProvider();
+        $webUser = \Yii::app()->user;
+        $authType = $webUser->getAuthType();
+        $authProvider = $webUser->getAuthProvider();
         
         $authManager = new AuthManager();
-        $authManager->logout($user);
+        $authManager->logout($webUser);
         
         // If logging out didn't redirect the user, show them a logged out
         // screen with the appropriate message based in which authentication

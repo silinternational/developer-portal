@@ -6,80 +6,144 @@ use ApiAxle\Api\Keyring as AxleKeyring;
 
 class Key extends KeyBase
 {
-    public function rules() {
-        $rules = parent::rules();
-        $newRules = array_merge($rules, array(
-            array('updated', 'default',
-                'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => false, 'on' => 'update'),
-            array('created,updated', 'default',
-                'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => false, 'on' => 'insert')
-        ));
+    use Sil\DevPortal\components\ModelFindByPkTrait;
+    
+    const STATUS_APPROVED = 'approved';
+    const STATUS_DENIED = 'denied';
+    const STATUS_PENDING = 'pending';
+    const STATUS_REVOKED = 'revoked';
+    
+    protected $previousAttributeValues = null;
+    
+    public function afterSave()
+    {
+        parent::afterSave();
         
-        return $newRules;
+        try {
+            if ($this->status === self::STATUS_PENDING) {
+                if ($this->isNewRecord) {
+                    $this->notifyApiOwnerOfPendingRequest();
+                }
+            } elseif ($this->status === self::STATUS_DENIED) {
+                $this->notifyUserOfDeniedKey();
+            } elseif ($this->status === self::STATUS_REVOKED) {
+                $this->notifyUserOfRevokedKey();
+                $this->notifyApiOwnerOfRevokedKey();
+            }
+        } finally {
+            $this->log(($this->isNewRecord ? 'created' : 'updated'));
+        }
+    }
+    
+    public function rules()
+    {
+        return \CMap::mergeArray(array(
+            array(
+                'updated',
+                'default',
+                'value' => new CDbExpression('NOW()'),
+                'setOnEmpty' => false,
+                'on' => 'update',
+            ),
+            array(
+                'created,updated,requested_on',
+                'default',
+                'value' => new CDbExpression('NOW()'),
+                'setOnEmpty' => false,
+                'on' => 'insert',
+            ),
+            array(
+                'status',
+                'in',
+                'range' => self::getValidStatusValues(),
+                'allowEmpty' => false,
+                'message' => 'That is not a valid key status.',
+            ),
+            array('processed_on', 'recordDateWhenProcessed'),
+            array('api_id', 'onlyAllowOneKeyPerApi', 'on' => 'insert'),
+        ), parent::rules());
     }
     
     public function beforeSave()
     {
-        parent::beforeSave();
+        $previousState = $this->findByPk($this->getPrimaryKey());
+        if ($previousState !== null) {
+            $this->previousAttributeValues = $previousState->attributes;
+        } else {
+            $this->previousAttributeValues = null;
+        }
+        
+        if ( ! parent::beforeSave()) {
+            return false;
+        }
         
         global $ENABLE_AXLE;
-        if(isset($ENABLE_AXLE) && !$ENABLE_AXLE){
+        if (isset($ENABLE_AXLE) && !$ENABLE_AXLE) {
             return true;
         }
         
-        $axleKey = new AxleKey(Yii::app()->params['apiaxle']);
-        $keyData = array(
-            'sharedSecret' => $this->secret,
-            'qpd' => (int)$this->queries_day,
-            'qps' => (int)$this->queries_second,
-        );
+        /* ***** ApiAxle-specific checks: ***** */
         
-        /**
-         * If Keyring does not already exist, we need to create it.
-         */
-        $user = User::model()->findByPk($this->user_id);
-        $keyringName = md5($user->email);
-        $axleKeyring = new AxleKeyring(Yii::app()->params['apiaxle']);
-        try {
-            $axleKeyring->get($keyringName);
-        } catch (\Exception $e) {
-            $axleKeyring->create($keyringName);
-        }
+        if ($this->status === \Key::STATUS_APPROVED) {
         
-        if($this->getIsNewRecord()){
+            $axleKey = new AxleKey(Yii::app()->params['apiaxle']);
+            $keyData = array(
+                'sharedSecret' => $this->secret,
+                'qpd' => (int)$this->queries_day,
+                'qps' => (int)$this->queries_second,
+            );
+
+            /**
+             * If Keyring does not already exist, we need to create it.
+             */
+            $user = User::model()->findByPk($this->user_id);
+
+            /**
+             * @todo Verify that a change to the User's email won't break anything
+             *       related to this.
+             */
+            $keyringName = md5($user->email);
+            $axleKeyring = new AxleKeyring(Yii::app()->params['apiaxle']);
             try {
-                /**
-                 * Create new Key in apiaxle
-                 */
-                $axleKey->create($this->value,$keyData);
-                /**
-                 * Link key to keyring
-                 */
-                $axleKeyring->linkKey($axleKey);
-                /**
-                 * Link key to Api
-                 */
-                $api = Api::model()->findByPk($this->api_id);
-                $axleApi = new AxleApi(Yii::app()->params['apiaxle'],$api->code);
-                $axleApi->linkKey($axleKey);
-                return true;
+                $axleKeyring->get($keyringName);
             } catch (\Exception $e) {
-                $this->addError('value',$e->getMessage());
-                return false;
+                $axleKeyring->create($keyringName);
             }
-        } else {
-            try{
-                /**
-                 * Get current key to check for key value change
-                 */
+            
+            /* Get the current key (if/as it exists in the database) to see
+             * whether this key would already exist in ApiAxle.  */
+            if ($this->key_id !== null) {
                 $current = Key::model()->findByPk($this->key_id);
-                if($current->value != $this->value){
+                $currentValue = (($current !== null) ? $current->value : null);
+            } else {
+                $currentValue = null; 
+            }
+            
+            if ($currentValue === null) {
+                try {
+                    // Create new Key in ApiAxle.
+                    $axleKey->create($this->value, $keyData);
+                    
+                    // Link key to keyring.
+                    $axleKeyring->linkKey($axleKey);
+                    
+                    // Link key to Api.
+                    $api = Api::model()->findByPk($this->api_id);
+                    $axleApi = new AxleApi(Yii::app()->params['apiaxle'], $api->code);
+                    $axleApi->linkKey($axleKey);
+                    return true;
+                } catch (\Exception $e) {
+                    $this->addError('value',$e->getMessage());
+                    return false;
+                }
+            }
+            
+            try {
+                if ($currentValue != $this->value) {
                     /*
                      * Need to delete existing key and create new key
                      */
-                    $axleKey->delete($current->value);
+                    $axleKey->delete($currentValue);
                     $axleKey->create($this->value, $keyData);
                     /**
                      * Link key to keyring
@@ -103,144 +167,315 @@ class Key extends KeyBase
                 $this->addError('value',$e->getMessage());
                 return false;
             }
+        } elseif ($this->status === \Key::STATUS_DENIED) {
+            
+            /**
+             * @todo Figure out what to do in ApiAxle when a Key in our database
+             *       is denied, and whether to do it in beforeSave() or
+             *       afterSave().
+             */
+            
+            // Make sure the key does not exist in ApiAxle.
+            if ($this->value !== null) {
+                return $this->deleteFromApiAxle();
+            }
+            return true;
+            
+        } elseif ($this->status === \Key::STATUS_PENDING) {
+            
+            /**
+             * @todo Figure out what to do in ApiAxle (if anything) when a Key
+             *       in our database is pending, and whether to do it in
+             *       beforeSave() or afterSave().
+             */
+            
+            // TEMP
+            return true;
+            
+        } elseif ($this->status === \Key::STATUS_REVOKED) {
+            
+            /**
+             * @todo Figure out how to delete the key from Axle when the Key
+             *       is revoked.
+             */
+            
+            // Make sure the key does not still exist in ApiAxle.
+            return $this->deleteFromApiAxle();
+            
+        } else {
+            
+            $this->addError('status', 'Unknown status value.');
+            return false;
         }
     }
     
     public function afterDelete()
     {
-      parent::afterDelete();
-
-//      // If we know the key request for this key...
-//      if ($this->key_request_id !== null) {
-//
-//        // Delete the related key request as well.
-//        $delKeyRequests = KeyRequest::model()->deleteByPk(
-//            $this->key_request_id
-//        );
-//      }
+        parent::afterDelete();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        \Event::log(sprintf(
+            '%s\'s (user_id %s) Key (key_id %s) to the "%s" API (api_id %s) was deleted%s.',
+            (isset($this->user) ? $this->user->getDisplayName() : 'A User'),
+            $this->user_id,
+            $this->key_id,
+            (isset($this->api) ? $this->api->display_name : ''),
+            $this->api_id,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+        ), $this->api_id, null, $this->user_id);
+        
+        $this->sendKeyDeletionNotification();
     }
     
-    public function beforeDelete()
+    /**
+     * Attempt to approve a pending (i.e. - requested) Key, receiving back an
+     * indicator of whether it was successful.
+     * 
+     * @param \User $approvingUser The user to record as the one who approved
+     *     the request for this Key (for Keys to Apis that require approval).
+     *     Defaults to null (used for auto-approved Keys).
+     * @return boolean True if the Key was successfully approved. If not, check
+     *     the Key's list of errors to find out why.
+     * @throws \Exception
+     */
+    public function approve($approvingUser = null)
     {
-        parent::beforeDelete();
+        if ($this->status !== self::STATUS_PENDING) {
+            $this->addError('status', 'Only pending keys can be approved.');
+            return false;
+        }
+        
+        if ($this->requiresApproval()) {
+            if ( ! $approvingUser instanceof \User) {
+                // This should not happen in the normal flow of things... thus
+                // the exception.
+                throw new \Exception(
+                    'No User provided when trying to approve a Key that '
+                    . 'requires approval.',
+                    1465926569
+                );
+            } elseif ( ! $approvingUser->isAuthorizedToApproveKey($this)) {
+                $this->addError('processed_by', sprintf(
+                    'That user (%s) is not authorized to approve keys to that API.',
+                    $approvingUser->getDisplayName()
+                ));
+                return false;
+            }
+            
+            // At this point, we know the given $approvingUser is authorized
+            // to (and needs to) approve this Key.
+            $this->processed_by = $approvingUser->user_id;
+        }
+        $this->status = self::STATUS_APPROVED;
+        $this->value = \Utils::getRandStr(32);
+        $this->secret = \Utils::getRandStr(128);
+        
+        if ($this->save()) {
+            $this->notifyUserOfApprovedKey();
+            $this->log('approved');
+            
+            // Indicate success.
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    protected function beforeDelete()
+    {
+        if ( ! parent::beforeDelete()) {
+            return false;
+        }
+        
+        foreach ($this->events as $event) {
+            $event->key_id = null;
+            if ( ! $event->save()) {
+                $this->addError('api_id', sprintf(
+                    'We could not delete this Key because we were not able to finish updating the related event '
+                    . 'records: %s',
+                    print_r($event->getErrors(), true)
+                ));
+                return false;
+            }
+        }
         
         global $ENABLE_AXLE;
-        if(isset($ENABLE_AXLE) && !$ENABLE_AXLE){
+        if (isset($ENABLE_AXLE) && !$ENABLE_AXLE) {
             return true;
         }
         
-        $axleKey = new AxleKey(Yii::app()->params['apiaxle']);
+        /**
+         * @todo We will probably only need to delete the key from Axle if it
+         *       it was an approved key. Make sure we're deleting keys from Axle
+         *       when revoked. Should we also just go ahead and re-try/confirm
+         *       that the key has been deleted from Axle at this point?
+         */
+        if ($this->value) {
+            return $this->deleteFromApiAxle();
+        }
+        return true;
+    }
+    
+    /**
+     * Whether the given User is allowed to delete this Key. This takes into
+     * account both the user's ownership (or lack thereof) of the Key and Api
+     * as well as the current status of the Key.
+     * 
+     * @param User $user
+     * @return boolean
+     */
+    public function canBeDeletedBy($user)
+    {
+        if ( ! ($user instanceof \User)) {
+            return false;
+        }
+        
+        if ($this->isOwnedBy($user)) {
+            
+            // Allow a User to delete their own Key regardless of status.
+            return true;
+            
+        } elseif ($this->isToApiOwnedBy($user) || $user->isAdmin()) {
+            
+            /* Only allow someone else to delete a User's Key if they have the
+             * appropriate authority and the Key has already been "terminated"
+             * (for lack of a better word).  */
+            switch ($this->status) {
+                case \Key::STATUS_DENIED:
+                case \Key::STATUS_REVOKED:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+    }
+    
+    public static function getActiveKeysDataProvider()
+    {
+        return new \CActiveDataProvider('Key', array(
+            'criteria' => array(
+                'condition' => 'status = :status',
+                'params' => array(
+                    ':status' => \Key::STATUS_APPROVED,
+                ),
+            ),
+        ));
+    }
+    
+    public static function getPendingKeysDataProvider()
+    {
+        return new \CActiveDataProvider('Key', array(
+            'criteria' => array(
+                'condition' => 'status = :status',
+                'params' => array(
+                    ':status' => \Key::STATUS_PENDING,
+                ),
+            ),
+        ));
+    }
+    
+    public function getStyledStatusHtml()
+    {
+        $cssClass = null;
+        $cssStyle = null;
+        switch ($this->status) {
+            case self::STATUS_APPROVED:
+                $displayText = ucfirst($this->status);
+                break;
+
+            case self::STATUS_DENIED:
+                $cssClass = 'text-error';
+                $displayText = ucfirst($this->status);
+                break;
+
+            case self::STATUS_PENDING:
+                $cssStyle = 'font-style: italic;';
+                $displayText = ucfirst($this->status);
+                break;
+
+            case self::STATUS_REVOKED:
+                $cssClass = 'text-error';
+                $cssStyle = 'font-weight: bold;';
+                $displayText = ucfirst($this->status);
+                break;
+
+            default:
+                $displayText = 'UNKNOWN STATUS: ' . $this->status;
+                break;
+        }
+        
+        return sprintf(
+            '<span%s%s>%s</span>',
+            ($cssClass ? ' class="' . $cssClass . '"' : ''),
+            ($cssStyle ? ' style="' . $cssStyle . '"' : ''),
+            CHtml::encode($displayText)
+        );
+    }
+    
+    /**
+     * Try to delete this key from ApiAxle, returning an indicator of whether we
+     * were successful.
+     * 
+     * @return boolean Whether it was successfully removed from ApiAxle. If not,
+     *     check the key's errors.
+     */
+    protected function deleteFromApiAxle()
+    {
         try{
+            $axleKey = new AxleKey(\Yii::app()->params['apiaxle']);
             $axleKey->delete($this->value);
             return true;
         } catch (\Exception $e) {
-            $this->addError('value',$e->getMessage());
+
+            // If the key was not found, consider the deletion successful.
+            $notFoundMessage = sprintf(
+                'API returned error: Key \'%s\' not found.',
+                $this->value
+            );
+            if (($e->getCode() == 201) && ($notFoundMessage === $e->getMessage())) {
+                return true;
+            }
+
+            // Otherwise, consider it not successful.
+            $this->addError('value', $e->getMessage());
             return false;
         }
     }
     
     /**
-     * Creates a new Key instance in the db.
-     * @param int $api_id The ID of the API the Key is for.
-     * @param int $user_id The ID of the User the Key will belong to.
-     * @param int $key_request_id The ID of the Key Request being granted.
-     * @param int $queries_second OPTIONAL The rate limit of queries-per-second
-     *     to enforce for this Key.
-     * @param int $queries_day OPTIONAL The rate limit of queries-per-day
-     *     to enforce for this Key.
-     * @return array An array with two values: a boolean indicating whether the
-     *     create worked, and either the new Key or an error message string.
+     * Get an array (attribute name => new value) of differences between the
+     * given previous attribute values the current attribute values (for use
+     * in the log).
+     * 
+     * NOTE: Certain attribute will never be included in this, either for
+     *       security reasons (such as `secret`) or lack of usefulness (such as
+     *       `updated`).
+     * 
+     * @param array $oldAttributes
+     * @return array
      */
-    public static function createKey($api_id, $user_id, $key_request_id,
-                                     $queries_second=null,  $queries_day=null) {
-
-        // Create a new Key instance.
-        $newKey = new Key();
-        
-        // Retrieve the specified Api.
-        $api = Api::model()->findByPk($api_id);
-        
-        // If that Api was NOT found...
-        if (is_null($api)) {
-            
-            // Say so.
-            return array(false, 'No Api found with api_id ' . $api_id);
-        }
-        
-        // Retrieve the specified User.
-        $user = User::model()->findByPk($user_id);
-        
-        // If that User was NOT found...
-        if (is_null($user)) {
-            
-            // Say so.
-            return array(false, 'No User found with user_id ' . $user_id);
-        }
-        
-        // Retrieve the specified Key Request.
-        $keyRequest = KeyRequest::model()->findByPk($key_request_id);
-        
-        // If that Key Request was NOT found...
-        if (is_null($keyRequest)) {
-            
-            // Say so.
-            return array(false, 'No KeyRequest found with key_request_id ' .
-                                $key_request_id);
-        }
-        
-        $newKey->user_id = $user_id;
-        $newKey->api_id = $api_id;     
-        $newKey->key_request_id = $key_request_id;
-        
-        if (is_null($queries_second)) {
-            $queries_second = $api->queries_second;
-        }
-        
-        if (is_null($queries_day)) {
-            $queries_day = $api->queries_day;
-        }
-        
-        $newKey->queries_second = $queries_second;
-        $newKey->queries_day = $queries_day;
-        
-        //$seed = microtime() . $user_id;                          
-        $newKey->value = Utils::getRandStr();//hash('md5', $seed); // length 32 
-        $newKey->secret = Utils::getRandStr(128);//hash('sha512', $seed); // length 128
-        
-        if ($newKey->save()) {
-			
-            // If we are in an environment where we should send email
-            // notifications...
-            if (Yii::app()->params['smtp'] !== FALSE) {
-
-                // If possible, include the API owner as Cc: on the email.
-                $cc = array();
-                if ($newKey->api->owner && $newKey->api->owner->email) {
-                    $cc[] = $newKey->api->owner->email;
-                }
- 
-                // Send an email notification.
-                $mail = Utils::getMailer();
-                $mail->setView('key-created');
-                $mail->setTo($newKey->user->email);
-                $mail->setCc($cc);
-                $mail->setSubject('API key created for ' .
-                        $newKey->api->display_name . ' API');
-                if (isset(Yii::app()->params['mail']['bcc'])) {
-                    $mail->setBcc(Yii::app()->params['mail']['bcc']);
-                }
-                $mail->setData(array(
-                    'key' => $newKey,
-                    'api' => $newKey->api,
-                ));
-                $mail->send();
+    protected function getChangesForLog($oldAttributes)
+    {
+        $attributesToSkip = array(
+            'created',
+            'processed_on',
+            'secret',
+            'updated',
+        );
+        $changes = array();
+        foreach ($this->attributes as $attributeName => $newValue) {
+            if (in_array($attributeName, $attributesToSkip)) {
+                continue;
             }
-
-            // Indicate success, returning the new Key's data as well.
-            return array(true, $newKey);
-        } else {
-            return array(false, print_r($newKey->getErrors(), true));
+            if ( ! array_key_exists($attributeName, $oldAttributes)) {
+                continue;
+            }
+            if ($oldAttributes[$attributeName] !== $newValue) {
+                $changes[$attributeName] = $newValue;
+            }
         }
+        return $changes;
     }
     
     /**
@@ -309,6 +544,16 @@ class Key extends KeyBase
         return $usage;
     }
     
+    public static function getValidStatusValues()
+    {
+        return array(
+            self::STATUS_APPROVED,
+            self::STATUS_DENIED,
+            self::STATUS_PENDING,
+            self::STATUS_REVOKED,
+        );
+    }
+           
     /**
      * Indicate whether this Key belongs to the given User. Note that this is a
      * User model, not a Yii CWebUser. If no user is given, then false is
@@ -391,7 +636,393 @@ class Key extends KeyBase
         );
     }
     
-    public static function resetKey($key_id) {
+    /**
+     * Log that an event happened to this Key. Call this AFTER successfully
+     * saving changes to this model. When possible and where appropriate, the
+     * changed attributes (and their new values) will be included in the log.
+     * 
+     * @param string $pastTenseAction A single word (in the past tense)
+     *     describing what happened. Examples: requested, reset, approved
+     */
+    protected function log($pastTenseAction)
+    {
+        if ($this->previousAttributeValues !== null) {
+            $changes = $this->getChangesForLog($this->previousAttributeValues);
+        } else {
+            $changes = null;
+        }
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        
+        \Event::log(sprintf(
+            'Key %s was %s%s%s.',
+            $this->key_id,
+            $pastTenseAction,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser),
+            (is_null($changes) ? '' : ': ' . json_encode($changes))
+        ), $this->api_id, $this->key_id, $this->user_id);
+    }
+    
+    /**
+     * Try to send a notification email to the Owner of the Api that this
+     * (pending) Key is for. If no owner email address is available, send it to
+     * the admins.
+     * 
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function notifyApiOwnerOfPendingRequest(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params->toArray();
+        }
+        
+        // If we are in an environment where we should send email
+        // notifications...
+        if ($appParams['mail'] !== false) {
+            
+            // Figure out what email address to send the notification to.
+            $sendToEmail = null;
+            if ($this->api->owner && $this->api->owner->email) {
+                
+                // If the API has an owner and we know their email address, use
+                // that.
+                $sendToEmail = $this->api->owner->email;
+                
+            } elseif (isset($appParams['adminEmail'])) {
+                
+                // Otherwise, try to notify the admins.
+                $sendToEmail = $appParams['adminEmail'];
+            }
+
+            // If we have an email address to send the notification to...
+            if ($sendToEmail) {
+                
+                // Try to send a notification email.
+                if ($mailer === null) {
+                    $mailer = Utils::getMailer();
+                }
+                $mailer->setView('key-request');
+                $mailer->setTo($sendToEmail);
+                $mailer->setSubject(sprintf(
+                    'New key request for %s API',
+                    $this->api->display_name
+                ));
+                if (isset($appParams['mail']['bcc'])) {
+                    $mailer->setBcc($appParams['mail']['bcc']);
+                }
+                $mailer->setData(array(
+                    'owner' => $this->api->owner,
+                    'api' => $this->api,
+                    'key' => $this,
+                    'requestingUser' => $this->user,
+                ));
+
+                // If unable to send the email, allow the process to
+                // continue but communicate the email failure somehow.
+                if ( ! $mailer->send()) {
+                    \Yii::log(
+                        'Unable to send pending key approval request email: '
+                        . $mailer->ErrorInfo,
+                        CLogger::LEVEL_WARNING
+                    );
+                }
+            }
+        }
+    }
+    
+    /**
+     * Try to send a notification email to the User that requested a Key that
+     * the request was denied.
+     * 
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function notifyUserOfDeniedKey(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params->toArray();
+        }
+        
+        // If we are in an environment where we should send email
+        // notifications...
+        if ($appParams['mail'] !== false) {
+            
+            // If we can successfully retrieve the requesting-user's email
+            // address...
+            if ($this->user && $this->user->email) {
+
+                // Try to send them a notification email.
+                if ($mailer === null) {
+                    $mailer = Utils::getMailer();
+                }
+                $mailer->setView('key-request-denied');
+                $mailer->setTo($this->user->email);
+                $mailer->setSubject(sprintf(
+                    'Key request for %s API was denied',
+                    $this->api->display_name
+                ));
+                if (isset($appParams['mail']['bcc'])) {
+                    $mailer->setBcc($appParams['mail']['bcc']);
+                }
+                $mailer->setData(array(
+                    'key' => $this,
+                ));
+
+                // If unable to send the email, allow the process to
+                // continue but communicate the email failure somehow.
+                if ( ! $mailer->send()) {
+                    \Yii::log(
+                        'Unable to send key-request-denied notification email '
+                        . 'to user: ' . $mailer->ErrorInfo,
+                        CLogger::LEVEL_WARNING
+                    );
+                }
+            }
+        }
+    }
+    
+    /**
+     * Try to send a notification email to the Owner of an Api that a Key to
+     * their Api has been revoked.
+     * 
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function notifyApiOwnerOfRevokedKey(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params->toArray();
+        }
+        
+        // If we are in an environment where we should NOT send email
+        // notifications, then don't.
+        if ($appParams['mail'] === false) {
+            return;
+        }
+        
+        if ($this->api->owner && $this->api->owner->email) {
+
+            // Try to send them a notification email.
+            if ($mailer === null) {
+                $mailer = Utils::getMailer();
+            }
+            $mailer->setView('key-revoked-api-owner');
+            $mailer->setTo($this->api->owner->email);
+            $mailer->setSubject(sprintf(
+                'Key revoked for %s API',
+                $this->api->display_name
+            ));
+            if (isset($appParams['mail']['bcc'])) {
+                $mailer->setBcc($appParams['mail']['bcc']);
+            }
+            $mailer->setData(array(
+                'apiOwner' => $this->api->owner,
+                'api' => $this->api,
+                'key' => $this,
+                'keyOwner' => $this->user,
+            ));
+
+            // If unable to send the email, allow the process to
+            // continue but communicate the email failure somehow.
+            if ( ! $mailer->send()) {
+                \Yii::log(
+                    'Unable to send key-revoked notification email to API '
+                    . 'owner: ' . $mailer->ErrorInfo,
+                    CLogger::LEVEL_WARNING
+                );
+            }
+        }
+    }
+    
+    /**
+     * Try to send a notification email to the User that one of their pending
+     * Keys has been approved.
+     * 
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function notifyUserOfApprovedKey(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params->toArray();
+        }
+        
+        // If we are in an environment where we should NOT send email
+        // notifications, then don't.
+        if ($appParams['mail'] === false) {
+            return;
+        }
+        
+        if ($this->user && $this->user->email) {
+
+            // Try to send them a notification email.
+            if ($mailer === null) {
+                $mailer = Utils::getMailer();
+            }
+            $mailer->setView('key-approved');
+            $mailer->setTo($this->user->email);
+            $mailer->setSubject(sprintf(
+                'Key approved for %s API',
+                $this->api->display_name
+            ));
+            if (isset($appParams['mail']['bcc'])) {
+                $mailer->setBcc($appParams['mail']['bcc']);
+            }
+            $mailer->setData(array(
+                'key' => $this,
+                'api' => $this->api,
+                'user' => $this->user,
+            ));
+            
+            /**
+             * @todo Figure out whether we want to Cc: the API Owner on this
+             *       email. I think not, to avoid exposing their email address
+             *       to people without their consent.
+             */
+            //$cc = array();
+            //if ($this->api->owner && $this->api->owner->email) {
+            //    $cc[] = $this->api->owner->email;
+            //}
+            //$mailer->setCc($cc);
+
+            // If unable to send the email, allow the process to
+            // continue but communicate the email failure somehow.
+            if ( ! $mailer->send()) {
+                \Yii::log(
+                    'Unable to send key-approved notification email to user: '
+                    . $mailer->ErrorInfo,
+                    CLogger::LEVEL_WARNING
+                );
+            }
+        }
+    }
+    
+    /**
+     * Try to send a notification email to the User that one of their Keys has
+     * been revoked.
+     * 
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function notifyUserOfRevokedKey(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params->toArray();
+        }
+        
+        // If we are in an environment where we should NOT send email
+        // notifications, then don't.
+        if ($appParams['mail'] === false) {
+            return;
+        }
+        
+        if ($this->user && $this->user->email) {
+
+            // Try to send them a notification email.
+            if ($mailer === null) {
+                $mailer = Utils::getMailer();
+            }
+            $mailer->setView('key-revoked-user');
+            $mailer->setTo($this->user->email);
+            $mailer->setSubject(sprintf(
+                'Key revoked for %s API',
+                $this->api->display_name
+            ));
+            if (isset($appParams['mail']['bcc'])) {
+                $mailer->setBcc($appParams['mail']['bcc']);
+            }
+            $mailer->setData(array(
+                'key' => $this,
+                'api' => $this->api,
+                'user' => $this->user,
+            ));
+
+            // If unable to send the email, allow the process to
+            // continue but communicate the email failure somehow.
+            if ( ! $mailer->send()) {
+                \Yii::log(
+                    'Unable to send key-revoked notification email to user: '
+                    . $mailer->ErrorInfo,
+                    CLogger::LEVEL_WARNING
+                );
+            }
+        }
+    }
+    
+    /**
+     * Prevent requests for new Keys that are for an Api that the requesting
+     * User already has either an active key or a pending key to.
+     * 
+     * @param string $attribute The name of the attribute to be validated.
+     */
+    public function onlyAllowOneKeyPerApi($attribute)
+    {
+        if ($this->user->hasActiveKeyToApi($this->api)) {
+            
+            // Prevent the user from requesting another key to an API that they
+            // already have an ACTIVE key for.
+            $this->addError(
+                $attribute,
+                'You already have an active key to that API.'
+            );
+        } elseif ($this->user->hasPendingKeyForApi($this->api)) {
+
+            // Prevent the user from requesting another key to an API that they
+            // already have a PENDING key request for.
+            $this->addError(
+                $attribute,
+                'You already have a pending key request for that API.'
+            );
+        }
+    }
+    
+    public function requiresApproval()
+    {
+        return ($this->api->approval_type !== \Api::APPROVAL_TYPE_AUTO);
+    }
+    
+    /**
+     * @todo Refactor this to ensure that the User trying to reset this Key is
+     *       actually allowed to do so. See revokeKey() for an example.
+     */
+    public static function resetKey($key_id)
+    {
         /**
          * Updates a Key instance with a new value and secret.
          * 
@@ -400,12 +1031,18 @@ class Key extends KeyBase
          *  - the Key instance or a string as an error message
          */
         
-        $key = Key::model()->findByPk($key_id);  
-        if (is_null($key)) { return array(false, 'Bad key_id');}     
+        /* @var $key \Key */
+        $key = \Key::model()->findByPk($key_id);  
+        if (is_null($key)) { return array(false, 'Bad key_id');}
         
         //$seed = microtime() . $key->user_id;         
         $key->value = Utils::getRandStr();//hash('md5', $seed); // length 32 
         $key->secret = Utils::getRandStr(128);//hash('sha512', $seed); // length 128
+        
+        /* Also re-sync the Key's rate limits in case those settings have
+         * changed on the Api and this Key somehow failed to be updated.  */
+        $key->queries_day = $key->api->queries_day;
+        $key->queries_second = $key->api->queries_second;
 
         // Try to save the changes to the Key. If successful...
         if ($key->save()) {
@@ -429,6 +1066,8 @@ class Key extends KeyBase
                 $mail->send();
             }
             
+            $key->log('reset');
+            
             // Indicate success, returning the Key's updated data as well.
             return array(true, $key);
         }
@@ -441,7 +1080,57 @@ class Key extends KeyBase
         
     }
     
-    public static function revokeKey($key_id)
+    /**
+     * Attempt to revoke a Key, receiving back an indicator of whether it was
+     * successful.
+     * 
+     * @param \User $revokingUser The User trying to revoke this Key.
+     * @return boolean True if the Key was successfully revoked. If not, check
+     *     the Key's list of errors to find out why.
+     * @throws \Exception
+     */
+    public function revoke($revokingUser)
+    {
+        if ( ! $revokingUser instanceof \User) {
+            // This should not happen in the normal flow of things... thus
+            // the exception.
+            throw new \Exception(
+                'No User provided when trying to revoke a Key.',
+                1466000163
+            );
+        } elseif ( ! $revokingUser->canRevokeKey($this)) {
+            $this->addError('processed_by', sprintf(
+                'That user (%s) is not authorized to revoke this key.',
+                $revokingUser->getDisplayName()
+            ));
+            return false;
+        }
+
+        if ($this->status !== self::STATUS_APPROVED) {
+            $this->addError('status', 'Only approved keys can be revoked.');
+            return false;
+        }
+        
+        $this->processed_by = $revokingUser->user_id;
+        $this->status = self::STATUS_REVOKED;
+        /* NOTE: Leave the key value intact (for identifying the revoked key,
+         *       both to ApiAxle and to the end user). Do get rid of the secret,
+         *       though.  */
+        $this->secret = null;
+        
+        if ($this->save()) {
+            $this->sendKeyDeletionNotification();
+            
+            $this->log('revoked');
+            
+            // Indicate success.
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public static function revokeKey($key_id, $revokingUser)
     {
         /**
          * Revokes a Key instance.
@@ -450,77 +1139,20 @@ class Key extends KeyBase
          *  - a boolean as to whether the revokation worked
          *  - the Key instance or a string as an error message
          */
-        
+        /* @var $key \Key */
         $key = Key::model()->findByPk($key_id);  
         if (is_null($key)) {
             return array(false, 'Bad key_id');
         }
         
-        // Keep a reference to its KeyRequest (if any) and the old status of
-        // that (if applicable).
-        $keyRequest = $key->keyRequest;
-        $oldKeyRequestStatus = null;
-        
-        // If we have the key request for this key...
-        if ($keyRequest !== null) {
-
-            // Make a note of it's old status, then mark it as revoked and save
-            // that change.
-            $oldKeyRequestStatus = $keyRequest->status;
-            $keyRequest->status = \KeyRequest::STATUS_REVOKED;
-            if ( ! $keyRequest->save()) {
-                
-                // TODO: Log that we failed to save this change.
-                throw new Exception(
-                    'We did not delete the key as requested because we failed '
-                    . 'to mark key request as revoked: '
-                    . var_export($keyRequest->getErrors(), true)
-                );
-            }
-        }
-
-        if ($key->delete()) {
-            
-            // If we are in an environment where we should send email
-            // notifications...
-            if (Yii::app()->params['mail'] !== FALSE) {
-                
-                // Send notification to owner of key that it was reset
-                $mail = Utils::getMailer();
-                $mail->setView('key-deleted');
-                $mail->setTo($key->user->email);
-                $mail->setSubject('API key deleted for '.$key->api->display_name.' API');
-                if (isset(Yii::app()->params['mail']['bcc'])) {
-                    $mail->setBcc(Yii::app()->params['mail']['bcc']);
-                }
-                $mail->setData(array(
-                    'key' => $key,
-                    'api' => $key->api,
-                ));
-                $mail->send();
-            }
+        if ($key->revoke($revokingUser)) {
             
             return array(true, null);
+            
         } else {
             
-            // If we failed to delete it, restore the key request's previous
-            // status (if applicable and possible).
-            if (($keyRequest !== null) && ($oldKeyRequestStatus !== null)) {
-                $keyRequest->status = $oldKeyRequestStatus;
-                if ( ! $keyRequest->save()) {
-
-                    // TODO: Log that we failed to save this change.
-                    throw new Exception(
-                        'Failed to restore the previous status of the key '
-                        . 'request (back from revoked) when we were unable to '
-                        . 'delete this key.'
-                    );
-
-                }
-            }
-            
             // Return the error messages.
-            return array(false,print_r($key->getErrors(),true));
+            return array(false, print_r($key->getErrors(), true));
         }
     }
     
@@ -534,4 +1166,153 @@ class Key extends KeyBase
         return parent::model($className);
     }
     
+    /**
+     * If the Key has a processed_by value but no processed_on value, use now
+     * as the processed_on value.
+     * 
+     * @param string $attribute The name of the attribute to be validated.
+     * @param array $params The options specified in the validation rule.
+     */
+    public function recordDateWhenProcessed($attribute, $params)
+    {
+        if ( ! empty($this->processed_by)) {
+            if (empty($this->processed_on)) {
+                $this->processed_on = new CDbExpression('NOW()');
+            }
+        }
+    }
+    
+    /**
+     * Try to send a notification email to the Owner of the Api that this
+     * pending Key is for. If no owner email address is available, send it to
+     * the admins.
+     * 
+     * @param YiiMailer $mailer See sendKeyDeletionNotification for details.
+     * @param array $appParams See sendKeyDeletionNotification for details.
+     */
+    protected function sendPendingKeyDeletionNotification(
+        YiiMailer $mailer,
+        array $appParams
+    ) {
+        // Figure out what email address to send the notification to.
+        $sendToEmail = null;
+        if ($this->api->owner && $this->api->owner->email) {
+            $sendToEmail = $this->api->owner->email;
+        } elseif (isset($appParams['adminEmail'])) {
+            $sendToEmail = $appParams['adminEmail'];
+        }
+        
+        if (empty($sendToEmail)) {
+            return;
+        }
+        
+        // Try to send a notification email.
+        $mailer->setView('pending-key-deleted');
+        $mailer->setTo($sendToEmail);
+        $mailer->setSubject(sprintf(
+            'Key request (for %s API) deleted',
+            $this->api->display_name
+        ));
+        if (isset($appParams['mail']['bcc'])) {
+            $mailer->setBcc($appParams['mail']['bcc']);
+        }
+        $mailer->setData(array(
+            'owner' => $this->api->owner,
+            'api' => $this->api,
+            'pendingKey' => $this,
+            'requestingUser' => $this->user,
+        ));
+
+        // If unable to send the email, allow the process to
+        // continue but communicate the email failure somehow.
+        if ( ! $mailer->send()) {
+            \Yii::log(
+                'Unable to send pending-key deletion email: '
+                . $mailer->ErrorInfo,
+                CLogger::LEVEL_WARNING
+            );
+        }
+    }
+    
+    /**
+     * Try to notify the owner of this key that it has been deleted.
+     * 
+     * @param YiiMailer $mailer See sendKeyDeletionNotification for details.
+     * @param array $appParams See sendKeyDeletionNotification for details.
+     */
+    protected function sendNonPendingKeyDeletionNotification(
+        YiiMailer $mailer,
+        array $appParams
+    ) {
+        if ($this->user && $this->user->email) {
+
+            // Send notification to owner of key that it was revoked.
+            $mailer->setView('key-deleted');
+            $mailer->setTo($this->user->email);
+            $mailer->setSubject(sprintf(
+                'API key deleted for %s API',
+                $this->api->display_name
+            ));
+            if (isset($appParams['mail']['bcc'])) {
+                $mailer->setBcc($appParams['mail']['bcc']);
+            }
+            $mailer->setData(array(
+                'key' => $this,
+                'api' => $this->api,
+            ));
+            
+            // If unable to send the email, allow the process to
+            // continue but communicate the email failure somehow.
+            if ( ! $mailer->send()) {
+                \Yii::log(
+                    'Unable to send key deletion email: '
+                    . $mailer->ErrorInfo,
+                    CLogger::LEVEL_WARNING
+                );
+            }
+        }
+    }
+    
+    /**
+     * Try to send a notification email to the appropriate person about this
+     * Key having been deleted.
+     * 
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function sendKeyDeletionNotification(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params->toArray();
+        }
+        
+        // If we are in an environment where we should NOT send email
+        // notifications, then don't.
+        if ($appParams['mail'] === false) {
+            return;
+        }
+        
+        if ($mailer === null) {
+            $mailer = Utils::getMailer();
+        }
+        
+        if ($this->status === self::STATUS_PENDING) {
+            $this->sendPendingKeyDeletionNotification(
+                $mailer,
+                $appParams
+            );
+        } else {
+            $this->sendNonPendingKeyDeletionNotification(
+                $mailer,
+                $appParams
+            );
+        }
+    }
 }

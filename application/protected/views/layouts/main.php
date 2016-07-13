@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/styles.css?2015-02-09" />
+    <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/styles.css?2016" />
     <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/prism.css" />
     <meta charset="utf-8">
     <title><?php echo CHtml::encode($this->pageTitle . ' - ' . \Yii::app()->name); ?></title>
@@ -40,7 +40,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                 array(
                     'label' => 'Keys',
                     'url' => array('key/'),
-                    'active' => (($this->id == 'key') || ($this->id == 'keyRequest')),
+                    'active' => ($this->id == 'key'),
                     'visible' => ( ! (Yii::app()->user->isGuest || Yii::app()->user->checkAccess('admin'))),
                 ),
                 array(
@@ -48,13 +48,13 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'items' => array(
                         array(
                             'label' => 'Active Keys',
-                            'url' => array('/key/all/'),
-                            'active' => ($this->route == 'key/all'),
+                            'url' => array('/key/active/'),
+                            'active' => ($this->route == 'key/active'),
                         ),
                         array(
                             'label' => 'Pending Keys',
-                            'url' => array('/key-request/'),
-                            'active' => ($this->route == 'keyRequest/index'),
+                            'url' => array('/key/pending/'),
+                            'active' => ($this->route == 'key/pending'),
                         ),
                         array(
                             'label' => 'My Keys',
@@ -63,7 +63,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                         ),
                     ),
                     'visible' => Yii::app()->user->role == 'admin',
-                    'active' => (($this->id == 'key') || ($this->id == 'keyRequest')),
+                    'active' => ($this->id == 'key'),
                 ),
                 array(
                     'label' => 'Users',
@@ -82,6 +82,12 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'url' => array('/faq/'),
                     'active' => ($this->id == 'faq'),
                     'visible' => ( ! Yii::app()->user->isGuest),
+                ),
+                array(
+                    'label' => 'Event Log',
+                    'url' => array('/event/'),
+                    'active' => ($this->id == 'event'),
+                    'visible' => Yii::app()->user->checkAccess('admin'),
                 ),
             ),
         ),

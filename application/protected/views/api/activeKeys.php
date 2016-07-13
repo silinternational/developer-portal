@@ -1,6 +1,6 @@
 <?php
 /* @var $this ApiController */
-/* @var $activeKeys Key[] */
+/* @var $activeKeysDataProvider CDataProvider */
 /* @var $api Api */
 
 // Set up the breadcrumbs.
@@ -21,7 +21,7 @@ $this->pageSubtitle = 'Current Keys for this API';
 
         $this->widget('bootstrap.widgets.TbGridView', array(
             'type' => 'striped hover',
-            'dataProvider' => $activeKeys,
+            'dataProvider' => $activeKeysDataProvider,
             'template' => '{items}{pager}',
             'columns' => array(
                 array(
@@ -40,16 +40,16 @@ $this->pageSubtitle = 'Current Keys for this API';
                     'visible' => \Yii::app()->user->checkAccess('admin'),
                 ),
                 array(
-                    'header' => 'Created',
-                    'value' => 'Utils::getShortDate($data->created)'
+                    'header' => 'Granted on',
+                    'value' => 'Utils::getShortDate($data->processed_on)'
                 ),
                 array(
                     'header' => 'Domain',
-                    'value' => '($data->keyRequest ? $data->keyRequest->domain : "UNKNOWN")'
+                    'value' => '$data->domain'
                 ),
                 array(
                     'header' => 'Purpose',
-                    'value' => '($data->keyRequest ? $data->keyRequest->purpose : "UNKNOWN")'
+                    'value' => '$data->purpose'
                 ),
                 array(
                     'class' => 'ActionLinksColumn',
@@ -70,7 +70,7 @@ $this->pageSubtitle = 'Current Keys for this API';
 </div>
 <?php
 
-if ($api->keyCount > 0) {
+if ($api->approvedKeyCount > 0) {
     echo sprintf(
         '<a href="%s" class="btn space-after-icon"><i class="icon-%s"></i>%s</a>',
         sprintf(

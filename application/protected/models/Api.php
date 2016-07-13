@@ -2,14 +2,17 @@
 
 use ApiAxle\Api\Api as AxleApi;
 
+/**
+ * Additional model relations (defined here, not in base class):
+ * @property int $approvedKeyCount
+ * @property int $pendingKeyCount
+ */
 class Api extends ApiBase
 {
+    use Sil\DevPortal\components\ModelFindByPkTrait;
+    
     CONST APPROVAL_TYPE_AUTO = 'auto';
     CONST APPROVAL_TYPE_OWNER = 'owner';
-    
-    CONST ACCESS_TYPE_PUBLIC = 'public';
-    CONST ACCESS_TYPE_INTERNAL_ALL = 'internal-all';
-    CONST ACCESS_TYPE_INTERNAL_GROUPS = 'internal-groups';
     
     CONST PROTOCOL_HTTP = 'http';
     CONST PROTOCOL_HTTPS = 'https';
@@ -20,13 +23,40 @@ class Api extends ApiBase
     CONST REGEX_ENDPOINT = '/^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\.?$/';
     CONST REGEX_PATH = '/^\/[a-zA-Z0-9\-\.\/_]{0,}$/';
     
+    CONST VISIBILITY_INVITATION = 'invitation';
+    CONST VISIBILITY_PUBLIC = 'public';
+    
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        \Event::log(sprintf(
+            'The "%s" API (%s, ID %s) was deleted%s.',
+            $this->display_name,
+            $this->code,
+            $this->api_id,
+            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+        ));
+    }
+    
     public function afterSave()
     {
         parent::afterSave();
         
+        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+        
         // If this is a new API...
         if ($this->isNewRecord) {
-
+            
+            \Event::log(sprintf(
+                'The "%s" API (%s, ID %s) was created%s.',
+                $this->display_name,
+                $this->code,
+                $this->api_id,
+                (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+            ), $this->api_id);
+            
             // If we are NOT in an environment where we should send email
             // notifications, skip the rest of this.
             if (\Yii::app()->params['mail'] === false) {
@@ -60,6 +90,26 @@ class Api extends ApiBase
                 \Yii::log(
                     'Unable to send API-added email: '
                     . $mailer->ErrorInfo,
+                    CLogger::LEVEL_WARNING
+                );
+            }
+        } else {
+            
+            \Event::log(sprintf(
+                'The "%s" API (%s, ID %s) was updated%s.',
+                $this->display_name,
+                $this->code,
+                $this->api_id,
+                (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+            ), $this->api_id);
+            
+            try {
+                $this->updateKeysRateLimitsToMatch();
+            } catch (\Exception $e) {
+                \Yii::log(
+                    "Unable to update this Api's keys' rate limits to match "
+                    . "its current rate limits: "
+                    . $e->getMessage(),
                     CLogger::LEVEL_WARNING
                 );
             }
@@ -101,35 +151,6 @@ class Api extends ApiBase
         );
     }
     
-    /**
-     * Get the user-friendly description of this Api's access type.
-     * 
-     * @return string|null The description of the access type (if available).
-     */
-    public function getAccessTypeDescription()
-    {
-        // Get the descriptions of the various access types.
-        $accessTypeDescriptions = self::getAccessTypes();
-        
-        // Return the description for this Api's access type (if set).
-        if ($this->access_type === null) {
-            return null;
-        } elseif ( ! isset($accessTypeDescriptions[$this->access_type])) {
-            return 'UNKNOWN ACCESS TYPE';
-        } else {
-            return $accessTypeDescriptions[$this->access_type];
-        }
-    }
-    
-    public static function getAccessTypes()
-    {
-        return array(
-            self::ACCESS_TYPE_PUBLIC => 'Publicly Available',
-            self::ACCESS_TYPE_INTERNAL_ALL => 'All Insite Users',
-            self::ACCESS_TYPE_INTERNAL_GROUPS => 'Insite Users of Specific Groups',
-        );
-    }
-    
     public static function getProtocols()
     {
         return array(
@@ -152,19 +173,13 @@ class Api extends ApiBase
      *     base class.
      */
     public function attributeLabels() {
-        $labels = parent::attributeLabels();
-        $newLabels = array_merge($labels, array(
-            'access_options' => 'Groups',
-            'access_type' => 'Visibility',
+        return \CMap::mergeArray(parent::attributeLabels(), array(
             'queries_second' => 'Queries per Second',
             'queries_day' => 'Queries per Day',
             'protocol' => 'Endpoint Protocol',
             'strict_ssl' => 'Endpoint Strict SSL',
             'endpoint_timeout' => 'Endpoint Timeout',
-            'support' => 'For Support',
         ));
-        
-        return $newLabels;
     }
     
     /**
@@ -181,7 +196,7 @@ class Api extends ApiBase
         $linkTarget = null
     ) {
         // Get the active key count (to avoid retrieving it multiple times).
-        $count = $this->keyCount;
+        $count = $this->approvedKeyCount;
         
         // Generate and return the HTML for a badge, highlighting it if the
         // pending key count is non-zero.
@@ -397,67 +412,133 @@ class Api extends ApiBase
         return $usage;
     }
     
-    public function rules() {
-        $rules = parent::rules();
-        $newRules = array_merge($rules, array(
+    /**
+     * Get the user-friendly description of this Api's visibility.
+     * 
+     * @return string|null The description of the visibility (if available).
+     */
+    public function getVisibilityDescription()
+    {
+        // Get the descriptions of the various access types.
+        $visibilityDescriptions = self::getVisibilityDescriptions();
+        
+        // Return the description for this Api's visibility.
+        if ( ! isset($visibilityDescriptions[$this->visibility])) {
+            return 'UNKNOWN VISIBILITY';
+        } else {
+            return $visibilityDescriptions[$this->visibility];
+        }
+    }
+    
+    /**
+     * Get the list of visibility descriptions, indexed by the visibility
+     * constant values.
+     * 
+     * @return array<string,string>
+     */
+    public static function getVisibilityDescriptions()
+    {
+        return array(
+            self::VISIBILITY_INVITATION => 'By Invitation Only',
+            self::VISIBILITY_PUBLIC => 'Publicly Available',
+        );
+    }
+    
+    public function rules()
+    {
+        return \CMap::mergeArray(array(
             array('code', 'unique'),
-            array('code', 'match',
+            array(
+                'code',
+                'match',
                 'allowEmpty' => false,
                 'pattern' => '/^([a-z0-9]{1}[a-z0-9\-]{1,}[a-z0-9]{1})$/',
-                'message' => 'The API code must only be (lowercase) letters ' .
-                'and numbers. It may contain hyphens, but not ' .
-                'at the beginning or end.'),
+                'message' => 'The API code must only be (lowercase) letters '
+                . 'and numbers. It may contain hyphens, but not at the '
+                . 'beginning or end.',
+            ),
             array('owner_id', 'validateOwnerId'),
-            array('endpoint', 'match',
+            array(
+                'endpoint',
+                'match',
                 'allowEmpty' => false,
                 'pattern' => self::REGEX_ENDPOINT,
                 'message' => 'Endpoint must be the domain only, no protocol or '
                 . 'path should be included. (ex: sub.domain.com)',
             ),
-            array('default_path', 'match',
+            array(
+                'default_path',
+                'match',
                 'allowEmpty' => true,
                 'pattern' => self::REGEX_PATH,
-                'message' => 'Default Path must begin with a / and should not include '
-                . 'any query string parameters. (ex: /example/path)',
+                'message' => 'Default Path must begin with a / and should not '
+                . 'include any query string parameters. (ex: /example/path)',
             ),
             array('endpoint', 'isUniqueEndpointDefaultPathCombo'),
-            array('updated', 'default',
+            array(
+                'updated',
+                'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => false, 'on' => 'update'),
-            array('created,updated', 'default',
+                'setOnEmpty' => false,
+                'on' => 'update',
+            ),
+            array(
+                'created,updated',
+                'default',
                 'value' => new CDbExpression('NOW()'),
-                'setOnEmpty' => true, 'on' => 'insert'),
+                'setOnEmpty' => true,
+                'on' => 'insert',
+            ),
             array('code', 'unsafe', 'on' => 'update'),
-            array('access_options', 'default', 'setOnEmpty' => true,
-                'value' => NULL),
-            array('protocol', 'default',
+            array(
+                'protocol',
+                'default',
                 'value' => 'http',
-                'setOnEmpty' => true, 'on' => 'insert'),
-            array('strict_ssl', 'default',
+                'setOnEmpty' => true,
+                'on' => 'insert',
+            ),
+            array(
+                'strict_ssl',
+                'default',
                 'value' => 1,
-                'setOnEmpty' => true, 'on' => 'insert'),
-            array('endpoint_timeout', 'numerical',
-                'integerOnly' => true, 'min' => 2, 'max' => 900),
-            array('queries_second, queries_day', 'numerical',
-                'integerOnly' => true, 'min' => 1, 'max' => 1000000000),
-        ));
-
-        return $newRules;
+                'setOnEmpty' => true,
+                'on' => 'insert',
+            ),
+            array(
+                'endpoint_timeout',
+                'numerical',
+                'integerOnly' => true,
+                'min' => 2,
+                'max' => 900,
+            ),
+            array(
+                'queries_second, queries_day',
+                'numerical',
+                'integerOnly' => true,
+                'min' => 1,
+                'max' => 1000000000,
+            ),
+        ), parent::rules());
     }
     
     public function relations()
     {
         return array_merge(parent::relations(), array(
-            'keyCount' => array(self::STAT, 'Key', 'api_id'),
-            'pendingKeyCount' => array(
+            'approvedKeyCount' => array(
                 self::STAT,
-                'KeyRequest',
+                'Key',
                 'api_id',
                 'condition' => 'status = :status',
-                'params' => array(':status' => \KeyRequest::STATUS_PENDING),
+                'params' => array(':status' => \Key::STATUS_APPROVED),
+            ),
+            'pendingKeyCount' => array(
+                self::STAT,
+                'Key',
+                'api_id',
+                'condition' => 'status = :status',
+                'params' => array(':status' => \Key::STATUS_PENDING),
             ),
         ));
-        
     }
     
     public function beforeSave()
@@ -473,7 +554,7 @@ class Api extends ApiBase
          * Before saving an Api object, we need to provision it on ApiAxle,
          * or update it of course.
          * 
-         * If the call to ApiAxle failes, the save will not go through
+         * If the call to ApiAxle fails, the save will not go through.
          */
         
         $apiData = array(
@@ -486,12 +567,15 @@ class Api extends ApiBase
         );
         
         $axleApi = new AxleApi(Yii::app()->params['apiaxle']);
-        if($this->getIsNewRecord()){
+        if ($this->getIsNewRecord()) {
             try {
-                $axleApi->create($this->code,$apiData);
+                $axleApi->create($this->code, $apiData);
                 return true;
             } catch (\Exception $e) {
-                $this->addError('code','Failed to create new API on the proxy: '.$e->getMessage());
+                $this->addError(
+                    'code',
+                    'Failed to create new API on the proxy: ' . $e->getMessage()
+                );
                 return false;
             }
         } else {
@@ -500,23 +584,108 @@ class Api extends ApiBase
                 $axleApi->update($apiData);
                 return true;
             } catch (\Exception $e) {
-                $this->addError('code','Failed to update API on the proxy: '.$e->getMessage());
+                
+                // If the Api was not found, try recreating it.
+                $notFoundMessage = sprintf(
+                    'API returned error: Api \'%s\' not found.',
+                    $this->code
+                );
+                if (($e->getCode() == 201) && ($notFoundMessage === $e->getMessage())) {
+                    try {
+                        $axleApi->create($this->code, $apiData);
+                        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+                        \Event::log(sprintf(
+                            'The "%s" API (%s, ID %s) was re-added to ApiAxle%s.',
+                            $this->display_name,
+                            $this->code,
+                            $this->api_id,
+                            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+                        ), $this->api_id);
+                        return true;
+                    } catch (\Exception $e) {
+                        $this->addError(
+                            'code',
+                            'Failed to recreate API on the proxy: ' . $e->getMessage()
+                        );
+                        return false;
+                    }
+                }
+
+                $this->addError(
+                    'code',
+                    'Failed to update API on the proxy: ' . $e->getMessage()
+                );
                 return false;
             }
         }
     }
     
-    public function beforeDelete()
+    protected function beforeDelete()
     {
-        parent::beforeDelete();
-
-        // first delete keys and key_requests
-        Key::model()->deleteAllByAttributes(array(
-            'api_id' => $this->api_id,
-        ));
-        KeyRequest::model()->deleteAllByAttributes(array(
-            'api_id' => $this->api_id,
-        ));
+        if ( ! parent::beforeDelete()) {
+            return false;
+        }
+        
+        if ($this->approvedKeyCount > 0) {
+            /* NOTE: We are intentionally doing a loose comparison (==) for the
+             * key count because Yii returns integers as strings to be able to
+             * handle large integer values.  */
+            $this->addError('api_id', sprintf(
+                'There %s still %s active %s to this API. Before you can delete this API, you must revoke all of '
+                . 'its active (aka. approved) keys.',
+                ($this->approvedKeyCount == 1 ? 'is' : 'are'),
+                $this->approvedKeyCount,
+                ($this->approvedKeyCount == 1 ? 'key' : 'keys')
+            ));
+            return false;
+        }
+        
+        foreach ($this->apiVisibilityDomains as $apiVisibilityDomain) {
+            if ( ! $apiVisibilityDomain->delete()) {
+                $this->addError('api_id', sprintf(
+                    'We could not delete this API because we were not able to finish deleting the records of what '
+                    . 'email domains are allowed to see this API: %s',
+                    print_r($apiVisibilityDomain->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        foreach ($this->apiVisibilityUsers as $apiVisibilityUser) {
+            if ( ! $apiVisibilityUser->delete()) {
+                $this->addError('api_id', sprintf(
+                    'We could not delete this API because we were not able to finish deleting the records of what '
+                    . 'users are allowed to see this API: %s',
+                    print_r($apiVisibilityUser->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        /* NOTE: The approved/active key count check (above) confirms that, by
+         *       this point, we know there are no active keys. That is why the
+         *       error message below refers to deleting the inactive keys.  */
+        foreach ($this->keys as $key) {
+            if ( ! $key->delete()) {
+                $this->addError('api_id', sprintf(
+                    'We could not delete this API because we were not able to finish deleting its inactive keys: %s',
+                    print_r($key->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
+        foreach ($this->events as $event) {
+            $event->api_id = null;
+            if ( ! $event->save()) {
+                $this->addError('api_id', sprintf(
+                    'We could not delete this API because we were not able to finish updating the related event '
+                    . 'records: %s',
+                    print_r($event->getErrors(), true)
+                ));
+                return false;
+            }
+        }
         
         global $ENABLE_AXLE;
         if(isset($ENABLE_AXLE) && !$ENABLE_AXLE){
@@ -582,6 +751,11 @@ class Api extends ApiBase
         }
     }
     
+    public function isPubliclyVisible()
+    {
+        return ($this->visibility === self::VISIBILITY_PUBLIC);
+    }
+    
     /**
      * Confirm that this Api's endpoint and default_path are a unique
      * combination.
@@ -627,64 +801,16 @@ class Api extends ApiBase
      */
     public function isVisibleToUser($user)
     {
-        // If the user is a guest...
+        // If the user is a guest, they can't see any APIs.
         if ( ! ($user instanceof \User)) {
-            
-            // They can't see any APIs.
             return false;
         }
         
-        
-        // ** Otherwise, determine access based on the API Access Type, etc: **
-        
-        // If the API is public, then it's visible to the user.
-        if ($this->access_type === self::ACCESS_TYPE_PUBLIC) {
-            return true;
-        }
-        // OR, if the API can be see by anyone in Insite...
-        elseif ($this->access_type == self::ACCESS_TYPE_INTERNAL_ALL) {
-            
-            // ... then the user can see it only if they're in Insite.
-            return $user->isInAccessGroup(
-                \Yii::app()->params['allInsiteUsersGroup']
-            );
-        }
-        // OR, if the API can only be seen by people in specific access
-        // groups...
-        elseif ($this->access_type == self::ACCESS_TYPE_INTERNAL_GROUPS) {
-            
-            // The user can only see if it they are in at least one of the
-            // specified access groups.
-            if (isset($this->access_options) && !is_null($this->access_options)) {
-                
-                // Get the list of groups allowed to see this API.
-                $allowedGroups = explode(',', $this->access_options);
-                foreach ($allowedGroups as $group) {
-                    
-                    // Clean up / format the group name.
-                    $group = strtoupper(trim($group));
-                    
-                    // If that groups is one of the groups that the user is
-                    // part of, then they can see this API.
-                    if ($user->isInAccessGroup($group)) {
-                        return true;
-                    }
-                }
-            }
-            
-            // If we reach this point, then the user was NOT in any of the
-            // groups allowed to see this API.
-            return false;
-        }
-        
-        // If we reach this point, we have come across a situation that we
-        // are not yet set up to handle.
-        throw new \Exception(
-            'Unable to determine whether a User should be allowed to see a '
-            . 'particular API because we do not know how to handle an API '
-            . 'access_type of "' . $this->access_type . '".',
-            1417718496
-        );
+        return $this->isPubliclyVisible() ||
+               $user->isIndividuallyInvitedToSeeApi($this) ||
+               $user->isInvitedByDomainToSeeApi($this) ||
+               $user->isAdmin() ||
+               $user->isOwnerOfApi($this);
     }
     
     /**
@@ -696,7 +822,34 @@ class Api extends ApiBase
     public static function model($className = __CLASS__) {
         return parent::model($className);
     }
-	
+    
+    /**
+     * Update the rate limits (queries per second, queries per day) of any of
+     * this Api's Keys that do not already have the correct rate limits.
+     * 
+     * @throws \Exception
+     */
+    public function updateKeysRateLimitsToMatch()
+    {
+        foreach ($this->keys as $key) {
+            if (($key->queries_day === $this->queries_day) &&
+                ($key->queries_second === $this->queries_second)) {
+                continue;
+            }
+            
+            $key->queries_day = $this->queries_day;
+            $key->queries_second = $this->queries_second;
+            if ( ! $key->save()) {
+                throw new \Exception(sprintf(
+                    'Failed to update Key %s\'s rate limits to match '
+                    . 'Api\'s rate limits: %s',
+                    $key->key_id,
+                    print_r($key->getErrors(), true)
+                ), 1467836607);
+            }
+        }
+    }
+    
     /**
      * @param string $attribute the name of the attribute to be validated
      * @param array $params options specified in the validation rule
@@ -711,7 +864,7 @@ class Api extends ApiBase
                             . 'or path.');
             }
     }
-	
+    
     /**
      * Validate that the specified owner_id is an acceptable value.
      * 

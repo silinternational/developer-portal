@@ -3,6 +3,8 @@ body {
     padding-top: 60px;
 }
 
+.bold { font-weight: bold; }
+
 .card-contents {
   border: 1px solid #333;
   border-left-width: 8px;
@@ -33,6 +35,8 @@ dd { margin-bottom: 10px; }
 .cursor-info {
   cursor: help;
 }
+
+.fixed { font-family: monospace; }
 
 #footer {
   color: #999;

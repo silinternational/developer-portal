@@ -4,7 +4,7 @@ class LinksManagerTest extends CDbTestCase
 {
     public $fixtures = array(
         'apis' => 'Api',
-        'keyRequests' => 'KeyRequest',
+        'keys' => 'Key',
         'users' => 'User',
     );
     
@@ -288,34 +288,34 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetDashboardKeyRequestActionLinks_noKeyRequest()
+    public function testGetDashboardKeyActionLinks_noKey()
     {
         // Arrange:
-        $keyRequest = null;
+        $key = null;
         $expected = array();
         
         // Act:
-        $actual = LinksManager::getDashboardKeyRequestActionLinks($keyRequest);
+        $actual = LinksManager::getDashboardKeyActionLinks($key);
         
         // Assert:
         $this->assertEquals(
             $expected,
             $actual,
-            'Failed to return no ActionLinks when given a null KeyRequest.'
+            'Failed to return no ActionLinks when given a null Key.'
         );
     }
     
-    public function testGetDashboardKeyRequestActionLinks_realKeyRequest()
+    public function testGetDashboardKeyActionLinks_realKey()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKeyRequestUser6');
+        $key = $this->keys('pendingKeyUser6');
         $expectedLinkTexts = array(
             'View Details',
         );
         
         // Act:
-        $actionLinks = LinksManager::getDashboardKeyRequestActionLinks(
-            $keyRequest
+        $actionLinks = LinksManager::getDashboardKeyActionLinks(
+            $key
         );
         $actualLinksTexts = array();
         foreach ($actionLinks as $actionLink) {
@@ -330,16 +330,16 @@ class LinksManagerTest extends CDbTestCase
         );
     }
     
-    public function testGetKeyRequestDetailsActionLinksForUser_noKeyRequest()
+    public function testGetKeyDetailsActionLinksForUser_noKey()
     {
         // Arrange:
-        $keyRequest = null;
+        $key = null;
         $user = $this->users('userWithRoleOfAdmin');
         $expected = array();
         
         // Act:
-        $actual = LinksManager::getKeyRequestDetailsActionLinksForUser(
-            $keyRequest,
+        $actual = LinksManager::getKeyDetailsActionLinksForUser(
+            $key,
             $user
         );
         
@@ -347,22 +347,20 @@ class LinksManagerTest extends CDbTestCase
         $this->assertEquals(
             $expected,
             $actual,
-            'Failed to return no ActionLinks when given a null KeyRequest.'
+            'Failed to return no ActionLinks when given a null Key.'
         );
     }
     
-    public function testGetDashboardKeyRequestActionLinks_canDeleteKeyRequest()
+    public function testGetKeyDetailsActionLinksForUser_canRevokeKey()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKeyRequestUser6');
+        $key = $this->keys('approvedKey');
         $user = $this->users('userWithRoleOfAdmin');
-        $expectedLinkTexts = array(
-            'Delete Key Request',
-        );
+        $expectedLinkText = 'Revoke Key';
         
         // Act:
-        $actionLinks = LinksManager::getKeyRequestDetailsActionLinksForUser(
-            $keyRequest,
+        $actionLinks = LinksManager::getKeyDetailsActionLinksForUser(
+            $key,
             $user
         );
         $actualLinksTexts = array();
@@ -371,23 +369,23 @@ class LinksManagerTest extends CDbTestCase
         }
         
         // Assert:
-        $this->assertEquals(
-            $expectedLinkTexts,
+        $this->assertContains(
+            $expectedLinkText,
             $actualLinksTexts,
-            'Failed to include the correct link (based on link text).'
+            'Failed to include a link to revoke the Key (based on link text).'
         );
     }
     
-    public function testGetDashboardKeyRequestActionLinks_cannotDeleteKeyRequest()
+    public function testGetDashboardKeyActionLinks_cannotRevokeKey()
     {
         // Arrange:
-        $keyRequest = $this->keyRequests('pendingKeyRequestUser6');
-        $user = $this->users('userWithNoKeyRequests');
+        $key = $this->keys('pendingKeyUser6');
+        $user = $this->users('userWithNoPendingKeys');
         $expectedLinkTexts = array();
         
         // Act:
-        $actionLinks = LinksManager::getKeyRequestDetailsActionLinksForUser(
-            $keyRequest,
+        $actionLinks = LinksManager::getKeyDetailsActionLinksForUser(
+            $key,
             $user
         );
         $actualLinksTexts = array();

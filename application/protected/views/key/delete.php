@@ -1,83 +1,33 @@
 <?php
-/* @var $this KeyController */
-/* @var $key Key */
-
-// Figure out whether to say delete or revoke.
-$deleteOrRevoke = $key->isOwnedBy(\Yii::app()->user->user) ? 'delete' : 'revoke';
+/* @var $this \KeyController */
+/* @var $key \Key */
+/* @var $currentUser \User */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
     'Dashboard' => array('/dashboard/'),
     'Keys' => array('/key/'),
-    ucfirst($deleteOrRevoke) . ' Key',
+    'Delete Key',
 );
 
-$this->pageTitle = ucfirst($deleteOrRevoke) . ' Key';
+$this->pageTitle = 'Delete Key';
 
 ?>
 <div class="row">
     <div class="span12">
-        <dl class="dl-horizontal">
-            <dt>API</dt>
-            <dd>
-                <?php echo sprintf(
-                    '<a href="%s">%s</a>',
-                    $this->createUrl('/api/details/', array(
-                        'code' => $key->api->code,
-                    )),
-                    CHtml::encode(
-                        $key->api->display_name . ' (' . $key->api->code . ')'
-                    )
-                ); ?>
-            </dd>
-            
-            <dt>User</dt>
-            <dd>
-                <?php
-                if (\Yii::app()->user->checkAccess('admin')) {
-                    echo sprintf(
-                        '<a href="%s">%s</a>',
-                        $this->createUrl('/user/details/', array(
-                            'id' => $key->user_id,
-                        )),
-                        CHtml::encode($key->user->display_name)
-                    );
-                } else {
-                    echo CHtml::encode($key->user->display_name);
-                }
-                ?>
-            </dd>
-
-            <dt>Value</dt>
-            <dd><?php echo CHtml::encode($key->value); ?>&nbsp;</dd>
-            
-            <?php
-            if ($key->keyRequest !== null) {
-                ?>
-                <dt>Purpose</dt>
-                <dd>
-                    <?php
-                    echo CHtml::encode($key->keyRequest->purpose);
-                    ?>&nbsp;
-                </dd>
-
-                <dt>Domain</dt>
-                <dd>
-                    <?php
-                    echo CHtml::encode($key->keyRequest->domain);
-                    ?>&nbsp;
-                </dd>
-                <?php
-            }
-            ?>
-        </dl>
+        <?php
+        $this->renderPartial('//partials/key-info', array(
+            'key' => $key,
+            'currentUser' => $currentUser,
+        ));
+        ?>
     </div>
 </div>
 <div class="row">
     <div class="span11 offset1">
         <?php $form = $this->beginWidget('CActiveForm'); ?>
 
-        <p>Do you really want to <?php echo $deleteOrRevoke; ?> this key? </p>
+        <p>Do you really want to delete this key? </p>
         <ul class="inline">
             <li>
                 <?php
@@ -100,7 +50,7 @@ $this->pageTitle = ucfirst($deleteOrRevoke) . ' Key';
                 $this->widget('bootstrap.widgets.TbButton', array(
                     'buttonType' => 'submit',
                     'icon' => 'remove',
-                    'label' => 'YES - ' . ucfirst($deleteOrRevoke),
+                    'label' => 'YES - Delete',
                     'type' => 'danger'
                 ));
 
