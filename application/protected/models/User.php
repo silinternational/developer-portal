@@ -192,6 +192,10 @@ class User extends UserBase
             return false;
         }
         
+        if ($key->status !== \Key::STATUS_APPROVED) {
+            return false;
+        }
+        
         // If the key belongs to this user, say yes.
         if ($key->isOwnedBy($this)) {
             return true;
@@ -224,9 +228,13 @@ class User extends UserBase
             return false;
         }
         
-        // If the key belongs to this user, say yes.
+        if ($key->status !== \Key::STATUS_APPROVED) {
+            return false;
+        }
+        
+        // A user cannot revoke their own key (just reset/delete it).
         if ($key->isOwnedBy($this)) {
-            return true;
+            return false;
         }
         
         // If the key is to an API that belongs to this user, say yes.
