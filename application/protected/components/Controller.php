@@ -178,6 +178,7 @@ class Controller extends CController
                     'delete',
                     'docsEdit',
                     'edit',
+                    'inviteUser',
                     'pendingKeys',
                 ),
                 'roles' => array('owner'),

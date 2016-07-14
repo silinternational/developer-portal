@@ -459,6 +459,55 @@ class ApiController extends Controller
         ));
     }
 
+    public function actionInviteUser($code)
+    {
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
+        
+        /* @var $api Api */
+        $api = \Api::model()->findByAttributes(array('code' => $code));
+        
+        if ( ! $currentUser->canInviteUserToSeeApi($api)) {
+            throw new \CHttpException(403, sprintf(
+                'That is not an API that you have permission to invite users to see.'
+            ));
+        }
+        
+        $apiVisibilityUser = new \ApiVisibilityUser();
+        
+        // If the form was submitted...
+        if (\Yii::app()->request->isPostRequest) {
+            
+            $postedData = \Yii::app()->request->getParam('ApiVisibilityUser');
+            
+            $apiVisibilityUser->attributes = array(
+                'api_id' => $api->api_id,
+                'invited_by_user_id' => $currentUser->user_id,
+                'invited_user_email' => $postedData['invited_user_email'],
+            );
+            if ($apiVisibilityUser->validate(array('invited_user_email'))) {
+                if ($apiVisibilityUser->save()) {
+                    Yii::app()->user->setFlash('success', sprintf(
+                        '<strong>Success!</strong> You have successfully '
+                        . 'invited %s to see the "%s" API.',
+                        \CHtml::encode($postedData['invited_user_email']),
+                        \CHtml::encode($api->display_name)
+                    ));
+
+                    $this->redirect(array(
+                        '/api/invite-user/',
+                        'code' => $api->code,
+                    ));
+                }
+            }
+        }
+        
+        $this->render('invite-user', array(
+            'api' => $api,
+            'apiVisibilityUser' => $apiVisibilityUser,
+        ));
+    }
+
     /**
      * Render or process request to test an API
      */

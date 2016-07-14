@@ -80,6 +80,11 @@ class UserTest extends DeveloperPortalTestCase
         }
     }
     
+    public function testAcceptAnyPendingInvitations()
+    {
+        $this->fail('Test(s) not yet written.');
+    }
+    
     public function testAffectedByEvents_none()
     {
         $this->markTestIncomplete('Test not yet written.');
@@ -347,6 +352,16 @@ class UserTest extends DeveloperPortalTestCase
             'Failed to report that a User can delete a revoked Key for an Api '
             . 'that they own.'
         );
+    }
+
+    public function testCanInviteUserToSeeApi()
+    {
+        // Arrange:
+        
+        // Act:
+        
+        // Assert:
+        $this->fail('Test(s) not yet written.');
     }
 
     public function testCanRevokeKey_approvedKeyNotOwnedByUserToApiNotOwnedByUser()

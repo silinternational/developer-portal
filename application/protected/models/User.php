@@ -21,6 +21,27 @@ class User extends UserBase
     
     protected $currentAccessGroups = null;
     
+    protected function acceptAnyPendingInvitations()
+    {
+        /* @var $pendingInvitations \ApiVisibilityUser[] */
+        $pendingInvitations = \ApiVisibilityUser::model()->findAllByAttributes(array(
+            'invited_user_email' => $this->email,
+        ));
+        foreach ($pendingInvitations as $pendingInvitation) {
+            
+            /* Re-save the invitation in order to trigger it's logic for finding
+             * the user with the matching email address (if applicable).  */
+            if ($pendingInvitation->save()) {
+                \Event::log(sprintf(
+                    '%s (%s) is now able to see the "%s" API.',
+                    $this->getDisplayName(),
+                    $this->email,
+                    $pendingInvitation->api->display_name
+                ));
+            }
+        }
+    }
+    
     public function afterDelete()
     {
         parent::afterDelete();
@@ -47,6 +68,8 @@ class User extends UserBase
             ($this->isNewRecord ? 'added' : 'updated'),
             (is_null($nameOfCurrentWebUser) ? '' : ' by ' . $nameOfCurrentWebUser)
         ), null, null, $this->user_id);
+        
+        $this->acceptAnyPendingInvitations();
     }
     
     protected function beforeDelete()
@@ -177,6 +200,22 @@ class User extends UserBase
     public function canDeleteKey($key)
     {
         return (($key instanceof \Key) && $key->canBeDeletedBy($this));
+    }
+    
+    /**
+     * Find out whether this User is allowed to invite a user (by email address)
+     * to see the given Api.
+     * 
+     * @param \Api $api The Api in question.
+     * @return boolean
+     */
+    public function canInviteUserToSeeApi($api)
+    {
+        if ( ! ($api instanceof \Api)) {
+            return false;
+        }
+        
+        return $this->isOwnerOfApi($api);
     }
     
     /**
