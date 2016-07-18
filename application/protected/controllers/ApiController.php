@@ -186,6 +186,10 @@ class ApiController extends Controller
                         '<strong>Error!</strong> Unable to delete that API: '
                         . '<pre>' . print_r($api->getErrors(), true) . '</pre>'
                     );
+
+                    $this->redirect(array('/api/details/',
+                        'code' => $api->code,
+                    ));
                 }
             }
             catch (CDbException $ex) {
@@ -456,6 +460,56 @@ class ApiController extends Controller
         $this->render('index', array(
             'apiList' => $apiList,
             'user' => $currentUser,
+        ));
+    }
+
+    public function actionInviteDomain($code)
+    {
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
+        
+        /* @var $api Api */
+        $api = \Api::model()->findByAttributes(array('code' => $code));
+        
+        if ( ! $currentUser->canInviteDomainToSeeApi($api)) {
+            throw new \CHttpException(403, sprintf(
+                'That is not an API that you have permission to invite users (by domain) to see.'
+            ));
+        }
+        
+        $apiVisibilityDomain = new \ApiVisibilityDomain();
+        
+        // If the form was submitted...
+        if (\Yii::app()->request->isPostRequest) {
+            
+            $postedData = \Yii::app()->request->getParam('ApiVisibilityDomain');
+            
+            $apiVisibilityDomain->attributes = array(
+                'api_id' => $api->api_id,
+                'domain' => $postedData['domain'],
+                'invited_by_user_id' => $currentUser->user_id,
+            );
+            if ($apiVisibilityDomain->validate(array('domain'))) {
+                if ($apiVisibilityDomain->save()) {
+                    Yii::app()->user->setFlash('success', sprintf(
+                        '<strong>Success!</strong> You have successfully '
+                        . 'enabled anyone with an email address ending with '
+                        . '"@%s" to see the "%s" API.',
+                        \CHtml::encode($postedData['domain']),
+                        \CHtml::encode($api->display_name)
+                    ));
+
+                    $this->redirect(array(
+                        '/api/details/',
+                        'code' => $api->code,
+                    ));
+                }
+            }
+        }
+        
+        $this->render('invite-domain', array(
+            'api' => $api,
+            'apiVisibilityDomain' => $apiVisibilityDomain,
         ));
     }
 
@@ -842,7 +896,19 @@ class ApiController extends Controller
                 else {
                     
                     // Save the new pending Key to the database.
-                    $key->save();
+                    if ( ! $key->save()) {
+                        Yii::log(
+                            'Saving validated pending Key FAILED: User ID '
+                            . $currentUser->user_id . ', API ID ' . $api->api_id,
+                            CLogger::LEVEL_ERROR,
+                            __CLASS__ . '.' . __FUNCTION__
+                        );
+                        throw new \CHttpException(
+                            500,
+                            "Something didn't work... but we're not sure why. Please try again.",
+                            1468440868
+                        );
+                    }
 
                     // Record that in the log.
                     Yii::log(

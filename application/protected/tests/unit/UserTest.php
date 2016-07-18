@@ -354,6 +354,16 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
 
+    public function testCanInviteDomainToSeeApi()
+    {
+        // Arrange:
+        
+        // Act:
+        
+        // Assert:
+        $this->fail('Test(s) not yet written.');
+    }
+
     public function testCanInviteUserToSeeApi()
     {
         // Arrange:

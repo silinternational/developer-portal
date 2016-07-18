@@ -203,6 +203,22 @@ class User extends UserBase
     }
     
     /**
+     * Find out whether this User is allowed to invite all users with email
+     * addresses in a particular domain name to see the given Api.
+     * 
+     * @param \Api $api The Api in question.
+     * @return boolean
+     */
+    public function canInviteDomainToSeeApi($api)
+    {
+        if ( ! ($api instanceof \Api)) {
+            return false;
+        }
+        
+        return $this->isOwnerOfApi($api);
+    }
+    
+    /**
      * Find out whether this User is allowed to invite a user (by email address)
      * to see the given Api.
      * 
