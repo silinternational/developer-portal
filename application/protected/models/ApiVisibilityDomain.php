@@ -72,4 +72,28 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
     {
         return parent::model($className);
     }
+    
+    public function rules()
+    {
+        return \CMap::mergeArray(array(
+            array(
+                'domain',
+                'isApparentlyValidDomain',
+            ),
+            array(
+                'updated',
+                'default',
+                'value' => new CDbExpression('NOW()'),
+                'setOnEmpty' => false,
+                'on' => 'update',
+            ),
+            array(
+                'created, updated',
+                'default',
+                'value' => new CDbExpression('NOW()'),
+                'setOnEmpty' => false,
+                'on' => 'insert',
+            ),
+        ), parent::rules());
+    }
 }
