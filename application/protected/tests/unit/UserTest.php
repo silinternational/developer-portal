@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * @method \Api apis(string $fixtureName) Get the Api with that fixture name.
+ * @method \ApiVisibilityDomain apiVisibilityDomains(string $fixtureName) Get
+ *     the ApiVisibilityDomain with that fixture name.
+ * @method \ApiVisibilityUser apiVisibilityUsers(string $fixtureName) Get the
+ *     ApiVisibilityUser with that fixture name.
+ * @method \Event events(string $fixtureName) Get the Event with that fixture name.
+ * @method \Key keys(string $fixtureName) Get the Key with that fixture name.
+ * @method \User users(string $fixtureName) Get the User with that fixture name.
+ */
 class UserTest extends DeveloperPortalTestCase
 {
     public $fixtures = array(
@@ -354,14 +364,55 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
 
-    public function testCanInviteDomainToSeeApi()
+    public function testCanInviteDomainToSeeApi_isOwnerOfThatApi()
     {
         // Arrange:
+        $api = $this->apis('apiOwnedByUser18');
+        $user = $this->users('user18');
         
         // Act:
+        $result = $user->canInviteDomainToSeeApi($api);
         
         // Assert:
-        $this->fail('Test(s) not yet written.');
+        $this->assertTrue(
+            $result,
+            'Failed to report that the owner of an Api can invite a domain to '
+            . 'see it.'
+        );
+    }
+
+    public function testCanInviteDomainToSeeApi_notOwnerOfThatApi()
+    {
+        // Arrange:
+        $api = $this->apis('api1');
+        $user = $this->users('userThatDoesNotOwnAnyApis');
+        
+        // Act:
+        $result = $user->canInviteDomainToSeeApi($api);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a User who is NOT the owner of an Api '
+            . 'can invite a domain to see the Api.'
+        );
+    }
+
+    public function testCanInviteDomainToSeeApi_nullApi()
+    {
+        // Arrange:
+        $api = null;
+        $user = $this->users('user18');
+        
+        // Act:
+        $result = $user->canInviteDomainToSeeApi($api);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a User can invite a domain to see a '
+            . 'null Api.'
+        );
     }
 
     public function testCanInviteUserToSeeApi()
