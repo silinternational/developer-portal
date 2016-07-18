@@ -47,6 +47,22 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
     }
 
     /**
+     * Validate that the given domain name appears to be a valid domain name.
+     * 
+     * @param string $attribute The name of the attribute to be validated.
+     */
+    public function isApparentlyValidDomain($attribute)
+    {
+        $fakeEmail = 'test@' . $this->$attribute;
+        if (filter_var($fakeEmail, FILTER_VALIDATE_EMAIL) === false) {
+            $this->addError($attribute, sprintf(
+                'The given domain name (%s) does not appear to be valid.',
+                $this->$attribute
+            ));
+        }
+    }
+    
+    /**
      * Returns the static model of the specified AR class.
      * Please note that you should have this exact method in all your CActiveRecord descendants!
      * @param string $className active record class name.
