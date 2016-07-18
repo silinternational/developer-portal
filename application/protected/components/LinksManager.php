@@ -125,6 +125,22 @@ class LinksManager extends CComponent
             ), 'Show Pending Keys', 'question-sign');
         }
         
+        if ( ! $api->isPubliclyVisible()) {
+            if ($user->canInviteUserToSeeApi($api)) {
+                $actionLinks[] = new ActionLink(array(
+                    '/api/invite-user/',
+                    'code' => $api->code,
+                ), 'Invite User', 'user');
+            }
+            
+            if ($user->canInviteDomainToSeeApi($api)) {
+                $actionLinks[] = new ActionLink(array(
+                    '/api/invite-domain/',
+                    'code' => $api->code,
+                ), 'Invite Users in Domain', 'globe');
+            }
+        }
+        
         if ($user->hasAdminPrivilegesForApi($api)) {
             if ($api->approvedKeyCount > 0) {
                 $actionLinks[] = new ActionLink(sprintf(

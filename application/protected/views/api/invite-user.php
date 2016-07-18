@@ -43,7 +43,7 @@ $this->pageTitle = 'Invite User';
         ?><div><?php
         $this->widget('bootstrap.widgets.TbButton', array(
             'buttonType' => 'submit',
-            'icon' => 'envelope white',
+            'icon' => 'user white',
             'label' => 'Invite',
             'type' => 'primary'
         ));
