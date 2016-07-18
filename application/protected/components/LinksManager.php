@@ -98,88 +98,55 @@ class LinksManager extends CComponent
         $actionLinks = array();
         
         if ($user->hasActiveKeyToApi($api)) {
-            
             foreach ($user->keys as $key) {
                 if ($key->api_id === $api->api_id) {
-                    $actionLinks[] = new ActionLink(
-                        array(
-                            '/key/details/',
-                            'id' => $key->key_id,
-                        ),
-                        'View Key Details',
-                        'list'
-                    );
+                    $actionLinks[] = new ActionLink(array(
+                        '/key/details/',
+                        'id' => $key->key_id,
+                    ), 'View Key Details', 'list');
                 }
             }
-            
         } else {
-            
-            $actionLinks[] = new ActionLink(
-                array(
-                    '/api/request-key/',
-                    'code' => $api->code,
-                ),
-                'Request Key',
-                'off'
-            );
+            $actionLinks[] = new ActionLink(array(
+                '/api/request-key/',
+                'code' => $api->code,
+            ), 'Request Key', 'off');
         }
         
         if ($user->canSeeKeysForApi($api)) {
+            $actionLinks[] = new ActionLink(array(
+                '/api/active-keys/',
+                'code' => $api->code,
+            ), 'Show Active Keys', 'ok-sign');
             
-            $actionLinks[] = new ActionLink(
-                array(
-                    '/api/active-keys/',
-                    'code' => $api->code,
-                ),
-                'Show Active Keys',
-                'ok-sign'
-            );
-            
-            $actionLinks[] = new ActionLink(
-                array(
-                    '/api/pending-keys/',
-                    'code' => $api->code,
-                ),
-                'Show Pending Keys',
-                'question-sign'
-            );
+            $actionLinks[] = new ActionLink(array(
+                '/api/pending-keys/',
+                'code' => $api->code,
+            ), 'Show Pending Keys', 'question-sign');
         }
         
         if ($user->hasAdminPrivilegesForApi($api)) {
-            
             if ($api->approvedKeyCount > 0) {
-                $actionLinks[] = new ActionLink(
-                    sprintf(
-                        'mailto:%s?subject=%s&bcc=%s',
-                        CHtml::encode($user->email),
-                        CHtml::encode($api->display_name . ' API'),
-                        CHtml::encode(implode(
-                            ',',
-                            $api->getEmailAddressesOfUsersWithActiveKeys()
-                        ))
-                    ),
-                    'Email Users With Keys',
-                    'envelope'
-                );
+                $actionLinks[] = new ActionLink(sprintf(
+                    'mailto:%s?subject=%s&bcc=%s',
+                    CHtml::encode($user->email),
+                    CHtml::encode($api->display_name . ' API'),
+                    CHtml::encode(implode(
+                        ',',
+                        $api->getEmailAddressesOfUsersWithActiveKeys()
+                    ))
+                ), 'Email Users With Keys', 'envelope');
             }
             
-            $actionLinks[] = new ActionLink(
-                array(
-                    '/api/edit/',
-                    'code' => $api->code,
-                ),
-                'Edit API',
-                'pencil'
-            );
+            $actionLinks[] = new ActionLink(array(
+                '/api/edit/',
+                'code' => $api->code,
+            ), 'Edit API', 'pencil');
         
-            $actionLinks[] = new ActionLink(
-                array(
-                    '/api/delete/',
-                    'code' => $api->code,
-                ),
-                'Delete API',
-                'remove'
-            );
+            $actionLinks[] = new ActionLink(array(
+                '/api/delete/',
+                'code' => $api->code,
+            ), 'Delete API', 'remove');
         }
         
         return $actionLinks;
