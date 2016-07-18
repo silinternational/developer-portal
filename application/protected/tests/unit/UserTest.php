@@ -415,14 +415,55 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
 
-    public function testCanInviteUserToSeeApi()
+    public function testCanInviteUserToSeeApi_isOwnerOfThatApi()
     {
         // Arrange:
+        $api = $this->apis('apiOwnedByUser18');
+        $user = $this->users('user18');
         
         // Act:
+        $result = $user->canInviteUserToSeeApi($api);
         
         // Assert:
-        $this->fail('Test(s) not yet written.');
+        $this->assertTrue(
+            $result,
+            'Failed to report that the owner of an Api can invite a specific '
+            . 'person to see it.'
+        );
+    }
+
+    public function testCanInviteUserToSeeApi_notOwnerOfThatApi()
+    {
+        // Arrange:
+        $api = $this->apis('api1');
+        $user = $this->users('userThatDoesNotOwnAnyApis');
+        
+        // Act:
+        $result = $user->canInviteUserToSeeApi($api);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a User who is NOT the owner of an Api '
+            . 'can invite a specific person to see the Api.'
+        );
+    }
+
+    public function testCanInviteUserToSeeApi_nullApi()
+    {
+        // Arrange:
+        $api = null;
+        $user = $this->users('user18');
+        
+        // Act:
+        $result = $user->canInviteUserToSeeApi($api);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a User can invite a specific person to '
+            . 'see a null Api.'
+        );
     }
 
     public function testCanRevokeKey_approvedKeyNotOwnedByUserToApiNotOwnedByUser()
