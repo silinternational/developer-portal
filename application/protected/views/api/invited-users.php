@@ -33,13 +33,7 @@ $this->pageSubtitle = 'People who have been individually invited to see this API
                 array(
                     'name' => 'invitedUser.display_name',
                     'header' => 'User',
-                    'value' => 'is_null($data->invitedUser) ? '
-                    . '$data->invited_user_email : '
-                    . 'sprintf('
-                    .   '"%s (%s)",'
-                    .   '$data->invitedUser->email,'
-                    .   '$data->invitedUser->getDisplayName()'
-                    . ');'
+                    'value' => '$data->getInviteeDisplayText()',
                 ),
                 array(
                     'name' => 'created',

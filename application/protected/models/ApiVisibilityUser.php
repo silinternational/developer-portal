@@ -60,6 +60,26 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
     }
     
     /**
+     * Get some text to display to identify the invited person. It will return
+     * an email address and, if known, a name.
+     *
+     * @return string The text to display to identify the invited person.
+     */
+    public function getInviteeDisplayText()
+    {
+        $emailAddress = $this->getInviteeEmailAddress();
+        if ($this->invitedUser !== null) {
+            return sprintf(
+                '%s (%s)',
+                $emailAddress,
+                $this->invitedUser->getDisplayName()
+            );
+        } else {
+            return $emailAddress;
+        }
+    }
+    
+    /**
      * Get an email address for the person invited. It may come from the
      * invited_user_email field or, if we already have a user record for someone
      * with that email address, from the invitedUser->email relationship.
