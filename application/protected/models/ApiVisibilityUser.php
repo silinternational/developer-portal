@@ -34,6 +34,10 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
             ($this->isNewRecord ? 'added' : 'updated'),
             (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
         ), $this->api_id, null, $this->invited_user_id);
+        
+        if ($this->isNewRecord) {
+            $this->notifyInvitee();
+        }
     }
     
     /**
@@ -142,6 +146,66 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
     public static function model($className=__CLASS__)
     {
         return parent::model($className);
+    }
+    
+    /**
+     * Try to send a notification email to the person invited to see this Api.
+     *
+     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
+     *     the email. Unless performing tests, it is best leave this out so that
+     *     our normal process for creating this will be followed.
+     * @param array $appParams (Optional:) The Yii app's params. If not
+     *     provided, they will be retrieved. This parameter is primarily to make
+     *     testing easier.
+     */
+    public function notifyInvitee(
+        YiiMailer $mailer = null,
+        array $appParams = null
+    ) {
+        // If not given the Yii app params, retrieve them.
+        if ($appParams === null) {
+            $appParams = \Yii::app()->params->toArray();
+        }
+        
+        // If we are in an environment where we should NOT send email
+        // notifications, then don't.
+        if ($appParams['mail'] === false) {
+            return;
+        }
+        
+        $inviteeEmailAddress = $this->getInviteeEmailAddress();
+        if ( ! empty($inviteeEmailAddress)) {
+
+            // Try to send them a notification email.
+            if ($mailer === null) {
+                $mailer = Utils::getMailer();
+            }
+            $mailer->setView('api-invited-user');
+            $mailer->setTo($inviteeEmailAddress);
+            $mailer->setSubject(sprintf(
+                'Invitation to see the "%s" API',
+                $this->api->display_name
+            ));
+            if (isset($appParams['mail']['bcc'])) {
+                $mailer->setBcc($appParams['mail']['bcc']);
+            }
+            $mailer->setData(array(
+                'api' => $this->api,
+                'apiVisibilityUser' => $this,
+                'inviteeEmailAddress' => $inviteeEmailAddress,
+                'invitedByUser' => $this->invitedByUser,
+            ));
+            
+            // If unable to send the email, allow the process to
+            // continue but communicate the email failure somehow.
+            if ( ! $mailer->send()) {
+                \Yii::log(
+                    'Unable to send api-invited-user notification email to user: '
+                    . $mailer->ErrorInfo,
+                    CLogger::LEVEL_WARNING
+                );
+            }
+        }
     }
     
     public function rules()
