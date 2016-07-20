@@ -55,6 +55,23 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
         return parent::beforeSave();
     }
     
+    /**
+     * Get an email address for the person invited. It may come from the
+     * invited_user_email field or, if we already have a user record for someone
+     * with that email address, from the invitedUser->email relationship.
+     * 
+     * @return string|null The email address (if available), otherwise null.
+     */
+    public function getInviteeEmailAddress()
+    {
+        if ( ! empty($this->invited_user_email)) {
+            return $this->invited_user_email;
+        } elseif ( ! is_null($this->invitedUser)) {
+            return $this->invitedUser->email;
+        }
+        return null;
+    }
+    
     public function replaceEmailWithUserIdIfPossible()
     {
         if ( ! empty($this->invited_user_email)) {
