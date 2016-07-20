@@ -128,6 +128,86 @@ class ApiController extends Controller
         $this->render('add', array('form' => $form));
     }
 
+    public function actionCancelUserInvitation($id)
+    {
+        /* @var $apiVisibilityUser \ApiVisibilityUser */
+        $apiVisibilityUser = \ApiVisibilityUser::model()->findByPk($id);
+        $api = (is_null($apiVisibilityUser) ? null : $apiVisibilityUser->api);
+        
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
+        
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
+            throw new CHttpException(
+                403,
+                'That is not an invitation to an API that you have permission to manage.'
+            );
+        }
+        
+        if ($apiVisibilityUser && $apiVisibilityUser->invitedUser) {
+            $invitedUser = $apiVisibilityUser->invitedUser;
+        } else {
+            $invitedUser = null;
+        }
+        
+        $hasActiveKey = ($invitedUser && $invitedUser->hasActiveKeyToApi($api));
+        
+        if ($hasActiveKey) {
+            
+            $key = $invitedUser->getActiveKeyToApi($api);
+            
+            Yii::app()->user->setFlash('error', sprintf(
+                '<b>Oops!</b> Before you can uninvite %s, you must first '
+                . '<a href="%s">revoke their key</a> to this API.',
+                $invitedUser->getDisplayName(),
+                $this->createUrl('/key/revoke', array(
+                    'id' => $key->key_id,
+                ))
+            ));
+            
+        } elseif (Yii::app()->request->isPostRequest) {
+            
+            if ( ! $apiVisibilityUser->delete()) {
+                
+                Yii::log(
+                    'ApiVisibilityUser deletion FAILED: ID ' . $id,
+                    CLogger::LEVEL_ERROR,
+                    __CLASS__ . '.' . __FUNCTION__
+                );
+
+                Yii::app()->user->setFlash(
+                    'error',
+                    '<strong>Error!</strong> Unable to cancel invitation: <pre>'
+                    . print_r($apiVisibilityUser->getErrors(), true) . '</pre>'
+                );
+            } else {
+                Yii::log(
+                    'ApiVisibilityUser deleted: ID ' . $id,
+                    CLogger::LEVEL_INFO,
+                    __CLASS__ . '.' . __FUNCTION__
+                );
+
+                Yii::app()->user->setFlash(
+                    'success',
+                    '<strong>Success!</strong> Invitation cancelled.'
+                );
+            }
+            
+            $this->redirect(array(
+                '/api/invited-users',
+                'code' => $api->code,
+            ));
+        }
+        
+        // Show the page.
+        $this->render('uninvite-user', array(
+            'api' => $api,
+            'apiVisibilityUser' => $apiVisibilityUser,
+            'currentUser' => $currentUser,
+            'hasActiveKey' => $hasActiveKey,
+        ));
+    }
+
     public function actionDelete($code)
     {
         // Get the current user's model.

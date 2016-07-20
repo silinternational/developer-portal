@@ -50,6 +50,17 @@ $this->pageSubtitle = 'People who have been individually invited to see this API
                     .   '$data->invitedByUser->getDisplayName()'
                     . ');'
                 ),
+                array(
+                    'class' => 'ActionLinksColumn',
+                    'htmlOptions' => array('style' => 'text-align: right'),
+                    'links' => array(
+                        array(
+                            'icon' => 'remove',
+                            'text' => 'Uninvite',
+                            'urlPattern' => '/api/cancel-user-invitation/:api_visibility_user_id',
+                        ),
+                    ),
+                ),
             ),
         )); 
         
