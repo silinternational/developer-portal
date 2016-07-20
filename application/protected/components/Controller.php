@@ -179,6 +179,7 @@ class Controller extends CController
                     'docsEdit',
                     'edit',
                     'inviteDomain',
+                    'invitedUsers',
                     'inviteUser',
                     'pendingKeys',
                 ),

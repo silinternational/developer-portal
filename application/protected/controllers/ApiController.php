@@ -260,6 +260,7 @@ class ApiController extends Controller
         $this->render('details', array(
             'actionLinks' => $actionLinks,
             'api' => $api,
+            'currentUser' => $currentUser,
         ));
     }
 
@@ -513,6 +514,44 @@ class ApiController extends Controller
         ));
     }
 
+    public function actionInvitedUsers($code)
+    {
+        // Make sure the specified API exists.
+        /* @var $api \Api */
+        $api = \Api::model()->findByAttributes(array('code' => $code));
+        
+        // Get a reference to the current website user's User model.
+        /* @var $currentUser \User */
+        $currentUser = \Yii::app()->user->user;
+        
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
+            throw new CHttpException(
+                403,
+                'That is not an API that you have permission to manage.'
+            );
+        }
+        
+        $apiVisibilityUsers = \ApiVisibilityUser::model()->findAllByAttributes(array(
+            'api_id' => $api->api_id,
+        ));
+        $invitedUsersDataProvider = new \CArrayDataProvider(
+            $apiVisibilityUsers,
+            array(
+                'keyField' => 'api_visibility_user_id',
+                'sort' => array(
+                    'attributes' => array('created'),
+                    'defaultOrder' => array('created' => \CSort::SORT_ASC)
+                ),
+            )
+        );
+        
+        // Show the page.
+        $this->render('invited-users', array(
+            'api' => $api,
+            'invitedUsersDataProvider' => $invitedUsersDataProvider,
+        ));
+    }
+    
     public function actionInviteUser($code)
     {
         /* @var $currentUser User */

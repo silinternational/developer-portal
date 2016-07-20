@@ -2,10 +2,7 @@
 /* @var $this ApiController */
 /* @var $actionLinks ActionLink[] */
 /* @var $api Api */
-
-// Get a simpler reference to the user.
-/* @var $user User */
-$user = \Yii::app()->user->user;
+/* @var $currentUser User */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
@@ -58,7 +55,7 @@ $attrLabels = $api->attributeLabels();
             <?php
 
             // If the user has permission to see them, show the key counts.
-            if ($user->canSeeKeysForApi($api)) {
+            if ($currentUser->canSeeKeysForApi($api)) {
                 ?>
                 <dt>Keys</dt>
                 <dd><?php
@@ -86,7 +83,7 @@ $attrLabels = $api->attributeLabels();
             }
 
             // If the user has permission to administer this Api, show more info.
-            if ($user->hasAdminPrivilegesForApi($api)) {
+            if ($currentUser->hasAdminPrivilegesForApi($api)) {
 
                 ?>
                 <dt><?php echo CHtml::encode($attrLabels['owner_id']); ?></dt>
@@ -109,7 +106,15 @@ $attrLabels = $api->attributeLabels();
 
                 <?php if (count($api->apiVisibilityUsers) > 0): ?>
                     <dt>Invited Users</dt>
-                    <dd><?php echo count($api->apiVisibilityUsers); ?></dd>
+                    <dd>
+                        <?php echo $api->getInvitedUsersCountBadgeHtml(
+                            'Click for more information.',
+                            $this->createUrl(
+                                '/api/invited-users/',
+                                array('code' => $api->code)
+                            )
+                        ); ?>
+                    </dd>
                 <?php endif; ?>
                 
                 <?php if (count($api->apiVisibilityDomains) > 0): ?>
@@ -162,7 +167,7 @@ $attrLabels = $api->attributeLabels();
 
 <b>Documentation</b>
 <div>
-    <?php if ($user->hasAdminPrivilegesForApi($api)): ?>
+    <?php if ($currentUser->hasAdminPrivilegesForApi($api)): ?>
         <a href="<?php echo $this->createUrl('/api/docs-edit/', array('code' => $api->code)); ?>" 
            class="nowrap space-after-icon pull-right btn btn-xs" style="margin: 5px;">
             <i class="icon-pencil"></i>Edit documentation

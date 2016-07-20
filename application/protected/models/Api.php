@@ -325,6 +325,29 @@ class Api extends ApiBase
     }
     
     /**
+     * Generate the HTML for the invited-users count badge.
+     * 
+     * @param string|null $hoverTitle (Optional:) Text to show on hover (if
+     *     any).
+     * @param string|null $linkTarget (Optional:) If desired, the URL to make
+     *     this badge a hyperlink to.
+     * @return string The resulting HTML.
+     */
+    public function getInvitedUsersCountBadgeHtml(
+        $hoverTitle = null,
+        $linkTarget = null
+    ) {
+        $count = count($this->apiVisibilityUsers);
+        
+        return self::generateBadgeHtml(
+            $count,
+            ($count ? 'badge-info' : null),
+            $hoverTitle,
+            $linkTarget
+        );
+    }
+    
+    /**
      * Get the public URL for this API as an HTML string that adds an HTML
      * element around the Api's code, with the given CSS class.
      * 
