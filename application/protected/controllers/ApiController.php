@@ -464,6 +464,44 @@ class ApiController extends Controller
         ));
     }
 
+    public function actionInvitedDomains($code)
+    {
+        // Make sure the specified API exists.
+        /* @var $api \Api */
+        $api = \Api::model()->findByAttributes(array('code' => $code));
+        
+        // Get a reference to the current website user's User model.
+        /* @var $currentUser \User */
+        $currentUser = \Yii::app()->user->user;
+        
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
+            throw new CHttpException(
+                403,
+                'That is not an API that you have permission to manage.'
+            );
+        }
+        
+        $apiVisibilityDomains = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+            'api_id' => $api->api_id,
+        ));
+        $invitedDomainsDataProvider = new \CArrayDataProvider(
+            $apiVisibilityDomains,
+            array(
+                'keyField' => 'api_visibility_domain_id',
+                'sort' => array(
+                    'attributes' => array('domain', 'created'),
+                    'defaultOrder' => array('created' => \CSort::SORT_ASC)
+                ),
+            )
+        );
+        
+        // Show the page.
+        $this->render('invited-domains', array(
+            'api' => $api,
+            'invitedDomainsDataProvider' => $invitedDomainsDataProvider,
+        ));
+    }
+
     public function actionInviteDomain($code)
     {
         /* @var $currentUser User */

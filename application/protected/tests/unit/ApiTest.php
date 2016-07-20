@@ -491,6 +491,29 @@ class ApiTest extends DeveloperPortalTestCase
         );
     }
 	
+    public function testGetInvitedDomainsCountBadgeHtml_hasBadgeValue()
+    {
+        // Arrange:
+        $api = $this->apis('apiVisibleByInvitationOnlyWith2UserAnd1DomainInvitation');
+        
+        // Act:
+        $result = $api->getInvitedDomainsCountBadgeHtml();
+        
+        // Assert:
+        $this->assertContains(
+            strval(1),
+            $result,
+            'Failed to include the correct number of invited domains in the '
+            . 'generated badge HTML.'
+        );
+        $this->assertContains(
+            strval(1),
+            strip_tags($result),
+            'Failed to include the correct number of invited domains in the '
+            . 'text contents of the generated badge HTML.'
+        );
+    }
+    
     public function testGetInvitedUsersCountBadgeHtml_hasBadgeValue()
     {
         // Arrange:

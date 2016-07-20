@@ -325,6 +325,29 @@ class Api extends ApiBase
     }
     
     /**
+     * Generate the HTML for the invited-domains count badge.
+     * 
+     * @param string|null $hoverTitle (Optional:) Text to show on hover (if
+     *     any).
+     * @param string|null $linkTarget (Optional:) If desired, the URL to make
+     *     this badge a hyperlink to.
+     * @return string The resulting HTML.
+     */
+    public function getInvitedDomainsCountBadgeHtml(
+        $hoverTitle = null,
+        $linkTarget = null
+    ) {
+        $count = count($this->apiVisibilityDomains);
+        
+        return self::generateBadgeHtml(
+            $count,
+            ($count ? 'badge-info' : null),
+            $hoverTitle,
+            $linkTarget
+        );
+    }
+    
+    /**
      * Generate the HTML for the invited-users count badge.
      * 
      * @param string|null $hoverTitle (Optional:) Text to show on hover (if

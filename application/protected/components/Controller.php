@@ -178,6 +178,7 @@ class Controller extends CController
                     'delete',
                     'docsEdit',
                     'edit',
+                    'invitedDomains',
                     'inviteDomain',
                     'invitedUsers',
                     'inviteUser',

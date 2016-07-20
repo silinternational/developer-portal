@@ -119,7 +119,15 @@ $attrLabels = $api->attributeLabels();
                 
                 <?php if (count($api->apiVisibilityDomains) > 0): ?>
                     <dt>Invited Domains</dt>
-                    <dd><?php echo count($api->apiVisibilityDomains); ?></dd>
+                    <dd>
+                        <?php echo $api->getInvitedDomainsCountBadgeHtml(
+                            'Click for more information.',
+                            $this->createUrl(
+                                '/api/invited-domains/',
+                                array('code' => $api->code)
+                            )
+                        ); ?>
+                    </dd>
                 <?php endif; ?>
                 
                 <dt><?php echo CHtml::encode($attrLabels['approval_type']); ?></dt>
