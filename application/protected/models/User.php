@@ -131,6 +131,20 @@ class User extends UserBase
             }
         }
         
+        $apiVisibilityUsersReceived = \ApiVisibilityUser::model()->findAllByAttributes(array(
+            'invited_user_id' => $this->user_id,
+        ));
+        foreach ($apiVisibilityUsersReceived as $apiVisibilityUserReceived) {
+            if ( ! $apiVisibilityUserReceived->delete()) {
+                $this->addError('user_id', sprintf(
+                    'We cannot delete this user because we could not finish deleting the invitations they received to '
+                    . 'see private APIs (though we may have deleted some of them): %s',
+                    print_r($apiVisibilityUserReceived->getErrors(), true)
+                ));
+                return false;
+            }
+        }
+        
         /* NOTE: Simply using $this->affectedByEvents was retrieving a cached
          *       list of Events, and so we were failing to update Events created
          *       earlier in this beforeDelete() method.  */
