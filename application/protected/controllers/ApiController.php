@@ -150,19 +150,15 @@ class ApiController extends Controller
             $invitedUser = null;
         }
         
-        $hasActiveKey = ($invitedUser && $invitedUser->hasActiveKeyToApi($api));
-        
-        if ($hasActiveKey) {
-            
-            $key = $invitedUser->getActiveKeyToApi($api);
+        $hasDependentKey = $apiVisibilityUser->hasDependentKey();
+        if ($hasDependentKey) {
             
             Yii::app()->user->setFlash('error', sprintf(
                 '<b>Oops!</b> Before you can uninvite %s, you must first '
-                . '<a href="%s">revoke their key</a> to this API.',
+                . 'first revoke/deny the following keys, which depend on '
+                . 'this invitation: %s',
                 $invitedUser->getDisplayName(),
-                $this->createUrl('/key/revoke', array(
-                    'id' => $key->key_id,
-                ))
+                $apiVisibilityUser->getLinksToDependentKeysAsHtmlList()
             ));
             
         } elseif (Yii::app()->request->isPostRequest) {
@@ -177,7 +173,7 @@ class ApiController extends Controller
 
                 Yii::app()->user->setFlash(
                     'error',
-                    '<strong>Error!</strong> Unable to cancel invitation: <pre>'
+                    '<strong>Error!</strong> Unable to withdraw invitation: <pre>'
                     . print_r($apiVisibilityUser->getErrors(), true) . '</pre>'
                 );
             } else {
@@ -189,7 +185,7 @@ class ApiController extends Controller
 
                 Yii::app()->user->setFlash(
                     'success',
-                    '<strong>Success!</strong> Invitation cancelled.'
+                    '<strong>Success!</strong> Invitation withdrawn.'
                 );
             }
             
@@ -204,7 +200,7 @@ class ApiController extends Controller
             'api' => $api,
             'apiVisibilityUser' => $apiVisibilityUser,
             'currentUser' => $currentUser,
-            'hasActiveKey' => $hasActiveKey,
+            'hasDependentKey' => $hasDependentKey,
         ));
     }
 

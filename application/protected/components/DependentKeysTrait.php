@@ -25,11 +25,12 @@ trait DependentKeysTrait
                 $userDisplayName = $key->user->getDisplayName();
             }
             $listItemLinksToDependentKeys[] = sprintf(
-                '<li><a href="%s">%s</a></li>',
+                '<li><a href="%s">%s</a> (%s)</li>',
                 \Yii::app()->createUrl('/key/details', array(
                     'id' => $key->key_id,
                 )),
-                \CHtml::encode($userDisplayName)
+                \CHtml::encode($userDisplayName),
+                $key->getStyledStatusHtml()
             );
         }
         return '<ul>' . implode(' ', $listItemLinksToDependentKeys) . '</ul>';

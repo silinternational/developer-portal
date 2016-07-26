@@ -3,7 +3,7 @@
 /* @var $api \Api */
 /* @var $apiVisibilityUser \ApiVisibilityUser */
 /* @var $currentUser \User */
-/* @var $hasActiveKeys boolean */
+/* @var $hasDependentKey boolean */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
@@ -41,7 +41,7 @@ $this->pageTitle = 'Uninvite User';
         </dl>
     </div>
 </div>
-<?php if ( ! $hasActiveKey): ?>
+<?php if ( ! $hasDependentKey): ?>
     <div class="row">
         <div class="span11 offset1">
             <?php $form = $this->beginWidget('CActiveForm'); ?>
