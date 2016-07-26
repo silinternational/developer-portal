@@ -12,6 +12,7 @@ $mysqlPassword = Env::get('MYSQL_PASSWORD');
 $mailerUsername = Env::get('MAILER_USERNAME', false); // Defaults to false to mimic previous getenv() behavior.
 $mailerPassword = Env::get('MAILER_PASSWORD', false); // Defaults to false to mimic previous getenv() behavior.
 $appEnv = Env::get('APP_ENV', 'not set');
+$appName = Env::get('APP_NAME', 'Developer Portal');
 $adminEmail = Env::get('ADMIN_EMAIL');
 $alertsEmail = Env::get('ALERTS_EMAIL');
 $apiaxleEndpoint = Env::get('APIAXLE_ENDPOINT');
@@ -36,7 +37,7 @@ Yii::setPathOfAlias('bootstrap', dirname(__FILE__) . '/../extensions/bootstrap')
 return array(
     
     'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
-    'name' => 'API Developer Portal',
+    'name' => $appName,
     'theme' => 'bootstrap',
     
     // preloading 'log' component
