@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @method \Api apis(string $fixtureName)
+ * @method \Key keys(string $fixtureName)
+ * @method \User users(string $fixtureName)
+ */
 class KeyTest extends DeveloperPortalTestCase
 {
     public $fixtures = array(
@@ -357,6 +362,126 @@ class KeyTest extends DeveloperPortalTestCase
         // Make sure the status constants have different values. (There aren't
         // any separate user-friendly versions of the constants to check).
         $this->confirmConstantsDiffer('Key', 'STATUS_');
+    }
+    
+    public function testDeny_alreadyDeniedKey()
+    {
+        // Arrange:
+        $key = $this->keys('deniedKeyUser5');
+        $userDenyingKey = $key->api->owner;
+        
+        // Act:
+        $result = $key->deny($userDenyingKey);
+
+        // Assert:
+        $this->assertFalse($result, 'Incorrectly denied an already-denied key.');
+    }
+    
+    public function testDeny_approvedKey()
+    {
+        // Arrange:
+        $key = $this->keys('approvedKey');
+        $userDenyingKey = $key->api->owner;
+        
+        // Act:
+        $result = $key->deny($userDenyingKey);
+
+        // Assert:
+        $this->assertFalse($result, 'Failed to reject denial of an approved key.');
+    }
+    
+    public function testDeny_revokedKey()
+    {
+        // Arrange:
+        $key = $this->keys('revokedKeyUser7');
+        $userDenyingKey = $key->api->owner;
+        
+        // Act:
+        $result = $key->deny($userDenyingKey);
+
+        // Assert:
+        $this->assertFalse($result, 'Failed to reject denial of a revoked key.');
+    }
+    
+    public function testDeny_authorizedUser()
+    {
+        // Arrange:
+        $key = $this->keys('pendingKeyToPublicApiThatRequiresApproval');
+        $userDenyingKey = $this->users('userWithRoleOfOwner');
+        
+        // Pre-assert:
+        $this->assertSame(
+            \Key::STATUS_PENDING,
+            $key->status,
+            'This test requires a pending key.'
+        );
+        $this->assertSame(
+            $key->api->owner_id,
+            $userDenyingKey->user_id,
+            'This test requires the User that owns the Api that the Key is for.'
+        );
+        
+        // Act:
+        $result = $key->deny($userDenyingKey);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to allow the owner of an Api to deny a Key for it.'
+        );
+        $key->refresh();
+        $this->assertSame(
+            \Key::STATUS_DENIED,
+            $key->status,
+            'Failed to set the Key as denied.'
+        );
+        $this->assertSame(
+            $userDenyingKey->user_id,
+            $key->processed_by,
+            'Failed to record that the Key was processed by the User that '
+            . 'denied the Key.'
+        );
+    }
+    
+    public function testDeny_unauthorizedUser()
+    {
+        // Arrange:
+        $key = $this->keys('pendingKeyToPublicApiThatRequiresApproval');
+        $userDenyingKey = $this->users('ownerThatDoesNotOwnAnyApisOrKeys');
+        
+        // Pre-assert:
+        $this->assertSame(
+            \Key::STATUS_PENDING,
+            $key->status,
+            'This test requires a pending key.'
+        );
+        $this->assertNotSame(
+            $key->api->owner_id,
+            $userDenyingKey->user_id,
+            'This test requires the User that is NOT the owner of the Api that '
+            . 'the Key is for.'
+        );
+        
+        // Act:
+        $result = $key->deny($userDenyingKey);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly allowed a non-admin owner that does NOT own that Api '
+            . 'to deny a Key for it.'
+        );
+        $key->refresh();
+        $this->assertSame(
+            \Key::STATUS_PENDING,
+            $key->status,
+            'Failed to leave Key\'s status as pending.'
+        );
+        $this->assertNull(
+            $key->processed_by,
+            'Incorrectly (apparently) changed the processed_by field (which '
+            . 'should have stayed null).'
+        );
     }
     
     public function testGetActiveKeysDataProvider_onlyIncludesActiveKeys()

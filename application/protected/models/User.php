@@ -206,6 +206,19 @@ class User extends UserBase
     }
     
     /**
+     * Find out whether this User is allowed to deny the given (pending) Key.
+     * 
+     * @param \Key $key The (pending) Key.
+     * @return boolean
+     */
+    public function isAuthorizedToDenyKey($key)
+    {
+        /* NOTE: The authority to deny a key is the same as the authority to
+         *       approve a key.  */
+        return $this->isAuthorizedToApproveKey($key);
+    }
+    
+    /**
      * Find out whether this user is allowed to delete the given Key.
      * 
      * @param Key $key The Key in question.

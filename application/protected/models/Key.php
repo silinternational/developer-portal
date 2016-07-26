@@ -444,6 +444,56 @@ class Key extends KeyBase
     }
     
     /**
+     * Attempt to deny a pending (i.e. - requested) Key, receiving back an
+     * indicator of whether it was successful.
+     * 
+     * @param \User $userDenyingKey The User to record as the one who denied the
+     *     request for this Key.
+     * @return boolean True if the Key was successfully denied. If not, check
+     *     the Key's list of errors to find out why.
+     * @throws \Exception
+     */
+    public function deny(User $userDenyingKey)
+    {
+        if ($this->status !== self::STATUS_PENDING) {
+            $this->addError('status', 'Only pending keys can be denied.');
+            return false;
+        }
+        
+        if ( ! $userDenyingKey->isAuthorizedToDenyKey($this)) {
+            $this->addError('processed_by', sprintf(
+                'That user (%s) is not authorized to deny keys for that API.',
+                $userDenyingKey->getDisplayName()
+            ));
+            return false;
+        }
+
+        // At this point, we know the given $deniedByUser is authorized
+        // to (and needs to) deny this Key.
+        $this->processed_by = $userDenyingKey->user_id;
+        $this->status = self::STATUS_DENIED;
+        
+        if ($this->save()) {
+            try {
+                $this->notifyUserOfDeniedKey();
+            } catch (Exception $e) {
+                \Yii::log(sprintf(
+                    'Error sending key-denied notification email: (%s) %s',
+                    $e->getCode(),
+                    $e->getMessage()
+                ), CLogger::LEVEL_WARNING);
+            }
+            
+            $this->log('denied');
+            
+            // Indicate success.
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
      * Get an array (attribute name => new value) of differences between the
      * given previous attribute values the current attribute values (for use
      * in the log).
