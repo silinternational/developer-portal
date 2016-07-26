@@ -24,4 +24,12 @@ return array(
         'created' => '2016-07-20 11:37:00',
         'updated' => '2016-07-20 11:37:00',
     ),
+    'avu4' => array(
+        'api_visibility_user_id' => 4,
+        'api_id' => 17,
+        'invited_user_id' => 36,
+        'invited_by_user_id' => 17,
+        'created' => '2016-07-20 11:37:00',
+        'updated' => '2016-07-20 11:37:00',
+    ),
 );

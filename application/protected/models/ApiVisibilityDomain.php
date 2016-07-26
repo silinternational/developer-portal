@@ -45,6 +45,44 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
             'api_id' => 'API',
         ));
     }
+    
+    /**
+     * Get the list of keys where the owner of the key can only see that API
+     * because of this ApiVisibilityDomain.
+     *
+     * @return \Key The list of keys.
+     */
+    public function getDependentKeys()
+    {
+        $api = $this->api;
+        
+        if ($api->isPubliclyVisible()) {
+            return array();
+        }
+        
+        $dependentKeys = array();
+        foreach ($api->keys as $keyToApi) {
+            
+            $user = $keyToApi->user;
+            if ($user === null) {
+                continue;
+            }
+            
+            if ($user->isAdmin() || $user->isOwnerOfApi($api)) {
+                continue;
+            }
+            
+            if ($user->isIndividuallyInvitedToSeeApi($api)) {
+                continue;
+            }
+            
+            if ($user->isInvitedByDomainToSeeApi($api)) {
+                $dependentKeys[] = $keyToApi;
+            }
+        }
+        
+        return $dependentKeys;
+    }
 
     /**
      * Validate that the given domain name appears to be a valid domain name.
