@@ -83,6 +83,35 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
         
         return $dependentKeys;
     }
+    
+    /**
+     * Get an HTML list representing the Keys that depend on this
+     * ApiVisibilityDomain (for the Keys' owners to be able to see the
+     * related Api).
+     * 
+     * @return string An HTML list of links to the dependent Keys.
+     */
+    public function getLinksToDependentKeysAsHtmlList()
+    {
+        $dependentKeys = $this->getDependentKeys();
+        $listItemLinksToDependentKeys = array();
+        foreach ($dependentKeys as $key) {
+            /* @var $key \Key */
+            if ($key->user === null) {
+                $userDisplayName = '(USER NOT FOUND)';
+            } else {
+                $userDisplayName = $key->user->getDisplayName();
+            }
+            $listItemLinksToDependentKeys[] = sprintf(
+                '<li><a href="%s">%s</a></li>',
+                \Yii::app()->createUrl('/key/details', array(
+                    'id' => $key->key_id,
+                )),
+                \CHtml::encode($userDisplayName)
+            );
+        }
+        return '<ul>' . implode(' ', $listItemLinksToDependentKeys) . '</ul>';
+    }
 
     /**
      * Validate that the given domain name appears to be a valid domain name.

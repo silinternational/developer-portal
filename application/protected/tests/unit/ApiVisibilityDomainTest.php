@@ -62,6 +62,20 @@ class ApiVisibilityDomainTest extends \CDbTestCase
         $this->assertNotContains($notDependentKey->key_id, $actualDependentKeyIds);
     }
     
+    public function testGetLinksToDependentKeysAsHtmlList()
+    {
+        // Arrange:
+        $apiVisibilityDomain = $this->apiVisibilityDomains('avdWithTwoDependentKeys');
+        
+        // Act:
+        $linksAsHtmlList = $apiVisibilityDomain->getLinksToDependentKeysAsHtmlList();
+        
+        // Assert:
+        $this->assertTrue(is_string($linksAsHtmlList));
+        $this->assertContains('<ul>', $linksAsHtmlList);
+        $this->assertContains('</ul>', $linksAsHtmlList);
+    }
+    
     public function testIsApparentlyValidDomain_valid()
     {
         // Arrange:
