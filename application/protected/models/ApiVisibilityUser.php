@@ -2,6 +2,7 @@
 
 class ApiVisibilityUser extends ApiVisibilityUserBase
 {
+    use Sil\DevPortal\components\DependentKeysTrait;
     use Sil\DevPortal\components\ModelFindByPkTrait;
     
     protected function afterDelete()
@@ -57,6 +58,46 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
     {
         $this->replaceEmailWithUserIdIfPossible();
         return parent::beforeSave();
+    }
+    
+    /**
+     * Get the list of Keys (active or pending) where the owner of the Key can
+     * only see that Api because of this invitation.
+     *
+     * @return \Key[] The list of keys.
+     */
+    public function getDependentKeys()
+    {
+        $api = $this->api;
+        $user = $this->invitedUser;
+        
+        if (($api !== null) && $api->isPubliclyVisible()) {
+            return array();
+        }
+        
+        if ($user !== null) {
+            if ($user->isAdmin() || $user->isOwnerOfApi($api)) {
+                return array();
+            }
+
+            if ($user->isInvitedByDomainToSeeApi($api)) {
+                return array();
+            }
+        }
+        
+        $keysOfThisUserToThisApi = \Key::model()->findAllByAttributes(array(
+            'api_id' => $this->api_id,
+            'user_id' => $this->invited_user_id,
+        ));
+        
+        $dependentKeys = array();
+        foreach ($keysOfThisUserToThisApi as $key) {
+            if ($key->isActiveOrPending()) {
+                $dependentKeys[] = $key;
+            }
+        }
+        
+        return $dependentKeys;
     }
     
     /**
