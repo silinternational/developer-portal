@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @method \Api apis(string $fixtureName)
+ */
 class ApiTest extends DeveloperPortalTestCase
 {
     public $fixtures = array(
@@ -484,6 +487,52 @@ class ApiTest extends DeveloperPortalTestCase
             strval(2),
             strip_tags($result),
             'Failed to include the correct number of pending keys in the text '
+            . 'contents of the generated badge HTML.'
+        );
+    }
+	
+    public function testGetInvitedDomainsCountBadgeHtml_hasBadgeValue()
+    {
+        // Arrange:
+        $api = $this->apis('apiVisibleByInvitationOnlyWith2UserAnd1DomainInvitation');
+        
+        // Act:
+        $result = $api->getInvitedDomainsCountBadgeHtml();
+        
+        // Assert:
+        $this->assertContains(
+            strval(1),
+            $result,
+            'Failed to include the correct number of invited domains in the '
+            . 'generated badge HTML.'
+        );
+        $this->assertContains(
+            strval(1),
+            strip_tags($result),
+            'Failed to include the correct number of invited domains in the '
+            . 'text contents of the generated badge HTML.'
+        );
+    }
+    
+    public function testGetInvitedUsersCountBadgeHtml_hasBadgeValue()
+    {
+        // Arrange:
+        $api = $this->apis('apiVisibleByInvitationOnlyWith2UserAnd1DomainInvitation');
+        
+        // Act:
+        $result = $api->getInvitedUsersCountBadgeHtml();
+        
+        // Assert:
+        $this->assertContains(
+            strval(2),
+            $result,
+            'Failed to include the correct number of invited users in the '
+            . 'generated badge HTML.'
+        );
+        $this->assertContains(
+            strval(2),
+            strip_tags($result),
+            'Failed to include the correct number of invited users in the text '
             . 'contents of the generated badge HTML.'
         );
     }

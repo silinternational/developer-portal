@@ -128,6 +128,156 @@ class ApiController extends Controller
         $this->render('add', array('form' => $form));
     }
 
+    public function actionCancelDomainInvitation($id)
+    {
+        /* @var $apiVisibilityDomain \ApiVisibilityDomain */
+        $apiVisibilityDomain = \ApiVisibilityDomain::model()->findByPk($id);
+        $api = (is_null($apiVisibilityDomain) ? null : $apiVisibilityDomain->api);
+        
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
+        
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
+            throw new CHttpException(
+                403,
+                'That is not an invitation to an API that you have permission to manage.'
+            );
+        }
+        
+        if ($apiVisibilityDomain === null) {
+            throw new CHttpException(404, 'We could not find that invitation.');
+        }
+        
+        $hasDependentKey = $apiVisibilityDomain->hasDependentKey();
+        if ($hasDependentKey) {
+            
+            Yii::app()->user->setFlash('error', sprintf(
+                '<b>Oops!</b> Before you can uninvite "%s" users, you must '
+                . 'first revoke/deny the following keys, which depend on '
+                . 'this invitation: %s',
+                $apiVisibilityDomain->domain,
+                $apiVisibilityDomain->getLinksToDependentKeysAsHtmlList()
+            ));
+            
+        } elseif (Yii::app()->request->isPostRequest) {
+            
+            if ( ! $apiVisibilityDomain->delete()) {
+                
+                Yii::log(
+                    'ApiVisibilityDomain deletion FAILED: ID ' . $id,
+                    CLogger::LEVEL_ERROR,
+                    __CLASS__ . '.' . __FUNCTION__
+                );
+
+                Yii::app()->user->setFlash(
+                    'error',
+                    '<strong>Error!</strong> Unable to withdraw invitation: <pre>'
+                    . print_r($apiVisibilityDomain->getErrors(), true) . '</pre>'
+                );
+            } else {
+                Yii::log(
+                    'ApiVisibilityDomain deleted: ID ' . $id,
+                    CLogger::LEVEL_INFO,
+                    __CLASS__ . '.' . __FUNCTION__
+                );
+
+                Yii::app()->user->setFlash(
+                    'success',
+                    '<strong>Success!</strong> Invitation withdrawn.'
+                );
+            }
+            
+            $this->redirect(array(
+                '/api/invited-domains',
+                'code' => $api->code,
+            ));
+        }
+        
+        // Show the page.
+        $this->render('uninvite-domain', array(
+            'api' => $api,
+            'apiVisibilityDomain' => $apiVisibilityDomain,
+            'currentUser' => $currentUser,
+            'hasDependentKey' => $hasDependentKey,
+        ));
+    }
+
+    public function actionCancelUserInvitation($id)
+    {
+        /* @var $apiVisibilityUser \ApiVisibilityUser */
+        $apiVisibilityUser = \ApiVisibilityUser::model()->findByPk($id);
+        $api = (is_null($apiVisibilityUser) ? null : $apiVisibilityUser->api);
+        
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
+        
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
+            throw new CHttpException(
+                403,
+                'That is not an invitation to an API that you have permission to manage.'
+            );
+        }
+        
+        if ($apiVisibilityUser && $apiVisibilityUser->invitedUser) {
+            $invitedUser = $apiVisibilityUser->invitedUser;
+        } else {
+            $invitedUser = null;
+        }
+        
+        $hasDependentKey = $apiVisibilityUser->hasDependentKey();
+        if ($hasDependentKey) {
+            
+            Yii::app()->user->setFlash('error', sprintf(
+                '<b>Oops!</b> Before you can uninvite %s, you must first '
+                . 'first revoke/deny the following keys, which depend on '
+                . 'this invitation: %s',
+                $invitedUser->getDisplayName(),
+                $apiVisibilityUser->getLinksToDependentKeysAsHtmlList()
+            ));
+            
+        } elseif (Yii::app()->request->isPostRequest) {
+            
+            if ( ! $apiVisibilityUser->delete()) {
+                
+                Yii::log(
+                    'ApiVisibilityUser deletion FAILED: ID ' . $id,
+                    CLogger::LEVEL_ERROR,
+                    __CLASS__ . '.' . __FUNCTION__
+                );
+
+                Yii::app()->user->setFlash(
+                    'error',
+                    '<strong>Error!</strong> Unable to withdraw invitation: <pre>'
+                    . print_r($apiVisibilityUser->getErrors(), true) . '</pre>'
+                );
+            } else {
+                Yii::log(
+                    'ApiVisibilityUser deleted: ID ' . $id,
+                    CLogger::LEVEL_INFO,
+                    __CLASS__ . '.' . __FUNCTION__
+                );
+
+                Yii::app()->user->setFlash(
+                    'success',
+                    '<strong>Success!</strong> Invitation withdrawn.'
+                );
+            }
+            
+            $this->redirect(array(
+                '/api/invited-users',
+                'code' => $api->code,
+            ));
+        }
+        
+        // Show the page.
+        $this->render('uninvite-user', array(
+            'api' => $api,
+            'apiVisibilityUser' => $apiVisibilityUser,
+            'currentUser' => $currentUser,
+            'hasDependentKey' => $hasDependentKey,
+        ));
+    }
+
     public function actionDelete($code)
     {
         // Get the current user's model.
@@ -186,6 +336,10 @@ class ApiController extends Controller
                         '<strong>Error!</strong> Unable to delete that API: '
                         . '<pre>' . print_r($api->getErrors(), true) . '</pre>'
                     );
+
+                    $this->redirect(array('/api/details/',
+                        'code' => $api->code,
+                    ));
                 }
             }
             catch (CDbException $ex) {
@@ -256,6 +410,7 @@ class ApiController extends Controller
         $this->render('details', array(
             'actionLinks' => $actionLinks,
             'api' => $api,
+            'currentUser' => $currentUser,
         ));
     }
 
@@ -456,6 +611,181 @@ class ApiController extends Controller
         $this->render('index', array(
             'apiList' => $apiList,
             'user' => $currentUser,
+        ));
+    }
+
+    public function actionInvitedDomains($code)
+    {
+        // Make sure the specified API exists.
+        /* @var $api \Api */
+        $api = \Api::model()->findByAttributes(array('code' => $code));
+        
+        // Get a reference to the current website user's User model.
+        /* @var $currentUser \User */
+        $currentUser = \Yii::app()->user->user;
+        
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
+            throw new CHttpException(
+                403,
+                'That is not an API that you have permission to manage.'
+            );
+        }
+        
+        $apiVisibilityDomains = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+            'api_id' => $api->api_id,
+        ));
+        $invitedDomainsDataProvider = new \CArrayDataProvider(
+            $apiVisibilityDomains,
+            array(
+                'keyField' => 'api_visibility_domain_id',
+                'sort' => array(
+                    'attributes' => array('domain', 'created'),
+                    'defaultOrder' => array('created' => \CSort::SORT_ASC)
+                ),
+            )
+        );
+        
+        // Show the page.
+        $this->render('invited-domains', array(
+            'api' => $api,
+            'invitedDomainsDataProvider' => $invitedDomainsDataProvider,
+        ));
+    }
+
+    public function actionInviteDomain($code)
+    {
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
+        
+        /* @var $api Api */
+        $api = \Api::model()->findByAttributes(array('code' => $code));
+        
+        if ( ! $currentUser->canInviteDomainToSeeApi($api)) {
+            throw new \CHttpException(403, sprintf(
+                'That is not an API that you have permission to invite users (by domain) to see.'
+            ));
+        }
+        
+        $apiVisibilityDomain = new \ApiVisibilityDomain();
+        
+        // If the form was submitted...
+        if (\Yii::app()->request->isPostRequest) {
+            
+            $postedData = \Yii::app()->request->getParam('ApiVisibilityDomain');
+            
+            $apiVisibilityDomain->attributes = array(
+                'api_id' => $api->api_id,
+                'domain' => $postedData['domain'],
+                'invited_by_user_id' => $currentUser->user_id,
+            );
+            if ($apiVisibilityDomain->validate(array('domain'))) {
+                if ($apiVisibilityDomain->save()) {
+                    Yii::app()->user->setFlash('success', sprintf(
+                        '<strong>Success!</strong> You have successfully '
+                        . 'enabled anyone with an email address ending with '
+                        . '"@%s" to see the "%s" API.',
+                        \CHtml::encode($postedData['domain']),
+                        \CHtml::encode($api->display_name)
+                    ));
+
+                    $this->redirect(array(
+                        '/api/details/',
+                        'code' => $api->code,
+                    ));
+                }
+            }
+        }
+        
+        $this->render('invite-domain', array(
+            'api' => $api,
+            'apiVisibilityDomain' => $apiVisibilityDomain,
+        ));
+    }
+
+    public function actionInvitedUsers($code)
+    {
+        // Make sure the specified API exists.
+        /* @var $api \Api */
+        $api = \Api::model()->findByAttributes(array('code' => $code));
+        
+        // Get a reference to the current website user's User model.
+        /* @var $currentUser \User */
+        $currentUser = \Yii::app()->user->user;
+        
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
+            throw new CHttpException(
+                403,
+                'That is not an API that you have permission to manage.'
+            );
+        }
+        
+        $apiVisibilityUsers = \ApiVisibilityUser::model()->findAllByAttributes(array(
+            'api_id' => $api->api_id,
+        ));
+        $invitedUsersDataProvider = new \CArrayDataProvider(
+            $apiVisibilityUsers,
+            array(
+                'keyField' => 'api_visibility_user_id',
+                'sort' => array(
+                    'attributes' => array('created'),
+                    'defaultOrder' => array('created' => \CSort::SORT_ASC)
+                ),
+            )
+        );
+        
+        // Show the page.
+        $this->render('invited-users', array(
+            'api' => $api,
+            'invitedUsersDataProvider' => $invitedUsersDataProvider,
+        ));
+    }
+    
+    public function actionInviteUser($code)
+    {
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
+        
+        /* @var $api Api */
+        $api = \Api::model()->findByAttributes(array('code' => $code));
+        
+        if ( ! $currentUser->canInviteUserToSeeApi($api)) {
+            throw new \CHttpException(403, sprintf(
+                'That is not an API that you have permission to invite users to see.'
+            ));
+        }
+        
+        $apiVisibilityUser = new \ApiVisibilityUser();
+        
+        // If the form was submitted...
+        if (\Yii::app()->request->isPostRequest) {
+            
+            $postedData = \Yii::app()->request->getParam('ApiVisibilityUser');
+            
+            $apiVisibilityUser->attributes = array(
+                'api_id' => $api->api_id,
+                'invited_by_user_id' => $currentUser->user_id,
+                'invited_user_email' => $postedData['invited_user_email'],
+            );
+            if ($apiVisibilityUser->validate(array('invited_user_email'))) {
+                if ($apiVisibilityUser->save()) {
+                    Yii::app()->user->setFlash('success', sprintf(
+                        '<strong>Success!</strong> You have successfully '
+                        . 'invited %s to see the "%s" API.',
+                        \CHtml::encode($postedData['invited_user_email']),
+                        \CHtml::encode($api->display_name)
+                    ));
+
+                    $this->redirect(array(
+                        '/api/invite-user/',
+                        'code' => $api->code,
+                    ));
+                }
+            }
+        }
+        
+        $this->render('invite-user', array(
+            'api' => $api,
+            'apiVisibilityUser' => $apiVisibilityUser,
         ));
     }
 
@@ -793,7 +1123,19 @@ class ApiController extends Controller
                 else {
                     
                     // Save the new pending Key to the database.
-                    $key->save();
+                    if ( ! $key->save()) {
+                        Yii::log(
+                            'Saving validated pending Key FAILED: User ID '
+                            . $currentUser->user_id . ', API ID ' . $api->api_id,
+                            CLogger::LEVEL_ERROR,
+                            __CLASS__ . '.' . __FUNCTION__
+                        );
+                        throw new \CHttpException(
+                            500,
+                            "Something didn't work... but we're not sure why. Please try again.",
+                            1468440868
+                        );
+                    }
 
                     // Record that in the log.
                     Yii::log(

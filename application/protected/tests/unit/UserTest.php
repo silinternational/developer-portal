@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * @method \Api apis(string $fixtureName) Get the Api with that fixture name.
+ * @method \ApiVisibilityDomain apiVisibilityDomains(string $fixtureName) Get
+ *     the ApiVisibilityDomain with that fixture name.
+ * @method \ApiVisibilityUser apiVisibilityUsers(string $fixtureName) Get the
+ *     ApiVisibilityUser with that fixture name.
+ * @method \Event events(string $fixtureName) Get the Event with that fixture name.
+ * @method \Key keys(string $fixtureName) Get the Key with that fixture name.
+ * @method \User users(string $fixtureName) Get the User with that fixture name.
+ */
 class UserTest extends DeveloperPortalTestCase
 {
     public $fixtures = array(
@@ -78,6 +88,11 @@ class UserTest extends DeveloperPortalTestCase
                 var_export($userOnInsert->getErrors(), true)
             ));
         }
+    }
+    
+    public function testAcceptAnyPendingInvitations()
+    {
+        $this->fail('Test(s) not yet written.');
     }
     
     public function testAffectedByEvents_none()
@@ -346,6 +361,108 @@ class UserTest extends DeveloperPortalTestCase
             $result,
             'Failed to report that a User can delete a revoked Key for an Api '
             . 'that they own.'
+        );
+    }
+
+    public function testCanInviteDomainToSeeApi_isOwnerOfThatApi()
+    {
+        // Arrange:
+        $api = $this->apis('apiOwnedByUser18');
+        $user = $this->users('user18');
+        
+        // Act:
+        $result = $user->canInviteDomainToSeeApi($api);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to report that the owner of an Api can invite a domain to '
+            . 'see it.'
+        );
+    }
+
+    public function testCanInviteDomainToSeeApi_notOwnerOfThatApi()
+    {
+        // Arrange:
+        $api = $this->apis('api1');
+        $user = $this->users('userThatDoesNotOwnAnyApis');
+        
+        // Act:
+        $result = $user->canInviteDomainToSeeApi($api);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a User who is NOT the owner of an Api '
+            . 'can invite a domain to see the Api.'
+        );
+    }
+
+    public function testCanInviteDomainToSeeApi_nullApi()
+    {
+        // Arrange:
+        $api = null;
+        $user = $this->users('user18');
+        
+        // Act:
+        $result = $user->canInviteDomainToSeeApi($api);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a User can invite a domain to see a '
+            . 'null Api.'
+        );
+    }
+
+    public function testCanInviteUserToSeeApi_isOwnerOfThatApi()
+    {
+        // Arrange:
+        $api = $this->apis('apiOwnedByUser18');
+        $user = $this->users('user18');
+        
+        // Act:
+        $result = $user->canInviteUserToSeeApi($api);
+        
+        // Assert:
+        $this->assertTrue(
+            $result,
+            'Failed to report that the owner of an Api can invite a specific '
+            . 'person to see it.'
+        );
+    }
+
+    public function testCanInviteUserToSeeApi_notOwnerOfThatApi()
+    {
+        // Arrange:
+        $api = $this->apis('api1');
+        $user = $this->users('userThatDoesNotOwnAnyApis');
+        
+        // Act:
+        $result = $user->canInviteUserToSeeApi($api);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a User who is NOT the owner of an Api '
+            . 'can invite a specific person to see the Api.'
+        );
+    }
+
+    public function testCanInviteUserToSeeApi_nullApi()
+    {
+        // Arrange:
+        $api = null;
+        $user = $this->users('user18');
+        
+        // Act:
+        $result = $user->canInviteUserToSeeApi($api);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Incorrectly reported that a User can invite a specific person to '
+            . 'see a null Api.'
         );
     }
 
