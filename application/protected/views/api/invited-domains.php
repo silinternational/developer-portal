@@ -50,6 +50,17 @@ $this->pageSubtitle = 'Domains that have been granted permission to see this API
                     .   '$data->invitedByUser->getDisplayName()'
                     . ');'
                 ),
+                array(
+                    'class' => 'ActionLinksColumn',
+                    'htmlOptions' => array('style' => 'text-align: right'),
+                    'links' => array(
+                        array(
+                            'icon' => 'remove',
+                            'text' => 'Uninvite',
+                            'urlPattern' => '/api/cancel-domain-invitation/:api_visibility_domain_id',
+                        ),
+                    ),
+                ),
             ),
         )); 
         

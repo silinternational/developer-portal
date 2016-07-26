@@ -128,6 +128,80 @@ class ApiController extends Controller
         $this->render('add', array('form' => $form));
     }
 
+    public function actionCancelDomainInvitation($id)
+    {
+        /* @var $apiVisibilityDomain \ApiVisibilityDomain */
+        $apiVisibilityDomain = \ApiVisibilityDomain::model()->findByPk($id);
+        $api = (is_null($apiVisibilityDomain) ? null : $apiVisibilityDomain->api);
+        
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
+        
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
+            throw new CHttpException(
+                403,
+                'That is not an invitation to an API that you have permission to manage.'
+            );
+        }
+        
+        if ($apiVisibilityDomain === null) {
+            throw new CHttpException(404, 'We could not find that invitation.');
+        }
+        
+        $hasDependentKey = $apiVisibilityDomain->hasDependentKey();
+        if ($hasDependentKey) {
+            
+            Yii::app()->user->setFlash('error', sprintf(
+                '<b>Oops!</b> Before you can uninvite "%s" users, you must '
+                . 'first revoke/deny the following keys, which depend on '
+                . 'this invitation: %s',
+                $apiVisibilityDomain->domain,
+                $apiVisibilityDomain->getLinksToDependentKeysAsHtmlList()
+            ));
+            
+        } elseif (Yii::app()->request->isPostRequest) {
+            
+            if ( ! $apiVisibilityDomain->delete()) {
+                
+                Yii::log(
+                    'ApiVisibilityDomain deletion FAILED: ID ' . $id,
+                    CLogger::LEVEL_ERROR,
+                    __CLASS__ . '.' . __FUNCTION__
+                );
+
+                Yii::app()->user->setFlash(
+                    'error',
+                    '<strong>Error!</strong> Unable to withdraw invitation: <pre>'
+                    . print_r($apiVisibilityDomain->getErrors(), true) . '</pre>'
+                );
+            } else {
+                Yii::log(
+                    'ApiVisibilityDomain deleted: ID ' . $id,
+                    CLogger::LEVEL_INFO,
+                    __CLASS__ . '.' . __FUNCTION__
+                );
+
+                Yii::app()->user->setFlash(
+                    'success',
+                    '<strong>Success!</strong> Invitation withdrawn.'
+                );
+            }
+            
+            $this->redirect(array(
+                '/api/invited-domains',
+                'code' => $api->code,
+            ));
+        }
+        
+        // Show the page.
+        $this->render('uninvite-domain', array(
+            'api' => $api,
+            'apiVisibilityDomain' => $apiVisibilityDomain,
+            'currentUser' => $currentUser,
+            'hasDependentKey' => $hasDependentKey,
+        ));
+    }
+
     public function actionCancelUserInvitation($id)
     {
         /* @var $apiVisibilityUser \ApiVisibilityUser */
