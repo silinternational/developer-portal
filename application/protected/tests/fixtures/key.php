@@ -306,7 +306,7 @@ return array(
         'domain' => 'developer-portal.local',
     ),
     'deniedKeyThusNotDependentOnAvd3AnyMore' => array(
-        'user_id' => 35,
+        'user_id' => 37,
         'api_id' => 17,
         'queries_second' => 10,
         'queries_day' => 1000,

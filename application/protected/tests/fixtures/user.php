@@ -343,4 +343,13 @@ return array(
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Insite',
     ),
+    'userWithDeniedKeyRelatedToAvd3' => array(
+        'user_id'       => 37,
+        'email'         => 'userWithDeniedKeyRelatedToAvd3@1469472196.example.com',
+        'first_name'    => 'User With Denied',
+        'last_name'     => 'Key Related To AVD',
+        'status'        => User::STATUS_ACTIVE,
+        'role'          => User::ROLE_USER,
+        'auth_provider' => 'Insite',
+    ),
 );
