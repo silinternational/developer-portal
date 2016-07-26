@@ -555,6 +555,18 @@ class Key extends KeyBase
     }
            
     /**
+     * Indicate whether this Key is active or pending (i.e. - it has not been
+     * terminated).
+     * 
+     * @return boolean
+     */
+    public function isActiveOrPending()
+    {
+        return ($this->status === self::STATUS_APPROVED) ||
+               ($this->status === self::STATUS_PENDING);
+    }
+           
+    /**
      * Indicate whether this Key belongs to the given User. Note that this is a
      * User model, not a Yii CWebUser. If no user is given, then false is
      * returned.
