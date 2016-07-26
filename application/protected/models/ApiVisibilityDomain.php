@@ -47,8 +47,8 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
     }
     
     /**
-     * Get the list of keys where the owner of the key can only see that API
-     * because of this ApiVisibilityDomain.
+     * Get the list of Keys (active or pending) where the owner of the Key can
+     * only see that Api because of this invitation.
      *
      * @return \Key The list of keys.
      */
@@ -62,6 +62,10 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
         
         $dependentKeys = array();
         foreach ($api->keys as $keyToApi) {
+            
+            if ( ! $keyToApi->isActiveOrPending()) {
+                continue;
+            }
             
             $user = $keyToApi->user;
             if ($user === null) {
@@ -85,9 +89,7 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
     }
     
     /**
-     * Get an HTML list representing the Keys that depend on this
-     * ApiVisibilityDomain (for the Keys' owners to be able to see the
-     * related Api).
+     * Get an HTML list representing the list of dependent Keys.
      * 
      * @return string An HTML list of links to the dependent Keys.
      */
@@ -111,6 +113,17 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
             );
         }
         return '<ul>' . implode(' ', $listItemLinksToDependentKeys) . '</ul>';
+    }
+    
+    /**
+     * Determine whether there are any Keys that depend on this
+     * ApiVisibilityDomain. See getDependentKeys() for more information.
+     *
+     * @return boolean
+     */
+    public function hasDependentKey()
+    {
+        return (count($this->getDependentKeys()) > 0);
     }
 
     /**

@@ -43,6 +43,7 @@ class ApiVisibilityDomainTest extends \CDbTestCase
         $dependentKey1 = $this->keys('firstUserKeyDependentOnAvd3');
         $dependentKey2 = $this->keys('secondUserKeyDependentOnAvd3');
         $notDependentKey = $this->keys('keyNotDependentOnAvd3');
+        $deniedKey = $this->keys('deniedKeyThusNotDependentOnAvd3AnyMore');
         
         // Act:
         $actualDependentKeys = $apiVisibilityDomain->getDependentKeys();
@@ -60,6 +61,11 @@ class ApiVisibilityDomainTest extends \CDbTestCase
         $this->assertContains($dependentKey1->key_id, $actualDependentKeyIds);
         $this->assertContains($dependentKey2->key_id, $actualDependentKeyIds);
         $this->assertNotContains($notDependentKey->key_id, $actualDependentKeyIds);
+        $this->assertNotContains(
+            $deniedKey->key_id,
+            $actualDependentKeyIds,
+            'Incorrectly included a denied Key in the list of dependent Keys.'
+        );
     }
     
     public function testGetLinksToDependentKeysAsHtmlList()
