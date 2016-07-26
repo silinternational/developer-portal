@@ -2,6 +2,7 @@
 
 class ApiVisibilityDomain extends ApiVisibilityDomainBase
 {
+    use Sil\DevPortal\components\DependentKeysTrait;
     use Sil\DevPortal\components\ModelFindByPkTrait;
     
     public function afterDelete()
@@ -88,44 +89,6 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
         return $dependentKeys;
     }
     
-    /**
-     * Get an HTML list representing the list of dependent Keys.
-     * 
-     * @return string An HTML list of links to the dependent Keys.
-     */
-    public function getLinksToDependentKeysAsHtmlList()
-    {
-        $dependentKeys = $this->getDependentKeys();
-        $listItemLinksToDependentKeys = array();
-        foreach ($dependentKeys as $key) {
-            /* @var $key \Key */
-            if ($key->user === null) {
-                $userDisplayName = '(USER NOT FOUND)';
-            } else {
-                $userDisplayName = $key->user->getDisplayName();
-            }
-            $listItemLinksToDependentKeys[] = sprintf(
-                '<li><a href="%s">%s</a></li>',
-                \Yii::app()->createUrl('/key/details', array(
-                    'id' => $key->key_id,
-                )),
-                \CHtml::encode($userDisplayName)
-            );
-        }
-        return '<ul>' . implode(' ', $listItemLinksToDependentKeys) . '</ul>';
-    }
-    
-    /**
-     * Determine whether there are any Keys that depend on this
-     * ApiVisibilityDomain. See getDependentKeys() for more information.
-     *
-     * @return boolean
-     */
-    public function hasDependentKey()
-    {
-        return (count($this->getDependentKeys()) > 0);
-    }
-
     /**
      * Validate that the given domain name appears to be a valid domain name.
      * 
