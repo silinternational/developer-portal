@@ -982,7 +982,7 @@ class Key extends KeyBase
             $mailer->setData(array(
                 'key' => $this,
                 'api' => $this->api,
-                'user' => $this->user,
+                'keyOwner' => $this->user,
             ));
 
             // If unable to send the email, allow the process to
