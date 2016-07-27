@@ -332,9 +332,15 @@ class KeyController extends Controller
         /* @var $key Key */
         $key = \Key::model()->findByPk($id);
         
-        // If this is not a Key that the current User is allowed to revoke,
-        // say so.
         if ( ! $currentUser->canRevokeKey($key)) {
+            
+            if ($key && $key->isOwnedBy($currentUser)) {
+                $this->redirect(array(
+                    '/key/delete',
+                    'id' => $key->key_id,
+                ));
+            }
+            
             throw new CHttpException(
                 403,
                 'That is not a Key that you have permission to revoke.'
