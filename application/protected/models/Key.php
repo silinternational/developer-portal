@@ -20,18 +20,11 @@ class Key extends KeyBase
         parent::afterSave();
         
         try {
-            if ($this->status === self::STATUS_PENDING) {
-                if ($this->isNewRecord) {
-                    $this->notifyApiOwnerOfPendingRequest();
-                }
-            } elseif ($this->status === self::STATUS_DENIED) {
-                $this->notifyUserOfDeniedKey();
-            } elseif ($this->status === self::STATUS_REVOKED) {
-                $this->notifyUserOfRevokedKey();
-                $this->notifyApiOwnerOfRevokedKey();
+            if ($this->isNewRecord && ($this->status === self::STATUS_PENDING)) {
+                $this->notifyApiOwnerOfPendingRequest();
             }
         } finally {
-            $this->log(($this->isNewRecord ? 'created' : 'updated'));
+            $this->log($this->isNewRecord ? 'created' : 'updated');
         }
     }
     
@@ -1181,10 +1174,19 @@ class Key extends KeyBase
         $this->secret = null;
         
         if ($this->save()) {
-            $this->sendKeyDeletionNotification();
-            
             $this->log('revoked');
             
+            try {
+                $this->notifyUserOfRevokedKey();
+                $this->notifyApiOwnerOfRevokedKey();
+            } catch (Exception $e) {
+                \Yii::log(sprintf(
+                    'Error sending key-revoked notification email(s): (%s) %s',
+                    $e->getCode(),
+                    $e->getMessage()
+                ), CLogger::LEVEL_WARNING);
+            }
+
             // Indicate success.
             return true;
         } else {
