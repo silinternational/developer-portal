@@ -20,18 +20,11 @@ class Key extends KeyBase
         parent::afterSave();
         
         try {
-            if ($this->status === self::STATUS_PENDING) {
-                if ($this->isNewRecord) {
-                    $this->notifyApiOwnerOfPendingRequest();
-                }
-            } elseif ($this->status === self::STATUS_DENIED) {
-                $this->notifyUserOfDeniedKey();
-            } elseif ($this->status === self::STATUS_REVOKED) {
-                $this->notifyUserOfRevokedKey();
-                $this->notifyApiOwnerOfRevokedKey();
+            if ($this->isNewRecord && ($this->status === self::STATUS_PENDING)) {
+                $this->notifyApiOwnerOfPendingRequest();
             }
         } finally {
-            $this->log(($this->isNewRecord ? 'created' : 'updated'));
+            $this->log($this->isNewRecord ? 'created' : 'updated');
         }
     }
     
@@ -439,6 +432,56 @@ class Key extends KeyBase
 
             // Otherwise, consider it not successful.
             $this->addError('value', $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Attempt to deny a pending (i.e. - requested) Key, receiving back an
+     * indicator of whether it was successful.
+     * 
+     * @param \User $userDenyingKey The User to record as the one who denied the
+     *     request for this Key.
+     * @return boolean True if the Key was successfully denied. If not, check
+     *     the Key's list of errors to find out why.
+     * @throws \Exception
+     */
+    public function deny(User $userDenyingKey)
+    {
+        if ($this->status !== self::STATUS_PENDING) {
+            $this->addError('status', 'Only pending keys can be denied.');
+            return false;
+        }
+        
+        if ( ! $userDenyingKey->isAuthorizedToDenyKey($this)) {
+            $this->addError('processed_by', sprintf(
+                'That user (%s) is not authorized to deny keys for that API.',
+                $userDenyingKey->getDisplayName()
+            ));
+            return false;
+        }
+
+        // At this point, we know the given $deniedByUser is authorized
+        // to (and needs to) deny this Key.
+        $this->processed_by = $userDenyingKey->user_id;
+        $this->status = self::STATUS_DENIED;
+        
+        if ($this->save()) {
+            try {
+                $this->notifyUserOfDeniedKey();
+            } catch (Exception $e) {
+                \Yii::log(sprintf(
+                    'Error sending key-denied notification email: (%s) %s',
+                    $e->getCode(),
+                    $e->getMessage()
+                ), CLogger::LEVEL_WARNING);
+            }
+            
+            $this->log('denied');
+            
+            // Indicate success.
+            return true;
+        } else {
             return false;
         }
     }
@@ -982,7 +1025,7 @@ class Key extends KeyBase
             $mailer->setData(array(
                 'key' => $this,
                 'api' => $this->api,
-                'user' => $this->user,
+                'keyOwner' => $this->user,
             ));
 
             // If unable to send the email, allow the process to
@@ -1131,10 +1174,19 @@ class Key extends KeyBase
         $this->secret = null;
         
         if ($this->save()) {
-            $this->sendKeyDeletionNotification();
-            
             $this->log('revoked');
             
+            try {
+                $this->notifyUserOfRevokedKey();
+                $this->notifyApiOwnerOfRevokedKey();
+            } catch (Exception $e) {
+                \Yii::log(sprintf(
+                    'Error sending key-revoked notification email(s): (%s) %s',
+                    $e->getCode(),
+                    $e->getMessage()
+                ), CLogger::LEVEL_WARNING);
+            }
+
             // Indicate success.
             return true;
         } else {

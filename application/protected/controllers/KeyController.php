@@ -113,10 +113,6 @@ class KeyController extends Controller
                 );
             }
             
-            // Record that the current user is the one that processed this
-            // key.
-            $key->processed_by = $currentUser->user_id;
-            
             // If the request was approved...
             if (isset($_POST[\Key::STATUS_APPROVED])) {
                 
@@ -148,10 +144,7 @@ class KeyController extends Controller
             // Otherwise (i.e. - it was denied)...
             else {
 
-                // Record that fact.
-                $key->status = \Key::STATUS_DENIED;
-
-                if ($key->save()) {
+                if ($key->deny($currentUser)) {
                     
                     // Update our local copy of this Key's data.
                     $key->refresh();
@@ -339,9 +332,15 @@ class KeyController extends Controller
         /* @var $key Key */
         $key = \Key::model()->findByPk($id);
         
-        // If this is not a Key that the current User is allowed to revoke,
-        // say so.
         if ( ! $currentUser->canRevokeKey($key)) {
+            
+            if ($key && $key->isOwnedBy($currentUser)) {
+                $this->redirect(array(
+                    '/key/delete',
+                    'id' => $key->key_id,
+                ));
+            }
+            
             throw new CHttpException(
                 403,
                 'That is not a Key that you have permission to revoke.'
