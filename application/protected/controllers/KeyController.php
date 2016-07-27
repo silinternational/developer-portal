@@ -113,10 +113,6 @@ class KeyController extends Controller
                 );
             }
             
-            // Record that the current user is the one that processed this
-            // key.
-            $key->processed_by = $currentUser->user_id;
-            
             // If the request was approved...
             if (isset($_POST[\Key::STATUS_APPROVED])) {
                 
@@ -148,10 +144,7 @@ class KeyController extends Controller
             // Otherwise (i.e. - it was denied)...
             else {
 
-                // Record that fact.
-                $key->status = \Key::STATUS_DENIED;
-
-                if ($key->save()) {
+                if ($key->deny($currentUser)) {
                     
                     // Update our local copy of this Key's data.
                     $key->refresh();
