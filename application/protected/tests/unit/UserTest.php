@@ -1834,6 +1834,56 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testIsInvitedByDomainToSeeApi_wouldBeIfNotExcluded()
+    {
+        // Arrange:
+        $api = $this->apis('apiVisibleByInvitationOnly');
+        $apiVisibilityDomain = $this->apiVisibilityDomains('avd1');
+        $domainName = $apiVisibilityDomain->domain;
+        $user = $this->users('userWithEmailDomainInvitedToSeeApi');
+        
+        // Pre-assert:
+        $numAvdsForThisApiAndDomain = \ApiVisibilityDomain::model()->countByAttributes(array(
+            'api_id' => $apiVisibilityDomain->api_id,
+            'domain' => $domainName,
+        ));
+        $this->assertEquals(
+            1,
+            $numAvdsForThisApiAndDomain,
+            'This test requires that only one ApiVisibilityDomain exist '
+            . 'allowing "' . $domainName . '" users to see Api '
+            . $apiVisibilityDomain->api_id
+        );
+        $this->assertEquals(
+            $api->api_id,
+            $apiVisibilityDomain->api_id,
+            'This test requires an ApiVisibilityDomain associated with this Api.'
+        );
+        $this->assertEquals(
+            $user->getEmailAddressDomain(),
+            $domainName,
+            'This test requires an ApiVisibilityDomain referencing the same '
+            . 'domain as the User\'s email address.'
+        );
+        
+        // Act:
+        $resultAllowingThisAvd = $user->isInvitedByDomainToSeeApi($api);
+        $resultExcludingThisAvd = $user->isInvitedByDomainToSeeApi(
+            $api,
+            $apiVisibilityDomain->api_visibility_domain_id
+        );
+        
+        // Assert:
+        $this->assertTrue(
+            $resultAllowingThisAvd,
+            'This test requres a User that is invited by domain to see the Api.'
+        );
+        $this->assertFalse(
+            $resultExcludingThisAvd,
+            'Failed to exclude the specified ApiVisibilityDomain.'
+        );
+    }
+    
     public function testIsOwnerOfApi_yes()
     {
         // Arrange:

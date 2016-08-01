@@ -817,14 +817,24 @@ class User extends UserBase
      * invited to see this Api. This should be case-insensitive.
      * 
      * @param \Api $api The Api in question.
+     * @param array $excludedAvdId The ID of an ApiVisibilityDomain that should
+     *     be ignored (if any). Useful for seeing whether a Key depends on a
+     *     particular ApiVisibilityDomain.
      * @return boolean
      */
-    public function isInvitedByDomainToSeeApi($api)
+    public function isInvitedByDomainToSeeApi($api, $excludedAvdId = null)
     {
+        $criteria = new \CDbCriteria();
+        if ($excludedAvdId !== null) {
+            $criteria->addNotInCondition(
+                'api_visibility_domain_id',
+                array($excludedAvdId)
+            );
+        }
         $apiVisibilityDomain = \ApiVisibilityDomain::model()->findByAttributes(array(
             'api_id' => $api->api_id,
             'domain' => $this->getEmailAddressDomain(),
-        ));
+        ), $criteria);
         return ($apiVisibilityDomain !== null);
     }
     
