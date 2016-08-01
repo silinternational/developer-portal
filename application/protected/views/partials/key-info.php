@@ -26,16 +26,21 @@ if ($currentUser->canSeeKey($key)) {
         <dt>User</dt>
         <dd>
             <?php
+            $userDisplayHtml = \CHtml::encode(sprintf(
+                '%s (%s)',
+                $key->user->display_name,
+                $key->user->email
+            ));
             if ($currentUser->isAdmin()) {
                 echo sprintf(
                     '<a href="%s">%s</a>',
                     $this->createUrl('/user/details/', array(
                         'id' => $key->user_id,
                     )),
-                    \CHtml::encode($key->user->display_name)
+                    $userDisplayHtml
                 );
             } else {
-                echo \CHtml::encode($key->user->display_name);
+                echo $userDisplayHtml;
             }
             ?>&nbsp;
         </dd>
