@@ -171,9 +171,7 @@ class AuthManager
     
     protected function isSamlAuthEnabled()
     {
-        // If we have SAML config data, consider SAML authentication enabled.
-        $rawSamlConfigData = \Yii::app()->params['saml'];
-        return is_array($rawSamlConfigData) && (count($rawSamlConfigData) > 0);
+        return \Yii::app()->params['saml']['enabled'];
     }
     
     /**

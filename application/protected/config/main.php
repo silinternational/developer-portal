@@ -25,6 +25,7 @@ $gaTrackingId = Env::get('GA_TRACKING_ID');
 $googleOAuthClientId = Env::get('GOOGLE_OAUTH_CLIENT_ID');
 $googleOAuthClientSecret = Env::get('GOOGLE_OAUTH_CLIENT_SECRET');
 $googleOAuthEnabled = Env::get('GOOGLE_OAUTH_ENABLED', false);
+$samlEnabled = Env::get('SAML_ENABLED', false);
 $samlIdpEntityId = Env::get('SAML_IDP');
 $samlIdpName = Env::get('SAML_IDP_NAME');
 $samlTrustEmailFor = Env::get('SAML_TRUST_EMAIL_FOR');
@@ -130,6 +131,7 @@ return array(
         'alertsEmail' => $alertsEmail,
         'saml' => array(
             'default-sp' => 'default-sp',
+            'enabled' => (bool)$samlEnabled,
             'map' => array(
                 'firstNameField' => 'givenName',
                 'firstNameFieldElement' => 0,
