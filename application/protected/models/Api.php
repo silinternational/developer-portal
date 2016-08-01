@@ -797,6 +797,11 @@ class Api extends ApiBase
         }
     }
     
+    public function hasTerms()
+    {
+        return ( ! empty($this->terms));
+    }
+    
     public function isPubliclyVisible()
     {
         return ($this->visibility === self::VISIBILITY_PUBLIC);

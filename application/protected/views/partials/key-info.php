@@ -99,7 +99,7 @@ if ($currentUser->canSeeKey($key)) {
         <?php endif; ?>
             
         <?php if ($key->accepted_terms_on !== null): ?>
-            <dt>Accepted terms on</dt>
+            <dt>Accepted terms</dt>
             <dd><?= Utils::getFriendlyDate($key->accepted_terms_on); ?></dd>
         <?php endif; ?>
     </dl>

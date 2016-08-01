@@ -1,6 +1,8 @@
 <?php
 /* @var $this ApiController */
+/* @var $api Api */
 /* @var $key Key */
+/* @var $acceptedTerms bool */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
@@ -29,7 +31,7 @@ $this->pageTitle = 'Request Key';
     <div class="span11 offset1">
         <?php
         
-        /** @var BootActiveForm $form */
+        /* @var $form TbActiveForm */
         $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
             'inlineErrors' => true,
         ));
@@ -46,6 +48,20 @@ $this->pageTitle = 'Request Key';
             <p>What url/domain do you plan to use this API on? </p>
             <?php echo $form->textField($key, 'domain'); ?>
         </label>
+        <?php if ($api->hasTerms()): ?>
+            <div class="well">
+                <?php
+                $this->beginWidget('CMarkdown', array('purifyOutput' => false));
+                echo $api->terms;
+                $this->endWidget();
+                ?>
+            </div>
+            <label class="checkbox">
+                <?= \CHtml::checkBox('accept_terms', $acceptedTerms); ?>
+                I accept the terms
+            </label>
+        <?php endif; ?>
+        <hr />
         <p class="muted">
             <b>Note:</b> The owner of this API will be able to see your name and
             email address if you request a key.

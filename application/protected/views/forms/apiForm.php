@@ -128,7 +128,20 @@ return array(
                 'style' => 'height: 25ex; width: 90%;'
             ),
             'type' => 'textarea',
-        )
+        ),
+        'terms' => array(
+            'htmlOptions' => array(
+                'hint' => '<i class="icon-lock"></i> If you provide '
+                . 'terms, anyone requesting a new key will be required to '
+                . 'accept these Terms. <br />'
+                . '<i class="icon-info-sign"></i> Use <a href="'
+                . 'http://en.wikipedia.org/wiki/Markdown" target="_blank">'
+                . 'Markdown</a> syntax to format your API\'s Terms of Use (if '
+                . 'applicable).',
+                'style' => 'height: 25ex; width: 90%;',
+            ),
+            'type' => 'textarea',
+        ),
     ),
     
     'buttons' => array(

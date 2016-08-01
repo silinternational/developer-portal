@@ -192,3 +192,18 @@ $attrLabels = $api->attributeLabels();
         ?>
     </div>
 </div>
+
+<b>Terms</b>
+<div>
+    <div class="well">
+        <?php
+        if ($api->hasTerms()) {
+            $this->beginWidget('CMarkdown', array('purifyOutput' => false));
+            echo $api->terms;
+            $this->endWidget();
+        } else {
+            echo '<i class="muted">none</i>';
+        }
+        ?>
+    </div>
+</div>

@@ -1054,8 +1054,10 @@ class ApiController extends Controller
         // Create a new (pending) Key object.
         $key = new Key();
         
-        // If the form has been submitted...
         $request = \Yii::app()->getRequest();
+        $acceptedTerms = $request->getPost('accept_terms', false);
+        
+        // If the form has been submitted...
         if ($request->isPostRequest) {
             
             /**
@@ -1068,6 +1070,9 @@ class ApiController extends Controller
             $formData = $request->getPost('Key');
             $key->domain = isset($formData['domain']) ? $formData['domain'] : null;
             $key->purpose = isset($formData['purpose']) ? $formData['purpose'] : null;
+            if ($acceptedTerms) {
+                $key->accepted_terms_on = new CDbExpression('NOW()');
+            }
             
             // Also record the extra data it needs (not submitted by the user).
             $key->user_id = $currentUser->user_id;
@@ -1168,6 +1173,7 @@ class ApiController extends Controller
         $this->render('requestKey', array(
             'api' => $api,
             'key' => $key,
+            'acceptedTerms' => $acceptedTerms,
         ));
     }
     

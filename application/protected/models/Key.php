@@ -54,6 +54,7 @@ class Key extends KeyBase
             ),
             array('processed_on', 'recordDateWhenProcessed'),
             array('api_id', 'onlyAllowOneKeyPerApi', 'on' => 'insert'),
+            array('terms', 'requireAcceptingTermsIfApplicable', 'on' => 'insert'),
         ), parent::rules());
     }
     
@@ -1063,6 +1064,21 @@ class Key extends KeyBase
             $this->addError(
                 $attribute,
                 'You already have a pending key request for that API.'
+            );
+        }
+    }
+    
+    /**
+     * Require the User to have accepted the terms for Apis that have terms.
+     * 
+     * @param string $attribute The name of the attribute to be validated.
+     */
+    public function requireAcceptingTermsIfApplicable($attribute)
+    {
+        if ($this->api->hasTerms() && ($this->accepted_terms_on === null)) {
+            $this->addError(
+                $attribute,
+                'You must accept the terms in order to request a key to this API.'
             );
         }
     }
