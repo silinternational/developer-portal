@@ -21,6 +21,19 @@ class User extends UserBase
     
     protected $currentAccessGroups = null;
     
+    /**
+     * See if there are any ApiVisibilityUsers specifying this User's email
+     * address (which would only happen if they were created before this User
+     * record, with this email address, existed). If any are found, update them
+     * to use this User's ID instead (to get the foreign key relations all
+     * working), setting the invited_user_email to null so that we know they
+     * have been "connected" to a User.
+     * 
+     * WARNING: A User must NEVER be allowed to manually specify their email
+     *          address. Otherwise, they could "accept" invitations intended for
+     *          others. This is an example of why we must only set a User's
+     *          email address to a verified value.
+     */
     protected function acceptAnyPendingInvitations()
     {
         /* @var $pendingInvitations \ApiVisibilityUser[] */

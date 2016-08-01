@@ -92,7 +92,7 @@ class UserTest extends DeveloperPortalTestCase
     
     public function testAcceptAnyPendingInvitations()
     {
-        $this->fail('Test(s) not yet written.');
+        $this->markTestIncomplete('Test(s) not yet written.');
     }
     
     public function testAffectedByEvents_none()
