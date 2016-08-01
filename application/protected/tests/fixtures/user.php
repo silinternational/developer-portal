@@ -352,4 +352,13 @@ return array(
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Insite',
     ),
+    'userWithKeyAllowedByTwoApiVisibilityDomains' => array(
+        'user_id'       => 38,
+        'email'         => 'userWithKeyAllowedByTwoApiVisibilityDomains@two-avds.example.com',
+        'first_name'    => 'User With Key Allowed By',
+        'last_name'     => 'Two ApiVisibilityDomains',
+        'status'        => User::STATUS_ACTIVE,
+        'role'          => User::ROLE_USER,
+        'auth_provider' => 'Insite',
+    ),
 );

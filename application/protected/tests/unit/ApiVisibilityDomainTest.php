@@ -68,6 +68,29 @@ class ApiVisibilityDomainTest extends \CDbTestCase
         );
     }
     
+    public function testGetDependentKeys_keyAllowedByTwoAvds()
+    {
+        // Arrange:
+        $apiVisibilityDomain = $this->apiVisibilityDomains('firstAvdAllowingKeyAllowedByTwoAvds');
+        $keyAllowedByTwoAvds = $this->keys('allowedByTwoApiVisibilityDomains');
+        
+        // Act:
+        $actualDependentKeys = $apiVisibilityDomain->getDependentKeys();
+        
+        // Assert:
+        $actualDependentKeyIds = array();
+        foreach ($actualDependentKeys as $actualDependentKey) {
+            $actualDependentKeyIds[] = $actualDependentKey->key_id;
+        }
+        $this->assertNotContains(
+            $keyAllowedByTwoAvds->key_id,
+            $actualDependentKeyIds,
+            'Incorrectly said a Key was dependent on (i.e. would not be '
+            . 'allowed without) an ApiVisibilityDomain (AVD) when there was a '
+            . '2nd AVD also allowing the Key.'
+        );
+    }
+    
     public function testGetLinksToDependentKeysAsHtmlList()
     {
         // Arrange:

@@ -318,4 +318,17 @@ return array(
         'purpose' => 'Some frivolous purpose',
         'domain' => 'developer-portal.local',
     ),
+    'allowedByTwoApiVisibilityDomains' => array(
+        'user_id' => 38,
+        'api_id' => 17,
+        'queries_second' => 10,
+        'queries_day' => 1000,
+        'created' => '2016-07-27 15:07:11',
+        'updated' => '2016-07-27 15:07:11',
+        'requested_on' => '2016-07-27 15:07:11',
+        'processed_on' => '2016-07-27 15:07:11',
+        'status' => Key::STATUS_APPROVED,
+        'purpose' => 'Testing Multiple ApiVisibilityDomains',
+        'domain' => 'developer-portal.local',
+    ),
 );

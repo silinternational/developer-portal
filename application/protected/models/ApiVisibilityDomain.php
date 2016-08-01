@@ -81,7 +81,12 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
                 continue;
             }
             
-            if ($user->isInvitedByDomainToSeeApi($api)) {
+            $isAllowedIncludingThisAvd = $user->isInvitedByDomainToSeeApi($api);
+            $isAllowedExcludingThisAvd = $user->isInvitedByDomainToSeeApi(
+                $api,
+                $this->api_visibility_domain_id
+            );
+            if ($isAllowedIncludingThisAvd && ( ! $isAllowedExcludingThisAvd)) {
                 $dependentKeys[] = $keyToApi;
             }
         }
