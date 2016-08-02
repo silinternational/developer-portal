@@ -17,47 +17,55 @@ $this->pageTitle = 'Delete API';
 <div class="row">
     <div class="span7 offset2">
 
-        <h3 class="text-error">Are you sure?</h3>
-        <?php $form = $this->beginWidget('CActiveForm'); ?>
-
-        <span class="help-block control-group error">
-            <strong class="control-label">
-                <span style="text-decoration: underline;">WARNING</span>:
-                This will completely delete this API as well as revoke 
-                any keys to this API.
-            </strong>
-        </span>
-        <div class="row">
-            <div class="span2 offset1">
-                <?php
-
-                $this->widget('bootstrap.widgets.TbButton', array(
-                    'buttonType' => 'link',
-                    'icon' => 'ban-circle',
-                    'label' => 'NO - Cancel',
-                    'url' => $this->createUrl('/api/details/', array(
-                        'code' => $api->code,
-                    )),
-                ));
-
-                ?>
+        <?php if ($api->approvedKeyCount > 0): ?>
+            <div class="alert alert-error">
+                <strong>NOTE:</strong><br />
+                Before you can delete this API you must revoke all of its
+                approved keys.
             </div>
-            <div class="span1">&nbsp;</div>
-            <div class="span2">
-                <?php
+        <?php else: ?>
+            <h3 class="text-error">Are you sure?</h3>
+            <?php $form = $this->beginWidget('CActiveForm'); ?>
 
-                $this->widget('bootstrap.widgets.TbButton', array(
-                    'buttonType' => 'submit',
-                    'icon' => 'remove',
-                    'label' => 'YES - Delete',
-                    'type' => 'danger'
-                ));
+            <span class="help-block control-group error">
+                <strong class="control-label">
+                    <span style="text-decoration: underline;">WARNING</span>:
+                    This will completely delete this API as well as deny 
+                    any pending requests for keys to this API.
+                </strong>
+            </span>
+            <div class="row">
+                <div class="span2 offset1">
+                    <?php
 
-                ?>
+                    $this->widget('bootstrap.widgets.TbButton', array(
+                        'buttonType' => 'link',
+                        'icon' => 'ban-circle',
+                        'label' => 'NO - Cancel',
+                        'url' => $this->createUrl('/api/details/', array(
+                            'code' => $api->code,
+                        )),
+                    ));
+
+                    ?>
+                </div>
+                <div class="span1">&nbsp;</div>
+                <div class="span2">
+                    <?php
+
+                    $this->widget('bootstrap.widgets.TbButton', array(
+                        'buttonType' => 'submit',
+                        'icon' => 'remove',
+                        'label' => 'YES - Delete',
+                        'type' => 'danger'
+                    ));
+
+                    ?>
+                </div>
             </div>
-        </div>
 
-        <?php $this->endWidget(); ?>
+            <?php $this->endWidget(); ?>
+        <?php endif; ?>
     </div>
 </div>
 <div class="row">
