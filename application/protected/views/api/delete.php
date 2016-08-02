@@ -24,7 +24,7 @@ $this->pageTitle = 'Delete API';
             <strong class="control-label">
                 <span style="text-decoration: underline;">WARNING</span>:
                 This will completely delete this API as well as revoke 
-                any keys that have been granted to users for this API.
+                any keys to this API.
             </strong>
         </span>
         <div class="row">
@@ -61,7 +61,7 @@ $this->pageTitle = 'Delete API';
     </div>
 </div>
 <div class="row">
-    <div class="span7 offset1">
+    <div class="span12">
 
         <h3>API Info</h3>
         <dl class="dl-horizontal">
@@ -107,52 +107,65 @@ $this->pageTitle = 'Delete API';
     </div>
 </div>
 <div class="row">
-  <div class="span9 offset1">
+  <div class="span12">
 
-    <h3>Users with Keys</h3>
+    <h3>Keys</h3>
     <?php 
       
-      $this->widget('bootstrap.widgets.TbGridView', array(
-         'type' => 'striped hover',
-         'dataProvider' => $keyList,
-         'template' => '{items}{pager}',
-         //'filter' => new Key(),
-         'columns' => array(
-              array(
-                  'name' => 'user.display_name',
-                  'header' => 'Name',
-                  'visible' => ( ! \Yii::app()->user->checkAccess('admin')),
-              ),
-              array(
-                  'class' => 'CLinkColumn',
-                  'labelExpression' => 'CHtml::encode($data->user->display_name)',
-                  'urlExpression' => 'Yii::app()->createUrl('
-                                       . '"/user/details/", '
-                                       . 'array("id" => $data->user_id)'
-                                   . ')',
-                  'header' => 'Name',
-                  'visible' => \Yii::app()->user->checkAccess('admin'),
-              ),
-              array('name' => 'user.email', 'header' => 'Email'),
-              array('name' => 'user.status', 'header' => 'Status'),
-              array(
-                  'name' => 'user.role',
-                  'header' => 'Role',
-                  'value' => 'User::getRoleString($data->user->role)',
-              ),
-              array(
-                  'class' => 'ActionLinksColumn',
-                  'htmlOptions' => array('style' => 'text-align: right'),
-                  'links' => array(
-                      array(
-                          'icon' => 'list',
-                          'text' => 'Details',
-                          'urlPattern' => '/key/details/:key_id',
-                      ),
-                  )
-              ),
-          ),
-      )); 
+        $this->widget('bootstrap.widgets.TbGridView', array(
+            'type' => 'striped hover',
+            'dataProvider' => $keyList,
+            'template' => '{items}{pager}',
+            //'filter' => new Key(),
+            'columns' => array(
+                array(
+                    'name' => 'user.display_name',
+                    'header' => 'User',
+                    'visible' => ( ! \Yii::app()->user->checkAccess('admin')),
+                ),
+                array(
+                    'class' => 'CLinkColumn',
+                    'labelExpression' => 'CHtml::encode($data->user->display_name)',
+                    'urlExpression' => 'Yii::app()->createUrl('
+                                         . '"/user/details/", '
+                                         . 'array("id" => $data->user_id)'
+                                     . ')',
+                    'header' => 'User',
+                    'visible' => \Yii::app()->user->checkAccess('admin'),
+                ),
+                array(
+                    'name' => 'status',
+                    'type' => 'raw',
+                    'value' => '$data->getStyledStatusHtml()',
+                ),
+                array(
+                    'name' => 'processed_on',
+                    'header' => 'Granted on',
+                    'value' => 'Utils::getShortDate($data->processed_on)'
+                ),
+                array(
+                    'name' => 'domain',
+                    'header' => 'Domain',
+                    'value' => '$data->domain'
+                ),
+                array(
+                    'name' => 'purpose',
+                    'header' => 'Purpose',
+                    'value' => '$data->purpose'
+                ),
+                array(
+                    'class' => 'ActionLinksColumn',
+                    'htmlOptions' => array('style' => 'text-align: right'),
+                    'links' => array(
+                        array(
+                            'icon' => 'list',
+                            'text' => 'Details',
+                            'urlPattern' => '/key/details/:key_id',
+                        ),
+                    ),
+                ),
+            ),
+        )); 
     ?>
   </div>
 </div>
