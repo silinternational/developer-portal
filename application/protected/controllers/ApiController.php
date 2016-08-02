@@ -334,10 +334,10 @@ class ApiController extends Controller
                     Yii::app()->user->setFlash(
                         'error',
                         '<strong>Error!</strong> Unable to delete that API: '
-                        . '<pre>' . print_r($api->getErrors(), true) . '</pre>'
+                        . $api->getErrorsAsFlatHtmlList()
                     );
 
-                    $this->redirect(array('/api/details/',
+                    $this->redirect(array('/api/delete/',
                         'code' => $api->code,
                     ));
                 }

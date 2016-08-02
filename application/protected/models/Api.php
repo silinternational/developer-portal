@@ -9,6 +9,7 @@ use ApiAxle\Api\Api as AxleApi;
  */
 class Api extends ApiBase
 {
+    use Sil\DevPortal\components\FormatModelErrorsTrait;
     use Sil\DevPortal\components\ModelFindByPkTrait;
     
     CONST APPROVAL_TYPE_AUTO = 'auto';
