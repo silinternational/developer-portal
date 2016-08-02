@@ -105,7 +105,7 @@ return array(
             'htmlOptions' => array(
                 'hint' => '<i class="icon-info-sign"></i> Enter a website, ' .
                           'email address, phone number, or some other way ' .
-                          'for people to get technical support for API.',
+                          'for people to get technical support for this API.',
                 'class' => 'input-xxlarge',
             ),
             'type' => 'text',
@@ -114,7 +114,7 @@ return array(
             'htmlOptions' => array(
                 'hint' => '<i class="icon-info-sign"></i> Enter a website, ' .
                           'email address, phone number, or some other way ' .
-                          'for people to get customer support for API.',
+                          'for people to get customer support for this API.',
                 'class' => 'input-xxlarge',
             ),
             'type' => 'text',
