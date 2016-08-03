@@ -2,6 +2,7 @@
 
 class Event extends EventBase
 {
+    use Sil\DevPortal\components\FormatModelErrorsTrait;
     use Sil\DevPortal\components\ModelFindByPkTrait;
     
     /**
@@ -49,9 +50,10 @@ class Event extends EventBase
                 \Yii::log($description, CLogger::LEVEL_WARNING);
             } else {
                 \Yii::log(sprintf(
-                    'Unable to log event: %s. Error: %s.',
+                    'Unable to log event: %s. Error: %s%s.',
                     $event->toJson(),
-                    print_r($event->getErrors(), true)
+                    PHP_EOL,
+                    $event->getErrorsAsFlatTextList()
                 ), CLogger::LEVEL_WARNING);
             }
         } catch (\Exception $exception) {

@@ -120,8 +120,8 @@ abstract class UserIdentity extends \CBaseUserIdentity
         // Try to save the new User record.
         if ( ! $user->save()) {
             throw new \Exception(
-                'Failed to save new User to database: '
-                . print_r($user->errors, true),
+                'Failed to save new User to database: ' . PHP_EOL
+                . $user->getErrorsAsFlatTextList(),
                 1444679705
             );
         }
@@ -288,8 +288,8 @@ abstract class UserIdentity extends \CBaseUserIdentity
         if ( ! $user->save()) {
             throw new \Exception(
                 'Failed to update our database with the data from the '
-                . 'authentication provider: '
-                . print_r($user->errors, true),
+                . 'authentication provider: ' . PHP_EOL
+                . $user->getErrorsAsFlatTextList(),
                 1444936203
             );
         }

@@ -307,8 +307,8 @@ class SamlUserIdentity extends UserIdentity
                 if ( ! $user->save()) {
                     throw new \Exception(
                         'Failed to save this user\'s auth. provider user '
-                        . 'identifier: '
-                        . print_r($user->errors, true),
+                        . 'identifier: ' . PHP_EOL
+                        . $user->getErrorsAsFlatTextList(),
                         1444936447
                     );
                 }

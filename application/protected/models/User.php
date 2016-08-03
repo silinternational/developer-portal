@@ -10,6 +10,7 @@
  */
 class User extends UserBase 
 {
+    use Sil\DevPortal\components\FormatModelErrorsTrait;
     use Sil\DevPortal\components\ModelFindByPkTrait;
     
     const ROLE_USER = 'user';
@@ -126,8 +127,9 @@ class User extends UserBase
             if ( ! $api->save()) {
                 $this->addError('user_id', sprintf(
                     'We cannot delete this user because we could not finish removing them as the owner of their APIs '
-                    . '(though we may done so for some of their APIs): %s',
-                    print_r($api->getErrors(), true)
+                    . '(though we may done so for some of their APIs): %s%s',
+                    PHP_EOL,
+                    $api->getErrorsAsFlatTextList()
                 ));
                 return false;
             }
@@ -137,13 +139,15 @@ class User extends UserBase
             if ( ! $key->delete()) {
                 $this->addError('user_id', sprintf(
                     'We cannot delete this user because we could not finish deleting the user\'s keys (though we may '
-                    . 'have deleted some of them): %s',
-                    print_r($key->getErrors(), true)
+                    . 'have deleted some of them): %s%s',
+                    PHP_EOL,
+                    $key->getErrorsAsFlatTextList()
                 ));
                 return false;
             }
         }
         
+        /* @var $apiVisibilityUsersReceived \ApiVisibilityUser */
         $apiVisibilityUsersReceived = \ApiVisibilityUser::model()->findAllByAttributes(array(
             'invited_user_id' => $this->user_id,
         ));
@@ -151,8 +155,9 @@ class User extends UserBase
             if ( ! $apiVisibilityUserReceived->delete()) {
                 $this->addError('user_id', sprintf(
                     'We cannot delete this user because we could not finish deleting the invitations they received to '
-                    . 'see private APIs (though we may have deleted some of them): %s',
-                    print_r($apiVisibilityUserReceived->getErrors(), true)
+                    . 'see private APIs (though we may have deleted some of them): %s%s',
+                    PHP_EOL,
+                    $apiVisibilityUserReceived->getErrorsAsFlatTextList()
                 ));
                 return false;
             }
@@ -161,6 +166,7 @@ class User extends UserBase
         /* NOTE: Simply using $this->affectedByEvents was retrieving a cached
          *       list of Events, and so we were failing to update Events created
          *       earlier in this beforeDelete() method.  */
+        /* @var $eventsAffectingUser \Event[] */
         $eventsAffectingUser = \Event::model()->findAllByAttributes(array(
             'affected_user_id' => $this->user_id,
         ));
@@ -169,8 +175,9 @@ class User extends UserBase
             if ( ! $eventAffectingUser->save()) {
                 $this->addError('user_id', sprintf(
                     'We could not delete this User because we were not able to finish updating our records of events '
-                    . 'that affected the User: %s',
-                    print_r($eventAffectingUser->getErrors(), true)
+                    . 'that affected the User: %s%s',
+                    PHP_EOL,
+                    $eventAffectingUser->getErrorsAsFlatTextList()
                 ));
                 return false;
             }
@@ -178,6 +185,7 @@ class User extends UserBase
         
         /* NOTE: Simply using $this->causedEvents fails to retrieve the most
          *       current list of Events caused by this User.  */
+        /* @var $eventsCausedByUser \Event[] */
         $eventsCausedByUser = \Event::model()->findAllByAttributes(array(
             'acting_user_id' => $this->user_id,
         ));
@@ -186,8 +194,9 @@ class User extends UserBase
             if ( ! $eventCausedByUser->save()) {
                 $this->addError('user_id', sprintf(
                     'We could not delete this User because we were not able to finish updating our records of events '
-                    . 'performed by the User: %s',
-                    print_r($eventCausedByUser->getErrors(), true)
+                    . 'performed by the User: %s%s',
+                    PHP_EOL,
+                    $eventCausedByUser->getErrorsAsFlatTextList()
                 ));
                 return false;
             }

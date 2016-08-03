@@ -117,8 +117,7 @@ class ApiController extends Controller
                     Yii::app()->user->setFlash(
                         'error',
                         '<strong>Error!</strong> We were unable to create that '
-                        . 'API: <pre>' . print_r($api->getErrors(), true)
-                        . '</pre>'
+                        . 'API: ' . $api->getErrorsAsFlatHtmlList()
                     );
                 }
             }
@@ -171,8 +170,8 @@ class ApiController extends Controller
 
                 Yii::app()->user->setFlash(
                     'error',
-                    '<strong>Error!</strong> Unable to withdraw invitation: <pre>'
-                    . print_r($apiVisibilityDomain->getErrors(), true) . '</pre>'
+                    '<strong>Error!</strong> Unable to withdraw invitation: '
+                    . $apiVisibilityDomain->getErrorsAsFlatHtmlList()
                 );
             } else {
                 Yii::log(
@@ -247,8 +246,8 @@ class ApiController extends Controller
 
                 Yii::app()->user->setFlash(
                     'error',
-                    '<strong>Error!</strong> Unable to withdraw invitation: <pre>'
-                    . print_r($apiVisibilityUser->getErrors(), true) . '</pre>'
+                    '<strong>Error!</strong> Unable to withdraw invitation: '
+                    . $apiVisibilityUser->getErrorsAsFlatHtmlList()
                 );
             } else {
                 Yii::log(
@@ -482,8 +481,8 @@ class ApiController extends Controller
                     Yii::app()->user->setFlash(
                         'error',
                         '<strong>Error!</strong> We were unable to save your '
-                        . 'changes to the API documentation: <pre>'
-                        . print_r($api->getErrors(), true) . '</pre>'
+                        . 'changes to the API documentation: '
+                        . $api->getErrorsAsFlatHtmlList()
                     );
                 }
             }
@@ -561,8 +560,8 @@ class ApiController extends Controller
                     Yii::app()->user->setFlash(
                         'error',
                         '<strong>Error!</strong> We were unable to save your '
-                        . 'changes to the API: <pre>'
-                        . print_r($api->getErrors(), true) . '</pre>'
+                        . 'changes to the API: '
+                        . $api->getErrorsAsFlatHtmlList()
                     );
                 }
             }
@@ -1102,7 +1101,7 @@ class ApiController extends Controller
                         Yii::app()->user->setFlash(
                             'error',
                             '<strong>Error!</strong> Unable to create key: '
-                            . '<br />' .  print_r($key->getErrors(), true)
+                            . $key->getErrorsAsFlatHtmlList()
                         );
                     }
                     // Otherwise...

@@ -6,6 +6,7 @@ use ApiAxle\Api\Keyring as AxleKeyring;
 
 class Key extends KeyBase
 {
+    use Sil\DevPortal\components\FormatModelErrorsTrait;
     use Sil\DevPortal\components\ModelFindByPkTrait;
     
     const STATUS_APPROVED = 'approved';
@@ -286,8 +287,9 @@ class Key extends KeyBase
             if ( ! $event->save()) {
                 $this->addError('api_id', sprintf(
                     'We could not delete this Key because we were not able to finish updating the related event '
-                    . 'records: %s',
-                    print_r($event->getErrors(), true)
+                    . 'records: %s%s',
+                    PHP_EOL,
+                    $event->getErrorsAsFlatTextList()
                 ));
                 return false;
             }
@@ -1146,7 +1148,7 @@ class Key extends KeyBase
         else {
             
             // Indicate failure, returning the error message(s).
-            return array(false,print_r($key->getErrors(),true));
+            return array(false, $key->getErrorsAsFlatTextList());
         }
         
     }
@@ -1232,7 +1234,7 @@ class Key extends KeyBase
         } else {
             
             // Return the error messages.
-            return array(false, print_r($key->getErrors(), true));
+            return array(false, $key->getErrorsAsFlatTextList());
         }
     }
     

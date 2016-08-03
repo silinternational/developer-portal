@@ -31,6 +31,7 @@ class UserController extends Controller
 
     public function actionEdit($id)
     {
+        /* @var $user \User */
         $user = $this->getPkOr404('User');
 
         // Get the form object.
@@ -79,7 +80,7 @@ class UserController extends Controller
                         '<strong>%s</strong> %s: <pre>%s</pre>',
                         'Error!',
                         'We were unable to save your changes to the User',
-                        print_r($user->getErrors(), true)
+                        $user->getErrorsAsFlatHtmlList()
                     )
                 );
             }

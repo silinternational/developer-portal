@@ -50,8 +50,8 @@ class KeyController extends Controller
                 // Tell the user.
                 Yii::app()->user->setFlash(
                     'error',
-                    '<strong>Error!</strong> Unable to delete key: <pre>'
-                    . print_r($key->getErrors(), true) . '</pre>'
+                    '<strong>Error!</strong> Unable to delete key: '
+                    . $key->getErrorsAsFlatHtmlList()
                 );
             }
             // Otherwise...
@@ -131,8 +131,8 @@ class KeyController extends Controller
                     Yii::app()->user->setFlash(
                         'error', 
                         '<strong>Error!</strong> We were unable to approve '
-                        . 'that key: <pre>'
-                        . \CHtml::encode(print_r($key->getErrors(), true)) . '</pre>'
+                        . 'that key: '
+                        . $key->getErrorsAsFlatHtmlList()
                     );
                 }
                 
@@ -157,8 +157,8 @@ class KeyController extends Controller
                     Yii::app()->user->setFlash(
                         'error',
                         '<strong>Error!</strong> We were unable to mark '
-                        . 'that key as having been denied: <pre>'
-                        . print_r($key->getErrors(), true) . '</pre>'
+                        . 'that key as having been denied: '
+                        . $key->getErrorsAsFlatHtmlList()
                     );
                 }
 

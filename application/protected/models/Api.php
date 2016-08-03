@@ -691,8 +691,9 @@ class Api extends ApiBase
             if ( ! $apiVisibilityDomain->delete()) {
                 $this->addError('api_id', sprintf(
                     'We could not delete this API because we were not able to finish deleting the records of what '
-                    . 'email domains are allowed to see this API: %s',
-                    print_r($apiVisibilityDomain->getErrors(), true)
+                    . 'email domains are allowed to see this API: %s%s',
+                    PHP_EOL,
+                    $apiVisibilityDomain->getErrorsAsFlatTextList()
                 ));
                 return false;
             }
@@ -702,8 +703,9 @@ class Api extends ApiBase
             if ( ! $apiVisibilityUser->delete()) {
                 $this->addError('api_id', sprintf(
                     'We could not delete this API because we were not able to finish deleting the records of what '
-                    . 'users are allowed to see this API: %s',
-                    print_r($apiVisibilityUser->getErrors(), true)
+                    . 'users are allowed to see this API: %s%s',
+                    PHP_EOL,
+                    $apiVisibilityUser->getErrorsAsFlatTextList()
                 ));
                 return false;
             }
@@ -715,8 +717,9 @@ class Api extends ApiBase
         foreach ($this->keys as $key) {
             if ( ! $key->delete()) {
                 $this->addError('api_id', sprintf(
-                    'We could not delete this API because we were not able to finish deleting its inactive keys: %s',
-                    print_r($key->getErrors(), true)
+                    'We could not delete this API because we were not able to finish deleting its inactive keys: %s%s',
+                    PHP_EOL,
+                    $key->getErrorsAsFlatTextList()
                 ));
                 return false;
             }
@@ -727,8 +730,9 @@ class Api extends ApiBase
             if ( ! $event->save()) {
                 $this->addError('api_id', sprintf(
                     'We could not delete this API because we were not able to finish updating the related event '
-                    . 'records: %s',
-                    print_r($event->getErrors(), true)
+                    . 'records: %s%s',
+                    PHP_EOL,
+                    $event->getErrorsAsFlatTextList()
                 ));
                 return false;
             }
@@ -894,9 +898,10 @@ class Api extends ApiBase
             if ( ! $key->save()) {
                 throw new \Exception(sprintf(
                     'Failed to update Key %s\'s rate limits to match '
-                    . 'Api\'s rate limits: %s',
+                    . 'Api\'s rate limits: %s%s',
                     $key->key_id,
-                    print_r($key->getErrors(), true)
+                    PHP_EOL,
+                    $key->getErrorsAsFlatTextList()
                 ), 1467836607);
             }
         }
