@@ -804,24 +804,29 @@ class ApiController extends Controller
         $download = false;
         $method = false;
         $requestPath = false;
-        $responseBody = $responseHeaders = $requestUrl = $apiRequest = $apiRequestBody = $responseSyntax = false;
+        $responseBody = false;
+        $responseHeaders = false;
+        $requestUrl = false;
+        $apiRequest = false;
+        $apiRequestBody = false;
+        $responseSyntax = false;
         $params = array(
             array(
                 'type' => null,
                 'name' => null,
                 'value' => null,
-            )
+            ),
         );
         
         // Record the key_id that the user provided (if any).
         $keyId = $request->getParam('key_id', false);
         
-        if($request->isPostRequest){
+        if ($request->isPostRequest) {
             // Override remaining variables with what was submitted.
-            $method = $request->getParam('method','GET');
-            $requestPath = $request->getParam('path','');
-            $params = $request->getParam('param',false);
-            $download = $request->getParam('download',false);
+            $method = $request->getParam('method', 'GET');
+            $requestPath = $request->getParam('path', '');
+            $params = $request->getParam('param', false);
+            $download = $request->getParam('download', false);
             
             /* Create copy of the request path for manipulation, ensuring it
              * begins with a forward-slash (/).  */
@@ -831,20 +836,20 @@ class ApiController extends Controller
              * Get Key object and make sure this user owns the key
              */
             $key = Key::model()->findByAttributes(array('key_id' => $keyId));
-            if($key && $key->user_id == Yii::app()->user->getId()){
+            if ($key && $key->user_id == Yii::app()->user->getId()) {
                 // Create a single dimension parameter array from parameters
                 // submitted divided by form and header parameters
                 $paramsForm = $paramsHeader = array();
-                if($params && is_array($params)){
-                    foreach($params as $param){
-                        if(isset($param['name']) && isset($param['value']) 
+                if ($params && is_array($params)) {
+                    foreach($params as $param) {
+                        if (isset($param['name']) && isset($param['value']) 
                                 && $param['name'] != '' && $param['value'] != ''
-                                && !is_null($param['name']) && !is_null($param['value'])){
+                                && !is_null($param['name']) && !is_null($param['value'])) {
 
                             // Determine if parameter is supposed to be form based or header
-                            if(isset($param['type']) && $param['type'] == 'form'){
+                            if (isset($param['type']) && $param['type'] == 'form') {
                                 $paramsForm[$param['name']] = $param['value'];
-                            } elseif(isset($param['type']) && $param['type'] == 'header'){
+                            } elseif (isset($param['type']) && $param['type'] == 'header') {
                                 $paramsHeader[$param['name']] = $param['value'];
                             }
                         }
@@ -859,7 +864,7 @@ class ApiController extends Controller
                 $proxyDomain = str_replace('apiaxle.', '', $proxyDomain);
                 
                 // Build url from components
-                $url = $proxyProtocol.'://'.$key->api->code.'.'.$proxyDomain.$path;
+                $url = $proxyProtocol . '://' . $key->api->code . '.' . $proxyDomain . $path;
 
                 /**
                  * Calculate signature for ApiAxle call
@@ -878,7 +883,7 @@ class ApiController extends Controller
                 if ($method == 'GET') {
                     $paramsQuery = CMap::mergeArray($paramsQuery, $paramsForm);
                     $paramsForm = null;
-                } elseif($method == 'POST' || $method == 'PUT') {
+                } elseif ($method == 'POST' || $method == 'PUT') {
                     $apiRequestBody = PHP_EOL . PHP_EOL;
                     foreach ($paramsForm as $name => $value) {
                         $apiRequestBody .= $name . '=' . $value . PHP_EOL;
@@ -889,11 +894,17 @@ class ApiController extends Controller
                  * Create Guzzle client for making API call
                  */
                 $client = new Guzzle\Http\Client();
-                $request = $client->createRequest($method,$url,$paramsHeader,$paramsForm,array(
-                    'query' => $paramsQuery,
-                    'exceptions' => false,
-                    'verify' => Yii::app()->params['apiaxle']['ssl_verifypeer'],
-                ));
+                $request = $client->createRequest(
+                    $method,
+                    $url,
+                    $paramsHeader,
+                    $paramsForm,
+                    array(
+                        'query' => $paramsQuery,
+                        'exceptions' => false,
+                        'verify' => Yii::app()->params['apiaxle']['ssl_verifypeer'],
+                    )
+                );
 
                 $apiRequest = $request->getRawHeaders();
                 $requestUrl = $request->getUrl();
@@ -902,7 +913,7 @@ class ApiController extends Controller
                 $responseHeaders = $response->getRawHeaders();
                 $responseBody = $response->getBody(true);
 
-                if($response->getContentType() == 'applicaton/json'){
+                if ($response->getContentType() == 'applicaton/json') {
                     $responseSyntax = 'javascript';
                 } else {
                     $responseSyntax = 'markup';
@@ -910,7 +921,7 @@ class ApiController extends Controller
 
             } else {
                 // Display an error
-                Yii::app()->user->setFlash('error','Invalid API selected');
+                Yii::app()->user->setFlash('error', 'Invalid API selected');
             }
             
         }
@@ -920,17 +931,17 @@ class ApiController extends Controller
          */
         $apiOptions = Key::model()->findAllByAttributes(array('user_id' => Yii::app()->user->getId()));
         
-        if(!$download){
+        if ( ! $download) {
             /**
              * Attempt to pretty print
              */
-            if(isset($response) && substr_count($response->getContentType(), 'xml') > 0){
+            if (isset($response) && substr_count($response->getContentType(), 'xml') > 0) {
                 $dom = new DOMDocument('1.0');
                 $dom->preserveWhiteSpace = false;
                 $dom->formatOutput = true;
-                if($dom->loadXML($responseBody)){
+                if ($dom->loadXML($responseBody)) {
                     $asString = $dom->saveXML();
-                    if($asString){
+                    if ($asString) {
                         $responseBody = $asString;
                     }
                 }
@@ -956,10 +967,10 @@ class ApiController extends Controller
              * We expect results to be either JSON, XML, or CSV. So we test if they
              * can be parsed as JSON and set headers appropriately. 
              */
-            if(isset($response) && substr_count($response->getContentType(), 'json') > 0){
+            if (isset($response) && substr_count($response->getContentType(), 'json') > 0) {
                 header('Content-disposition: attachment; filename=results.json');
                 header('Content-type: application/json');
-            } elseif(isset($response) && substr_count($response->getContentType(), 'xml') > 0) {
+            } elseif (isset($response) && substr_count($response->getContentType(), 'xml') > 0) {
                 header('Content-disposition: attachment; filename=results.xml');
                 header('Content-type: application/xml');
             } else {
