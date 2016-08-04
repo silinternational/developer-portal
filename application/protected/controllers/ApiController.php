@@ -1,5 +1,7 @@
 <?php
 
+use Stringy\Stringy;
+
 class ApiController extends Controller
 {
     public $layout = '//layouts/one-column-with-title';
@@ -821,8 +823,9 @@ class ApiController extends Controller
             $params = $req->getParam('param',false);
             $download = $req->getParam('download',false);
             
-            // Create copy of $reqPath for manipulation
-            $path = $reqPath;
+            /* Create copy of $reqPath for manipulation, ensuring it begins with
+             * a forward-slash (/).  */
+            $path = Stringy::create($reqPath)->ensureLeft('/');
             
             /**
              * Get Key object and make sure this user owns the key
