@@ -795,7 +795,7 @@ class ApiController extends Controller
      */
     public function actionPlayground()
     {
-        $req = Yii::app()->request;
+        $request = Yii::app()->request;
 
         /**
          * Initialize variables in case this is a GET request or in case there
@@ -803,7 +803,7 @@ class ApiController extends Controller
          */
         $download = false;
         $method = false;
-        $reqPath = false;
+        $requestPath = false;
         $responseBody = $responseHeaders = $requestUrl = $apiRequest = $apiRequestBody = $responseSyntax = false;
         $params = array(
             array(
@@ -814,18 +814,18 @@ class ApiController extends Controller
         );
         
         // Record the key_id that the user provided (if any).
-        $keyId = $req->getParam('key_id', false);
+        $keyId = $request->getParam('key_id', false);
         
-        if($req->isPostRequest){
+        if($request->isPostRequest){
             // Override remaining variables with what was submitted.
-            $method = $req->getParam('method','GET');
-            $reqPath = $req->getParam('path','');
-            $params = $req->getParam('param',false);
-            $download = $req->getParam('download',false);
+            $method = $request->getParam('method','GET');
+            $requestPath = $request->getParam('path','');
+            $params = $request->getParam('param',false);
+            $download = $request->getParam('download',false);
             
-            /* Create copy of $reqPath for manipulation, ensuring it begins with
-             * a forward-slash (/).  */
-            $path = Stringy::create($reqPath)->ensureLeft('/');
+            /* Create copy of the request path for manipulation, ensuring it
+             * begins with a forward-slash (/).  */
+            $path = Stringy::create($requestPath)->ensureLeft('/');
             
             /**
              * Get Key object and make sure this user owns the key
@@ -943,7 +943,7 @@ class ApiController extends Controller
                 'method' => $method,
                 'apiOptions' => $apiOptions,
                 'params' => $params,
-                'path' => $reqPath,
+                'path' => $requestPath,
                 'responseBody' => $responseBody,
                 'responseHeaders' => $responseHeaders,
                 'requestUrl' => $requestUrl,
