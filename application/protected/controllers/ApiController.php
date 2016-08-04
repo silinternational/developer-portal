@@ -795,6 +795,8 @@ class ApiController extends Controller
      */
     public function actionPlayground()
     {
+        /* @var $currentUser \User */
+        $currentUser = \Yii::app()->user->user;
         $request = Yii::app()->request;
 
         /**
@@ -832,11 +834,9 @@ class ApiController extends Controller
              * begins with a forward-slash (/).  */
             $path = Stringy::create($requestPath)->ensureLeft('/');
             
-            /**
-             * Get Key object and make sure this user owns the key
-             */
-            $key = Key::model()->findByAttributes(array('key_id' => $keyId));
-            if ($key && $key->user_id == Yii::app()->user->getId()) {
+            $key = \Key::model()->findByPk($keyId);
+            if ($key && $key->isOwnedBy($currentUser)) {
+                
                 // Create a single dimension parameter array from parameters
                 // submitted divided by form and header parameters
                 $paramsForm = $paramsHeader = array();
@@ -929,7 +929,9 @@ class ApiController extends Controller
         /**
          * Get list of APIs that user has a key for
          */
-        $apiOptions = Key::model()->findAllByAttributes(array('user_id' => Yii::app()->user->getId()));
+        $apiOptions = \Key::model()->findAllByAttributes(array(
+            'user_id' => $currentUser->user_id,
+        ));
         
         if ( ! $download) {
             /**
