@@ -799,10 +799,8 @@ class ApiController extends Controller
         $currentUser = \Yii::app()->user->user;
         $request = Yii::app()->request;
 
-        /**
-         * Initialize variables in case this is a GET request or in case there
-         * are errors during POST processing
-         */
+        /* Initialize variables in case this is a GET request or in case there
+         * are errors during POST processing.  */
         $download = false;
         $method = false;
         $requestPath = false;
@@ -856,19 +854,15 @@ class ApiController extends Controller
                     }
                 }
                 
-                /**
-                 * Figure out proxy domain to form url
-                 */
+                // Figure out proxy domain to form url.
                 $proxyProtocol = parse_url(Yii::app()->params['apiaxle']['endpoint'], PHP_URL_SCHEME);
                 $proxyDomain = parse_url(Yii::app()->params['apiaxle']['endpoint'], PHP_URL_HOST);
                 $proxyDomain = str_replace('apiaxle.', '', $proxyDomain);
                 
-                // Build url from components
+                // Build url from components.
                 $url = $proxyProtocol . '://' . $key->api->code . '.' . $proxyDomain . $path;
 
-                /**
-                 * Calculate signature for ApiAxle call
-                 */
+                // Calculate signature for ApiAxle call.
                 $apiKey = $key->value;
                 $apiSig = \CalcApiSig\HmacSigner::CalcApiSig($apiKey, $key->secret);
 
@@ -877,9 +871,7 @@ class ApiController extends Controller
                     'api_sig' => $apiSig,
                 );
 
-                /**
-                 * If GET request, merge paramsForm into paramsQuery
-                 */
+                // If GET request, merge paramsForm into paramsQuery.
                 if ($method == 'GET') {
                     $paramsQuery = CMap::mergeArray($paramsQuery, $paramsForm);
                     $paramsForm = null;
@@ -890,9 +882,7 @@ class ApiController extends Controller
                     }
                 }
 
-                /**
-                 * Create Guzzle client for making API call
-                 */
+                // Create Guzzle client for making API call
                 $client = new Guzzle\Http\Client();
                 $request = $client->createRequest(
                     $method,
@@ -926,17 +916,14 @@ class ApiController extends Controller
             
         }
         
-        /**
-         * Get list of APIs that user has a key for
-         */
+        // Get list of APIs that user has a key for.
         $apiOptions = \Key::model()->findAllByAttributes(array(
             'user_id' => $currentUser->user_id,
         ));
         
         if ( ! $download) {
-            /**
-             * Attempt to pretty print
-             */
+            
+            // Attempt to pretty print.
             if (isset($response) && substr_count($response->getContentType(), 'xml') > 0) {
                 $dom = new DOMDocument('1.0');
                 $dom->preserveWhiteSpace = false;
@@ -965,10 +952,9 @@ class ApiController extends Controller
                 'responseSyntax' => $responseSyntax,
             ));
         } else {
-            /**
-             * We expect results to be either JSON, XML, or CSV. So we test if they
-             * can be parsed as JSON and set headers appropriately. 
-             */
+            
+            /* We expect results to be either JSON, XML, or CSV. So we test if
+             * they can be parsed as JSON and set headers appropriately.  */
             if (isset($response) && substr_count($response->getContentType(), 'json') > 0) {
                 header('Content-disposition: attachment; filename=results.json');
                 header('Content-type: application/json');
