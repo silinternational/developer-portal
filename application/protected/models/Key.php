@@ -617,7 +617,7 @@ class Key extends KeyBase
      * User model, not a Yii CWebUser. If no user is given, then false is
      * returned.
      * 
-     * @param User $user|null The User (model) in question.
+     * @param User|null $user The User (model) in question.
      * @return boolean Whether this Key belongs to that User.
      */
     public function isOwnedBy($user)
@@ -634,7 +634,7 @@ class Key extends KeyBase
      * Note that this is a User model, not a Yii CWebUser. If no user is given,
      * then false is returned.
      * 
-     * @param User $user|null The User (model) in question.
+     * @param User|null $user The User (model) in question.
      * @return boolean Whether this Key is to an API that belongs to that User.
      */
     public function isToApiOwnedBy($user)
