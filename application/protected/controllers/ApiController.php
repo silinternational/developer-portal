@@ -795,75 +795,74 @@ class ApiController extends Controller
      */
     public function actionPlayground()
     {
-        $req = Yii::app()->request;
+        /* @var $currentUser \User */
+        $currentUser = \Yii::app()->user->user;
+        $request = Yii::app()->request;
 
-        /**
-         * Initialize variables in case this is a GET request or in case there
-         * are errors during POST processing
-         */
+        /* Initialize variables in case this is a GET request or in case there
+         * are errors during POST processing.  */
         $download = false;
         $method = false;
-        $reqPath = false;
-        $responseBody = $responseHeaders = $requestUrl = $apiRequest = $apiRequestBody = $responseSyntax = false;
+        $requestPath = false;
+        $responseBody = false;
+        $responseHeaders = false;
+        $requestUrl = false;
+        $apiRequest = false;
+        $apiRequestBody = false;
+        $responseSyntax = false;
         $params = array(
             array(
                 'type' => null,
                 'name' => null,
                 'value' => null,
-            )
+            ),
         );
         
-        // Record the key_id that the user provided (if any).
-        $keyId = $req->getParam('key_id', false);
+        $keyId = $request->getParam('key_id', null);
         
-        if($req->isPostRequest){
+        if ($request->isPostRequest) {
+            
             // Override remaining variables with what was submitted.
-            $method = $req->getParam('method','GET');
-            $reqPath = $req->getParam('path','');
-            $params = $req->getParam('param',false);
-            $download = $req->getParam('download',false);
+            $method = $request->getParam('method', 'GET');
+            $requestPath = $request->getParam('path', '');
+            $params = $request->getParam('param', false);
+            $download = $request->getParam('download', false);
             
-            /* Create copy of $reqPath for manipulation, ensuring it begins with
-             * a forward-slash (/).  */
-            $path = Stringy::create($reqPath)->ensureLeft('/');
+            /* Create copy of the request path for manipulation, ensuring it
+             * begins with a forward-slash (/).  */
+            $path = Stringy::create($requestPath)->ensureLeft('/');
             
-            /**
-             * Get Key object and make sure this user owns the key
-             */
-            $key = Key::model()->findByAttributes(array('key_id' => $keyId));
-            if($key && $key->user_id == Yii::app()->user->getId()){
+            $key = \Key::model()->findByPk($keyId);
+            if ($key && $key->isOwnedBy($currentUser)) {
+                
                 // Create a single dimension parameter array from parameters
                 // submitted divided by form and header parameters
                 $paramsForm = $paramsHeader = array();
-                if($params && is_array($params)){
-                    foreach($params as $param){
-                        if(isset($param['name']) && isset($param['value']) 
+                if ($params && is_array($params)) {
+                    foreach ($params as $param) {
+                        if (isset($param['name']) && isset($param['value']) 
                                 && $param['name'] != '' && $param['value'] != ''
-                                && !is_null($param['name']) && !is_null($param['value'])){
+                                && !is_null($param['name']) && !is_null($param['value'])) {
 
                             // Determine if parameter is supposed to be form based or header
-                            if(isset($param['type']) && $param['type'] == 'form'){
+                            if (isset($param['type']) && $param['type'] == 'form') {
                                 $paramsForm[$param['name']] = $param['value'];
-                            } elseif(isset($param['type']) && $param['type'] == 'header'){
+                            } elseif (isset($param['type']) && $param['type'] == 'header') {
                                 $paramsHeader[$param['name']] = $param['value'];
                             }
                         }
                     }
                 }
                 
-                /**
-                 * Figure out proxy domain to form url
-                 */
+                // Figure out proxy domain to form url.
                 $proxyProtocol = parse_url(Yii::app()->params['apiaxle']['endpoint'], PHP_URL_SCHEME);
                 $proxyDomain = parse_url(Yii::app()->params['apiaxle']['endpoint'], PHP_URL_HOST);
                 $proxyDomain = str_replace('apiaxle.', '', $proxyDomain);
                 
-                // Build url from components
-                $url = $proxyProtocol.'://'.$key->api->code.'.'.$proxyDomain.$path;
+                // Build url from components.
+                $url = $proxyProtocol . '://' . $key->api->code . '.' . $proxyDomain . $path;
 
-                /**
-                 * Calculate signature for ApiAxle call
-                 */
+                // Calculate signature for ApiAxle call.
                 $apiKey = $key->value;
                 $apiSig = \CalcApiSig\HmacSigner::CalcApiSig($apiKey, $key->secret);
 
@@ -872,28 +871,30 @@ class ApiController extends Controller
                     'api_sig' => $apiSig,
                 );
 
-                /**
-                 * If GET request, merge paramsForm into paramsQuery
-                 */
+                // If GET request, merge paramsForm into paramsQuery.
                 if ($method == 'GET') {
                     $paramsQuery = CMap::mergeArray($paramsQuery, $paramsForm);
                     $paramsForm = null;
-                } elseif($method == 'POST' || $method == 'PUT') {
+                } elseif ($method == 'POST' || $method == 'PUT') {
                     $apiRequestBody = PHP_EOL . PHP_EOL;
                     foreach ($paramsForm as $name => $value) {
                         $apiRequestBody .= $name . '=' . $value . PHP_EOL;
                     }
                 }
 
-                /**
-                 * Create Guzzle client for making API call
-                 */
+                // Create Guzzle client for making API call
                 $client = new Guzzle\Http\Client();
-                $request = $client->createRequest($method,$url,$paramsHeader,$paramsForm,array(
-                    'query' => $paramsQuery,
-                    'exceptions' => false,
-                    'verify' => Yii::app()->params['apiaxle']['ssl_verifypeer'],
-                ));
+                $request = $client->createRequest(
+                    $method,
+                    $url,
+                    $paramsHeader,
+                    $paramsForm,
+                    array(
+                        'query' => $paramsQuery,
+                        'exceptions' => false,
+                        'verify' => Yii::app()->params['apiaxle']['ssl_verifypeer'],
+                    )
+                );
 
                 $apiRequest = $request->getRawHeaders();
                 $requestUrl = $request->getUrl();
@@ -902,7 +903,7 @@ class ApiController extends Controller
                 $responseHeaders = $response->getRawHeaders();
                 $responseBody = $response->getBody(true);
 
-                if($response->getContentType() == 'applicaton/json'){
+                if ($response->getContentType() == 'applicaton/json') {
                     $responseSyntax = 'javascript';
                 } else {
                     $responseSyntax = 'markup';
@@ -910,27 +911,26 @@ class ApiController extends Controller
 
             } else {
                 // Display an error
-                Yii::app()->user->setFlash('error','Invalid API selected');
+                Yii::app()->user->setFlash('error', 'Invalid API selected');
             }
             
         }
         
-        /**
-         * Get list of APIs that user has a key for
-         */
-        $apiOptions = Key::model()->findAllByAttributes(array('user_id' => Yii::app()->user->getId()));
+        // Get list of APIs that user has a key for.
+        $apiOptions = \Key::model()->findAllByAttributes(array(
+            'user_id' => $currentUser->user_id,
+        ));
         
-        if(!$download){
-            /**
-             * Attempt to pretty print
-             */
-            if(isset($response) && substr_count($response->getContentType(), 'xml') > 0){
+        if ( ! $download) {
+            
+            // Attempt to pretty print.
+            if (isset($response) && substr_count($response->getContentType(), 'xml') > 0) {
                 $dom = new DOMDocument('1.0');
                 $dom->preserveWhiteSpace = false;
                 $dom->formatOutput = true;
-                if($dom->loadXML($responseBody)){
+                if ($dom->loadXML($responseBody)) {
                     $asString = $dom->saveXML();
-                    if($asString){
+                    if ($asString) {
                         $responseBody = $asString;
                     }
                 }
@@ -938,12 +938,12 @@ class ApiController extends Controller
                 $responseBody = Utils::pretty_json($responseBody);
             }
 
-            $this->render('playground',array(
-                'key_id' => $keyId,
+            $this->render('playground', array(
+                'keyId' => $keyId,
                 'method' => $method,
                 'apiOptions' => $apiOptions,
                 'params' => $params,
-                'path' => $reqPath,
+                'path' => $requestPath,
                 'responseBody' => $responseBody,
                 'responseHeaders' => $responseHeaders,
                 'requestUrl' => $requestUrl,
@@ -952,14 +952,13 @@ class ApiController extends Controller
                 'responseSyntax' => $responseSyntax,
             ));
         } else {
-            /**
-             * We expect results to be either JSON, XML, or CSV. So we test if they
-             * can be parsed as JSON and set headers appropriately. 
-             */
-            if(isset($response) && substr_count($response->getContentType(), 'json') > 0){
+            
+            /* We expect results to be either JSON, XML, or CSV. So we test if
+             * they can be parsed as JSON and set headers appropriately.  */
+            if (isset($response) && substr_count($response->getContentType(), 'json') > 0) {
                 header('Content-disposition: attachment; filename=results.json');
                 header('Content-type: application/json');
-            } elseif(isset($response) && substr_count($response->getContentType(), 'xml') > 0) {
+            } elseif (isset($response) && substr_count($response->getContentType(), 'xml') > 0) {
                 header('Content-disposition: attachment; filename=results.xml');
                 header('Content-type: application/xml');
             } else {
