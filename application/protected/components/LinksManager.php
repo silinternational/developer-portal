@@ -60,7 +60,6 @@ class LinksManager extends CComponent
                     'Unknown button size passed to LinksManager.',
                     1423241139
                 );
-                break;
         }
         
         // Return the resulting HTML.
