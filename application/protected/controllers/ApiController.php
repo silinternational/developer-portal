@@ -818,10 +818,10 @@ class ApiController extends Controller
             ),
         );
         
-        // Record the key_id that the user provided (if any).
-        $keyId = $request->getParam('key_id', false);
+        $keyId = $request->getParam('key_id', null);
         
         if ($request->isPostRequest) {
+            
             // Override remaining variables with what was submitted.
             $method = $request->getParam('method', 'GET');
             $requestPath = $request->getParam('path', '');
@@ -839,7 +839,7 @@ class ApiController extends Controller
                 // submitted divided by form and header parameters
                 $paramsForm = $paramsHeader = array();
                 if ($params && is_array($params)) {
-                    foreach($params as $param) {
+                    foreach ($params as $param) {
                         if (isset($param['name']) && isset($param['value']) 
                                 && $param['name'] != '' && $param['value'] != ''
                                 && !is_null($param['name']) && !is_null($param['value'])) {
@@ -938,8 +938,8 @@ class ApiController extends Controller
                 $responseBody = Utils::pretty_json($responseBody);
             }
 
-            $this->render('playground',array(
-                'key_id' => $keyId,
+            $this->render('playground', array(
+                'keyId' => $keyId,
                 'method' => $method,
                 'apiOptions' => $apiOptions,
                 'params' => $params,

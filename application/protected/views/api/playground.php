@@ -59,7 +59,7 @@ echo CHtml::form(array('/api/playground/'), 'post');
             <?php
                 foreach($apiOptions as $apiOption){
                     echo "<option value='".$apiOption->key_id."' ";
-                    if(isset($key_id) && $key_id == $apiOption->key_id){
+                    if (isset($keyId) && $keyId == $apiOption->key_id) {
                         echo "selected='selected'";
                     }
                     echo ">".$apiOption->api->display_name."</option>".PHP_EOL;
