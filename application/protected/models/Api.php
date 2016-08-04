@@ -931,7 +931,7 @@ class Api extends ApiBase
     public function validateOwnerId($attribute, $params)
     {
         // If they selected anyone...
-        if (($this->owner_id !== null) && ($this->owner_id !== '')) {
+        if (strval($this->owner_id) !== '') {
 
             // Try to get the User model for the specified owner.
             $owner = $this->owner;
