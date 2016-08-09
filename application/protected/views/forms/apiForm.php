@@ -100,17 +100,11 @@ return array(
         ),
         'visibility' => array(
             'type' => 'dropdownlist',
-            'data' => array_merge(
-                array('' => '-- Select one: --'),
-                Api::getVisibilityDescriptions()
-            ),
+            'data' => Api::getVisibilityDescriptions(),
         ),
         'approval_type' => array(
             'type' => 'dropdownlist',
-            'data' => array_merge(
-                array('' => '-- Select one: --'),
-                Api::getApprovalTypes()
-            ),
+            'data' => Api::getApprovalTypes(),
         ),
         'technical_support' => array(
             'htmlOptions' => array(
