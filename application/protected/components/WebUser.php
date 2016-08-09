@@ -123,6 +123,11 @@ class WebUser extends CWebUser
         return (is_null($user) ? null : $user->getDisplayName());
     }
     
+    public function getUser()
+    {
+        return $this->getModel();
+    }
+    
     public function getUserId()
     {
         $user = $this->getModel();
