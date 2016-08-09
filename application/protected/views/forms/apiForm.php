@@ -39,7 +39,9 @@ return array(
                         'role' => array(\User::ROLE_OWNER, \User::ROLE_ADMIN),
                     )),
                     'user_id',
-                    'display_name'
+                    function($user) {
+                        return $user->display_name . ' (' . $user->email . ')';
+                    }
                 ))
             ),
             'visible' => \Yii::app()->user->checkAccess('admin'),
