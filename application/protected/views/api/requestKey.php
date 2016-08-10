@@ -4,15 +4,14 @@
 /* @var $key Key */
 /* @var $acceptedTerms bool */
 
-// Set up the breadcrumbs.
+$this->pageTitle = $api->getRequestKeyText();
 $this->breadcrumbs = array(
     'Dashboard' => array('/dashboard/'),
     'APIs' => array('/api/'),
     $api->display_name => array('/api/details/', 'code' => $api->code),
-    'Request Key',
+    $this->pageTitle,
 );
 
-$this->pageTitle = 'Request Key';
 
 ?>
 <dl class="dl-horizontal">
@@ -73,7 +72,7 @@ $this->pageTitle = 'Request Key';
         $this->widget('bootstrap.widgets.TbButton', array(
             'buttonType' => 'submit',
             'icon' => 'off white',
-            'label' => 'Request',
+            'label' => $api->getRequestKeyText(),
             'type' => 'primary'
         ));
         ?></div><?php

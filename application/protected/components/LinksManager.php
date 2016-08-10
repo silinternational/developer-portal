@@ -109,7 +109,7 @@ class LinksManager extends CComponent
             $actionLinks[] = new ActionLink(array(
                 '/api/request-key/',
                 'code' => $api->code,
-            ), 'Request Key', 'off');
+            ), $api->getRequestKeyText(), 'off');
         }
         
         if ($user->canSeeKeysForApi($api)) {

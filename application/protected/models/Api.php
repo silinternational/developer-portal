@@ -381,6 +381,12 @@ class Api extends ApiBase
             $linkTarget
         );
     }
+
+    public function getRequestKeyText()
+    {
+        return ($this->requiresApproval() ? 'Request' : 'Get') . ' Key';
+    }
+    
     
     public function getRequiresSignatureText()
     {
