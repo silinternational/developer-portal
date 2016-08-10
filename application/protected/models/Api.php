@@ -915,6 +915,11 @@ class Api extends ApiBase
         return ($this->require_signature !== self::REQUIRE_SIGNATURES_NO);
     }
     
+    public function requiresApproval()
+    {
+        return ($this->approval_type !== \Api::APPROVAL_TYPE_AUTO);
+    }
+    
     /**
      * Update the rate limits (queries per second, queries per day) of any of
      * this Api's Keys that do not already have the correct rate limits.
