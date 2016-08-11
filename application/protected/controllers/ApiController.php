@@ -1123,6 +1123,11 @@ class ApiController extends Controller
                             'success',
                             '<strong>Success!</strong> Key created.'
                         );
+
+                        $this->redirect(array(
+                            '/key/details/',
+                            'id' => $key->key_id,
+                        ));
                     }
                 }
                 // Otherwise (i.e. - this API is NOT set to auto-approve)...
@@ -1157,16 +1162,15 @@ class ApiController extends Controller
                         '<strong>Success!</strong> Key requested.'
                     );
                     
+                    $this->redirect(array(
+                        '/key/details/',
+                        'id' => $key->key_id,
+                    ));
+                    
                     // NOTE: The Key model's afterSave method should have sent
                     //       an email to the API Owner (if set) about the
                     //       pending key request.
                 }
-
-                // Send the user back to the API details page.
-                $this->redirect(array(
-                    '/api/details/',
-                    'code' => $api->code,
-                ));
             }
         }
 
