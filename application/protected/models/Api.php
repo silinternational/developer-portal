@@ -24,6 +24,9 @@ class Api extends ApiBase
     CONST REGEX_ENDPOINT = '/^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\.?$/';
     CONST REGEX_PATH = '/^\/[a-zA-Z0-9\-\.\/_]{0,}$/';
     
+    CONST REQUIRE_SIGNATURES_YES = 'yes';
+    CONST REQUIRE_SIGNATURES_NO = 'no';
+    
     CONST VISIBILITY_INVITATION = 'invitation';
     CONST VISIBILITY_PUBLIC = 'public';
     
@@ -877,6 +880,13 @@ class Api extends ApiBase
      */
     public static function model($className = __CLASS__) {
         return parent::model($className);
+    }
+    
+    public function requiresSignature()
+    {
+        /* Compare against the No value so that, if there is some weird
+         * mismatch or unexpected value, it defaults to requiring signature.  */
+        return ($this->require_signature !== self::REQUIRE_SIGNATURES_NO);
     }
     
     /**

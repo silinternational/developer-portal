@@ -1070,6 +1070,11 @@ class Key extends KeyBase
         }
     }
     
+    public function requiresSignature()
+    {
+        return $this->api->requiresSignature();
+    }
+    
     /**
      * Require the User to have accepted the terms for Apis that have terms.
      * 
