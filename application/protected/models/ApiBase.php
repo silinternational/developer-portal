@@ -26,6 +26,7 @@
  * @property string $terms
  * @property integer $cost_scheme_id
  * @property string $logo_url
+ * @property string $require_signature
  *
  * The followings are the available model relations:
  * @property CostScheme $costScheme
@@ -60,10 +61,11 @@ class ApiBase extends CActiveRecord
 			array('brief_description, endpoint, default_path, technical_support, customer_support, logo_url', 'length', 'max'=>255),
 			array('approval_type, protocol', 'length', 'max'=>5),
 			array('visibility', 'length', 'max'=>10),
+			array('require_signature', 'length', 'max'=>3),
 			array('documentation, terms', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('api_id, code, display_name, brief_description, endpoint, queries_second, queries_day, documentation, created, updated, approval_type, protocol, strict_ssl, endpoint_timeout, default_path, owner_id, technical_support, visibility, customer_support, terms, cost_scheme_id, logo_url', 'safe', 'on'=>'search'),
+			array('api_id, code, display_name, brief_description, endpoint, queries_second, queries_day, documentation, created, updated, approval_type, protocol, strict_ssl, endpoint_timeout, default_path, owner_id, technical_support, visibility, customer_support, terms, cost_scheme_id, logo_url, require_signature', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -112,6 +114,7 @@ class ApiBase extends CActiveRecord
 			'terms' => 'Terms',
 			'cost_scheme_id' => 'Cost Scheme',
 			'logo_url' => 'Logo Url',
+			'require_signature' => 'Require Signature',
 		);
 	}
 
@@ -155,6 +158,7 @@ class ApiBase extends CActiveRecord
 		$criteria->compare('terms',$this->terms,true);
 		$criteria->compare('cost_scheme_id',$this->cost_scheme_id);
 		$criteria->compare('logo_url',$this->logo_url,true);
+		$criteria->compare('require_signature',$this->require_signature,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
