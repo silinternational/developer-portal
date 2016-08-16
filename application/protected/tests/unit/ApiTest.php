@@ -1042,6 +1042,47 @@ class ApiTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testRequireSignature_acceptValidValues()
+    {
+        // Arrange:
+        $api = new \Api();
+        $validValues = ['yes', 'no'];
+        
+        foreach ($validValues as $validValue) {
+            
+            // Act:
+            $api->require_signature = $validValue;
+            $result = $api->validate(['require_signature']);
+
+            // Assert:
+            $this->assertTrue(
+                $result,
+                'Failed to accept valid value (' . var_export($validValue, true)
+                . '): ' . PHP_EOL . $api->getErrorsForConsole()
+            );
+        }
+    }
+    
+    public function testRequireSignature_rejectInvalidValues()
+    {
+        // Arrange:
+        $api = new \Api();
+        $invalidValues = [0, 1, '0', '1', '', 'abc'];
+        
+        foreach ($invalidValues as $invalidValue) {
+            
+            // Act:
+            $api->require_signature = $invalidValue;
+            $result = $api->validate(['require_signature']);
+
+            // Assert:
+            $this->assertFalse(
+                $result,
+                'Accepted invalid value: ' . var_export($invalidValue, true)
+            );
+        }
+    }
+    
     public function testRequiresSignature_invalidValue()
     {
         // Arrange:

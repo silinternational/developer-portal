@@ -163,6 +163,14 @@ class Api extends ApiBase
         );
     }
     
+    public static function getRequireSignatureOptions()
+    {
+        return array(
+            self::REQUIRE_SIGNATURES_YES => 'Yes',
+            self::REQUIRE_SIGNATURES_NO => 'No',
+        );
+    }
+    
     public static function getStrictSsls()
     {
         return array(
@@ -567,6 +575,16 @@ class Api extends ApiBase
                 'integerOnly' => true,
                 'min' => 1,
                 'max' => 1000000000,
+            ),
+            array(
+                'require_signature',
+                'in',
+                'allowEmpty' => false,
+                'range' => array_keys(self::getRequireSignatureOptions()),
+                'strict' => true,
+                'message' => 'Please choose one of the provided options ('
+                . implode('/', array_keys(self::getRequireSignatureOptions()))
+                . ') for whether calls to this API will require a signature.'
             ),
         ), parent::rules());
     }
