@@ -79,7 +79,7 @@ class Key extends KeyBase
         
         /* ***** ApiAxle-specific checks: ***** */
         
-        if ($this->status === \Key::STATUS_APPROVED) {
+        if ($this->status === self::STATUS_APPROVED) {
         
             $axleKey = new AxleKey(Yii::app()->params['apiaxle']);
             $keyData = array(
@@ -108,7 +108,7 @@ class Key extends KeyBase
             /* Get the current key (if/as it exists in the database) to see
              * whether this key would already exist in ApiAxle.  */
             if ($this->key_id !== null) {
-                $current = Key::model()->findByPk($this->key_id);
+                $current = self::model()->findByPk($this->key_id);
                 $currentValue = (($current !== null) ? $current->value : null);
             } else {
                 $currentValue = null; 
@@ -162,7 +162,7 @@ class Key extends KeyBase
                 $this->addError('value',$e->getMessage());
                 return false;
             }
-        } elseif ($this->status === \Key::STATUS_DENIED) {
+        } elseif ($this->status === self::STATUS_DENIED) {
             
             /**
              * @todo Figure out what to do in ApiAxle when a Key in our database
@@ -176,7 +176,7 @@ class Key extends KeyBase
             }
             return true;
             
-        } elseif ($this->status === \Key::STATUS_PENDING) {
+        } elseif ($this->status === self::STATUS_PENDING) {
             
             /**
              * @todo Figure out what to do in ApiAxle (if anything) when a Key
@@ -187,7 +187,7 @@ class Key extends KeyBase
             // TEMP
             return true;
             
-        } elseif ($this->status === \Key::STATUS_REVOKED) {
+        } elseif ($this->status === self::STATUS_REVOKED) {
             
             /**
              * @todo Figure out how to delete the key from Axle when the Key
@@ -336,8 +336,8 @@ class Key extends KeyBase
              * appropriate authority and the Key has already been "terminated"
              * (for lack of a better word).  */
             switch ($this->status) {
-                case \Key::STATUS_DENIED:
-                case \Key::STATUS_REVOKED:
+                case self::STATUS_DENIED:
+                case self::STATUS_REVOKED:
                     return true;
 
                 default:
@@ -362,7 +362,7 @@ class Key extends KeyBase
             'criteria' => array(
                 'condition' => 'status = :status',
                 'params' => array(
-                    ':status' => \Key::STATUS_APPROVED,
+                    ':status' => self::STATUS_APPROVED,
                 ),
             ),
         ));
@@ -374,7 +374,7 @@ class Key extends KeyBase
             'criteria' => array(
                 'condition' => 'status = :status',
                 'params' => array(
-                    ':status' => \Key::STATUS_PENDING,
+                    ':status' => self::STATUS_PENDING,
                 ),
             ),
         ));
@@ -1119,7 +1119,7 @@ class Key extends KeyBase
          */
         
         /* @var $key \Key */
-        $key = \Key::model()->findByPk($key_id);  
+        $key = self::model()->findByPk($key_id);  
         if (is_null($key)) { return array(false, 'Bad key_id');}
         
         $key->generateNewValueAndSecret();
@@ -1238,7 +1238,7 @@ class Key extends KeyBase
          *  - the Key instance or a string as an error message
          */
         /* @var $key \Key */
-        $key = Key::model()->findByPk($key_id);  
+        $key = self::model()->findByPk($key_id);  
         if (is_null($key)) {
             return array(false, 'Bad key_id');
         }
