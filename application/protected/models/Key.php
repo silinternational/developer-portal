@@ -262,8 +262,7 @@ class Key extends KeyBase
             $this->processed_by = $approvingUser->user_id;
         }
         $this->status = self::STATUS_APPROVED;
-        $this->value = \Utils::getRandStr(32);
-        $this->secret = \Utils::getRandStr(128);
+        $this->generateNewValueAndSecret();
         
         if ($this->save()) {
             $this->notifyUserOfApprovedKey();
@@ -344,6 +343,16 @@ class Key extends KeyBase
                 default:
                     return false;
             }
+        }
+    }
+    
+    public function generateNewValueAndSecret()
+    {
+        $this->value = \Utils::getRandStr(32);
+        if ($this->api->requiresSignature()) {
+            $this->secret = \Utils::getRandStr(128);
+        } else {
+            $this->secret = null;
         }
     }
     
@@ -1070,6 +1079,11 @@ class Key extends KeyBase
         }
     }
     
+    public function requiresSignature()
+    {
+        return $this->api->requiresSignature();
+    }
+    
     /**
      * Require the User to have accepted the terms for Apis that have terms.
      * 
@@ -1108,9 +1122,7 @@ class Key extends KeyBase
         $key = \Key::model()->findByPk($key_id);  
         if (is_null($key)) { return array(false, 'Bad key_id');}
         
-        //$seed = microtime() . $key->user_id;         
-        $key->value = Utils::getRandStr();//hash('md5', $seed); // length 32 
-        $key->secret = Utils::getRandStr(128);//hash('sha512', $seed); // length 128
+        $key->generateNewValueAndSecret();
         
         /* Also re-sync the Key's rate limits in case those settings have
          * changed on the Api and this Key somehow failed to be updated.  */
@@ -1189,6 +1201,10 @@ class Key extends KeyBase
         /* NOTE: Leave the key value intact (for identifying the revoked key,
          *       both to ApiAxle and to the end user). Do get rid of the secret,
          *       though.  */
+        /* NOTE 2: Don't worry about the fact that, if the Key was to an Api
+         *       that did not require a signature, there was no secret (and the
+         *       value was sufficient by itself). When we save a Key with a
+         *       status of revoked, it deletes it from ApiAxle.  */
         $this->secret = null;
         
         if ($this->save()) {

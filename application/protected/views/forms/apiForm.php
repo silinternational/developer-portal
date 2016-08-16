@@ -73,6 +73,15 @@ return array(
             'type' => 'radiobuttonlist_inline',
             'data' => Api::getStrictSsls()
         ),
+        'require_signature' => array(
+            'type' => 'radiobuttonlist_inline',
+            'data' => Api::getRequireSignatureOptions(),
+            'htmlOptions' => array(
+                'hint' => '<i class="icon-info-sign"></i> This controls '
+                . 'whether calls to this API require a signature (and thus '
+                . 'whether keys to this API will have a secret value).',
+            ),
+        ),
         'queries_second' => array(
             'htmlOptions' => array(
                 'placeholder' => '3',

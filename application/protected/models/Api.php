@@ -24,6 +24,9 @@ class Api extends ApiBase
     CONST REGEX_ENDPOINT = '/^(?=.{1,255}$)[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?(?:\.[0-9A-Za-z](?:(?:[0-9A-Za-z]|-){0,61}[0-9A-Za-z])?)*\.?$/';
     CONST REGEX_PATH = '/^\/[a-zA-Z0-9\-\.\/_]{0,}$/';
     
+    CONST REQUIRE_SIGNATURES_YES = 'yes';
+    CONST REQUIRE_SIGNATURES_NO = 'no';
+    
     CONST VISIBILITY_INVITATION = 'invitation';
     CONST VISIBILITY_PUBLIC = 'public';
     
@@ -157,6 +160,14 @@ class Api extends ApiBase
         return array(
             self::PROTOCOL_HTTP => 'HTTP',
             self::PROTOCOL_HTTPS => 'HTTPS'
+        );
+    }
+    
+    public static function getRequireSignatureOptions()
+    {
+        return array(
+            self::REQUIRE_SIGNATURES_YES => 'Yes',
+            self::REQUIRE_SIGNATURES_NO => 'No',
         );
     }
     
@@ -371,6 +382,14 @@ class Api extends ApiBase
         );
     }
     
+    public function getRequiresSignatureText()
+    {
+        $options = self::getRequireSignatureOptions();
+        return $this->requiresSignature() ?
+            $options[self::REQUIRE_SIGNATURES_YES] :
+            $options[self::REQUIRE_SIGNATURES_NO];
+    }
+    
     /**
      * Get the public URL for this API as an HTML string that adds an HTML
      * element around the Api's code, with the given CSS class.
@@ -564,6 +583,16 @@ class Api extends ApiBase
                 'integerOnly' => true,
                 'min' => 1,
                 'max' => 1000000000,
+            ),
+            array(
+                'require_signature',
+                'in',
+                'allowEmpty' => false,
+                'range' => array_keys(self::getRequireSignatureOptions()),
+                'strict' => true,
+                'message' => 'Please choose one of the provided options ('
+                . implode('/', array_keys(self::getRequireSignatureOptions()))
+                . ') for whether calls to this API will require a signature.'
             ),
         ), parent::rules());
     }
@@ -877,6 +906,13 @@ class Api extends ApiBase
      */
     public static function model($className = __CLASS__) {
         return parent::model($className);
+    }
+    
+    public function requiresSignature()
+    {
+        /* Compare against the No value so that, if there is some weird
+         * mismatch or unexpected value, it defaults to requiring signature.  */
+        return ($this->require_signature !== self::REQUIRE_SIGNATURES_NO);
     }
     
     /**

@@ -45,27 +45,42 @@ if ($currentUser->canSeeKey($key)) {
             ?>&nbsp;
         </dd>
         
-        <?php if ($key->status === \Key::STATUS_APPROVED): ?>
+        <?php if ($key->value !== null): ?>
             <dt>Value</dt>
-            <dd><?= \CHtml::encode($key->value); ?>&nbsp;</dd>
-            
-            <dt>Secret</dt>
-            <dd>
-                <?php
+            <dd><?php
                 if ($key->isOwnedBy($currentUser)) {
-                    ?>
-                    <input type="password" 
-                           readonly="readonly"
-                           onblur="this.type = 'password';"
-                           onfocus="this.type = 'text';"
-                           title="Click to view shared secret"
-                           value="<?= \CHtml::encode($key->secret); ?>" />
-                    <?php
+                    echo \CHtml::encode($key->value);
                 } else {
-                    echo '<span class="muted">(only visible to the key\'s owner)</span>';
+                    echo sprintf(
+                        '<span title="Full value only shown to key owner.">%s</span>',
+                        \CHtml::encode(substr($key->value, 0, 12)) . '...'
+                    );
                 }
-                ?>
-            </dd>
+                ?></dd>
+        <?php endif; ?>
+        
+        <?php if ($key->status === \Key::STATUS_APPROVED): ?>
+            <dt>Secret</dt>
+            <?php if ($key->secret !== null): ?>
+                <dd>
+                    <?php
+                    if ($key->isOwnedBy($currentUser)) {
+                        ?>
+                        <input type="password" 
+                               readonly="readonly"
+                               onblur="this.type = 'password';"
+                               onfocus="this.type = 'text';"
+                               title="Click to view shared secret"
+                               value="<?= \CHtml::encode($key->secret); ?>" />
+                        <?php
+                    } else {
+                        echo '<span class="muted">(only visible to the key\'s owner)</span>';
+                    }
+                    ?>
+                </dd>
+            <?php elseif ( ! $key->api->requiresSignature()): ?>
+                <dd><i class="muted">not applicable - no signature necessary</i></dd>
+            <?php endif;?>
         <?php endif;?>
         
         <dt>Query rate limits</dt>
