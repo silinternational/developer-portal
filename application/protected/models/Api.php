@@ -382,6 +382,14 @@ class Api extends ApiBase
         );
     }
     
+    public function getRequiresSignatureText()
+    {
+        $options = self::getRequireSignatureOptions();
+        return $this->requiresSignature() ?
+            $options[self::REQUIRE_SIGNATURES_YES] :
+            $options[self::REQUIRE_SIGNATURES_NO];
+    }
+    
     /**
      * Get the public URL for this API as an HTML string that adds an HTML
      * element around the Api's code, with the given CSS class.

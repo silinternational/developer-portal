@@ -1122,6 +1122,34 @@ class ApiTest extends DeveloperPortalTestCase
         $this->assertTrue($result);
     }
     
+    public function testGetRequiresSignatureText_no()
+    {
+        // Arrange:
+        $api = new \Api();
+        $api->require_signature = \Api::REQUIRE_SIGNATURES_NO;
+        $expected = 'No';
+        
+        // Act:
+        $actual = $api->getRequiresSignatureText();
+        
+        // Assert:
+        $this->assertSame($expected, $actual);
+    }
+    
+    public function testGetRequiresSignatureText_yes()
+    {
+        // Arrange:
+        $api = new \Api();
+        $api->require_signature = \Api::REQUIRE_SIGNATURES_YES;
+        $expected = 'Yes';
+        
+        // Act:
+        $actual = $api->getRequiresSignatureText();
+        
+        // Assert:
+        $this->assertSame($expected, $actual);
+    }
+    
     public function testUpdateKeysRateLimitsToMatch()
     {
         // Arrange:
