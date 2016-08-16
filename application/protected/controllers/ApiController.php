@@ -832,6 +832,7 @@ class ApiController extends Controller
              * begins with a forward-slash (/).  */
             $path = Stringy::create($requestPath)->ensureLeft('/');
             
+            /* @var $key \Key */
             $key = \Key::model()->findByPk($keyId);
             if ($key && $key->isOwnedBy($currentUser)) {
                 
@@ -862,14 +863,16 @@ class ApiController extends Controller
                 // Build url from components.
                 $url = $proxyProtocol . '://' . $key->api->code . '.' . $proxyDomain . $path;
 
-                // Calculate signature for ApiAxle call.
-                $apiKey = $key->value;
-                $apiSig = \CalcApiSig\HmacSigner::CalcApiSig($apiKey, $key->secret);
-
+                // Calculate the necessary parameters for the ApiAxle call.
                 $paramsQuery = array(
-                    'api_key' => $apiKey,
-                    'api_sig' => $apiSig,
+                    'api_key' => $key->value,
                 );
+                if ($key->api->requiresSignature()) {
+                    $paramsQuery['api_sig'] = \CalcApiSig\HmacSigner::CalcApiSig(
+                        $key->value,
+                        $key->secret
+                    );
+                }
 
                 // If GET request, merge paramsForm into paramsQuery.
                 if ($method == 'GET') {
