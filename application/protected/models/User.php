@@ -839,9 +839,9 @@ class User extends UserBase
      * invited to see this Api. This should be case-insensitive.
      * 
      * @param \Api $api The Api in question.
-     * @param array $excludedAvdId The ID of an ApiVisibilityDomain that should
-     *     be ignored (if any). Useful for seeing whether a Key depends on a
-     *     particular ApiVisibilityDomain.
+     * @param integer|null $excludedAvdId (Optional:) The ID of an
+     *     ApiVisibilityDomain that should be ignored. Useful for seeing whether
+     *     a Key depends on a particular ApiVisibilityDomain.
      * @return boolean
      */
     public function isInvitedByDomainToSeeApi($api, $excludedAvdId = null)
