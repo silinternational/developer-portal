@@ -47,7 +47,16 @@ if ($currentUser->canSeeKey($key)) {
         
         <?php if ($key->value !== null): ?>
             <dt>Value</dt>
-            <dd><?= \CHtml::encode($key->value); ?>&nbsp;</dd>
+            <dd><?php
+                if ($key->isOwnedBy($currentUser)) {
+                    echo \CHtml::encode($key->value);
+                } else {
+                    echo sprintf(
+                        '<span title="Full value only shown to key owner.">%s</span>',
+                        \CHtml::encode(substr($key->value, 0, 12)) . '...'
+                    );
+                }
+                ?></dd>
         <?php endif; ?>
         
         <?php if ($key->status === \Key::STATUS_APPROVED): ?>
