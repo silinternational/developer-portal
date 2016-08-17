@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "2846693426ddaae5c1882fdf0e3e771b",
-    "content-hash": "b25b8983a0a9b93a93e1082d6b9cf77c",
+    "hash": "e0c70f207fe1cbba078b5ed9c40da3c0",
+    "content-hash": "452cf3e544e4ad2df455dc4a09245270",
     "packages": [
         {
             "name": "danielstjules/stringy",
@@ -602,16 +602,16 @@
         },
         {
             "name": "yiisoft/yii",
-            "version": "1.1.15",
+            "version": "1.1.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii.git",
-                "reference": "022a51d34ad2c95db2b77b2075e98f5dd78b08e0"
+                "reference": "467ff50a77bf7030a168defc1d47f446136d6228"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii/zipball/022a51d34ad2c95db2b77b2075e98f5dd78b08e0",
-                "reference": "022a51d34ad2c95db2b77b2075e98f5dd78b08e0",
+                "url": "https://api.github.com/repos/yiisoft/yii/zipball/467ff50a77bf7030a168defc1d47f446136d6228",
+                "reference": "467ff50a77bf7030a168defc1d47f446136d6228",
                 "shasum": ""
             },
             "require": {
@@ -621,6 +621,12 @@
                 "framework/yiic"
             ],
             "type": "library",
+            "autoload": {
+                "classmap": [
+                    "framework/YiiBase.php",
+                    "framework/yii.php"
+                ]
+            },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
@@ -682,7 +688,7 @@
                 "framework",
                 "yii"
             ],
-            "time": "2014-06-30 00:14:27"
+            "time": "2016-01-13 16:23:58"
         }
     ],
     "packages-dev": [

@@ -4,7 +4,7 @@
     },
     "require": {
         "danielstjules/stringy": "^2.3",
-        "yiisoft/yii": "1.1.15",
+        "yiisoft/yii": "1.1.17",
         "fillup/apiaxle": "^0.7.2",
         "guzzle/guzzle": "3.9.*",
         "forevermatt/calc-api-sig": "0.1.1",
