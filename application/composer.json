@@ -6,7 +6,7 @@
         "danielstjules/stringy": "^2.3",
         "yiisoft/yii": "1.1.17",
         "fillup/apiaxle": "^0.7.2",
-        "guzzle/guzzle": "3.9.*",
+        "guzzlehttp/guzzle": "^6.2",
         "forevermatt/calc-api-sig": "0.1.1",
         "hybridauth/hybridauth": "2.*",
         "silinternational/opsworks-deploy": "dev-master",

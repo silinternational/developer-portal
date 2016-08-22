@@ -1,5 +1,17 @@
  <?php
 /* @var $this ApiController */
+/* @var $keyId integer|string */
+/* @var $method string */
+/* @var $apiOptions array */
+/* @var $params array[] */
+/* @var $path string */
+/* @var $responseBody string */
+/* @var $responseHeaders string */
+/* @var $requestedUrl string */
+/* @var $rawApiRequest string */
+/* @var $responseSyntax string */
+/* @var $debugText string */
+/* @var $currentUser \User */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
@@ -70,7 +82,7 @@ echo CHtml::form(array('/api/playground/'), 'post');
     <div class="span6">
         <b>Path</b><br />
         <input type="text" class="input-block-level" name="path" 
-               value="<?php if(isset($path)){ echo CHtml::encode($path); } ?>"
+               value="<?= \CHtml::encode($path); ?>"
                placeholder="/optional" />
     </div>
 </div>
@@ -137,19 +149,24 @@ if($responseBody){
 ?>
 <div class="row-fluid">
     <div class="span12">
+        <?php if ($currentUser->isAdmin()): ?>
+            <h4 class="muted" title="Only shown to admins">Debug*:</h4>
+            <pre style="overflow: auto;"><code class="language-http"><?php
+                echo CHtml::encode($debugText);
+            ?></code></pre>
+        <?php endif; ?>
+        
         <h4>Requested URL:</h4>
-        <pre style="overflow: auto; width: 100%; "><code class="language-http"><?php echo CHtml::encode($requestUrl); ?></code></pre>
+        <pre style="overflow: auto;"><code class="language-http"><?= \CHtml::encode($requestedUrl); ?></code></pre>
+        
         <h4>Raw Request:</h4>
-        <pre style="overflow: auto; width: 100%;"><code class="language-http"><?php
-            echo CHtml::encode($apiRequest);
-            if($apiRequestBody){
-                echo CHtml::encode($apiRequestBody);
-            }
-        ?></code></pre>
+        <pre style="overflow: auto;"><code class="language-http"><?= \CHtml::encode($rawApiRequest); ?></code></pre>
+        
         <h4>Response Headers:</h4>
-        <pre style="overflow: auto; width: 100%;"><code class="language-http"><?php echo CHtml::encode($responseHeaders); ?></code></pre>
+        <pre style="overflow: auto;"><code class="language-http"><?= \CHtml::encode($responseHeaders); ?></code></pre>
+        
         <h4>Response Body:</h4>
-        <pre style="overflow: auto; width: 100%; max-height: 400px;"><code class="language-<?php echo $responseSyntax; ?>"><?php echo CHtml::encode($responseBody); ?></code></pre>
+        <pre style="overflow: auto; max-height: 400px;"><code class="language-<?php echo $responseSyntax; ?>"><?php echo CHtml::encode($responseBody); ?></code></pre>
     </div>
 </div>
 <?php
