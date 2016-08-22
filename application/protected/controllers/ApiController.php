@@ -1,6 +1,6 @@
 <?php
 
-use Stringy\Stringy;
+use Stringy\StaticStringy as SS;
 
 class ApiController extends Controller
 {
@@ -801,36 +801,30 @@ class ApiController extends Controller
 
         /* Initialize variables in case this is a GET request or in case there
          * are errors during POST processing.  */
-        $download = false;
-        $method = false;
-        $requestPath = false;
-        $responseBody = false;
-        $responseHeaders = false;
-        $requestUrl = false;
-        $apiRequest = false;
-        $apiRequestBody = false;
-        $responseSyntax = false;
-        $params = array(
-            array(
+        $download = $request->getPost('download', false);
+        $debugText = null;
+        $method = $request->getPost('method', 'GET');
+        $requestPath = $request->getPost('path', '');
+        $responseBody = null;
+        $responseHeaders = null;
+        $requestedUrl = null;
+        $rawApiRequest = null;
+        $responseSyntax = null;
+        $params = $request->getPost('param', [
+            [
                 'type' => null,
                 'name' => null,
                 'value' => null,
-            ),
-        );
+            ],
+        ]);
         
         $keyId = $request->getParam('key_id', null);
         
         if ($request->isPostRequest) {
             
-            // Override remaining variables with what was submitted.
-            $method = $request->getParam('method', 'GET');
-            $requestPath = $request->getParam('path', '');
-            $params = $request->getParam('param', false);
-            $download = $request->getParam('download', false);
-            
             /* Create copy of the request path for manipulation, ensuring it
              * begins with a forward-slash (/).  */
-            $path = Stringy::create($requestPath)->ensureLeft('/');
+            $path = SS::ensureLeft($requestPath, '/');
             
             /* @var $key \Key */
             $key = \Key::model()->findByPk($keyId);
@@ -855,13 +849,19 @@ class ApiController extends Controller
                     }
                 }
                 
-                // Figure out proxy domain to form url.
+                // Figure out proxy domain to form URL.
                 $proxyProtocol = parse_url(Yii::app()->params['apiaxle']['endpoint'], PHP_URL_SCHEME);
-                $proxyDomain = parse_url(Yii::app()->params['apiaxle']['endpoint'], PHP_URL_HOST);
-                $proxyDomain = str_replace('apiaxle.', '', $proxyDomain);
+                $apiAxleEndpointDomain = parse_url(Yii::app()->params['apiaxle']['endpoint'], PHP_URL_HOST);
+                $proxyDomain = str_replace('apiaxle.', '', $apiAxleEndpointDomain);
                 
                 // Build url from components.
-                $url = $proxyProtocol . '://' . $key->api->code . '.' . $proxyDomain . $path;
+                $url = sprintf(
+                    '%s://%s.%s%s',
+                    $proxyProtocol,
+                    $key->api->code,
+                    $proxyDomain,
+                    $path
+                );
 
                 // Calculate the necessary parameters for the ApiAxle call.
                 $paramsQuery = array(
@@ -878,35 +878,68 @@ class ApiController extends Controller
                 if ($method == 'GET') {
                     $paramsQuery = CMap::mergeArray($paramsQuery, $paramsForm);
                     $paramsForm = null;
-                } elseif ($method == 'POST' || $method == 'PUT') {
-                    $apiRequestBody = PHP_EOL . PHP_EOL;
-                    foreach ($paramsForm as $name => $value) {
-                        $apiRequestBody .= $name . '=' . $value . PHP_EOL;
+                    $apiRequestBody = null;
+                } else {
+                    $apiRequestBody = http_build_query($paramsForm);
+                }
+                
+                // Append the query string parameters to the URL.
+                if ( ! empty($paramsQuery)) {
+                    list($urlMinusFragment, ) = explode('#', $url);
+                    $urlMinusFragment .= SS::contains($url, '?') ? '&' : '?';
+                    $paramsQueryPairs = [];
+                    foreach ($paramsQuery as $name => $value) {
+                        $paramsQueryPairs[] = rawurlencode($name) . '=' . rawurlencode($value);
                     }
+                    $urlMinusFragment .= implode('&', $paramsQueryPairs);
+                    $url = $urlMinusFragment;
                 }
 
                 // Create Guzzle client for making API call
-                $client = new Guzzle\Http\Client();
-                $request = $client->createRequest(
+                $client = new GuzzleHttp\Client();
+                $debugStream = fopen('php://temp', 'w+');
+                $guzzleRequest = new GuzzleHttp\Psr7\Request(
                     $method,
                     $url,
                     $paramsHeader,
-                    $paramsForm,
-                    array(
-                        'query' => $paramsQuery,
-                        'exceptions' => false,
-                        'verify' => Yii::app()->params['apiaxle']['ssl_verifypeer'],
-                    )
+                    $apiRequestBody
                 );
-
-                $apiRequest = $request->getRawHeaders();
-                $requestUrl = $request->getUrl();
-                $response = $request->send();
-
-                $responseHeaders = $response->getRawHeaders();
-                $responseBody = $response->getBody(true);
-
-                if ($response->getContentType() == 'applicaton/json') {
+                $response = $client->send($guzzleRequest, [
+                    'debug' => $debugStream,
+                    'form_params' => $paramsForm,
+                    'headers' => $paramsHeader,
+                    'query' => $paramsQuery,
+                    'http_errors' => false,
+                    'verify' => Yii::app()->params['apiaxle']['ssl_verifypeer'],
+                ]);
+                rewind($debugStream);
+                $debugText = stream_get_contents($debugStream);
+                fclose($debugStream);
+                
+                $requestedUrl = $guzzleRequest->getUri();
+                
+                // Get the response headers and body.
+                $responseHeadersFormatter = new GuzzleHttp\MessageFormatter('{res_headers}');
+                $responseHeaders = $responseHeadersFormatter->format($guzzleRequest, $response);
+                $responseBodyFormatter = new GuzzleHttp\MessageFormatter('{res_body}');
+                $responseBody = $responseBodyFormatter->format($guzzleRequest, $response);
+                
+                // Get the content type.
+                $responseContentTypes = $response->getHeader('Content-Type');
+                $responseContentType = end($responseContentTypes);
+                
+                /* Get the raw request that was sent to the API.
+                 * 
+                 * NOTE: Just getting the raw request from the Guzzle request
+                 *       object leaves out several headers (user agent, content
+                 *       type, content length).
+                 */
+                $requestHeaders = $this->getActualRequestHeadersFromDebugText($debugText);
+                $requestBodyFormatter = new GuzzleHttp\MessageFormatter('{req_body}');
+                $requestBody = $requestBodyFormatter->format($guzzleRequest);
+                $rawApiRequest = trim($requestHeaders . $requestBody);
+                
+                if ($responseContentType === 'applicaton/json') {
                     $responseSyntax = 'javascript';
                 } else {
                     $responseSyntax = 'markup';
@@ -916,7 +949,6 @@ class ApiController extends Controller
                 // Display an error
                 Yii::app()->user->setFlash('error', 'Invalid API selected');
             }
-            
         }
         
         // Get list of APIs that user has a key for.
@@ -926,8 +958,8 @@ class ApiController extends Controller
         
         if ( ! $download) {
             
-            // Attempt to pretty print.
-            if (isset($response) && substr_count($response->getContentType(), 'xml') > 0) {
+            // Attempt to pretty print the response body.
+            if (isset($response) && substr_count($responseContentType, 'xml') > 0) {
                 $dom = new DOMDocument('1.0');
                 $dom->preserveWhiteSpace = false;
                 $dom->formatOutput = true;
@@ -937,7 +969,7 @@ class ApiController extends Controller
                         $responseBody = $asString;
                     }
                 }
-            } elseif (isset($response) && substr_count($response->getContentType(), 'json') > 0) {
+            } elseif (isset($response) && substr_count($responseContentType, 'json') > 0) {
                 $responseBody = Utils::pretty_json($responseBody);
             }
 
@@ -949,19 +981,20 @@ class ApiController extends Controller
                 'path' => $requestPath,
                 'responseBody' => $responseBody,
                 'responseHeaders' => $responseHeaders,
-                'requestUrl' => $requestUrl,
-                'apiRequest' => $apiRequest,
-                'apiRequestBody' => $apiRequestBody,
+                'requestedUrl' => $requestedUrl,
+                'rawApiRequest' => $rawApiRequest,
                 'responseSyntax' => $responseSyntax,
+                'debugText' => $debugText,
+                'currentUser' => $currentUser,
             ));
         } else {
             
             /* We expect results to be either JSON, XML, or CSV. So we test if
              * they can be parsed as JSON and set headers appropriately.  */
-            if (isset($response) && substr_count($response->getContentType(), 'json') > 0) {
+            if (isset($response) && substr_count($responseContentType, 'json') > 0) {
                 header('Content-disposition: attachment; filename=results.json');
                 header('Content-type: application/json');
-            } elseif (isset($response) && substr_count($response->getContentType(), 'xml') > 0) {
+            } elseif (isset($response) && substr_count($responseContentType, 'xml') > 0) {
                 header('Content-disposition: attachment; filename=results.xml');
                 header('Content-type: application/xml');
             } else {
@@ -1207,5 +1240,33 @@ class ApiController extends Controller
         $this->render('usage', array(
             'api' => $api,
         ));
+    }
+    
+    protected function getActualRequestHeadersFromDebugText($debugText)
+    {
+        $fullRequest = '';
+        $lines = explode("\n", $debugText);
+        $line = array_shift($lines);
+        
+        // Find the beginning of the request section.
+        while ($line !== null) {
+            if (SS::startsWith($line, '> ')) {
+                $fullRequest .= substr($line, 2);
+                break;
+            }
+            $line = array_shift($lines);
+        }
+        $line = array_shift($lines);
+        
+        // Collect lines until the end of the request section.
+        while ($line !== null) {
+            if (SS::startsWith($line, '* ') || SS::startsWith($line, '< ')) {
+                break;
+            }
+            $fullRequest .= $line;
+            $line = array_shift($lines);
+        }
+        
+        return $fullRequest;
     }
 }
