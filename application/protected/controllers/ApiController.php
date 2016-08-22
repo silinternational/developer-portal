@@ -807,6 +807,7 @@ class ApiController extends Controller
         $requestPath = $request->getPost('path', '');
         $responseBody = null;
         $responseHeaders = null;
+        $responseContentType = null;
         $requestedUrl = null;
         $rawApiRequest = null;
         $responseSyntax = null;
