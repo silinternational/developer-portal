@@ -9,10 +9,10 @@
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
-    'Dashboard',
+    'Home',
 );
 
-$this->pageTitle = 'Dashboard';
+$this->pageTitle = '';
 
 // If the user is an owner and has any pending keys, say so.
 if ($user->hasOwnerPrivileges()) {

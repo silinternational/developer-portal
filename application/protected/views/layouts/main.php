@@ -26,8 +26,8 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
             'class' => 'bootstrap.widgets.TbMenu',
             'items' => array(
                 array(
-                    'label' => 'Dashboard',
-                    'url' => array('dashboard/'),
+                    'label' => 'Home',
+                    'url' => array('/dashboard/'),
                     'active' => ($this->id == 'dashboard'),
                     'visible' => ( ! Yii::app()->user->isGuest),
                 ),

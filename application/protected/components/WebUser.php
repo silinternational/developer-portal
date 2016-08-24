@@ -28,11 +28,6 @@ class WebUser extends CWebUser
     {
         return $this->getState('authType', null);
     }
-    
-    public function getHomeLinkText()
-    {
-        return $this->isGuest ? 'Home' : 'Dashboard';
-    }
 
     public function getHomeUrl()
     {

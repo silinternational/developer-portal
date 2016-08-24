@@ -15,7 +15,7 @@
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+    'Home' => array('/dashboard/'),
     'API Playground',
 );
 

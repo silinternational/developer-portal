@@ -286,7 +286,7 @@ class HttpAdminTest extends CDbTestCase
     public function testDashboard()
     {
         $this->assertContentPiecesFoundOnPage(
-            array('Dashboard'),
+            array('My Usage'),
             '/dashboard/'
         );
     }

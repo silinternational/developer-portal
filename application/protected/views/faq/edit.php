@@ -4,7 +4,7 @@
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+    'Home' => array('/dashboard/'),
     'FAQs' => array('/faq/'),
     $form->model->question => array(
         '/faq/details/',

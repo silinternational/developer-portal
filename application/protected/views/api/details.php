@@ -6,7 +6,7 @@
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
-    $webUser->getHomeLinkText() => $webUser->getHomeUrl(),
+    'Home' => $webUser->getHomeUrl(),
     'APIs' => array('/api/'),
     $api->display_name,
 );
