@@ -1,6 +1,7 @@
 <?php
 
 use Sil\DevPortal\components\AuthManager;
+use Stringy\StaticStringy as SS;
 
 class AuthController extends Controller
 {
@@ -16,6 +17,20 @@ class AuthController extends Controller
     public function actionLogin($authType = null)
     {
         $authManager = new AuthManager();
+        
+        /* If there is no return-to already defined and the user came from
+         * somewhere (other than the auth controller) on this website, send
+         * them back to the page they came from.  */
+        if (\Yii::app()->user->getReturnUrl() === '/') {
+            $referrer = \Yii::app()->request->getUrlReferrer();
+            $absoluteUrlForThisWebsite = SS::ensureRight(\Yii::app()->getBaseUrl(true), '/');
+            $authControllerUrl = $absoluteUrlForThisWebsite . 'auth/';
+            if ($referrer &&
+                SS::startsWith($referrer, $absoluteUrlForThisWebsite) &&
+                ( ! SS::startsWith($referrer, $authControllerUrl))) {
+                \Yii::app()->user->setReturnUrl($referrer);
+            }
+        }
 
         if ($authType === null) {
             if ($authManager->canUseMultipleAuthTypes()) {

@@ -198,6 +198,15 @@ class Controller extends CController
                 ),
                 'roles' => array('owner', 'user'),
             ),
+            array( // Anyone can see basic info about (some) APIs (policed in the controller).
+                'allow',
+                'controllers' => array('api'),
+                'actions' => array(
+                    'details',
+                    'index',
+                ),
+                'roles' => array('*'),
+            ),
             array( // Owners can do certain things with keys.
                 'allow',
                 'controllers' => array('key'),

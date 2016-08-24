@@ -773,9 +773,9 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->isVisibleToUser($user);
         
         // Assert:
-        $this->assertFalse(
+        $this->assertTrue(
             $result,
-            'Failed to hide public Api from unauthenticated (null) User.'
+            'Incorrectly hid public Api from unauthenticated (null) User.'
         );
     }
     

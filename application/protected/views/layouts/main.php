@@ -26,16 +26,15 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
             'class' => 'bootstrap.widgets.TbMenu',
             'items' => array(
                 array(
-                    'label' => 'Dashboard',
-                    'url' => array('dashboard/'),
+                    'label' => 'Home',
+                    'url' => array('/dashboard/'),
                     'active' => ($this->id == 'dashboard'),
                     'visible' => ( ! Yii::app()->user->isGuest),
                 ),
                 array(
-                    'label' => 'APIs',
+                    'label' => 'Browse APIs',
                     'url' => array('api/'),
                     'active' => (($this->id == 'api') && ($this->route != 'api/playground')),
-                    'visible' => ( ! Yii::app()->user->isGuest),
                 ),
                 array(
                     'label' => 'Keys',

@@ -1,5 +1,7 @@
 <?php
 
+ini_set('display_errors', 'On');
+
 // Set the path for the Yii framework.
 $yii = __DIR__.'/../vendor/yiisoft/yii/framework/yii.php';
 

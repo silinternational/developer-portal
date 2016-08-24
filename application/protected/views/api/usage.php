@@ -4,7 +4,7 @@
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+    'Home' => array('/dashboard/'),
     'APIs' => array('/api/'),
     $api->display_name => array('/api/details/', 'code' => $api->code),
     'API Usage',

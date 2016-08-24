@@ -7,7 +7,7 @@ $this->pageTitle = 'Publish a new API';
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+    'Home' => array('/dashboard/'),
     'APIs' => array('/api/'),
     $this->pageTitle
 );
