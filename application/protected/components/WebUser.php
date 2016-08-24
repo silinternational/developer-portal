@@ -168,6 +168,15 @@ class WebUser extends CWebUser
         }
     }
     
+    public function hasActiveKeyToApi($api)
+    {
+        $userModel = $this->getModel();
+        if ($userModel instanceof \User) {
+            return $userModel->hasActiveKeyToApi($api);
+        }
+        return false;
+    }
+    
     public function hasAdminPrivilegesForApi($api)
     {
         $userModel = $this->getModel();
