@@ -24,12 +24,10 @@
  * @property string $visibility
  * @property string $customer_support
  * @property string $terms
- * @property integer $cost_scheme_id
  * @property string $logo_url
  * @property string $require_signature
  *
  * The followings are the available model relations:
- * @property CostScheme $costScheme
  * @property User $owner
  * @property ApiVisibilityDomain[] $apiVisibilityDomains
  * @property ApiVisibilityUser[] $apiVisibilityUsers
@@ -55,7 +53,7 @@ class ApiBase extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('code, display_name, endpoint, queries_second, queries_day, created, updated, endpoint_timeout', 'required'),
-			array('queries_second, queries_day, strict_ssl, endpoint_timeout, owner_id, cost_scheme_id', 'numerical', 'integerOnly'=>true),
+			array('queries_second, queries_day, strict_ssl, endpoint_timeout, owner_id', 'numerical', 'integerOnly'=>true),
 			array('code', 'length', 'max'=>32),
 			array('display_name', 'length', 'max'=>64),
 			array('brief_description, endpoint, default_path, technical_support, customer_support, logo_url', 'length', 'max'=>255),
@@ -65,7 +63,7 @@ class ApiBase extends CActiveRecord
 			array('documentation, terms', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('api_id, code, display_name, brief_description, endpoint, queries_second, queries_day, documentation, created, updated, approval_type, protocol, strict_ssl, endpoint_timeout, default_path, owner_id, technical_support, visibility, customer_support, terms, cost_scheme_id, logo_url, require_signature', 'safe', 'on'=>'search'),
+			array('api_id, code, display_name, brief_description, endpoint, queries_second, queries_day, documentation, created, updated, approval_type, protocol, strict_ssl, endpoint_timeout, default_path, owner_id, technical_support, visibility, customer_support, terms, logo_url, require_signature', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -77,7 +75,6 @@ class ApiBase extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'costScheme' => array(self::BELONGS_TO, 'CostScheme', 'cost_scheme_id'),
 			'owner' => array(self::BELONGS_TO, 'User', 'owner_id'),
 			'apiVisibilityDomains' => array(self::HAS_MANY, 'ApiVisibilityDomain', 'api_id'),
 			'apiVisibilityUsers' => array(self::HAS_MANY, 'ApiVisibilityUser', 'api_id'),
@@ -112,7 +109,6 @@ class ApiBase extends CActiveRecord
 			'visibility' => 'Visibility',
 			'customer_support' => 'Customer Support',
 			'terms' => 'Terms',
-			'cost_scheme_id' => 'Cost Scheme',
 			'logo_url' => 'Logo Url',
 			'require_signature' => 'Require Signature',
 		);
@@ -156,7 +152,6 @@ class ApiBase extends CActiveRecord
 		$criteria->compare('visibility',$this->visibility,true);
 		$criteria->compare('customer_support',$this->customer_support,true);
 		$criteria->compare('terms',$this->terms,true);
-		$criteria->compare('cost_scheme_id',$this->cost_scheme_id);
 		$criteria->compare('logo_url',$this->logo_url,true);
 		$criteria->compare('require_signature',$this->require_signature,true);
 
