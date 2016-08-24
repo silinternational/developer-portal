@@ -1101,7 +1101,7 @@ class Key extends KeyBase
     
     public function requiresApproval()
     {
-        return ($this->api->approval_type !== \Api::APPROVAL_TYPE_AUTO);
+        return $this->api->requiresApproval();
     }
     
     /**

@@ -39,7 +39,9 @@ return array(
                         'role' => array(\User::ROLE_OWNER, \User::ROLE_ADMIN),
                     )),
                     'user_id',
-                    'display_name'
+                    function($user) {
+                        return $user->display_name . ' (' . $user->email . ')';
+                    }
                 ))
             ),
             'visible' => \Yii::app()->user->checkAccess('admin'),
@@ -98,17 +100,11 @@ return array(
         ),
         'visibility' => array(
             'type' => 'dropdownlist',
-            'data' => array_merge(
-                array('' => '-- Select one: --'),
-                Api::getVisibilityDescriptions()
-            ),
+            'data' => Api::getVisibilityDescriptions(),
         ),
         'approval_type' => array(
             'type' => 'dropdownlist',
-            'data' => array_merge(
-                array('' => '-- Select one: --'),
-                Api::getApprovalTypes()
-            ),
+            'data' => Api::getApprovalTypes(),
         ),
         'technical_support' => array(
             'htmlOptions' => array(

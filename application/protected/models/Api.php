@@ -381,6 +381,12 @@ class Api extends ApiBase
             $linkTarget
         );
     }
+
+    public function getRequestKeyText()
+    {
+        return ($this->requiresApproval() ? 'Request' : 'Get') . ' Key';
+    }
+    
     
     public function getRequiresSignatureText()
     {
@@ -913,6 +919,11 @@ class Api extends ApiBase
         /* Compare against the No value so that, if there is some weird
          * mismatch or unexpected value, it defaults to requiring signature.  */
         return ($this->require_signature !== self::REQUIRE_SIGNATURES_NO);
+    }
+    
+    public function requiresApproval()
+    {
+        return ($this->approval_type !== \Api::APPROVAL_TYPE_AUTO);
     }
     
     /**
