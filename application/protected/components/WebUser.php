@@ -28,6 +28,16 @@ class WebUser extends CWebUser
     {
         return $this->getState('authType', null);
     }
+    
+    public function getHomeLinkText()
+    {
+        return $this->isGuest ? 'Home' : 'Dashboard';
+    }
+
+    public function getHomeUrl()
+    {
+        return $this->isGuest ? '/' : array('/dashboard/');
+    }
 
     /**
      * Get the user's role.
@@ -156,5 +166,23 @@ class WebUser extends CWebUser
         } else {
             return false;
         }
+    }
+    
+    public function hasAdminPrivilegesForApi($api)
+    {
+        $userModel = $this->getModel();
+        if ($userModel instanceof \User) {
+            return $userModel->hasAdminPrivilegesForApi($api);
+        }
+        return false;
+    }
+    
+    public function isAdmin()
+    {
+        $userModel = $this->getModel();
+        if ($userModel instanceof \User) {
+            return $userModel->isAdmin();
+        }
+        return false;
     }
 }

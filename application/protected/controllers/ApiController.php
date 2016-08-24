@@ -382,9 +382,10 @@ class ApiController extends Controller
 
     public function actionDetails($code)
     {
-        // Get the current user's model.
-        /* @var $currentUser User */
-        $currentUser = \Yii::app()->user->user;
+        /* @var $webUser WebUser */
+        $webUser = \Yii::app()->user;
+        /* @var $currentUser User|null */
+        $currentUser = $webUser->getUser();
         
         // Get the API by the code name.
         /* @var $api Api */
@@ -411,7 +412,7 @@ class ApiController extends Controller
         $this->render('details', array(
             'actionLinks' => $actionLinks,
             'api' => $api,
-            'currentUser' => $currentUser,
+            'webUser' => $webUser,
         ));
     }
 
@@ -577,11 +578,11 @@ class ApiController extends Controller
     
     public function actionIndex()
     {
-        // Get the current user's model.
-        $currentUser = \Yii::app()->user->user;
+        /* @var $webUser WebUser */
+        $webUser = \Yii::app()->user;
         
-        // If the user is an admin, get the list of all APIs.
-        if ($currentUser->role === User::ROLE_ADMIN) {
+        // If the website user is an admin, get the list of all APIs.
+        if ($webUser->isAdmin()) {
             $apiList = new CActiveDataProvider('Api',array(
                 'criteria' => array(
                     'with' => array('approvedKeyCount', 'pendingKeyCount'),
@@ -592,9 +593,10 @@ class ApiController extends Controller
             // Otherwise, get the list of APIs that should be visible to the
             // current user.
             $visibleApis = array();
+            /* @var $allApis \Api[] */
             $allApis = Api::model()->findAll();
             foreach ($allApis as $api) {
-                if ($api->isVisibleToUser($currentUser)) {
+                if ($api->isVisibleToUser($webUser->getUser())) {
                     $visibleApis[] = $api;
                 }
             }
@@ -611,7 +613,7 @@ class ApiController extends Controller
         // Render the page.
         $this->render('index', array(
             'apiList' => $apiList,
-            'user' => $currentUser,
+            'webUser' => $webUser,
         ));
     }
 

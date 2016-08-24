@@ -32,10 +32,9 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'visible' => ( ! Yii::app()->user->isGuest),
                 ),
                 array(
-                    'label' => 'APIs',
+                    'label' => 'Browse APIs',
                     'url' => array('api/'),
                     'active' => (($this->id == 'api') && ($this->route != 'api/playground')),
-                    'visible' => ( ! Yii::app()->user->isGuest),
                 ),
                 array(
                     'label' => 'Keys',

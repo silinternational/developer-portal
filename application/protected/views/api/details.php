@@ -2,11 +2,11 @@
 /* @var $this ApiController */
 /* @var $actionLinks ActionLink[] */
 /* @var $api Api */
-/* @var $currentUser User */
+/* @var $webUser WebUser */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+    $webUser->getHomeLinkText() => $webUser->getHomeUrl(),
     'APIs' => array('/api/'),
     $api->display_name,
 );
@@ -178,7 +178,7 @@ $attrLabels = $api->attributeLabels();
 
 <b>Documentation</b>
 <div>
-    <?php if ($currentUser->hasAdminPrivilegesForApi($api)): ?>
+    <?php if ($webUser->hasAdminPrivilegesForApi($api)): ?>
         <a href="<?php echo $this->createUrl('/api/docs-edit/', array('code' => $api->code)); ?>" 
            class="nowrap space-after-icon pull-right btn btn-xs" style="margin: 5px;">
             <i class="icon-pencil"></i>Edit documentation
