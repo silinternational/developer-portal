@@ -892,13 +892,16 @@ class Api extends ApiBase
      */
     public function isVisibleToUser($user)
     {
-        // If the user is a guest, they can't see any APIs.
+        if ($this->isPubliclyVisible()) {
+            return true;
+        }
+        
+        // If the user is a guest, they can only see public APIs.
         if ( ! ($user instanceof \User)) {
             return false;
         }
         
-        return $this->isPubliclyVisible() ||
-               $user->isIndividuallyInvitedToSeeApi($this) ||
+        return $user->isIndividuallyInvitedToSeeApi($this) ||
                $user->isInvitedByDomainToSeeApi($this) ||
                $user->isAdmin() ||
                $user->isOwnerOfApi($this);
