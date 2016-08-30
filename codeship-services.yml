@@ -32,8 +32,9 @@ proxy:
 
 portal:
     build:
-        image: docker.sil.org/developer-portal
-        dockerfile_path: Dockerfile
+        image: silintl/developer-portal
+        dockerfile_path: ./Dockerfile
+        cached: true
     links:
         - db
         - proxy:apiaxle.api.proxy
