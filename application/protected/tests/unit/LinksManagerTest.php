@@ -112,7 +112,7 @@ class LinksManagerTest extends CDbTestCase
         $api = $this->apis('apiOwnedByUser18');
         $user = $this->users('userWithRoleOfAdmin');
         $expectedLinkTexts = array(
-            'Request Key',
+            'Get Key',
             'Show Active Keys',
             'Show Pending Keys',
             'Email Users With Keys',
@@ -177,7 +177,7 @@ class LinksManagerTest extends CDbTestCase
         $api = $this->apis('apiOwnedByUser18');
         $user = $this->users('user18');
         $expectedLinkTexts = array(
-            'Request Key',
+            'Get Key',
             'Show Active Keys',
             'Show Pending Keys',
             'Email Users With Keys',
@@ -210,7 +210,7 @@ class LinksManagerTest extends CDbTestCase
         $api = $this->apis('apiOwnedByUser18');
         $user = $this->users('userWithRoleOfOwner');
         $expectedLinkTexts = array(
-            'Request Key',
+            'Get Key',
         );
         
         // Act:
@@ -266,7 +266,7 @@ class LinksManagerTest extends CDbTestCase
         $api = $this->apis('apiOwnedByUser18');
         $user = $this->users('userWithRoleOfUser');
         $expectedLinkTexts = array(
-            'Request Key',
+            'Get Key',
         );
         
         // Act:
