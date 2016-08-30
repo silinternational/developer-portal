@@ -86,6 +86,9 @@ phpunit:
     environment:
       MYSQL_HOST: testDb
       MYSQL_DATABASE: test
+      SAML_ADMIN_PASSWORD: dummy-for-tests-q6.eYWtfLF-BTQXf-OktD5lVFCOFyC4B
+      SAML_SECRET_SALT: dummy-for-tests-Ac4MTgO9UJ6_wpXXKc6EGU_.gWNNkdMe
+      SAML_IDP: NONE
 
 
 redis:
