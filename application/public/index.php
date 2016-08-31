@@ -42,7 +42,7 @@ if (APPLICATION_ENV !== 'production') {
     }
 
     // If this is a dev. environment, show more debug info.
-    if (APPLICATION_ENV == 'development') {
+    if (APPLICATION_ENV === 'development') {
         defined('YII_DEBUG') or define('YII_DEBUG',true);
         defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL', 3);
     }
