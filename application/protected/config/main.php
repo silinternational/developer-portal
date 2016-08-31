@@ -11,7 +11,7 @@ $mysqlUser = Env::get('MYSQL_USER');
 $mysqlPassword = Env::get('MYSQL_PASSWORD');
 $mailerUsername = Env::get('MAILER_USERNAME', false); // Defaults to false to mimic previous getenv() behavior.
 $mailerPassword = Env::get('MAILER_PASSWORD', false); // Defaults to false to mimic previous getenv() behavior.
-$appEnv = Env::get('APP_ENV', 'not set');
+$appEnv = Env::get('APPLICATION_ENV', 'not set');
 $appName = Env::get('APP_NAME', 'Developer Portal');
 $adminEmail = Env::get('ADMIN_EMAIL');
 $alertsEmail = Env::get('ALERTS_EMAIL');
@@ -103,8 +103,12 @@ return array(
             'class' => 'CLogRouter',
             'routes' => array(
                 array(
-                    'class' => 'CFileLogRoute',
+                    'class' => 'CSysLogRoute',
                     'levels' => 'error, warning',
+                    'filter' => array(
+                        'class' => 'CLogFilter',
+                        'logVars' => array(),
+                    ),
                 ),
             // Uncomment the following to show log messages on web pages:
             /*
