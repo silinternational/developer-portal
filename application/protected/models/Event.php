@@ -47,7 +47,7 @@ class Event extends EventBase
             $event->acting_user_id = \Yii::app()->user->getUserId();
             
             if ($event->save()) {
-                \Yii::log($description, CLogger::LEVEL_WARNING);
+                \Yii::log($description, CLogger::LEVEL_INFO);
             } else {
                 \Yii::log(sprintf(
                     'Unable to log event: %s. Error: %s%s.',
