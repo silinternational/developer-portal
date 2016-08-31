@@ -103,8 +103,12 @@ return array(
             'class' => 'CLogRouter',
             'routes' => array(
                 array(
-                    'class' => 'CFileLogRoute',
+                    'class' => 'CSysLogRoute',
                     'levels' => 'error, warning',
+                    'filter' => array(
+                        'class' => 'CLogFilter',
+                        'logVars' => array(),
+                    ),
                 ),
             // Uncomment the following to show log messages on web pages:
             /*
