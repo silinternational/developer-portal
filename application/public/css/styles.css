@@ -44,10 +44,17 @@ dd { margin-bottom: 10px; }
   line-height: 1.25;
 }
 
+#get-started {
+   border-left: 2px solid #333;
+   padding-left: 20px;
+}
+
 .has-tooltip {
   border-bottom: 1px dashed #999;
   cursor: help;
 }
+
+.home-page .site-name { font-size: 50px; }
 
 .nowrap { white-space: nowrap; }
 
