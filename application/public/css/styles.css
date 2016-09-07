@@ -58,6 +58,25 @@ dd { margin-bottom: 10px; }
 
 .home-page .site-name { font-size: 50px; }
 
+#logo-strip {
+    border-radius: 12px;
+    margin: 40px 0;
+    overflow: hidden;
+}
+#logo-strip > div {
+    border-radius: 2px;
+    box-shadow: inset 0px 0px 8px -3px #000;
+    margin: 0 -15px;
+    padding: 0 15px;
+}
+#logo-strip img {
+    margin: 16px 10%;
+}
+#logo-strip * {
+    line-height: 30px;
+    text-align: center;
+}
+
 .nowrap { white-space: nowrap; }
 
 .pad-horiz {

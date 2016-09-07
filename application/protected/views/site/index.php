@@ -50,5 +50,13 @@ $this->pageTitle = 'Welcome';
                 <?php endif; ?>
             </div>
         </div>
+    
+        <div id="logo-strip">
+            <div>
+                <img src="/img/logos/one.png" />
+                <img src="/img/logos/two.png" />
+                <img src="/img/logos/three.png" />
+            </div>
+        </div>
     </div>
 </div>
