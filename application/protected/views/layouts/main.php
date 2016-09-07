@@ -131,6 +131,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
     <div class="clear"></div>
     <hr>
     <div id="footer">
+        <img src="/img/logos/site-logo.png" class="pull-left footer-logo" />
         &copy; <?php echo date('Y'); ?> by SIL International Inc. | All Rights Reserved.<br/>
         Delivered by GTIS, USA Studio<br />
         <?php

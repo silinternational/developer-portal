@@ -42,7 +42,9 @@ dd { margin-bottom: 10px; }
   color: #999;
   font-size: 11px;
   line-height: 1.25;
+  margin: 6px 0;
 }
+.footer-logo { margin: 2px 8px 8px; }
 
 #get-started {
    border-left: 2px solid #333;
