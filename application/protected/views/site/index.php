@@ -1,5 +1,6 @@
 <?php
 /* @var $this SiteController */
+/* @var $popularApis \Api[] */
 
 $this->pageTitle = 'Welcome';
 ?>
@@ -35,16 +36,21 @@ $this->pageTitle = 'Welcome';
             <div class="span4">
                 <h2>Popular APIs</h2>
                 <dl>
-                    <dt><a href="#">One</a></dt>
-                    <dd>A sample API</dd>
-                    
-                    <dt><a href="#">Two</a></dt>
-                    <dd>Another sample API</dd>
-                    
-                    <dt><a href="#">Three</a></dt>
-                    <dd>A third sample API</dd>
+                    <?php
+                    foreach ($popularApis as $api) {
+                        echo sprintf(
+                            '<dt><a href="%s">%s&nbsp;</a></dt> <dd>%s&nbsp;</dd> ',
+                            \CHtml::encode($this->createUrl(
+                                'api/details',
+                                array('code' => $api->code)
+                            )),
+                            \CHtml::encode($api->display_name),
+                            \CHtml::encode($api->brief_description)
+                        );
+                    }
+                    ?>
                 </dl>
-                <a href="#" class="pull-right space-after-icon"><i class="icon-arrow-right"></i>Browse APIs</a>
+                <a href="#" class="pull-right space-before-icon">Browse APIs<i class="icon-arrow-right"></i></a>
             </div>
         </div>
     </div>

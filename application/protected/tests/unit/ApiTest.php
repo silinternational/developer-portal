@@ -628,6 +628,24 @@ class ApiTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testGetPopularApis()
+    {
+        // Arrange: (n/a)
+        
+        // Act:
+        $popularApis = \Api::getPopularApis();
+        
+        // Assert:
+        $this->assertGreaterThan(1, count($popularApis));
+        $this->assertInstanceOf('\Api', $popularApis[0]);
+        $this->assertGreaterThan(
+            $popularApis[1]->approvedKeyCount,
+            $popularApis[0]->approvedKeyCount,
+            'The most popular API incorrectly has fewer approved keys than the '
+            . '2nd most popular API.'
+        );
+    }
+    
     public function testGetPublicUrl()
     {
         // Arrange:

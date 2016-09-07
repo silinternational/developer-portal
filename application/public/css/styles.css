@@ -86,6 +86,7 @@ dd { margin-bottom: 10px; }
 .sil-blue { color: #005B99; }
 
 .space-after-icon > i { padding-right: 4px; }
+.space-before-icon > i { margin-left: 4px; }
 .space-horiz {
     padding-left: 1ex;
     padding-right: 1ex;

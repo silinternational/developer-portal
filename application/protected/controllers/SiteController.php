@@ -27,19 +27,15 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        // If the user is logged in...
         if ( ! Yii::app()->user->isGuest) {
-            
-            // Redirect them to the dashboard controller.
             $this->redirect(array('dashboard/'));
         }
         
-        // Set the page title.
-        $this->pageTitle = Yii::app()->name;
+        $popularApis = \Api::getPopularApis();
         
-        // renders the view file 'protected/views/site/index.php'
-        // using the default layout 'protected/views/layouts/main.php'
-        $this->render('index');
+        $this->render('index', array(
+            'popularApis' => $popularApis,
+        ));
     }
 
     /**
