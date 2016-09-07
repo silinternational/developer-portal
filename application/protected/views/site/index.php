@@ -1,7 +1,7 @@
 <?php
 /* @var $this SiteController */
 /* @var $loginOptions array<string,string> */
-/* @var $popularApis \Api[] */
+/* @var $popularApis \Api[]|null */
 
 $this->pageTitle = 'Welcome';
 ?>
@@ -35,31 +35,19 @@ $this->pageTitle = 'Welcome';
     <div class="pad-horiz-extra">
         <div class="row-fluid">
             <div class="span8">
-                <h2>Intro</h2>
-                <p>
-                    Lorem ipsum...
-                </p>
+                <?php $this->renderPartial('//partials/home-lower-left'); ?>
             </div>
 
             <div class="span4">
-                <h2>Popular&nbsp;APIs</h2>
-                <dl>
+                <?php if ($popularApis === null): ?>
+                    <?php $this->renderPartial('//partials/home-lower-right'); ?>
+                <?php else: ?>
                     <?php
-                    foreach ($popularApis as $api) {
-                        echo sprintf(
-                            '<dt><a href="%s">%s&nbsp;</a></dt> <dd>%s&nbsp;</dd> ',
-                            \CHtml::encode($this->createUrl(
-                                'api/details',
-                                array('code' => $api->code)
-                            )),
-                            \CHtml::encode($api->display_name),
-                            \CHtml::encode($api->brief_description)
-                        );
-                    }
+                    $this->renderPartial('//partials/popular-apis', array(
+                        'popularApis' => $popularApis,
+                    ));
                     ?>
-                </dl>
-                <a href="<?= $this->createUrl('api/'); ?>"
-                   class="pull-right space-before-icon">Browse APIs<i class="icon-arrow-right"></i></a>
+                <?php endif; ?>
             </div>
         </div>
     </div>

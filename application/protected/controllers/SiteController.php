@@ -33,7 +33,11 @@ class SiteController extends Controller
             $this->redirect(array('dashboard/'));
         }
         
-        $popularApis = \Api::getPopularApis();
+        if (\Yii::app()->params['showPopularApis']) {
+            $popularApis = \Api::getPopularApis();
+        } else {
+            $popularApis = null;
+        }
         
         $authManager = new AuthManager();
         $loginOptions = $authManager->getLoginOptions();

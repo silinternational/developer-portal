@@ -18,6 +18,13 @@
    your user in the user table and change role to 'admin'. Logout and login
    again to become an admin.
 
+### local.env reference ###
+- ```SHOW_POPULAR_APIS``` (boolean)  
+  Whether to show the most popular APIs (based on the number of approved keys).
+  If false, the file ```application/protected/views/partials/home-lower-right.php```
+  will be shown (which you can overwrite with whatever content you want during
+  your deployment process).
+
 ## Reference Links ##
 1. Yii Bootstrap extension - http://www.yiiframework.com/extension/bootstrap
 2. Swagger for API documentation - https://developers.helloreverb.com/swagger/
