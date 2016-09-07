@@ -58,7 +58,8 @@ $this->pageTitle = 'Welcome';
                     }
                     ?>
                 </dl>
-                <a href="#" class="pull-right space-before-icon">Browse APIs<i class="icon-arrow-right"></i></a>
+                <a href="<?= $this->createUrl('api/'); ?>"
+                   class="pull-right space-before-icon">Browse APIs<i class="icon-arrow-right"></i></a>
             </div>
         </div>
     </div>
