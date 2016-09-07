@@ -1,5 +1,7 @@
 <?php
 
+use Sil\DevPortal\components\AuthManager;
+
 class SiteController extends Controller
 {
     ///**
@@ -33,7 +35,11 @@ class SiteController extends Controller
         
         $popularApis = \Api::getPopularApis();
         
+        $authManager = new AuthManager();
+        $loginOptions = $authManager->getLoginOptions();
+        
         $this->render('index', array(
+            'loginOptions' => $loginOptions,
             'popularApis' => $popularApis,
         ));
     }

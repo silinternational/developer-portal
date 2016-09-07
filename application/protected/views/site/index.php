@@ -1,5 +1,6 @@
 <?php
 /* @var $this SiteController */
+/* @var $loginOptions array<string,string> */
 /* @var $popularApis \Api[] */
 
 $this->pageTitle = 'Welcome';
@@ -17,8 +18,15 @@ $this->pageTitle = 'Welcome';
             <div class="span4">
                 <div id="get-started">
                     <h2>Get Started</h2>
-                    Login using ___<br />
-                    Login using ___
+                    <?php
+                    foreach ($loginOptions as $displayName => $loginUrl) {
+                        echo sprintf(
+                            '<div><a href="%s" class="btn btn-success">Login with %s</a></div> ',
+                            $loginUrl,
+                            \CHtml::encode($displayName)
+                        );
+                    }
+                    ?>
                 </div>
             </div>
         </div>
