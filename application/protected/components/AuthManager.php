@@ -139,6 +139,29 @@ class AuthManager
         return $messageHtml;
     }
     
+    /**
+     * Get the list of login options.
+     * 
+     * @return array<string,string> The list of login options, where keys are
+     *     the display name for that authentication types (e.g. Google) and
+     *     values are URL for logging in using that auth. type.
+     */
+    public function getLoginOptions()
+    {
+        $loginOptions = array();
+        if ($this->isAuthTypeEnabled('saml')) {
+            $loginOptions['Insite'] = \Yii::app()->createUrl('auth/login', array(
+                'authType' => 'saml',
+            ));
+        }
+        if ($this->isAuthTypeEnabled('hybrid')) {
+            $loginOptions['Google'] = \Yii::app()->createUrl('auth/login', array(
+                'authType' => 'hybrid',
+            ));
+        }
+        return $loginOptions;
+    }
+    
     protected function getKnownAuthTypeNames()
     {
         return \array_keys($this->knownAuthTypes);
