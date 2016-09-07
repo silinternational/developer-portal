@@ -35,12 +35,12 @@ $this->pageTitle = 'Welcome';
     <div class="pad-horiz-extra">
         <div class="row-fluid">
             <div class="span8">
-                <?php $this->renderPartial('//partials/home-lower-left'); ?>
+                <?php $this->renderPartial('//partials/site-text/home-lower-left'); ?>
             </div>
 
             <div class="span4">
                 <?php if ($popularApis === null): ?>
-                    <?php $this->renderPartial('//partials/home-lower-right'); ?>
+                    <?php $this->renderPartial('//partials/site-text/home-lower-right'); ?>
                 <?php else: ?>
                     <?php
                     $this->renderPartial('//partials/popular-apis', array(
