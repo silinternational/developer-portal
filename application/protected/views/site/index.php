@@ -42,7 +42,7 @@ $this->pageTitle = 'Welcome';
             </div>
 
             <div class="span4">
-                <h2>Popular APIs</h2>
+                <h2>Popular&nbsp;APIs</h2>
                 <dl>
                     <?php
                     foreach ($popularApis as $api) {
