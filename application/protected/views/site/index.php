@@ -1,6 +1,8 @@
 <?php
 /* @var $this SiteController */
 /* @var $loginOptions array<string,string> */
+/* @var $homeLowerLeftHtml string|null */
+/* @var $homeLowerRightHtml string|null */
 /* @var $popularApis \Api[]|null */
 
 $this->pageTitle = 'Welcome';
@@ -35,12 +37,12 @@ $this->pageTitle = 'Welcome';
     <div class="pad-horiz-extra">
         <div class="row-fluid">
             <div class="span8">
-                <?php $this->renderPartial('//partials/site-text/home-lower-left'); ?>
+                <?= $homeLowerLeftHtml; ?>
             </div>
 
             <div class="span4">
                 <?php if ($popularApis === null): ?>
-                    <?php $this->renderPartial('//partials/site-text/home-lower-right'); ?>
+                    <?php $homeLowerRightHtml; ?>
                 <?php else: ?>
                     <?php
                     $this->renderPartial('//partials/popular-apis', array(
