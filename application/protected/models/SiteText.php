@@ -22,4 +22,26 @@ class SiteText extends SiteTextBase
     {
         return parent::model($className);
     }
+    
+    public function rules()
+    {
+        return \CMap::mergeArray(array(
+            array(
+                'name',
+                'filter',
+                'filter' => array($this, 'slugify'),
+            ),
+            array(
+                'name',
+                'match',
+                'pattern' => '/^[a-z-]+$/',
+                'message' => 'Please use only lowercase letters (a-z) and hyphens (-) in the name.',
+            ),
+        ), parent::rules());
+    }
+    
+    public function slugify($name)
+    {
+        return (string)\Stringy\StaticStringy::slugify($name);
+    }
 }
