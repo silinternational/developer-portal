@@ -24,18 +24,18 @@ class SiteTextController extends Controller
             // an operation).
             $siteText->attributes = $postData;
 
-            // Attempt to save the changes to the FAQ (validating the user
+            // Attempt to save the changes to the SiteText (validating the user
             // input). If successful...
             if ($siteText->save()) {
 
                 // Record that in the log.
                 Yii::log(
-                    'FAQ created, ID ' . $siteText->site_text_id,
+                    'SiteText created, ID ' . $siteText->site_text_id,
                     CLogger::LEVEL_INFO,
                     __CLASS__ . '.' . __FUNCTION__
                 );
 
-                // Send the user back to the FAQ details page.
+                // Send the user back to the SiteText details page.
                 $this->redirect(array(
                     '/site-text/details/',
                     'id' => $siteText->site_text_id,
@@ -51,14 +51,14 @@ class SiteTextController extends Controller
     
     public function actionDetails($id)
     {
-        // Get the FAQ whose ID is specified in the URL. Expects the pk of a
+        // Get the SiteText whose ID is specified in the URL. Expects the pk of a
         // SiteText as 'id'.
         $siteText = $this->getPkOr404('SiteText');
         
         // Set this page to use a different layout.
         $this->layout = 'column1';
 
-        // Show the FAQ's details.
+        // Show the SiteText's details.
         $this->render('details', array(
             'siteText' => $siteText,
         ));
@@ -66,7 +66,7 @@ class SiteTextController extends Controller
     
     public function actionEdit($id)
     {
-        // Get the FAQ whose ID is specified in the URL. Expects the pk of a
+        // Get the SiteText whose ID is specified in the URL. Expects the pk of a
         // SiteText as 'id'.
         $siteText = $this->getPkOr404('SiteText');
         
@@ -85,18 +85,18 @@ class SiteTextController extends Controller
             // an operation).
             $siteText->attributes = $postData;
 
-            // Attempt to save the changes to the FAQ (validating the user
+            // Attempt to save the changes to the SiteText (validating the user
             // input). If successful...
             if ($siteText->save()) {
 
                 // Record that in the log.
                 Yii::log(
-                    'FAQ updated, ID ' . $siteText->site_text_id,
+                    'SiteText updated, ID ' . $siteText->site_text_id,
                     CLogger::LEVEL_INFO,
                     __CLASS__ . '.' . __FUNCTION__
                 );
 
-                // Send the user back to the FAQ details page.
+                // Send the user back to the SiteText details page.
                 $this->redirect(array('/site-text/details/', 'id' => $siteText->site_text_id));
             }
         }
