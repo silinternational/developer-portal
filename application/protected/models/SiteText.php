@@ -44,6 +44,12 @@ class SiteText extends SiteTextBase
                 'pattern' => '/^[a-z-]+$/',
                 'message' => 'Please use only lowercase letters (a-z) and hyphens (-) in the name.',
             ),
+            array(
+                'name',
+                'unique',
+                'allowEmpty' => false,
+                'caseSensitive' => false,
+            ),
         ), parent::rules());
     }
     
