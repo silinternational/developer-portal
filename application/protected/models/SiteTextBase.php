@@ -26,8 +26,9 @@ class SiteTextBase extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('name, markdown_content', 'required'),
+			array('name', 'required'),
 			array('name', 'length', 'max'=>255),
+			array('markdown_content', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('site_text_id, name, markdown_content', 'safe', 'on'=>'search'),
