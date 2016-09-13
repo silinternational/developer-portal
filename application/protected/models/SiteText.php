@@ -35,6 +35,11 @@ class SiteText extends SiteTextBase
         return \CMap::mergeArray(array(
             array(
                 'name',
+                'unsafe',
+                'on' => 'update',
+            ),
+            array(
+                'name',
                 'filter',
                 'filter' => array($this, 'slugify'),
             ),

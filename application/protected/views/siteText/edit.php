@@ -13,7 +13,7 @@ $this->breadcrumbs = array(
     'Edit Site Text'
 );
 
-$this->pageTitle = 'Edit Site Text';
+$this->pageTitle = 'Edit "' . $form->model->name . '"';
 
 // Show the form.
 ?>

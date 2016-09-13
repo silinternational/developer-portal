@@ -4,51 +4,6 @@ class SiteTextController extends Controller
 {
     public $layout = '//layouts/one-column-with-title';
     
-    public function actionAdd()
-    {
-        // Create a new instance of the model.
-        $siteText = new SiteText;
-        
-        // Get the form object.
-        $form = new YbHorizForm('application.views.forms.siteTextForm', $siteText);
-        
-        // Collect the user input data (if any).
-        $postData = Yii::app()->request->getPost('SiteText', false);
-        
-        // If form has been submitted (as evidenced by the presence of POSTed
-        // user input data)...
-        if ($postData !== false) {
-            
-            // Do a massive assignment of the POSTed data to the model (which
-            // is safe because Yii only uses attributes marked as safe for such
-            // an operation).
-            $siteText->attributes = $postData;
-
-            // Attempt to save the changes to the SiteText (validating the user
-            // input). If successful...
-            if ($siteText->save()) {
-
-                // Record that in the log.
-                Yii::log(
-                    'SiteText created, ID ' . $siteText->site_text_id,
-                    CLogger::LEVEL_INFO,
-                    __CLASS__ . '.' . __FUNCTION__
-                );
-
-                // Send the user back to the SiteText details page.
-                $this->redirect(array(
-                    '/site-text/details/',
-                    'id' => $siteText->site_text_id,
-                ));
-            }
-        }
-        
-        // If we reach this point, render the page.
-        $this->render('add', array(
-            'form' => $form,
-        ));
-    }
-    
     public function actionDetails($id)
     {
         // Get the SiteText whose ID is specified in the URL. Expects the pk of a
