@@ -30,6 +30,12 @@ body {
   padding-left: 4px;
 }
 
+.clear {
+  clear: both;
+  height: 0;
+  line-height: 0;
+}
+
 dd { margin-bottom: 10px; }
 
 .cursor-info {
