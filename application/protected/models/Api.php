@@ -155,6 +155,28 @@ class Api extends ApiBase
         );
     }
     
+    /**
+     * Get the top few (PUBLIC) popular APIs, ordered by the number of
+     * active keys.
+     * 
+     * @return \Api[] A short list of APIs.
+     */
+    public static function getPopularApis()
+    {
+        // Get all of the public APIs.
+        $publicApis = \Api::model()->findAllByAttributes(array(
+            'visibility' => self::VISIBILITY_PUBLIC,
+        ));
+        
+        // Sort them by popularity (= the number of approved keys).
+        usort($publicApis, function($firstApi, $secondApi) {
+            return ($firstApi->approvedKeyCount < $secondApi->approvedKeyCount);
+        });
+        
+        // Return the top few results.
+        return array_slice($publicApis, 0, 3);
+    }
+    
     public static function getProtocols()
     {
         return array(

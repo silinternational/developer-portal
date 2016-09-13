@@ -94,17 +94,7 @@ class AuthController extends Controller
     {
         $authManager = new AuthManager();
         
-        $loginOptions = array();
-        if ($authManager->isAuthTypeEnabled('saml')) {
-            $loginOptions['Insite'] = $this->createUrl('auth/login', array(
-                'authType' => 'saml',
-            ));
-        }
-        if ($authManager->isAuthTypeEnabled('hybrid')) {
-            $loginOptions['Google'] = $this->createUrl('auth/login', array(
-                'authType' => 'hybrid',
-            ));
-        }
+        $loginOptions = $authManager->getLoginOptions();
         
         $this->render('login-options', array(
             'loginOptions' => $loginOptions,

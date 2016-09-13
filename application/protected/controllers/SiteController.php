@@ -1,5 +1,7 @@
 <?php
 
+use Sil\DevPortal\components\AuthManager;
+
 class SiteController extends Controller
 {
     ///**
@@ -27,19 +29,25 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        // If the user is logged in...
         if ( ! Yii::app()->user->isGuest) {
-            
-            // Redirect them to the dashboard controller.
             $this->redirect(array('dashboard/'));
         }
         
-        // Set the page title.
-        $this->pageTitle = Yii::app()->name;
+        if (\Yii::app()->params['showPopularApis']) {
+            $popularApis = \Api::getPopularApis();
+        } else {
+            $popularApis = null;
+        }
         
-        // renders the view file 'protected/views/site/index.php'
-        // using the default layout 'protected/views/layouts/main.php'
-        $this->render('index');
+        $authManager = new AuthManager();
+        $loginOptions = $authManager->getLoginOptions();
+        
+        $this->render('index', array(
+            'loginOptions' => $loginOptions,
+            'popularApis' => $popularApis,
+            'homeLowerLeftHtml' => \SiteText::getHtml('home-lower-left'),
+            'homeLowerRightHtml' => \SiteText::getHtml('home-lower-right'),
+        ));
     }
 
     /**

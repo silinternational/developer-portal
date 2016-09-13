@@ -83,6 +83,12 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'visible' => ( ! Yii::app()->user->isGuest),
                 ),
                 array(
+                    'label' => 'Site Text',
+                    'url' => array('/site-text/'),
+                    'active' => ($this->id == 'siteText'),
+                    'visible' => Yii::app()->user->checkAccess('admin'),
+                ),
+                array(
                     'label' => 'Event Log',
                     'url' => array('/event/'),
                     'active' => ($this->id == 'event'),
@@ -131,6 +137,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
     <div class="clear"></div>
     <hr>
     <div id="footer">
+        <img src="/img/logos/site-logo.png" class="pull-left footer-logo" />
         &copy; <?php echo date('Y'); ?> by SIL International Inc. | All Rights Reserved.<br/>
         Delivered by GTIS, USA Studio<br />
         <?php
