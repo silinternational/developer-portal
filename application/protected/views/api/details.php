@@ -208,7 +208,7 @@ $attrLabels = $api->attributeLabels();
     <div class="well">
         <?php
 
-        $this->beginWidget('CMarkdown', array('purifyOutput' => false));
+        $this->beginWidget('CMarkdown', array('purifyOutput' => true));
         echo $api->documentation;
         $this->endWidget();
 
@@ -221,7 +221,7 @@ $attrLabels = $api->attributeLabels();
     <div>
         <div class="well">
             <?php
-            $this->beginWidget('CMarkdown', array('purifyOutput' => false));
+            $this->beginWidget('CMarkdown', array('purifyOutput' => true));
             echo $api->terms;
             $this->endWidget();
             ?>

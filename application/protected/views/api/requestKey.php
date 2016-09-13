@@ -50,7 +50,7 @@ $this->breadcrumbs = array(
         <?php if ($api->hasTerms()): ?>
             <div class="well">
                 <?php
-                $this->beginWidget('CMarkdown', array('purifyOutput' => false));
+                $this->beginWidget('CMarkdown', array('purifyOutput' => true));
                 echo $api->terms;
                 $this->endWidget();
                 ?>

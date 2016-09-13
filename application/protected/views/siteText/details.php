@@ -26,7 +26,7 @@ if (\Yii::app()->user->checkAccess('admin')) {
 <div class="well">
     <?php
     
-    $this->beginWidget('CMarkdown', array('purifyOutput' => false));
+    $this->beginWidget('CMarkdown', array('purifyOutput' => true));
     echo $siteText->markdown_content;
     $this->endWidget();
     
