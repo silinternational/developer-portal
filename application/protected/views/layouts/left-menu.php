@@ -59,6 +59,11 @@
                   'url' => $this->createUrl('/faq/'),
               ),
               array(
+                  'label' => 'Site Text',
+                  'url' => $this->createUrl('/site-text/'),
+                  'visible' => \Yii::app()->user->checkAccess('admin'),
+              ),
+              array(
                   'label' => 'Event Log',
                   'url' => $this->createUrl('/event/'),
                   'visible' => \Yii::app()->user->checkAccess('admin'),
