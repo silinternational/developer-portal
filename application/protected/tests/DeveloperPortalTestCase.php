@@ -53,7 +53,7 @@ class DeveloperPortalTestCase extends CDbTestCase {
      * @param string $relationName The name of the expected relationship.
      *     Example: 'keys'.
      * @param string $relatedClassName The name of the related class.
-     *     Example: 'Key'.
+     *     Example: '\Sil\DevPortal\models\Key'.
      */
 	protected function assertClassHasRelation($classInstance, $relationName,
         $relatedClassName)

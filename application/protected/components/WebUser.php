@@ -1,5 +1,7 @@
 <?php
 
+use Sil\DevPortal\models\User;
+
 class WebUser extends CWebUser
 {
     private $_model = null;
@@ -21,7 +23,7 @@ class WebUser extends CWebUser
     public function getAuthProvider()
     {
         $user = $this->getModel();
-        return ($user instanceof \User ? $user->auth_provider : null);
+        return ($user instanceof User ? $user->auth_provider : null);
     }
     
     public function getAuthType()
@@ -156,7 +158,7 @@ class WebUser extends CWebUser
     public function hasOwnerPrivileges()
     {
         $userModel = $this->getModel();
-        if ($userModel instanceof \User) {
+        if ($userModel instanceof User) {
             return $userModel->hasOwnerPrivileges();
         } else {
             return false;
@@ -166,7 +168,7 @@ class WebUser extends CWebUser
     public function hasActiveKeyToApi($api)
     {
         $userModel = $this->getModel();
-        if ($userModel instanceof \User) {
+        if ($userModel instanceof User) {
             return $userModel->hasActiveKeyToApi($api);
         }
         return false;
@@ -175,7 +177,7 @@ class WebUser extends CWebUser
     public function hasAdminPrivilegesForApi($api)
     {
         $userModel = $this->getModel();
-        if ($userModel instanceof \User) {
+        if ($userModel instanceof User) {
             return $userModel->hasAdminPrivilegesForApi($api);
         }
         return false;
@@ -184,7 +186,7 @@ class WebUser extends CWebUser
     public function isAdmin()
     {
         $userModel = $this->getModel();
-        if ($userModel instanceof \User) {
+        if ($userModel instanceof User) {
             return $userModel->isAdmin();
         }
         return false;

@@ -3,18 +3,19 @@ namespace Sil\DevPortal\tests\unit;
 
 use Sil\DevPortal\components\UserAuthenticationData;
 use Sil\DevPortal\components\UserIdentity;
+use Sil\DevPortal\models\User;
 
 class UserIdentityTest extends \CDbTestCase
 {
     public $fixtures = array(
-        'users' => 'User',
+        'users' => '\Sil\DevPortal\models\User',
     );
     
     public function testAuthenticate_activeUser()
     {
         // Arrange:
         $userAuthData = \Phake::mock('\Sil\DevPortal\components\UserAuthenticationData');
-        $user = \Phake::mock('\User');
+        $user = \Phake::mock('\Sil\DevPortal\models\User');
         \Phake::when($user)->isDisabled->thenReturn(false);
         /* @var $userIdentity UserIdentity */
         $userIdentity = \Phake::mock('Sil\DevPortal\components\UserIdentity');
@@ -39,7 +40,7 @@ class UserIdentityTest extends \CDbTestCase
     {
         // Arrange:
         $userAuthData = \Phake::mock('\Sil\DevPortal\components\UserAuthenticationData');
-        $disabledUser = \Phake::mock('\User');
+        $disabledUser = \Phake::mock('\Sil\DevPortal\models\User');
         \Phake::when($disabledUser)->isDisabled->thenReturn(true);
         /* @var $userIdentity UserIdentity */
         $userIdentity = \Phake::mock('Sil\DevPortal\components\UserIdentity');
@@ -68,7 +69,7 @@ class UserIdentityTest extends \CDbTestCase
     {
         // Arrange:
         $userAuthData = \Phake::mock('\Sil\DevPortal\components\UserAuthenticationData');
-        $newUser = \Phake::mock('\User');
+        $newUser = \Phake::mock('\Sil\DevPortal\models\User');
         \Phake::when($newUser)->isDisabled->thenReturn(false);
         /* @var $userIdentity UserIdentity */
         $userIdentity = \Phake::mock('Sil\DevPortal\components\UserIdentity');
@@ -136,7 +137,7 @@ class UserIdentityTest extends \CDbTestCase
         
         // Pre-assert:
         $this->assertFalse(
-            \User::isEmailAddressInUse($newEmailAddress),
+            User::isEmailAddressInUse($newEmailAddress),
             'This test requires an email address that is not yet in use in the '
             . 'test database.'
         );
@@ -146,12 +147,12 @@ class UserIdentityTest extends \CDbTestCase
         
         // Assert:
         $this->assertInstanceOf(
-            '\User',
+            '\Sil\DevPortal\models\User',
             $result,
             'Failed to return new User instance.'
         );
         $this->assertTrue(
-            \User::isEmailAddressInUse($newEmailAddress),
+            User::isEmailAddressInUse($newEmailAddress),
             'Failed to find the new email address in the database after '
             . 'creating the user record.'
         );
@@ -174,7 +175,7 @@ class UserIdentityTest extends \CDbTestCase
         
         // Pre-assert:
         $this->assertTrue(
-            \User::isEmailAddressInUse($dataFromExistingUser['email']),
+            User::isEmailAddressInUse($dataFromExistingUser['email']),
             'This test requires an email address that is already in use in the '
             . 'test database.'
         );
@@ -417,7 +418,7 @@ class UserIdentityTest extends \CDbTestCase
     public function testUpdateUserRecord_success()
     {
         // Arrange:
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userFromInsite');
         $newFirstName = uniqid(); // Random value.
         $newLastName = uniqid(); // Random value.
@@ -506,7 +507,7 @@ class UserIdentityTest extends \CDbTestCase
     public function testWarnIfEmailIsInUseByDiffAuthProvider_yes()
     {
         // Arrange:
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userFromInsite');
         $userAuthData = new UserAuthenticationData(
             'Google',

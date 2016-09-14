@@ -2,6 +2,7 @@
 namespace Sil\DevPortal\components;
 
 use Sil\DevPortal\components\UserAuthenticationData;
+use Sil\DevPortal\models\User;
 
 class SamlUserIdentity extends UserIdentity
 {
@@ -73,7 +74,7 @@ class SamlUserIdentity extends UserIdentity
      * the database.
      * 
      * @param \Sil\DevPortal\components\UserAuthenticationData $userAuthData
-     * @return \User|null
+     * @return User|null
      */
     protected function findUserRecord($userAuthData)
     {
@@ -83,8 +84,8 @@ class SamlUserIdentity extends UserIdentity
             $authProvider = $userAuthData->getAuthProvider();
             if ($this->canTrustEmailAsFallbackIdFor($authProvider)) {
             
-                /* @var $user \User */
-                $user = \User::model()->findByAttributes(array(
+                /* @var $user User */
+                $user = User::model()->findByAttributes(array(
                     'auth_provider' => $authProvider,
                     'auth_provider_user_identifier' => null,
                     'email' => $userAuthData->getEmailAddress(),

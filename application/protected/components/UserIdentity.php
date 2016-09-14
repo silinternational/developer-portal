@@ -3,6 +3,7 @@ namespace Sil\DevPortal\components;
 
 use Sil\DevPortal\components\UserAuthenticationData;
 use Sil\DevPortal\components\WrongAuthProviderException;
+use Sil\DevPortal\models\User;
 
 abstract class UserIdentity extends \CBaseUserIdentity
 {
@@ -41,7 +42,7 @@ abstract class UserIdentity extends \CBaseUserIdentity
         $userAuthData = $this->getUserAuthData();
 
         try {
-            /* @var $user \User */
+            /* @var $user User */
             $user = $this->findUserRecord($userAuthData);
 
             if ($user === null) {
@@ -92,11 +93,11 @@ abstract class UserIdentity extends \CBaseUserIdentity
      * given user auth. data.
      * 
      * @param UserAuthenticationData $userAuthData
-     * @return \User The new User.
+     * @return User The new User.
      */
     protected function createUserRecord($userAuthData)
     {
-        if (\User::isEmailAddressInUse($userAuthData->getEmailAddress())) {
+        if (User::isEmailAddressInUse($userAuthData->getEmailAddress())) {
             throw new \Exception(
                 'A user with that email address already exists in our '
                 . 'database.',
@@ -105,7 +106,7 @@ abstract class UserIdentity extends \CBaseUserIdentity
         }
         
         // Create the new User instance.
-        $user = new \User();
+        $user = new User();
         $user->auth_provider = $userAuthData->getAuthProvider();
         $user->auth_provider_user_identifier = $userAuthData->getAuthProviderUserIdentifier();
         $user->email = $userAuthData->getEmailAddress();
@@ -114,8 +115,8 @@ abstract class UserIdentity extends \CBaseUserIdentity
         $user->display_name = $userAuthData->getDisplayName();
 
         // Assign them a default role and mark them as active.
-        $user->role = \User::ROLE_USER;
-        $user->status = \User::STATUS_ACTIVE;
+        $user->role = User::ROLE_USER;
+        $user->status = User::STATUS_ACTIVE;
 
         // Try to save the new User record.
         if ( ! $user->save()) {
@@ -135,7 +136,7 @@ abstract class UserIdentity extends \CBaseUserIdentity
      * returned.
      * 
      * @param UserAuthenticationData $userAuthData
-     * @return \User|null
+     * @return User|null
      */
     protected function findUserRecord($userAuthData)
     {
@@ -160,7 +161,7 @@ abstract class UserIdentity extends \CBaseUserIdentity
             );
         }
         
-        $user = \User::model()->findByAttributes(array(
+        $user = User::model()->findByAttributes(array(
             'auth_provider' => $authProvider,
             'auth_provider_user_identifier' => $authProviderUserIdentifier,
         ));
@@ -218,7 +219,7 @@ abstract class UserIdentity extends \CBaseUserIdentity
      * Load the necessary information from the given parameters in order to
      * populate the required fields for this UserIdentity.
      * 
-     * @param \User $user
+     * @param User $user
      * @param array $accessGroups
      * @param mixed $uuid
      */
@@ -304,8 +305,8 @@ abstract class UserIdentity extends \CBaseUserIdentity
      */
     protected function warnIfEmailIsInUseByDiffAuthProvider($userAuthData)
     {
-        /* @var $possibleUser \User */
-        $possibleUser = \User::model()->findByAttributes(array(
+        /* @var $possibleUser User */
+        $possibleUser = User::model()->findByAttributes(array(
             'email' => $userAuthData->getEmailAddress(),
         ));
         

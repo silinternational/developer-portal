@@ -1,7 +1,10 @@
 <?php
+
+use Sil\DevPortal\models\Key;
+
 /* @var $this Controller */
-/* @var $key \Key */
-/* @var $currentUser \User */
+/* @var $key Key */
+/* @var $currentUser \Sil\DevPortal\models\User */
 
 if ($currentUser->canSeeKey($key)) {
     ?>
@@ -59,7 +62,7 @@ if ($currentUser->canSeeKey($key)) {
                 ?></dd>
         <?php endif; ?>
         
-        <?php if ($key->status === \Key::STATUS_APPROVED): ?>
+        <?php if ($key->status === Key::STATUS_APPROVED): ?>
             <dt>Secret</dt>
             <?php if ($key->secret !== null): ?>
                 <dd>

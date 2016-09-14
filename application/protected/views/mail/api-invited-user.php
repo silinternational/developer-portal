@@ -1,6 +1,6 @@
 <?php
 /* @var $api Api */
-/* @var $apiVisibilityUser \ApiVisibilityUser */
+/* @var $apiVisibilityUser \Sil\DevPortal\models\ApiVisibilityUser */
 /* @var $invitedByUser User */
 /* @var $inviteeEmailAddress string */
 /* @var $this Controller */

@@ -1,7 +1,7 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\ApiController */
-/* @var $api \Api */
-/* @var $apiVisibilityDomain \ApiVisibilityDomain */
+/* @var $api \Sil\DevPortal\models\Api */
+/* @var $apiVisibilityDomain \Sil\DevPortal\models\ApiVisibilityDomain */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(

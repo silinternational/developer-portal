@@ -11,7 +11,7 @@
 /* @var $rawApiRequest string */
 /* @var $responseSyntax string */
 /* @var $debugText string */
-/* @var $currentUser \User */
+/* @var $currentUser \Sil\DevPortal\models\User */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(

@@ -7,6 +7,7 @@ use ApiAxle\Api\Keyring as AxleKeyring;
 
 class Key extends \KeyBase
 {
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     
@@ -36,14 +37,14 @@ class Key extends \KeyBase
             array(
                 'updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'update',
             ),
             array(
                 'created,updated,requested_on',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'insert',
             ),
@@ -359,7 +360,7 @@ class Key extends \KeyBase
     
     public static function getActiveKeysDataProvider()
     {
-        return new \CActiveDataProvider('Key', array(
+        return new \CActiveDataProvider('\Sil\DevPortal\models\Key', array(
             'criteria' => array(
                 'condition' => 'status = :status',
                 'params' => array(
@@ -371,7 +372,7 @@ class Key extends \KeyBase
     
     public static function getPendingKeysDataProvider()
     {
-        return new \CActiveDataProvider('Key', array(
+        return new \CActiveDataProvider('\Sil\DevPortal\models\Key', array(
             'criteria' => array(
                 'condition' => 'status = :status',
                 'params' => array(
@@ -1276,7 +1277,7 @@ class Key extends \KeyBase
     {
         if ( ! empty($this->processed_by)) {
             if (empty($this->processed_on)) {
-                $this->processed_on = new CDbExpression('NOW()');
+                $this->processed_on = new \CDbExpression('NOW()');
             }
         }
     }

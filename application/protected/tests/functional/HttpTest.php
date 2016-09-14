@@ -6,9 +6,9 @@
 class HttpTest extends CDbTestCase
 {
     public $fixtures = array(
-        'apis' => 'Api',
-        'users' => 'User',
-        'keys' => 'Key',
+        'apis' => '\Sil\DevPortal\models\Api',
+        'users' => '\Sil\DevPortal\models\User',
+        'keys' => '\Sil\DevPortal\models\Key',
     );
 
     private function get_client($uri, $redirects = 1, $timeout = 10)

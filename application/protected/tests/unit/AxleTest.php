@@ -3,6 +3,8 @@
 use ApiAxle\Api\Api as AxleApi;
 use ApiAxle\Api\Key as AxleKey;
 use ApiAxle\Shared\ApiException;
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\Key;
 
 /**
  * @group ApiAxle
@@ -12,8 +14,8 @@ class AxleTest extends DeveloperPortalTestCase
     protected $config;
     
     public $fixtures = array(
-        'users' => 'User',
-        'keys' => 'Key',
+        'users' => '\Sil\DevPortal\models\User',
+        'keys' => '\Sil\DevPortal\models\Key',
     );  
     
     public function setUp()
@@ -85,7 +87,7 @@ class AxleTest extends DeveloperPortalTestCase
             'default_path' => '/path/' . __FUNCTION__,
             'queries_second' => 3,
             'queries_day' => 1000,
-            'visibility' => \Api::VISIBILITY_PUBLIC,
+            'visibility' => Api::VISIBILITY_PUBLIC,
             'protocol' => 'http',
             'strict_ssl' => 1,
             'approval_type' => 'auto',
@@ -115,7 +117,7 @@ class AxleTest extends DeveloperPortalTestCase
         // Arrange:
         $normalUser = $this->users('userWithRoleOfUser');
         $adminUser = $this->users('userWithRoleOfAdmin');
-        $api = new \Api();
+        $api = new Api();
         $api->setAttributes(array(
             'code' => 'test-' . str_replace('.', '', microtime(true)),
             'display_name' => __FUNCTION__,
@@ -133,7 +135,7 @@ class AxleTest extends DeveloperPortalTestCase
             $api->save(),
             'Failed to create API: ' . print_r($api->getErrors(), true)
         );
-        $key = new \Key();
+        $key = new Key();
         $key->setAttributes(array(
             'user_id' => $normalUser->user_id,
             'api_id' => $api->api_id,
@@ -173,7 +175,7 @@ class AxleTest extends DeveloperPortalTestCase
         $initialKeySecret = $key->secret;
         
         // Act (reset):
-        $resetKeyResult = \Key::resetKey($key->key_id);
+        $resetKeyResult = Key::resetKey($key->key_id);
         
         // Assert (reset):
         $this->assertTrue(
@@ -207,7 +209,7 @@ class AxleTest extends DeveloperPortalTestCase
         );
         
         // Act (revoke):
-        $revokeKeyResult = \Key::revokeKey($key->key_id, $adminUser);
+        $revokeKeyResult = Key::revokeKey($key->key_id, $adminUser);
         
         // Assert (revoke):
         $key->refresh();
@@ -239,7 +241,7 @@ class AxleTest extends DeveloperPortalTestCase
             'default_path' => '/path/' . __FUNCTION__,
             'queries_second' => 3,
             'queries_day' => 1000,
-            'visibility' => \Api::VISIBILITY_PUBLIC,
+            'visibility' => Api::VISIBILITY_PUBLIC,
             'protocol' => 'http',
             'strict_ssl' => 1,
             'approval_type' => 'auto',
@@ -283,7 +285,7 @@ class AxleTest extends DeveloperPortalTestCase
             'default_path' => '/path/' . __FUNCTION__,
             'queries_second' => 3,
             'queries_day' => 1000,
-            'visibility' => \Api::VISIBILITY_PUBLIC,
+            'visibility' => Api::VISIBILITY_PUBLIC,
             'protocol' => 'http',
             'strict_ssl' => 1,
             'approval_type' => 'auto',

@@ -6,10 +6,10 @@
 class HttpAdminTest extends CDbTestCase
 {
     public $fixtures = array(
-        'apis' => 'Api',
-        'faqs' => 'Faq',
-        'users' => 'User',
-        'keys' => 'Key',
+        'apis' => '\Sil\DevPortal\models\Api',
+        'faqs' => '\Sil\DevPortal\models\Faq',
+        'users' => '\Sil\DevPortal\models\User',
+        'keys' => '\Sil\DevPortal\models\Key',
     );
 
     private function get_client($uri, $redirects = 1, $timeout = 10)

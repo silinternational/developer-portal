@@ -11,6 +11,7 @@ namespace Sil\DevPortal\models;
  */
 class User extends \UserBase 
 {
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     
@@ -897,14 +898,14 @@ class User extends \UserBase
             array(
                 'updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'update',
             ),
             array(
                 'created,updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => true,
                 'on' => 'insert',
             ),
@@ -927,25 +928,25 @@ class User extends \UserBase
     public function relations()
     {
         return array(
-            'apis' => array(self::HAS_MANY, 'Api', 'owner_id'),
-            'affectedByEvents' => array(self::HAS_MANY, 'Event', 'affected_user_id'),
-            'causedEvents' => array(self::HAS_MANY, 'Event', 'acting_user_id'),
+            'apis' => array(self::HAS_MANY, '\Sil\DevPortal\models\Api', 'owner_id'),
+            'affectedByEvents' => array(self::HAS_MANY, '\Sil\DevPortal\models\Event', 'affected_user_id'),
+            'causedEvents' => array(self::HAS_MANY, '\Sil\DevPortal\models\Event', 'acting_user_id'),
             'approvedKeyCount' => array(
                 self::STAT,
-                'Key',
+                '\Sil\DevPortal\models\Key',
                 'user_id',
                 'condition' => 'status = :status',
                 'params' => array(':status' => Key::STATUS_APPROVED),
             ),
             'pendingKeyCount' => array(
                 self::STAT,
-                'Key',
+                '\Sil\DevPortal\models\Key',
                 'user_id',
                 'condition' => 'status = :status',
                 'params' => array(':status' => Key::STATUS_PENDING),
             ),
-            'keys' => array(self::HAS_MANY, 'Key', 'user_id'),
-            'keysProcessed' => array(self::HAS_MANY, 'Key', 'processed_by'),
+            'keys' => array(self::HAS_MANY, '\Sil\DevPortal\models\Key', 'user_id'),
+            'keysProcessed' => array(self::HAS_MANY, '\Sil\DevPortal\models\Key', 'processed_by'),
         );
     }
     

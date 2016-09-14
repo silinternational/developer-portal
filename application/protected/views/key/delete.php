@@ -1,7 +1,7 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\KeyController */
-/* @var $key \Key */
-/* @var $currentUser \User */
+/* @var $key \Sil\DevPortal\models\Key */
+/* @var $currentUser \Sil\DevPortal\models\User */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(

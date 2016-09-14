@@ -10,6 +10,7 @@ use ApiAxle\Api\Api as AxleApi;
  */
 class Api extends \ApiBase
 {
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     
@@ -259,7 +260,7 @@ class Api extends \ApiBase
         if (isset(\Yii::app()->params['apiProxyDomain'])) {
             return \Yii::app()->params['apiProxyDomain'];
         } else {
-            throw new Exception(
+            throw new \Exception(
                 'The API proxy domain has not been defined in the config data.',
                 1420751158
             );
@@ -573,14 +574,14 @@ class Api extends \ApiBase
             array(
                 'updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'update',
             ),
             array(
                 'created,updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => true,
                 'on' => 'insert',
             ),
@@ -628,17 +629,17 @@ class Api extends \ApiBase
     
     public function relations()
     {
-        return array_merge(parent::relations(), array(
+        return array_merge($this->fixRelationsClassPaths(parent::relations()), array(
             'approvedKeyCount' => array(
                 self::STAT,
-                'Key',
+                '\Sil\DevPortal\models\Key',
                 'api_id',
                 'condition' => 'status = :status',
                 'params' => array(':status' => Key::STATUS_APPROVED),
             ),
             'pendingKeyCount' => array(
                 self::STAT,
-                'Key',
+                '\Sil\DevPortal\models\Key',
                 'api_id',
                 'condition' => 'status = :status',
                 'params' => array(':status' => Key::STATUS_PENDING),

@@ -1,6 +1,8 @@
 <?php
 namespace Sil\DevPortal\controllers;
 
+use Sil\DevPortal\models\SiteText;
+
 class SiteTextController extends \Controller
 {
     public $layout = '//layouts/one-column-with-title';
@@ -9,7 +11,7 @@ class SiteTextController extends \Controller
     {
         // Get the SiteText whose ID is specified in the URL. Expects the pk of a
         // SiteText as 'id'.
-        $siteText = $this->getPkOr404('SiteText');
+        $siteText = $this->getPkOr404('\Sil\DevPortal\models\SiteText');
         
         // Set this page to use a different layout.
         $this->layout = 'column1';
@@ -24,7 +26,7 @@ class SiteTextController extends \Controller
     {
         // Get the SiteText whose ID is specified in the URL. Expects the pk of a
         // SiteText as 'id'.
-        $siteText = $this->getPkOr404('SiteText');
+        $siteText = $this->getPkOr404('\Sil\DevPortal\models\SiteText');
         
         // Get the form object.
         $form = new \YbHorizForm('application.views.forms.siteTextForm', $siteText);
@@ -65,7 +67,7 @@ class SiteTextController extends \Controller
     
     public function actionIndex()
     {
-        $siteTexts = \SiteText::model()->findAll(array(
+        $siteTexts = SiteText::model()->findAll(array(
             'order' => '`name` ASC, `site_text_id` ASC',
         ));
         

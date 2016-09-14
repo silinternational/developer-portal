@@ -1,6 +1,11 @@
 <?php
 namespace Sil\DevPortal\controllers;
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\ApiVisibilityDomain;
+use Sil\DevPortal\models\ApiVisibilityUser;
+use Sil\DevPortal\models\Key;
+use Sil\DevPortal\models\User;
 use Stringy\StaticStringy as SS;
 
 class ApiController extends \Controller
@@ -10,7 +15,7 @@ class ApiController extends \Controller
     public function actionActiveKeys($code)
     {
         // Make sure the specified API exists.
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // Get a reference to the current website user's User model.
         $currentUser = \Yii::app()->user->user;
@@ -38,7 +43,7 @@ class ApiController extends \Controller
         // Get the list of active keys for that API.
         $activeKeys = array();
         foreach ($api->keys as $key) {
-            if ($key->status === \Key::STATUS_APPROVED) {
+            if ($key->status === Key::STATUS_APPROVED) {
                 $activeKeys[] = $key;
             }
         }
@@ -69,7 +74,7 @@ class ApiController extends \Controller
         
         // Set up to add an API.
         /* @var $api Api */
-        $api = new \Api;
+        $api = new Api;
         
         // Record the current user as the owner.
         $api->owner_id = $currentUser->user_id;
@@ -81,7 +86,7 @@ class ApiController extends \Controller
         if ($form->submitted('yt0')) {
 
             // If the user making this change is NOT an admin...
-            if ($currentUser->role !== \User::ROLE_ADMIN) {
+            if ($currentUser->role !== User::ROLE_ADMIN) {
 
                 // Make sure they are still set as the owner.
                 $api->owner_id = $currentUser->user_id;
@@ -132,8 +137,8 @@ class ApiController extends \Controller
 
     public function actionCancelDomainInvitation($id)
     {
-        /* @var $apiVisibilityDomain \ApiVisibilityDomain */
-        $apiVisibilityDomain = \ApiVisibilityDomain::model()->findByPk($id);
+        /* @var $apiVisibilityDomain ApiVisibilityDomain */
+        $apiVisibilityDomain = ApiVisibilityDomain::model()->findByPk($id);
         $api = (is_null($apiVisibilityDomain) ? null : $apiVisibilityDomain->api);
         
         /* @var $currentUser User */
@@ -206,8 +211,8 @@ class ApiController extends \Controller
 
     public function actionCancelUserInvitation($id)
     {
-        /* @var $apiVisibilityUser \ApiVisibilityUser */
-        $apiVisibilityUser = \ApiVisibilityUser::model()->findByPk($id);
+        /* @var $apiVisibilityUser ApiVisibilityUser */
+        $apiVisibilityUser = ApiVisibilityUser::model()->findByPk($id);
         $api = (is_null($apiVisibilityUser) ? null : $apiVisibilityUser->api);
         
         /* @var $currentUser User */
@@ -288,7 +293,7 @@ class ApiController extends \Controller
         
         // Get the API by the code name.
         /* @var $api Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If that is NOT an Api that the User has permission to manage, say so.
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
@@ -370,7 +375,7 @@ class ApiController extends \Controller
         // Get the list of all Keys to this API.
         $criteria = new \CDbCriteria;
         $criteria->compare('api_id', $api->api_id);
-        $keyList = new \CActiveDataProvider('Key',
+        $keyList = new \CActiveDataProvider('\Sil\DevPortal\models\Key',
             array('criteria' => $criteria)
         );
         
@@ -390,7 +395,7 @@ class ApiController extends \Controller
         
         // Get the API by the code name.
         /* @var $api Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If no such Api was found 
         //    OR
@@ -425,7 +430,7 @@ class ApiController extends \Controller
         
         // Get the API by the code name.
         /* @var $api Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If that is NOT an Api that the User has permission to manage, say so.
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
@@ -446,7 +451,7 @@ class ApiController extends \Controller
         if ($form->submitted('yt0')) {
 
             // If the user making this change is NOT an admin...
-            if ($currentUser->role !== \User::ROLE_ADMIN) {
+            if ($currentUser->role !== User::ROLE_ADMIN) {
 
                 // Make sure they didn't change the owner_id.
                 $api->owner_id = $apiOwnerId;
@@ -506,7 +511,7 @@ class ApiController extends \Controller
         
         // Get the API by the code name.
         /* @var $api Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If that is NOT an Api that the User has permission to manage, say so.
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
@@ -527,7 +532,7 @@ class ApiController extends \Controller
         if ($form->submitted('yt0')) {
             
             // If the user making this change is NOT an admin...
-            if ($currentUser->role !== \User::ROLE_ADMIN) {
+            if ($currentUser->role !== User::ROLE_ADMIN) {
 
                 // Make sure they didn't change the owner_id.
                 $api->owner_id = $apiOwnerId;
@@ -584,7 +589,7 @@ class ApiController extends \Controller
         
         // If the website user is an admin, get the list of all APIs.
         if ($webUser->isAdmin()) {
-            $apiList = new \CActiveDataProvider('Api',array(
+            $apiList = new \CActiveDataProvider('\Sil\DevPortal\models\Api', array(
                 'criteria' => array(
                     'with' => array('approvedKeyCount', 'pendingKeyCount'),
                 ),
@@ -594,8 +599,8 @@ class ApiController extends \Controller
             // Otherwise, get the list of APIs that should be visible to the
             // current user.
             $visibleApis = array();
-            /* @var $allApis \Api[] */
-            $allApis = \Api::model()->findAll();
+            /* @var $allApis Api[] */
+            $allApis = Api::model()->findAll();
             foreach ($allApis as $api) {
                 if ($api->isVisibleToUser($webUser->getUser())) {
                     $visibleApis[] = $api;
@@ -621,11 +626,11 @@ class ApiController extends \Controller
     public function actionInvitedDomains($code)
     {
         // Make sure the specified API exists.
-        /* @var $api \Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        /* @var $api Api */
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // Get a reference to the current website user's User model.
-        /* @var $currentUser \User */
+        /* @var $currentUser User */
         $currentUser = \Yii::app()->user->user;
         
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
@@ -635,7 +640,7 @@ class ApiController extends \Controller
             );
         }
         
-        $apiVisibilityDomains = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+        $apiVisibilityDomains = ApiVisibilityDomain::model()->findAllByAttributes(array(
             'api_id' => $api->api_id,
         ));
         $invitedDomainsDataProvider = new \CArrayDataProvider(
@@ -662,7 +667,7 @@ class ApiController extends \Controller
         $currentUser = \Yii::app()->user->user;
         
         /* @var $api Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         if ( ! $currentUser->canInviteDomainToSeeApi($api)) {
             throw new \CHttpException(403, sprintf(
@@ -670,7 +675,7 @@ class ApiController extends \Controller
             ));
         }
         
-        $apiVisibilityDomain = new \ApiVisibilityDomain();
+        $apiVisibilityDomain = new ApiVisibilityDomain();
         
         // If the form was submitted...
         if (\Yii::app()->request->isPostRequest) {
@@ -709,11 +714,11 @@ class ApiController extends \Controller
     public function actionInvitedUsers($code)
     {
         // Make sure the specified API exists.
-        /* @var $api \Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        /* @var $api Api */
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // Get a reference to the current website user's User model.
-        /* @var $currentUser \User */
+        /* @var $currentUser User */
         $currentUser = \Yii::app()->user->user;
         
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
@@ -723,7 +728,7 @@ class ApiController extends \Controller
             );
         }
         
-        $apiVisibilityUsers = \ApiVisibilityUser::model()->findAllByAttributes(array(
+        $apiVisibilityUsers = ApiVisibilityUser::model()->findAllByAttributes(array(
             'api_id' => $api->api_id,
         ));
         $invitedUsersDataProvider = new \CArrayDataProvider(
@@ -750,7 +755,7 @@ class ApiController extends \Controller
         $currentUser = \Yii::app()->user->user;
         
         /* @var $api Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         if ( ! $currentUser->canInviteUserToSeeApi($api)) {
             throw new \CHttpException(403, sprintf(
@@ -758,7 +763,7 @@ class ApiController extends \Controller
             ));
         }
         
-        $apiVisibilityUser = new \ApiVisibilityUser();
+        $apiVisibilityUser = new ApiVisibilityUser();
         
         // If the form was submitted...
         if (\Yii::app()->request->isPostRequest) {
@@ -798,7 +803,7 @@ class ApiController extends \Controller
      */
     public function actionPlayground()
     {
-        /* @var $currentUser \User */
+        /* @var $currentUser User */
         $currentUser = \Yii::app()->user->user;
         $request = \Yii::app()->request;
 
@@ -830,8 +835,8 @@ class ApiController extends \Controller
              * begins with a forward-slash (/).  */
             $path = SS::ensureLeft($requestPath, '/');
             
-            /* @var $key \Key */
-            $key = \Key::model()->findByPk($keyId);
+            /* @var $key Key */
+            $key = Key::model()->findByPk($keyId);
             if ($key && $key->isOwnedBy($currentUser)) {
                 
                 // Create a single dimension parameter array from parameters
@@ -956,7 +961,7 @@ class ApiController extends \Controller
         }
         
         // Get list of APIs that user has a key for.
-        $apiOptions = \Key::model()->findAllByAttributes(array(
+        $apiOptions = Key::model()->findAllByAttributes(array(
             'user_id' => $currentUser->user_id,
         ));
         
@@ -1012,7 +1017,7 @@ class ApiController extends \Controller
     public function actionPendingKeys($code)
     {
         // Make sure the specified API exists.
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // Get a reference to the current website user's User model.
         $currentUser = \Yii::app()->user->user;
@@ -1040,7 +1045,7 @@ class ApiController extends \Controller
         // Get the list of pending keys for that API.
         $pendingKeys = array();
         foreach ($api->keys as $key) {
-            if ($key->status === \Key::STATUS_PENDING) {
+            if ($key->status === Key::STATUS_PENDING) {
                 $pendingKeys[] = $key;
             }
         }
@@ -1059,7 +1064,7 @@ class ApiController extends \Controller
     {
         // Get the API by the code name.
         /* @var $api Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
 
         // Get the current user's model.
         /* @var $currentUser User */
@@ -1093,7 +1098,7 @@ class ApiController extends \Controller
         }
         
         // Create a new (pending) Key object.
-        $key = new \Key();
+        $key = new Key();
         
         $request = \Yii::app()->getRequest();
         $acceptedTerms = $request->getPost('accept_terms', false);
@@ -1118,7 +1123,7 @@ class ApiController extends \Controller
             // Also record the extra data it needs (not submitted by the user).
             $key->user_id = $currentUser->user_id;
             $key->api_id = $api->api_id;
-            $key->status = \Key::STATUS_PENDING;
+            $key->status = Key::STATUS_PENDING;
             $key->queries_day = $api->queries_day;
             $key->queries_second = $api->queries_second;
             
@@ -1230,7 +1235,7 @@ class ApiController extends \Controller
         
         // Get the API by the code name.
         /* @var $api Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // If that is NOT an Api that the User has permission to manage, say so.
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {

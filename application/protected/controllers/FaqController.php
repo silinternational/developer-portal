@@ -1,6 +1,8 @@
 <?php
 namespace Sil\DevPortal\controllers;
 
+use Sil\DevPortal\models\Faq;
+
 class FaqController extends \Controller
 {
     public $layout = '//layouts/one-column-with-title';
@@ -8,7 +10,7 @@ class FaqController extends \Controller
     public function actionAdd()
     {
         // Create a new instance of the model.
-        $faq = new \Faq;
+        $faq = new Faq;
         
         // Get the form object.
         $form = new \YbHorizForm('application.views.forms.faqForm', $faq);
@@ -54,7 +56,7 @@ class FaqController extends \Controller
     {
         // Get the FAQ whose ID is specified in the URL. Expects the pk of an
         // Faq as 'id'.
-        $faq = $this->getPkOr404('Faq');
+        $faq = $this->getPkOr404('\Sil\DevPortal\models\Faq');
         
         // Set this page to use a different layout.
         $this->layout = 'column1';
@@ -69,7 +71,7 @@ class FaqController extends \Controller
     {
         // Get the FAQ whose ID is specified in the URL. Expects the pk of an
         // Faq as 'id'.
-        $faq = $this->getPkOr404('Faq');
+        $faq = $this->getPkOr404('\Sil\DevPortal\models\Faq');
         
         // Get the form object.
         $form = new \YbHorizForm('application.views.forms.faqForm', $faq);
@@ -110,7 +112,7 @@ class FaqController extends \Controller
     
     public function actionIndex()
     {
-        $faqs = \Faq::model()->findAll(array(
+        $faqs = Faq::model()->findAll(array(
             'order' => '`order` ASC, `faq_id` ASC',
         ));
         

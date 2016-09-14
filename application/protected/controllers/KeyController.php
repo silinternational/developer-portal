@@ -1,6 +1,9 @@
 <?php
 namespace Sil\DevPortal\controllers;
 
+use Sil\DevPortal\models\Key;
+use Sil\DevPortal\models\User;
+
 class KeyController extends \Controller
 {
     public $layout = '//layouts/one-column-with-title';
@@ -8,7 +11,7 @@ class KeyController extends \Controller
     public function actionActive()
     {
         // Get the list of all active Keys.
-        $activeKeysDataProvider = \Key::getActiveKeysDataProvider();
+        $activeKeysDataProvider = Key::getActiveKeysDataProvider();
         
         // Render the page.
         $this->render('active', array(
@@ -24,7 +27,7 @@ class KeyController extends \Controller
         
         // Try to retrieve the specified Key's data.
         /* @var $key Key */
-        $key = \Key::model()->findByPk($id);
+        $key = Key::model()->findByPk($id);
         
         // If this is not a Key that the current User is allowed to delete,
         // say so.
@@ -86,12 +89,12 @@ class KeyController extends \Controller
     public function actionDetails($id)
     {
         // Get a reference to the current website user's User model.
-        /* @var $currentUser \User */
+        /* @var $currentUser User */
         $currentUser = \Yii::app()->user->user;
         
         // Try to retrieve the specified Key's data.
-        /* @var $key \Key */
-        $key = \Key::model()->findByPk($id);
+        /* @var $key Key */
+        $key = Key::model()->findByPk($id);
         
         // Prevent access by users without permission to see this key.
         if (( ! $key) || ( ! $key->isVisibleToUser($currentUser))) {
@@ -103,7 +106,7 @@ class KeyController extends \Controller
         }
         
         if (\Yii::app()->request->isPostRequest &&
-            ($key->status == \Key::STATUS_PENDING)) {
+            ($key->status == Key::STATUS_PENDING)) {
             
             // If the User does NOT have permission to process requests
             // for keys to the corresponding API, say so.
@@ -115,7 +118,7 @@ class KeyController extends \Controller
             }
             
             // If the request was approved...
-            if (isset($_POST[\Key::STATUS_APPROVED])) {
+            if (isset($_POST[Key::STATUS_APPROVED])) {
                 
                 // Try to approve the key.
                 if ($key->approve($currentUser)) {
@@ -192,7 +195,7 @@ class KeyController extends \Controller
         
         // If the user is an admin, redirect them to the list of active keys.
         // Otherwise redirect them to the list of their keys.
-        if ($currentUser->role === \User::ROLE_ADMIN) {
+        if ($currentUser->role === User::ROLE_ADMIN) {
             $this->redirect(array('/key/active'));
         } else {
             $this->redirect(array('/key/mine'));
@@ -212,7 +215,7 @@ class KeyController extends \Controller
         }
         
         // Get the list of all pending Keys.
-        $pendingKeysDataProvider = \Key::getPendingKeysDataProvider();
+        $pendingKeysDataProvider = Key::getPendingKeysDataProvider();
         
         // Render the page.
         $this->render('pending', array(
@@ -228,7 +231,7 @@ class KeyController extends \Controller
         
         // Try to retrieve the specified Key's data.
         /* @var $key Key */
-        $key = \Key::model()->findByPk($id);
+        $key = Key::model()->findByPk($id);
         
         // If this is not a Key that the current User is allowed to reset, say
         // so.
@@ -243,7 +246,7 @@ class KeyController extends \Controller
         if (\Yii::app()->request->isPostRequest) {
             
             // Reset the key, paying attention to the results.
-            $resetResults = \Key::resetKey($key->key_id);
+            $resetResults = Key::resetKey($key->key_id);
             
             // If we were unable to reset that Key...
             if ( ! $resetResults[0]) {
@@ -303,7 +306,7 @@ class KeyController extends \Controller
         $activeKeys = array();
         $nonActiveKeys = array();
         foreach ($currentUser->keys as $key) {
-            if ($key->status === \Key::STATUS_APPROVED) {
+            if ($key->status === Key::STATUS_APPROVED) {
                 $activeKeys[] = $key;
             } else {
                 $nonActiveKeys[] = $key;
@@ -331,7 +334,7 @@ class KeyController extends \Controller
         
         // Try to retrieve the specified Key's data.
         /* @var $key Key */
-        $key = \Key::model()->findByPk($id);
+        $key = Key::model()->findByPk($id);
         
         if ( ! $currentUser->canRevokeKey($key)) {
             
@@ -352,7 +355,7 @@ class KeyController extends \Controller
         if (\Yii::app()->request->isPostRequest) {
             
             // Revoke the key, paying attention to the results.
-            $revokeResults = \Key::revokeKey($key->key_id, $currentUser);
+            $revokeResults = Key::revokeKey($key->key_id, $currentUser);
             
             // If we were unable to delete that Key...
             if ( ! $revokeResults[0]) {

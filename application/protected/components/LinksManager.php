@@ -1,5 +1,9 @@
 <?php
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\Key;
+use Sil\DevPortal\models\User;
+
 class LinksManager extends CComponent
 {
     const BUTTON_SIZE_LARGE = 'large';

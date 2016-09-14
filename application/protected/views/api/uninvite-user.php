@@ -1,8 +1,8 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\ApiController */
-/* @var $api \Api */
-/* @var $apiVisibilityUser \ApiVisibilityUser */
-/* @var $currentUser \User */
+/* @var $api \Sil\DevPortal\models\Api */
+/* @var $apiVisibilityUser \Sil\DevPortal\models\ApiVisibilityUser */
+/* @var $currentUser \Sil\DevPortal\models\User */
 /* @var $hasDependentKey boolean */
 
 // Set up the breadcrumbs.

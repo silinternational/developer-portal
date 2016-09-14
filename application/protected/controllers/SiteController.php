@@ -2,6 +2,8 @@
 namespace Sil\DevPortal\controllers;
 
 use Sil\DevPortal\components\AuthManager;
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\SiteText;
 
 class SiteController extends \Controller
 {
@@ -35,7 +37,7 @@ class SiteController extends \Controller
         }
         
         if (\Yii::app()->params['showPopularApis']) {
-            $popularApis = \Api::getPopularApis();
+            $popularApis = Api::getPopularApis();
         } else {
             $popularApis = null;
         }
@@ -46,8 +48,8 @@ class SiteController extends \Controller
         $this->render('index', array(
             'loginOptions' => $loginOptions,
             'popularApis' => $popularApis,
-            'homeLowerLeftHtml' => \SiteText::getHtml('home-lower-left'),
-            'homeLowerRightHtml' => \SiteText::getHtml('home-lower-right'),
+            'homeLowerLeftHtml' => SiteText::getHtml('home-lower-left'),
+            'homeLowerRightHtml' => SiteText::getHtml('home-lower-right'),
         ));
     }
 

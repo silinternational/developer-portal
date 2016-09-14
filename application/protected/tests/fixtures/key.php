@@ -1,4 +1,7 @@
 <?php
+
+use Sil\DevPortal\models\Key;
+
 return array(
     'key1' => array(
         'value' => 'K1_value',

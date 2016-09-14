@@ -1,16 +1,22 @@
 <?php
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\ApiVisibilityDomain;
+use Sil\DevPortal\models\ApiVisibilityUser;
+use Sil\DevPortal\models\Key;
+use Sil\DevPortal\models\User;
+
 /**
- * @method \Api apis(string $fixtureName)
+ * @method Api apis(string $fixtureName)
  */
 class ApiTest extends DeveloperPortalTestCase
 {
     public $fixtures = array(
-        'apis' => 'Api',
-        'keys' => 'Key',
-        'apiVisibilityDomains' => 'ApiVisibilityDomain',
-        'apiVisibilityUsers' => 'ApiVisibilityUser',
-        'users' => 'User',
+        'apis' => '\Sil\DevPortal\models\Api',
+        'keys' => '\Sil\DevPortal\models\Key',
+        'apiVisibilityDomains' => '\Sil\DevPortal\models\ApiVisibilityDomain',
+        'apiVisibilityUsers' => '\Sil\DevPortal\models\ApiVisibilityUser',
+        'users' => '\Sil\DevPortal\models\User',
     );
     
     public function setUp()
@@ -46,9 +52,9 @@ class ApiTest extends DeveloperPortalTestCase
     public function testFixtureDataValidity()
     {
         foreach ($this->apis as $fixtureName => $fixtureData) {
-            /* @var $api \Api */
+            /* @var $api Api */
             $api = $this->apis($fixtureName);
-            \Key::model()->deleteAllByAttributes(array(
+            Key::model()->deleteAllByAttributes(array(
                 'api_id' => $api->api_id,
             ));
             $this->assertTrue($api->delete(), sprintf(
@@ -56,7 +62,7 @@ class ApiTest extends DeveloperPortalTestCase
                 $fixtureName,
                 print_r($api->getErrors(), true)
             ));
-            $apiOnInsert = new \Api();
+            $apiOnInsert = new Api();
             $apiOnInsert->setAttributes($fixtureData, false);
             $this->assertTrue($apiOnInsert->save(), sprintf(
                 'Api fixture "%s" (%s) does not have valid data: %s',
@@ -71,7 +77,7 @@ class ApiTest extends DeveloperPortalTestCase
     {
         // Make sure the approval type constants differ (both in their values
         // and in their user-friendly versions).
-        $this->confirmConstantsDiffer('Api', 'APPROVAL_TYPE_',
+        $this->confirmConstantsDiffer('\Sil\DevPortal\models\Api', 'APPROVAL_TYPE_',
                 Api::getApprovalTypes());
     }
     
@@ -79,7 +85,7 @@ class ApiTest extends DeveloperPortalTestCase
     {
         // Make sure the protocol constants differ (both in their values and
         // in their user-friendly versions).
-        $this->confirmConstantsDiffer('Api', 'PROTOCOL_',
+        $this->confirmConstantsDiffer('\Sil\DevPortal\models\Api', 'PROTOCOL_',
                 Api::getProtocols());
     }
     
@@ -87,14 +93,14 @@ class ApiTest extends DeveloperPortalTestCase
     {
         // Make sure the strict SSL constants differ (both in their values and
         // in their user-friendly versions).
-        $this->confirmConstantsDiffer('Api', 'STRICT_SSL_',
+        $this->confirmConstantsDiffer('\Sil\DevPortal\models\Api', 'STRICT_SSL_',
                 Api::getStrictSsls());
     }
     
     public function testConfirmVisibilityConstantsDiffer()
     {
         $this->confirmConstantsDiffer(
-            'Api',
+            '\Sil\DevPortal\models\Api',
             'VISIBILITY_',
             Api::getVisibilityDescriptions()
         );
@@ -109,7 +115,7 @@ class ApiTest extends DeveloperPortalTestCase
         $api->endpoint = 'localhost';
         $api->queries_second = 2;
         $api->queries_day = 1000;
-        $api->visibility = \Api::VISIBILITY_PUBLIC;
+        $api->visibility = Api::VISIBILITY_PUBLIC;
         $api->protocol = 'http';
         $api->strict_ssl = 0;
         $api->approval_type = 'auto';
@@ -199,7 +205,7 @@ class ApiTest extends DeveloperPortalTestCase
         );
         
         // Act:
-        $result = \Api::model()->findByPk(null);
+        $result = Api::model()->findByPk(null);
         
         // Assert:
         $this->assertNull(
@@ -215,7 +221,7 @@ class ApiTest extends DeveloperPortalTestCase
         $badgeValue = 3;
         
         // Act:
-        $result = \Api::generateBadgeHtml($badgeValue);
+        $result = Api::generateBadgeHtml($badgeValue);
         
         // Assert:
         $this->assertContains(
@@ -238,7 +244,7 @@ class ApiTest extends DeveloperPortalTestCase
         $extraCssClass = 'fake-css-class';
         
         // Act:
-        $result = \Api::generateBadgeHtml(3, $extraCssClass);
+        $result = Api::generateBadgeHtml(3, $extraCssClass);
         
         // Assert:
         $this->assertContains(
@@ -255,7 +261,7 @@ class ApiTest extends DeveloperPortalTestCase
         $hoverTitle = 'Some text to show on mouse hover.';
         
         // Act:
-        $result = \Api::generateBadgeHtml(3, null, $hoverTitle);
+        $result = Api::generateBadgeHtml(3, null, $hoverTitle);
         
         // Assert:
         $this->assertContains(
@@ -272,7 +278,7 @@ class ApiTest extends DeveloperPortalTestCase
         $linkTarget = 'http://localhost/';
         
         // Act:
-        $result = \Api::generateBadgeHtml(3, null, null, $linkTarget);
+        $result = Api::generateBadgeHtml(3, null, null, $linkTarget);
         
         // Assert:
         $this->assertContains(
@@ -633,11 +639,11 @@ class ApiTest extends DeveloperPortalTestCase
         // Arrange: (n/a)
         
         // Act:
-        $popularApis = \Api::getPopularApis();
+        $popularApis = Api::getPopularApis();
         
         // Assert:
         $this->assertGreaterThan(1, count($popularApis));
-        $this->assertInstanceOf('\Api', $popularApis[0]);
+        $this->assertInstanceOf('\Sil\DevPortal\models\Api', $popularApis[0]);
         $this->assertGreaterThan(
             $popularApis[1]->approvedKeyCount,
             $popularApis[0]->approvedKeyCount,
@@ -740,19 +746,19 @@ class ApiTest extends DeveloperPortalTestCase
 	public function testHasKeysRelationship()
     {
         // Confirm that the relationship is set up between the classes.
-        $this->assertClassHasRelation(new Api(), 'keys', 'Key');
+        $this->assertClassHasRelation(new Api(), 'keys', '\Sil\DevPortal\models\Key');
     }
     
 	public function testHasOwnerRelationship()
     {
         // Confirm that the relationship is set up between the classes.
-        $this->assertClassHasRelation(new Api(), 'owner', 'User');
+        $this->assertClassHasRelation(new Api(), 'owner', '\Sil\DevPortal\models\User');
     }
     
     public function testIsPubliclyVisible_no()
     {
         // Arrange:
-        /* @var $api \Api */
+        /* @var $api Api */
         $api = $this->apis('apiVisibleByInvitationOnly');
         
         // Act:
@@ -768,7 +774,7 @@ class ApiTest extends DeveloperPortalTestCase
     public function testIsPubliclyVisible_yes()
     {
         // Arrange:
-        /* @var $api \Api */
+        /* @var $api Api */
         $api = $this->apis('publicApi');
         
         // Act:
@@ -848,13 +854,13 @@ class ApiTest extends DeveloperPortalTestCase
     public function testIsVisibleToUser_no()
     {
         // Arrange:
-        /* @var $api \Api */
+        /* @var $api Api */
         $api = $this->apis('apiVisibleByInvitationOnlyWithNoInvitations');
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userNotInvitedToSeeAnyApi');
         
         // Pre-assert:
-        $apiVisibilityDomains = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+        $apiVisibilityDomains = ApiVisibilityDomain::model()->findAllByAttributes(array(
             'api_id' => $api->api_id,
         ));
         $this->assertCount(
@@ -862,7 +868,7 @@ class ApiTest extends DeveloperPortalTestCase
             $apiVisibilityDomains,
             'This test requires an Api that no domains have been invited to see.'
         );
-        $apiVisibilityUsers = \ApiVisibilityUser::model()->findAllByAttributes(array(
+        $apiVisibilityUsers = ApiVisibilityUser::model()->findAllByAttributes(array(
             'api_id' => $api->api_id,
         ));
         $this->assertCount(
@@ -1063,7 +1069,7 @@ class ApiTest extends DeveloperPortalTestCase
     public function testRequireSignature_acceptValidValues()
     {
         // Arrange:
-        $api = new \Api();
+        $api = new Api();
         $validValues = ['yes', 'no'];
         
         foreach ($validValues as $validValue) {
@@ -1084,7 +1090,7 @@ class ApiTest extends DeveloperPortalTestCase
     public function testRequireSignature_rejectInvalidValues()
     {
         // Arrange:
-        $api = new \Api();
+        $api = new Api();
         $invalidValues = [0, 1, '0', '1', '', 'abc'];
         
         foreach ($invalidValues as $invalidValue) {
@@ -1104,7 +1110,7 @@ class ApiTest extends DeveloperPortalTestCase
     public function testRequiresSignature_invalidValue()
     {
         // Arrange:
-        $api = new \Api();
+        $api = new Api();
         $api->require_signature = '';
         
         // Act:
@@ -1117,8 +1123,8 @@ class ApiTest extends DeveloperPortalTestCase
     public function testRequiresSignature_no()
     {
         // Arrange:
-        $api = new \Api();
-        $api->require_signature = \Api::REQUIRE_SIGNATURES_NO;
+        $api = new Api();
+        $api->require_signature = Api::REQUIRE_SIGNATURES_NO;
         
         // Act:
         $result = $api->requiresSignature();
@@ -1130,8 +1136,8 @@ class ApiTest extends DeveloperPortalTestCase
     public function testRequiresSignature_yes()
     {
         // Arrange:
-        $api = new \Api();
-        $api->require_signature = \Api::REQUIRE_SIGNATURES_YES;
+        $api = new Api();
+        $api->require_signature = Api::REQUIRE_SIGNATURES_YES;
         
         // Act:
         $result = $api->requiresSignature();
@@ -1143,8 +1149,8 @@ class ApiTest extends DeveloperPortalTestCase
     public function testGetRequiresSignatureText_no()
     {
         // Arrange:
-        $api = new \Api();
-        $api->require_signature = \Api::REQUIRE_SIGNATURES_NO;
+        $api = new Api();
+        $api->require_signature = Api::REQUIRE_SIGNATURES_NO;
         $expected = 'No';
         
         // Act:
@@ -1157,8 +1163,8 @@ class ApiTest extends DeveloperPortalTestCase
     public function testGetRequiresSignatureText_yes()
     {
         // Arrange:
-        $api = new \Api();
-        $api->require_signature = \Api::REQUIRE_SIGNATURES_YES;
+        $api = new Api();
+        $api->require_signature = Api::REQUIRE_SIGNATURES_YES;
         $expected = 'Yes';
         
         // Act:
@@ -1171,14 +1177,14 @@ class ApiTest extends DeveloperPortalTestCase
     public function testUpdateKeysRateLimitsToMatch()
     {
         // Arrange:
-        /* @var $api \Api */
+        /* @var $api Api */
         $api = $this->apis('apiWithTwoKeys');
-        /* @var $key1 \Key */
+        /* @var $key1 Key */
         $key1 = $api->keys[0];
         $key1->queries_day += 1000;
         $key1->queries_second += 10;
         $key1UpdateResult = $key1->save();
-        /* @var $key2 \Key */
+        /* @var $key2 Key */
         $key2 = $api->keys[1];
         
         // Pre-assert:

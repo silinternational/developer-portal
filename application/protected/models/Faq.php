@@ -3,6 +3,7 @@ namespace Sil\DevPortal\models;
 
 class Faq extends \FaqBase
 {
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     
     public function afterDelete()
@@ -39,14 +40,14 @@ class Faq extends \FaqBase
             array(
                 'updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'update',
             ),
             array(
                 'created,updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => true,
                 'on' => 'insert',
             ),
@@ -67,12 +68,12 @@ class Faq extends \FaqBase
      * based on the search/filter conditions.
      */
     public function search() {
-        $criteria = new CDbCriteria;
+        $criteria = new \CDbCriteria;
 
         $criteria->compare('question', $this->question, true);
         $criteria->compare('answer', $this->answer, true);
 
-        return new CActiveDataProvider($this, array(
+        return new \CActiveDataProvider($this, array(
             'criteria' => $criteria,
         ));
     }

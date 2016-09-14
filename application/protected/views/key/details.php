@@ -1,8 +1,11 @@
 <?php
+
+use Sil\DevPortal\models\Key;
+
 /* @var $this \Sil\DevPortal\controllers\KeyController */
 /* @var $actionLinks \ActionLink[] */
-/* @var $key \Key */
-/* @var $currentUser \User */
+/* @var $key Key */
+/* @var $currentUser \Sil\DevPortal\models\User */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
@@ -29,7 +32,7 @@ $this->pageTitle = 'Key Details';
         // If the key is still pending
         //    AND
         // if the user has permission to grant/deny this request...
-        if (($key->status == \Key::STATUS_PENDING) &&
+        if (($key->status == Key::STATUS_PENDING) &&
             $currentUser->hasAdminPrivilegesForApi($key->api)) {
             
             // Provide a way for this admin user to grant/deny the request.
@@ -40,13 +43,13 @@ $this->pageTitle = 'Key Details';
                 <dl>
                     <dd>
                         <?= \CHtml::submitButton('Grant a Key', array(
-                            'name' => \Key::STATUS_APPROVED,
+                            'name' => Key::STATUS_APPROVED,
                             'class' => 'btn btn-primary',
                         )); ?>
                     </dd>
                     <dd>
                         <?= \CHtml::submitButton('Deny the Request', array(
-                            'name' => \Key::STATUS_DENIED,
+                            'name' => Key::STATUS_DENIED,
                             'class' => 'btn btn-danger',
                         )); ?>
                     </dd>

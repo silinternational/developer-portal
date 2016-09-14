@@ -18,7 +18,7 @@ $this->pageTitle = 'Users';
             'type' => 'striped hover',
             'dataProvider' => $usersDataProvider,
             'rowCssClassExpression' => '('
-            . '    ($data->status == \User::STATUS_ACTIVE) ? "" : "muted"'
+            . '    ($data->status == \Sil\DevPortal\models\User::STATUS_ACTIVE) ? "" : "muted"'
             . ')',
             'template' => '{items}{pager}',
             'columns' => array(

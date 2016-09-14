@@ -4,6 +4,7 @@ namespace Sil\DevPortal\models;
 class ApiVisibilityDomain extends \ApiVisibilityDomainBase
 {
     use \Sil\DevPortal\components\DependentKeysTrait;
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     
@@ -133,14 +134,14 @@ class ApiVisibilityDomain extends \ApiVisibilityDomainBase
             array(
                 'updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'update',
             ),
             array(
                 'created, updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'insert',
             ),

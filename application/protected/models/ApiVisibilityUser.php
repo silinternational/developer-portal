@@ -4,6 +4,7 @@ namespace Sil\DevPortal\models;
 class ApiVisibilityUser extends \ApiVisibilityUserBase
 {
     use \Sil\DevPortal\components\DependentKeysTrait;
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     
@@ -288,14 +289,14 @@ class ApiVisibilityUser extends \ApiVisibilityUserBase
             array(
                 'updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'update',
             ),
             array(
                 'created, updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'insert',
             ),

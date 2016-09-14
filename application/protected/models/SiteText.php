@@ -3,6 +3,7 @@ namespace Sil\DevPortal\models;
 
 class SiteText extends \SiteTextBase
 {
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     

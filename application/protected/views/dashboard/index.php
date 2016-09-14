@@ -1,6 +1,7 @@
 <?php
 
 use Sil\DevPortal\controllers\DashboardController;
+use Sil\DevPortal\models\Key;
 
 /* @var $this \Sil\DevPortal\controllers\DashboardController */
 /* @var $user User */
@@ -163,7 +164,7 @@ if ($user->hasOwnerPrivileges()) {
         $cardActionLinksHtml = null;
         $cardDetailsHtml = null;
         switch($key->status) {
-          case \Key::STATUS_APPROVED:
+          case Key::STATUS_APPROVED:
 
             // Assemble the info/links to show for this key/api.
             $cardActionLinksHtml = sprintf(
@@ -215,7 +216,7 @@ if ($user->hasOwnerPrivileges()) {
             );
             break;
 
-          case \Key::STATUS_DENIED:
+          case Key::STATUS_DENIED:
             $cardActionLinksHtml = LinksManager::generateActionsDropdownHtml(
                 LinksManager::getDashboardKeyActionLinks($key),
                 LinksManager::BUTTON_SIZE_SMALL
@@ -226,7 +227,7 @@ if ($user->hasOwnerPrivileges()) {
               . '</div>';
             break;
 
-          case \Key::STATUS_PENDING:
+          case Key::STATUS_PENDING:
             $cardActionLinksHtml = LinksManager::generateActionsDropdownHtml(
                 LinksManager::getDashboardKeyActionLinks($key),
                 LinksManager::BUTTON_SIZE_SMALL
@@ -237,7 +238,7 @@ if ($user->hasOwnerPrivileges()) {
               . '</div>';
             break;
 
-          case \Key::STATUS_REVOKED:
+          case Key::STATUS_REVOKED:
             $cardActionLinksHtml = LinksManager::generateActionsDropdownHtml(
                 LinksManager::getDashboardKeyActionLinks($key),
                 LinksManager::BUTTON_SIZE_SMALL

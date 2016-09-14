@@ -7,7 +7,7 @@ class EventController extends \Controller
     
     public function actionIndex()
     {
-        $eventDataProvider = new \CActiveDataProvider('Event', array(
+        $eventDataProvider = new \CActiveDataProvider('\Sil\DevPortal\models\Event', array(
             'sort' => array(
                 'defaultOrder' => array(
                     'created' => \CSort::SORT_DESC,

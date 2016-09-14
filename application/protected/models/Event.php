@@ -3,6 +3,7 @@ namespace Sil\DevPortal\models;
 
 class Event extends \EventBase
 {
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     
@@ -86,7 +87,7 @@ class Event extends \EventBase
                  * Events, rather than letting the user specify it.  */
                 'created',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false, // setOnEmpty means "only set when empty"
                 'on' => 'insert',
             ),

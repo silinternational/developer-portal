@@ -123,7 +123,7 @@ class UtilsTest extends CDbTestCase
 
     public function testfindPkOr404() 
     {
-        $model = 'Api';
+        $model = '\Sil\DevPortal\models\Api';
         $pk = 2;
         $expected = 'www.owner.com';
         
@@ -136,7 +136,7 @@ class UtilsTest extends CDbTestCase
 
     public function testfindPkOr404_Fail() 
     {
-        $model = 'Api';
+        $model = '\Sil\DevPortal\models\Api';
         $pk = 999;
         $expected = 'invalid request';
         
