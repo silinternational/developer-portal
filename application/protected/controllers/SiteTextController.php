@@ -1,6 +1,7 @@
 <?php
+namespace Sil\DevPortal\controllers;
 
-class SiteTextController extends Controller
+class SiteTextController extends \Controller
 {
     public $layout = '//layouts/one-column-with-title';
     
@@ -26,10 +27,10 @@ class SiteTextController extends Controller
         $siteText = $this->getPkOr404('SiteText');
         
         // Get the form object.
-        $form = new YbHorizForm('application.views.forms.siteTextForm', $siteText);
+        $form = new \YbHorizForm('application.views.forms.siteTextForm', $siteText);
         
         // Collect the user input data (if any).
-        $postData = Yii::app()->request->getPost('SiteText', false);
+        $postData = \Yii::app()->request->getPost('SiteText', false);
         
         // If form has been submitted (as evidenced by the presence of POSTed
         // user input data)...
@@ -45,9 +46,9 @@ class SiteTextController extends Controller
             if ($siteText->save()) {
 
                 // Record that in the log.
-                Yii::log(
+                \Yii::log(
                     'SiteText updated, ID ' . $siteText->site_text_id,
-                    CLogger::LEVEL_INFO,
+                    \CLogger::LEVEL_INFO,
                     __CLASS__ . '.' . __FUNCTION__
                 );
 

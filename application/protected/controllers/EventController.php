@@ -1,6 +1,7 @@
 <?php
+namespace Sil\DevPortal\controllers;
 
-class EventController extends Controller
+class EventController extends \Controller
 {
     public $layout = '//layouts/one-column-with-title';
     
@@ -9,7 +10,7 @@ class EventController extends Controller
         $eventDataProvider = new \CActiveDataProvider('Event', array(
             'sort' => array(
                 'defaultOrder' => array(
-                    'created' => CSort::SORT_DESC,
+                    'created' => \CSort::SORT_DESC,
                 ),                
             ),
         ));

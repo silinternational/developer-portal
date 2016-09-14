@@ -41,6 +41,7 @@ return array(
     'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
     'name' => $appName,
     'theme' => 'bootstrap',
+    'controllerNamespace' => '\\Sil\\DevPortal\\controllers',
     
     // preloading 'log' component
     'preload' => array('log'),

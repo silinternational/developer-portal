@@ -1,6 +1,7 @@
 <?php
+namespace Sil\DevPortal\controllers;
 
-class DashboardController extends Controller
+class DashboardController extends \Controller
 {
     const CHART_ALL_APIS = 'all-api';
     const CHART_MY_APIS = 'api';

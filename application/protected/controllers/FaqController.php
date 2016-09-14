@@ -1,19 +1,20 @@
 <?php
+namespace Sil\DevPortal\controllers;
 
-class FaqController extends Controller
+class FaqController extends \Controller
 {
     public $layout = '//layouts/one-column-with-title';
     
     public function actionAdd()
     {
         // Create a new instance of the model.
-        $faq = new Faq;
+        $faq = new \Faq;
         
         // Get the form object.
-        $form = new YbHorizForm('application.views.forms.faqForm', $faq);
+        $form = new \YbHorizForm('application.views.forms.faqForm', $faq);
         
         // Collect the user input data (if any).
-        $postData = Yii::app()->request->getPost('Faq', false);
+        $postData = \Yii::app()->request->getPost('Faq', false);
         
         // If form has been submitted (as evidenced by the presence of POSTed
         // user input data)...
@@ -29,9 +30,9 @@ class FaqController extends Controller
             if ($faq->save()) {
 
                 // Record that in the log.
-                Yii::log(
+                \Yii::log(
                     'FAQ created, ID ' . $faq->faq_id,
-                    CLogger::LEVEL_INFO,
+                    \CLogger::LEVEL_INFO,
                     __CLASS__ . '.' . __FUNCTION__
                 );
 
@@ -71,10 +72,10 @@ class FaqController extends Controller
         $faq = $this->getPkOr404('Faq');
         
         // Get the form object.
-        $form = new YbHorizForm('application.views.forms.faqForm', $faq);
+        $form = new \YbHorizForm('application.views.forms.faqForm', $faq);
         
         // Collect the user input data (if any).
-        $postData = Yii::app()->request->getPost('Faq', false);
+        $postData = \Yii::app()->request->getPost('Faq', false);
         
         // If form has been submitted (as evidenced by the presence of POSTed
         // user input data)...
@@ -90,9 +91,9 @@ class FaqController extends Controller
             if ($faq->save()) {
 
                 // Record that in the log.
-                Yii::log(
+                \Yii::log(
                     'FAQ updated, ID ' . $faq->faq_id,
-                    CLogger::LEVEL_INFO,
+                    \CLogger::LEVEL_INFO,
                     __CLASS__ . '.' . __FUNCTION__
                 );
 
