@@ -3,7 +3,7 @@ namespace Sil\DevPortal\models;
 
 class Faq extends \FaqBase
 {
-    use Sil\DevPortal\components\ModelFindByPkTrait;
+    use \Sil\DevPortal\components\ModelFindByPkTrait;
     
     public function afterDelete()
     {

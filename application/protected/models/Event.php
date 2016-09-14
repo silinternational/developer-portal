@@ -3,8 +3,8 @@ namespace Sil\DevPortal\models;
 
 class Event extends \EventBase
 {
-    use Sil\DevPortal\components\FormatModelErrorsTrait;
-    use Sil\DevPortal\components\ModelFindByPkTrait;
+    use \Sil\DevPortal\components\FormatModelErrorsTrait;
+    use \Sil\DevPortal\components\ModelFindByPkTrait;
     
     /**
      * @return array customized attribute labels (name=>label)

@@ -3,9 +3,9 @@ namespace Sil\DevPortal\models;
 
 class ApiVisibilityDomain extends \ApiVisibilityDomainBase
 {
-    use Sil\DevPortal\components\DependentKeysTrait;
-    use Sil\DevPortal\components\FormatModelErrorsTrait;
-    use Sil\DevPortal\components\ModelFindByPkTrait;
+    use \Sil\DevPortal\components\DependentKeysTrait;
+    use \Sil\DevPortal\components\FormatModelErrorsTrait;
+    use \Sil\DevPortal\components\ModelFindByPkTrait;
     
     public function afterDelete()
     {

@@ -11,8 +11,8 @@ namespace Sil\DevPortal\models;
  */
 class User extends UserBase 
 {
-    use Sil\DevPortal\components\FormatModelErrorsTrait;
-    use Sil\DevPortal\components\ModelFindByPkTrait;
+    use \Sil\DevPortal\components\FormatModelErrorsTrait;
+    use \Sil\DevPortal\components\ModelFindByPkTrait;
     
     const ROLE_USER = 'user';
     const ROLE_OWNER = 'owner';
