@@ -1,5 +1,5 @@
 <?php
-/* @var $this AuthController */
+/* @var $this \Sil\DevPortal\controllers\AuthController */
 /* @var $loginOptions array */
 
 // Set the page title.

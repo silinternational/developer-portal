@@ -1,5 +1,8 @@
 <?php
-/* @var $this DashboardController */
+
+use Sil\DevPortal\controllers\DashboardController;
+
+/* @var $this \Sil\DevPortal\controllers\DashboardController */
 /* @var $user User */
 /* @var $keys Key[] */
 /* @var $usageStats UsageStats */
@@ -39,20 +42,20 @@ if ($user->hasOwnerPrivileges()) {
 
 ?>
 <ul class="nav nav-tabs">
-  <li<?php echo ($chart === \DashboardController::CHART_MY_KEYS ? ' class="active"' : ''); ?>>
+  <li<?php echo ($chart === DashboardController::CHART_MY_KEYS ? ' class="active"' : ''); ?>>
     <a href="<?php echo $this->createUrl('', array(
         'interval' => $currentInterval,
-        //'chart' => \DashboardController::CHART_MY_KEYS, // Automatic default.
+        //'chart' => DashboardController::CHART_MY_KEYS, // Automatic default.
     )); ?>">My Usage</a>
   </li>
   <?php
 
   if ($user->hasOwnerPrivileges()) {
       ?>
-      <li<?php echo ($chart === \DashboardController::CHART_MY_APIS ? ' class="active"' : ''); ?>>
+      <li<?php echo ($chart === DashboardController::CHART_MY_APIS ? ' class="active"' : ''); ?>>
         <a href="<?php echo $this->createUrl('', array(
             'interval' => $currentInterval,
-            'chart' => \DashboardController::CHART_MY_APIS,
+            'chart' => DashboardController::CHART_MY_APIS,
         )); ?>">My APIs</a>
       </li>
       <?php
@@ -60,16 +63,16 @@ if ($user->hasOwnerPrivileges()) {
 
   if ($user->isAdmin()) {
       ?>
-      <li<?php echo ($chart === \DashboardController::CHART_ALL_APIS ? ' class="active"' : ''); ?>>
+      <li<?php echo ($chart === DashboardController::CHART_ALL_APIS ? ' class="active"' : ''); ?>>
         <a href="<?php echo $this->createUrl('', array(
             'interval' => $currentInterval,
-            'chart' => \DashboardController::CHART_ALL_APIS,
+            'chart' => DashboardController::CHART_ALL_APIS,
         )); ?>">All APIs</a>
       </li>
-      <li<?php echo ($chart === \DashboardController::CHART_TOTALS ? ' class="active"' : ''); ?>>
+      <li<?php echo ($chart === DashboardController::CHART_TOTALS ? ' class="active"' : ''); ?>>
         <a href="<?php echo $this->createUrl('', array(
             'interval' => $currentInterval,
-            'chart' => \DashboardController::CHART_TOTALS,
+            'chart' => DashboardController::CHART_TOTALS,
         )); ?>">Totals</a>
       </li>
       <?php

@@ -1,5 +1,5 @@
 <?php
-/* @var $this AdminController */
+/* @var $this \Sil\DevPortal\controllers\AdminController */
 /* @var $form CForm */
 
 // Set up the breadcrumbs.

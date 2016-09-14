@@ -1,5 +1,5 @@
 <?php
-/* @var $this ApiController */
+/* @var $this \Sil\DevPortal\controllers\ApiController */
 /* @var $form YbHorizForm */
 
 // Set the page title.

@@ -1,5 +1,5 @@
 <?php
-/* @var $this SiteController */
+/* @var $this \Sil\DevPortal\controllers\SiteController */
 /* @var $loginOptions array<string,string> */
 /* @var $homeLowerLeftHtml string|null */
 /* @var $homeLowerRightHtml string|null */

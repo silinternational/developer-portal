@@ -1,5 +1,5 @@
 <?php
-/* @var $this ApiController */
+/* @var $this \Sil\DevPortal\controllers\ApiController */
 /* @var $api Api */
 /* @var $key Key */
 /* @var $acceptedTerms bool */

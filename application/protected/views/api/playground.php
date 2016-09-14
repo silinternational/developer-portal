@@ -1,5 +1,5 @@
  <?php
-/* @var $this ApiController */
+/* @var $this \Sil\DevPortal\controllers\ApiController */
 /* @var $keyId integer|string */
 /* @var $method string */
 /* @var $apiOptions array */

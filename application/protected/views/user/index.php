@@ -1,5 +1,5 @@
 <?php
-/* @var $this UserController */
+/* @var $this \Sil\DevPortal\controllers\UserController */
 /* @var $usersDataProvider CDataProvider*/
 
 // Set up the breadcrumbs.
