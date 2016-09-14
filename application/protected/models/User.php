@@ -9,7 +9,7 @@ namespace Sil\DevPortal\models;
  * @property Event[] $affectedByEvents
  * @property Event[] $causedEvents
  */
-class User extends UserBase 
+class User extends \UserBase 
 {
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
