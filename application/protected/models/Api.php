@@ -1,4 +1,5 @@
 <?php
+namespace Sil\DevPortal\models;
 
 use ApiAxle\Api\Api as AxleApi;
 
@@ -7,7 +8,7 @@ use ApiAxle\Api\Api as AxleApi;
  * @property int $approvedKeyCount
  * @property int $pendingKeyCount
  */
-class Api extends ApiBase
+class Api extends \ApiBase
 {
     use Sil\DevPortal\components\FormatModelErrorsTrait;
     use Sil\DevPortal\components\ModelFindByPkTrait;
@@ -35,7 +36,7 @@ class Api extends ApiBase
         parent::afterDelete();
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-        \Event::log(sprintf(
+        Event::log(sprintf(
             'The "%s" API (%s, ID %s) was deleted%s.',
             $this->display_name,
             $this->code,
@@ -53,7 +54,7 @@ class Api extends ApiBase
         // If this is a new API...
         if ($this->isNewRecord) {
             
-            \Event::log(sprintf(
+            Event::log(sprintf(
                 'The "%s" API (%s, ID %s) was created%s.',
                 $this->display_name,
                 $this->code,
@@ -74,7 +75,7 @@ class Api extends ApiBase
             }
 
             // Try to send a notification email.
-            $mailer = Utils::getMailer();
+            $mailer = \Utils::getMailer();
             $mailer->setView('api-added');
             $mailer->setTo(\Yii::app()->params['adminEmail']);
             $mailer->setSubject(sprintf(
@@ -94,12 +95,12 @@ class Api extends ApiBase
                 \Yii::log(
                     'Unable to send API-added email: '
                     . $mailer->ErrorInfo,
-                    CLogger::LEVEL_WARNING
+                    \CLogger::LEVEL_WARNING
                 );
             }
         } else {
             
-            \Event::log(sprintf(
+            Event::log(sprintf(
                 'The "%s" API (%s, ID %s) was updated%s.',
                 $this->display_name,
                 $this->code,
@@ -114,7 +115,7 @@ class Api extends ApiBase
                     "Unable to update this Api's keys' rate limits to match "
                     . "its current rate limits: "
                     . $e->getMessage(),
-                    CLogger::LEVEL_WARNING
+                    \CLogger::LEVEL_WARNING
                 );
             }
         }
@@ -159,12 +160,12 @@ class Api extends ApiBase
      * Get the top few (PUBLIC) popular APIs, ordered by the number of
      * active keys.
      * 
-     * @return \Api[] A short list of APIs.
+     * @return Api[] A short list of APIs.
      */
     public static function getPopularApis()
     {
         // Get all of the public APIs.
-        $publicApis = \Api::model()->findAllByAttributes(array(
+        $publicApis = self::model()->findAllByAttributes(array(
             'visibility' => self::VISIBILITY_PUBLIC,
         ));
         
@@ -430,10 +431,10 @@ class Api extends ApiBase
     {
         return sprintf(
             '%s://<span class="%s">%s</span>%s/',
-            CHtml::encode($this->getApiProxyProtocol()),
-            CHtml::encode($cssClass),
-            CHtml::encode($this->code),
-            CHtml::encode($this->getApiProxyDomain())
+            \CHtml::encode($this->getApiProxyProtocol()),
+            \CHtml::encode($cssClass),
+            \CHtml::encode($this->code),
+            \CHtml::encode($this->getApiProxyDomain())
         );
     }
     
@@ -462,7 +463,7 @@ class Api extends ApiBase
         $includeCurrentInterval = true
     ) {
         // Get the ApiAxle Api object for this Api model.
-        $axleApi = new AxleApi(Yii::app()->params['apiaxle'], $this->code);
+        $axleApi = new AxleApi(\Yii::app()->params['apiaxle'], $this->code);
         
         // Get the starting timestamp for the data we care about.
         $timeStart = \UsageStats::getTimeStart(
@@ -493,11 +494,11 @@ class Api extends ApiBase
         }
         
         // Sum the cached and uncached hits, then sum that with the errors.
-        $successfulUsage = UsageStats::combineUsageCategoryArrays(
+        $successfulUsage = \UsageStats::combineUsageCategoryArrays(
             $dataByCategory['uncached'],
             $dataByCategory['cached']
         );
-        $usage = UsageStats::combineUsageCategoryArrays(
+        $usage = \UsageStats::combineUsageCategoryArrays(
             $successfulUsage,
             $dataByCategory['error']
         );
@@ -633,14 +634,14 @@ class Api extends ApiBase
                 'Key',
                 'api_id',
                 'condition' => 'status = :status',
-                'params' => array(':status' => \Key::STATUS_APPROVED),
+                'params' => array(':status' => Key::STATUS_APPROVED),
             ),
             'pendingKeyCount' => array(
                 self::STAT,
                 'Key',
                 'api_id',
                 'condition' => 'status = :status',
-                'params' => array(':status' => \Key::STATUS_PENDING),
+                'params' => array(':status' => Key::STATUS_PENDING),
             ),
         ));
     }
@@ -670,7 +671,7 @@ class Api extends ApiBase
                     ? (int)$this->endpoint_timeout : 2,
         );
         
-        $axleApi = new AxleApi(Yii::app()->params['apiaxle']);
+        $axleApi = new AxleApi(\Yii::app()->params['apiaxle']);
         if ($this->getIsNewRecord()) {
             try {
                 $axleApi->create($this->code, $apiData);
@@ -698,7 +699,7 @@ class Api extends ApiBase
                     try {
                         $axleApi->create($this->code, $apiData);
                         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-                        \Event::log(sprintf(
+                        Event::log(sprintf(
                             'The "%s" API (%s, ID %s) was re-added to ApiAxle%s.',
                             $this->display_name,
                             $this->code,
@@ -800,7 +801,7 @@ class Api extends ApiBase
             return true;
         }
         
-        $axleApi = new AxleApi(Yii::app()->params['apiaxle']);
+        $axleApi = new AxleApi(\Yii::app()->params['apiaxle']);
         try{
             $axleApi->delete($this->code);
             return true;
@@ -832,7 +833,7 @@ class Api extends ApiBase
         if ($hoverTitle === null) {
             $titleAttrHtml = '';
         } else {
-            $titleAttrHtml = ' title="' . CHtml::encode($hoverTitle) . '"';
+            $titleAttrHtml = ' title="' . \CHtml::encode($hoverTitle) . '"';
         }
            
         // Assemble the HTML for the badge itself.
@@ -840,7 +841,7 @@ class Api extends ApiBase
             '<span class="badge%s"%s>%s</span>',
             ($extraCssClass !== null ? ' ' . $extraCssClass : ''),
             $titleAttrHtml,
-            CHtml::encode($badgeValue)
+            \CHtml::encode($badgeValue)
         );
         
         // If given a URL to link to...
@@ -879,7 +880,7 @@ class Api extends ApiBase
     public function isUniqueEndpointDefaultPathCombo($attribute, $params)
     {
         // Get the list of all Apis that have this endpoint and default_path.
-        $apis = \Api::model()->findAllByAttributes(array(
+        $apis = self::model()->findAllByAttributes(array(
             'endpoint' => $this->endpoint,
             'default_path' => $this->default_path,
         ));
@@ -919,7 +920,7 @@ class Api extends ApiBase
         }
         
         // If the user is a guest, they can only see public APIs.
-        if ( ! ($user instanceof \User)) {
+        if ( ! ($user instanceof User)) {
             return false;
         }
         
@@ -948,7 +949,7 @@ class Api extends ApiBase
     
     public function requiresApproval()
     {
-        return ($this->approval_type !== \Api::APPROVAL_TYPE_AUTO);
+        return ($this->approval_type !== self::APPROVAL_TYPE_AUTO);
     }
     
     /**
@@ -1007,7 +1008,7 @@ class Api extends ApiBase
 
             // Try to get the User model for the specified owner.
             $owner = $this->owner;
-            if ( ! ($owner instanceof \User)) {
+            if ( ! ($owner instanceof User)) {
                 $this->addError(
                     $attribute,
                     'Please pick a real user to be the owner.'

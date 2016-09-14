@@ -1,6 +1,7 @@
 <?php
+namespace Sil\DevPortal\models;
 
-class Faq extends FaqBase
+class Faq extends \FaqBase
 {
     use Sil\DevPortal\components\ModelFindByPkTrait;
     
@@ -9,7 +10,7 @@ class Faq extends FaqBase
         parent::afterDelete();
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-        \Event::log(sprintf(
+        Event::log(sprintf(
             'Faq %s was deleted%s: %s',
             $this->faq_id,
             (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser),
@@ -23,7 +24,7 @@ class Faq extends FaqBase
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
         
-        \Event::log(sprintf(
+        Event::log(sprintf(
             'Faq %s was %s%s (%s).',
             $this->faq_id,
             ($this->isNewRecord ? 'created' : 'updated'),

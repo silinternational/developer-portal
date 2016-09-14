@@ -1,6 +1,7 @@
 <?php
+namespace Sil\DevPortal\models;
 
-class ApiVisibilityDomain extends ApiVisibilityDomainBase
+class ApiVisibilityDomain extends \ApiVisibilityDomainBase
 {
     use Sil\DevPortal\components\DependentKeysTrait;
     use Sil\DevPortal\components\FormatModelErrorsTrait;
@@ -11,7 +12,7 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
         parent::afterDelete();
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-        \Event::log(sprintf(
+        Event::log(sprintf(
             'The ability for "%s" Users to see the "%s" API (api_id %s) was deleted%s.',
             $this->domain,
             (isset($this->api) ? $this->api->display_name : ''),
@@ -26,7 +27,7 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
         
-        \Event::log(sprintf(
+        Event::log(sprintf(
             'The ability for "%s" Users to see the "%s" API (api_id %s) was %s%s.',
             $this->domain,
             (isset($this->api) ? $this->api->display_name : ''),
@@ -52,7 +53,7 @@ class ApiVisibilityDomain extends ApiVisibilityDomainBase
      * Get the list of Keys (active or pending) where the owner of the Key can
      * only see that Api because of this invitation.
      *
-     * @return \Key The list of keys.
+     * @return Key[] The list of keys.
      */
     public function getDependentKeys()
     {
