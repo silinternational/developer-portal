@@ -1,5 +1,6 @@
 <?php
 
+use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\User;
 
 return array(
