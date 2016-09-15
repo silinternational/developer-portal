@@ -3,8 +3,6 @@
 // Define a constant to indicate that this is a testing environment.
 define('APPLICATION_ENV', 'testing');
 
-require_once __DIR__.'/../utils/Utils.php';
-
 // simpleSAMLphp autoloading
 if (file_exists(__DIR__ . '/../../simplesamlphp/lib/_autoload.php')) {
     $loader = include_once __DIR__ . '/../../simplesamlphp/lib/_autoload.php';
