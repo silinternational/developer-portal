@@ -312,13 +312,8 @@ class User extends \UserBase
             return true;
         }
         
-        // If the user is an admin, say yes.
-        if ($this->role === self::ROLE_ADMIN) {
-            return true;
-        }
-        
-        // Otherwise, say no.
-        return false;
+        // If the user is an admin, say yes. Otherwise, say no.
+        return ($this->role === self::ROLE_ADMIN);
     }
     
     /**
@@ -737,11 +732,7 @@ class User extends \UserBase
     public function hasOwnerPrivileges()
     {
         $role = $this->role;
-        if (($role === self::ROLE_ADMIN) || ($role === self::ROLE_OWNER)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (($role === self::ROLE_ADMIN) || ($role === self::ROLE_OWNER));
     }
     
     /**
