@@ -1081,6 +1081,9 @@ class Key extends \KeyBase
         }
     }
     
+    /**
+     * @return boolean
+     */
     public function requiresSignature()
     {
         return $this->api->requiresSignature();

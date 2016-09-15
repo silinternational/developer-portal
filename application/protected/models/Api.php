@@ -941,6 +941,9 @@ class Api extends \ApiBase
         return parent::model($className);
     }
     
+    /**
+     * @return boolean
+     */
     public function requiresSignature()
     {
         /* Compare against the No value so that, if there is some weird
