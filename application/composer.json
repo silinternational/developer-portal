@@ -9,7 +9,6 @@
         "guzzlehttp/guzzle": "^6.2",
         "forevermatt/calc-api-sig": "0.1.1",
         "hybridauth/hybridauth": "2.*",
-        "silinternational/opsworks-deploy": "dev-master",
         "silinternational/php-env": "0.*",
         "roave/security-advisories": "dev-master"
     },

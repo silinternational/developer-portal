@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b4c3a161de3dd190cb9d150d245d5a5a",
-    "content-hash": "534c75919078df25273aa478eb0552cc",
+    "hash": "a3850da46005af8cd28f05ab2bdc3978",
+    "content-hash": "a574ce64723dfdd5669f625328e42576",
     "packages": [
         {
             "name": "danielstjules/stringy",
@@ -316,16 +316,16 @@
         },
         {
             "name": "hybridauth/hybridauth",
-            "version": "v2.6.0",
+            "version": "v2.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hybridauth/hybridauth.git",
-                "reference": "45e52d12dccc00d4de25dc534961ab46204a15cf"
+                "reference": "d4e5bc34008e8c187c302eb4e94200ee4a208c63"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/45e52d12dccc00d4de25dc534961ab46204a15cf",
-                "reference": "45e52d12dccc00d4de25dc534961ab46204a15cf",
+                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/d4e5bc34008e8c187c302eb4e94200ee4a208c63",
+                "reference": "d4e5bc34008e8c187c302eb4e94200ee4a208c63",
                 "shasum": ""
             },
             "require": {
@@ -364,7 +364,7 @@
                 "twitter",
                 "yahoo"
             ],
-            "time": "2016-01-12 12:19:25"
+            "time": "2016-09-05 03:02:22"
         },
         {
             "name": "psr/http-message",
@@ -422,20 +422,21 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "d954a95c1be04118dbbda88f3524424695dd886f"
+                "reference": "1fd74f8f5102adb4eabda9a2a372bca3143f11e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/d954a95c1be04118dbbda88f3524424695dd886f",
-                "reference": "d954a95c1be04118dbbda88f3524424695dd886f",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/1fd74f8f5102adb4eabda9a2a372bca3143f11e6",
+                "reference": "1fd74f8f5102adb4eabda9a2a372bca3143f11e6",
                 "shasum": ""
             },
             "conflict": {
                 "amphp/artax": ">=2,<2.0.4|>0.7.1,<1.0.4",
                 "aws/aws-sdk-php": ">=3,<3.2.1",
                 "bugsnag/bugsnag-laravel": ">=2,<2.0.2",
-                "cakephp/cakephp": ">=3,<3.0.15|>=2,<2.4.99|>=2.5,<2.5.90|>=2.6,<2.6.12|>=1.3,<1.3.18|>=2.7,<2.7.6|>=3.1,<3.1.3",
-                "codeigniter/framework": "<3.0.3",
+                "cakephp/cakephp": ">=3,<3.0.15|>=2,<2.4.99|>=2.5,<2.5.99|>=2.6,<2.6.12|>=1.3,<1.3.18|>=2.7,<2.7.6|>=3.1,<3.1.4",
+                "cartalyst/sentry": "<2.1",
+                "codeigniter/framework": "<=3.0.6",
                 "composer/composer": "<=1.0.0-alpha11",
                 "contao-components/mediaelement": ">=2.14.2,<2.21.1",
                 "contao/core": ">=2.11,<3|>=3,<3.5.15",
@@ -494,7 +495,7 @@
                 "thelia/backoffice-default-template": ">=2.1,<2.1.2",
                 "thelia/thelia": ">=2.1.0-beta1,<2.1.3|>=2.1,<2.1.2",
                 "twig/twig": "<1.20",
-                "typo3/cms": ">=6.2,<6.2.26|>=8,<8.2|>=8.2,<8.2.1|>=7.6,<7.6.10|>=7,<7.1|>=7.1,<7.2|>=7.2,<7.3|>=7.3,<7.4|>=7.4,<7.5|>=7.5,<7.6",
+                "typo3/cms": ">=6.2,<6.2.27|>=8,<8.2|>=8.2,<8.3|>=7.6,<7.6.11|>=7,<7.1|>=7.1,<7.2|>=7.2,<7.3|>=7.3,<7.4|>=7.4,<7.5|>=7.5,<7.6|>=8.3,<8.3.1",
                 "typo3/flow": ">=1,<1.0.4|>=1.1,<1.1.1|>=2,<2.0.1|>=2.3,<2.3.7|>=3,<3.0.1",
                 "typo3/neos": ">=1.1,<1.1.3|>=1.2,<1.2.13|>=2,<2.0.4",
                 "willdurand/js-translation-bundle": "<2.1.1",
@@ -520,7 +521,7 @@
                 "zendframework/zend-view": ">=2,<2.2.7|>=2.3,<2.3.1",
                 "zendframework/zend-xmlrpc": ">=2.1,<2.1.6|>=2.2,<2.2.6",
                 "zendframework/zendframework": ">=2,<2.4.9|>=2.5,<2.5.1",
-                "zendframework/zendframework1": "<1.12.19",
+                "zendframework/zendframework1": "<1.12.20",
                 "zendframework/zendopenid": ">=2,<2.0.2",
                 "zendframework/zendxml": ">=1,<1.0.1",
                 "zf-commons/zfc-user": "<1.2.2",
@@ -540,38 +541,7 @@
                 }
             ],
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it",
-            "time": "2016-07-29 12:29:36"
-        },
-        {
-            "name": "silinternational/opsworks-deploy",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/silinternational/opsworks-deploy.git",
-                "reference": "e55dbb25b954027ea087c7c10756190dee12656d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/silinternational/opsworks-deploy/zipball/e55dbb25b954027ea087c7c10756190dee12656d",
-                "reference": "e55dbb25b954027ea087c7c10756190dee12656d",
-                "shasum": ""
-            },
-            "bin": [
-                "opsworks-deploy"
-            ],
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Shell script to initiate and monitor OpsWorks application deployments using AWC CLI scripts",
-            "homepage": "https://github.com/silinternational/opsworks-deploy",
-            "keywords": [
-                "amazon web services",
-                "aws",
-                "opsworks"
-            ],
-            "time": "2015-04-24 13:49:09"
+            "time": "2016-09-14 21:32:40"
         },
         {
             "name": "silinternational/php-env",
@@ -1720,16 +1690,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.8.9",
+            "version": "v2.8.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "0ceab136f43ed9d3e97b3eea32a7855dc50c121d"
+                "reference": "e7540734bad981fe59f8ef14b6fc194ae9df8d9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/0ceab136f43ed9d3e97b3eea32a7855dc50c121d",
-                "reference": "0ceab136f43ed9d3e97b3eea32a7855dc50c121d",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/e7540734bad981fe59f8ef14b6fc194ae9df8d9c",
+                "reference": "e7540734bad981fe59f8ef14b6fc194ae9df8d9c",
                 "shasum": ""
             },
             "require": {
@@ -1765,13 +1735,12 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2016-07-17 09:06:15"
+            "time": "2016-09-02 01:57:56"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "silinternational/opsworks-deploy": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": false,
