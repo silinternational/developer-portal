@@ -553,6 +553,11 @@ class Api extends \ApiBase
                 . 'and numbers. It may contain hyphens, but not at the '
                 . 'beginning or end.',
             ),
+            array(
+                'display_name',
+                'unique',
+                'caseSensitive' => false,
+            ),
             array('owner_id', 'validateOwnerId'),
             array(
                 'endpoint',

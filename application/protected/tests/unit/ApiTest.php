@@ -938,6 +938,7 @@ class ApiTest extends DeveloperPortalTestCase
         $newApi = new Api;
         $newApi->attributes = $existingApi->attributes;
         $newApi->code = $existingApi->code . '-duplicate';
+        $newApi->display_name = $existingApi->display_name . '-duplicate';
         $newApi->endpoint = $existingApi->endpoint . '-duplicate';
         
         // Act:
@@ -961,6 +962,7 @@ class ApiTest extends DeveloperPortalTestCase
         $newApi = new Api;
         $newApi->attributes = $existingApi->attributes;
         $newApi->code = $existingApi->code . '-duplicate';
+        $newApi->display_name = $existingApi->display_name . '-duplicate';
         $newApi->endpoint = $existingApi->endpoint . '-duplicate';
         
         // Act:
@@ -984,6 +986,7 @@ class ApiTest extends DeveloperPortalTestCase
         $newApi = new Api;
         $newApi->attributes = $existingApi->attributes;
         $newApi->code = $existingApi->code . '-duplicate';
+        $newApi->display_name = $existingApi->display_name . '-duplicate';
         $newApi->endpoint = $existingApi->endpoint . '-duplicate';
         $newApi->default_path = $existingApi->default_path . '-duplicate';
         
@@ -1172,6 +1175,30 @@ class ApiTest extends DeveloperPortalTestCase
         
         // Assert:
         $this->assertSame($expected, $actual);
+    }
+    
+    public function testUniqueDisplayNameCaseInsensitive()
+    {
+        // Arrange:
+        $existingApi = $this->apis('api1');
+        $newApi = new Api();
+        $newApi->display_name = strtoupper($existingApi->display_name);
+        
+        // Pre-assert:
+        $this->assertNotSame($existingApi->display_name, $newApi->display_name);
+        $this->assertSame(
+            strtoupper($existingApi->display_name),
+            strtoupper($newApi->display_name)
+        );
+        
+        // Act:
+        $result = $newApi->validate(array('display_name'));
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Failed to reject a duplicate display_name.'
+        );
     }
     
     public function testUpdateKeysRateLimitsToMatch()
