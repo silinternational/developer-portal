@@ -111,12 +111,10 @@ return array(
                         'logVars' => array(),
                     ),
                 ),
-            // Uncomment the following to show log messages on web pages:
-            /*
-              array(
-              'class'=>'CWebLogRoute',
-              ),
-            */
+                //// Uncomment the following to show log messages on web pages:
+                //array(
+                //    'class' => 'CWebLogRoute',
+                //),
             ),
         ),            
         'request' => array(
