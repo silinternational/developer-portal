@@ -27,5 +27,10 @@ WORKDIR /data
 # Install/cleanup composer dependencies
 RUN composer install --prefer-dist --no-interaction --no-dev --optimize-autoloader
 
+# Get s3-expand for ENTRYPOINT
+RUN curl -o /usr/local/bin/s3-expand https://raw.githubusercontent.com/silinternational/s3-expand/master/s3-expand \
+    && chmod a+x /usr/local/bin/s3-expand
+
 EXPOSE 80
+ENTRYPOINT ["/usr/local/bin/s3-expand"]
 CMD ["/data/run.sh"]
