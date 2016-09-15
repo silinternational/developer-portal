@@ -483,7 +483,7 @@ class Key extends \KeyBase
         if ($this->save()) {
             try {
                 $this->notifyUserOfDeniedKey();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 \Yii::log(sprintf(
                     'Error sending key-denied notification email: (%s) %s',
                     $e->getCode(),
@@ -1215,7 +1215,7 @@ class Key extends \KeyBase
             try {
                 $this->notifyUserOfRevokedKey();
                 $this->notifyApiOwnerOfRevokedKey();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 \Yii::log(sprintf(
                     'Error sending key-revoked notification email(s): (%s) %s',
                     $e->getCode(),

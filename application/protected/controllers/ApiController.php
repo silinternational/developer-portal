@@ -349,7 +349,7 @@ class ApiController extends \Controller
                     ));
                 }
             }
-            catch (CDbException $ex) {
+            catch (\CDbException $ex) {
                 
                 // Record that in the log.
                 \Yii::log(

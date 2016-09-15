@@ -143,7 +143,7 @@ class UtilsTest extends CDbTestCase
         try {
             $results = Utils::findPkOr404($model, $pk);
         }
-        catch (Exception $ex) {
+        catch (\Exception $ex) {
             $results = $ex->getMessage();
         }
         
