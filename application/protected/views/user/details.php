@@ -1,5 +1,5 @@
 <?php
-/* @var $this UserController */
+/* @var $this \Sil\DevPortal\controllers\UserController */
 /* @var $apisDataProvider CDataProvider */
 /* @var $keysDataProvider CDataProvider */
 /* @var $user User */

@@ -1,9 +1,10 @@
 <?php
+namespace Sil\DevPortal\controllers;
 
 use Sil\DevPortal\components\AuthManager;
 use Stringy\StaticStringy as SS;
 
-class AuthController extends Controller
+class AuthController extends \Controller
 {
     /**
      * The HybridAuth endpoint, needed for authentications managed by
@@ -135,11 +136,10 @@ class AuthController extends Controller
     
     public function actionIdentity()
     {
-        if(!Yii::app()->user->isGuest){
+        if ( ! \Yii::app()->user->isGuest) {
             $this->render('identity');
         } else {
             $this->redirect('/');
         }
-        
     }
 }

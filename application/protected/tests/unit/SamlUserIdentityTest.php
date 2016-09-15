@@ -4,11 +4,12 @@ namespace Sil\DevPortal\tests\unit;
 use Sil\DevPortal\components\SamlUserIdentity;
 use Sil\DevPortal\components\UserAuthenticationData;
 use Sil\DevPortal\components\UserIdentity;
+use Sil\DevPortal\models\User;
 
 class SamlUserIdentityTest extends \CDbTestCase
 {
     public $fixtures = array(
-        'users' => 'User',
+        'users' => '\Sil\DevPortal\models\User',
     );
     
     public function testExtractAccessGroups_exampleFromFunctionDocumentation()
@@ -38,7 +39,7 @@ class SamlUserIdentityTest extends \CDbTestCase
     public function testFindUserRecord_fallbackToMatchByEmailForTrustedAuthProvider()
     {
         // Arrange:
-        /* @var $expectedUser \User */
+        /* @var $expectedUser User */
         $expectedUser = $this->users('userFromTrustedAuthProviderLackingIdentifier');
         $userAuthData = new UserAuthenticationData(
             $expectedUser->auth_provider,
@@ -71,7 +72,7 @@ class SamlUserIdentityTest extends \CDbTestCase
     public function testFindUserRecord_doNotFallbackToMatchByEmailForOtherAuthProvider()
     {
         // Arrange:
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userFromOtherAuthProviderLackingIdentifier');
         $userAuthData = new UserAuthenticationData(
             $user->auth_provider,

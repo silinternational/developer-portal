@@ -1,9 +1,9 @@
 <?php
-/* @var $this SiteController */
+/* @var $this \Sil\DevPortal\controllers\SiteController */
 /* @var $loginOptions array<string,string> */
 /* @var $homeLowerLeftHtml string|null */
 /* @var $homeLowerRightHtml string|null */
-/* @var $popularApis \Api[]|null */
+/* @var $popularApis \Sil\DevPortal\models\Api[]|null */
 
 $this->pageTitle = 'Welcome';
 ?>

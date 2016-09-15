@@ -1,8 +1,11 @@
 <?php
+namespace Sil\DevPortal\controllers;
 
 use Sil\DevPortal\components\AuthManager;
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\SiteText;
 
-class SiteController extends Controller
+class SiteController extends \Controller
 {
     ///**
     // * Declares class-based actions.
@@ -29,12 +32,12 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        if ( ! Yii::app()->user->isGuest) {
+        if ( ! \Yii::app()->user->isGuest) {
             $this->redirect(array('dashboard/'));
         }
         
         if (\Yii::app()->params['showPopularApis']) {
-            $popularApis = \Api::getPopularApis();
+            $popularApis = Api::getPopularApis();
         } else {
             $popularApis = null;
         }
@@ -45,8 +48,8 @@ class SiteController extends Controller
         $this->render('index', array(
             'loginOptions' => $loginOptions,
             'popularApis' => $popularApis,
-            'homeLowerLeftHtml' => \SiteText::getHtml('home-lower-left'),
-            'homeLowerRightHtml' => \SiteText::getHtml('home-lower-right'),
+            'homeLowerLeftHtml' => SiteText::getHtml('home-lower-left'),
+            'homeLowerRightHtml' => SiteText::getHtml('home-lower-right'),
         ));
     }
 
@@ -55,9 +58,9 @@ class SiteController extends Controller
      */
     public function actionError()
     {
-        $error = Yii::app()->errorHandler->error;
+        $error = \Yii::app()->errorHandler->error;
         if ($error) {
-            if (Yii::app()->request->isAjaxRequest) {
+            if (\Yii::app()->request->isAjaxRequest) {
                 echo $error['message'];
             } else {
                 $this->render('error', $error);
@@ -76,7 +79,7 @@ class SiteController extends Controller
             /**
              * Get an apixle object and try to fetch details about 'apiaxle' api
              */
-            $axle = new \ApiAxle\Api\Api(Yii::app()->params['apiaxle']);
+            $axle = new \ApiAxle\Api\Api(\Yii::app()->params['apiaxle']);
             $check = $axle->get('apiaxle');
             $data = $check->getData();
 
@@ -103,7 +106,7 @@ class SiteController extends Controller
             
             // If we are in an environment where we should send email
             // notifications...
-            if (Yii::app()->params['mail'] !== false) {
+            if (\Yii::app()->params['mail'] !== false) {
                 
                 // Get some identifier for which server this is.
                 if (isset($_SERVER['HTTP_HOST'])) {
@@ -113,7 +116,7 @@ class SiteController extends Controller
                 }
                 
                 // Email us the full error info.
-                $mail = Utils::getMailer();
+                $mail = \Utils::getMailer();
                 $alertsEmail = \Yii::app()->params['alertsEmail'];
                 if ( ! empty($alertsEmail)) {
                     $mail->setTo($alertsEmail);
@@ -145,7 +148,7 @@ class SiteController extends Controller
     public function actionPrivacyPolicy()
     {
         $this->render('privacy-policy',array(
-            'contactEmail' => Yii::app()->params['adminEmail'],
+            'contactEmail' => \Yii::app()->params['adminEmail'],
         ));
     }
 }

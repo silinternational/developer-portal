@@ -1,17 +1,19 @@
 <?php
+namespace Sil\DevPortal\models;
 
-class ApiVisibilityUser extends ApiVisibilityUserBase
+class ApiVisibilityUser extends \ApiVisibilityUserBase
 {
-    use Sil\DevPortal\components\DependentKeysTrait;
-    use Sil\DevPortal\components\FormatModelErrorsTrait;
-    use Sil\DevPortal\components\ModelFindByPkTrait;
+    use \Sil\DevPortal\components\DependentKeysTrait;
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
+    use \Sil\DevPortal\components\FormatModelErrorsTrait;
+    use \Sil\DevPortal\components\ModelFindByPkTrait;
     
     protected function afterDelete()
     {
         parent::afterDelete();
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-        \Event::log(sprintf(
+        Event::log(sprintf(
             'The ability for %s (User ID %s) to see the "%s" API (api_id %s) was deleted%s.',
             (isset($this->invitedUser) ? $this->invitedUser->getDisplayName() : 'a User'),
             $this->invited_user_id,
@@ -27,7 +29,7 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
         
-        \Event::log(sprintf(
+        Event::log(sprintf(
             'The ability for %s%s to see the "%s" API (api_id %s) was %s%s.',
             (isset($this->invited_user_id) ? $this->invitedUser->getDisplayName() : $this->invited_user_email),
             (isset($this->invited_user_id) ? ' (User ID ' . $this->invited_user_id . ')' : ''),
@@ -51,7 +53,7 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
         return \CMap::mergeArray(parent::attributeLabels(), array(
             'api_visibility_user_id' => 'API Visibility User',
             'api_id' => 'API',
-			'invited_user_email' => 'Email address',
+            'invited_user_email' => 'Email address',
         ));
     }
     
@@ -65,7 +67,7 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
      * Get the list of Keys (active or pending) where the owner of the Key can
      * only see that Api because of this invitation.
      *
-     * @return \Key[] The list of keys.
+     * @return Key[] The list of keys.
      */
     public function getDependentKeys()
     {
@@ -86,7 +88,7 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
             }
         }
         
-        $keysOfThisUserToThisApi = \Key::model()->findAllByAttributes(array(
+        $keysOfThisUserToThisApi = Key::model()->findAllByAttributes(array(
             'api_id' => $this->api_id,
             'user_id' => $this->invited_user_id,
         ));
@@ -142,8 +144,8 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
     {
         if ( ! empty($this->invited_user_email)) {
             
-            /* @var $invitedUser \User */
-            $invitedUser = \User::model()->findByAttributes(array(
+            /* @var $invitedUser User */
+            $invitedUser = User::model()->findByAttributes(array(
                 'email' => $this->invited_user_email,
             ));
             
@@ -213,15 +215,15 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
     /**
      * Try to send a notification email to the person invited to see this Api.
      *
-     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
     public function notifyInvitee(
-        YiiMailer $mailer = null,
+        \YiiMailer $mailer = null,
         array $appParams = null
     ) {
         // If not given the Yii app params, retrieve them.
@@ -240,7 +242,7 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
 
             // Try to send them a notification email.
             if ($mailer === null) {
-                $mailer = Utils::getMailer();
+                $mailer = \Utils::getMailer();
             }
             $mailer->setView('api-invited-user');
             $mailer->setTo($inviteeEmailAddress);
@@ -264,7 +266,7 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
                 \Yii::log(
                     'Unable to send api-invited-user notification email to user: '
                     . $mailer->ErrorInfo,
-                    CLogger::LEVEL_WARNING
+                    \CLogger::LEVEL_WARNING
                 );
             }
         }
@@ -287,14 +289,14 @@ class ApiVisibilityUser extends ApiVisibilityUserBase
             array(
                 'updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'update',
             ),
             array(
                 'created, updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'insert',
             ),

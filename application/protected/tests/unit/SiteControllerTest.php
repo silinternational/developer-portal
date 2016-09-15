@@ -6,7 +6,7 @@ class SiteControllerTest extends ControllerTestCase {
     {
         // Define what controller is expected to handle all of the tests in this
         // class.
-        $this->expectedController = 'SiteController';
+        $this->expectedController = 'Sil\DevPortal\controllers\SiteController';
     }
     
     public function testRoutesIndex()

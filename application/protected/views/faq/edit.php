@@ -1,5 +1,5 @@
 <?php
-/* @var $this FaqController */
+/* @var $this \Sil\DevPortal\controllers\FaqController */
 /* @var $form CForm */
 
 // Set up the breadcrumbs.

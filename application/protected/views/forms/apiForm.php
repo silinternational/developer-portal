@@ -1,5 +1,7 @@
 <?php
 
+use Sil\DevPortal\models\User;
+
 return array(
     
     'elements' => array(
@@ -35,8 +37,8 @@ return array(
             'data' => CMap::mergeArray(
                 array('' => '-- none --'),
                 CHtml::encodeArray(CHtml::listData(
-                    \User::model()->findAllByAttributes(array(
-                        'role' => array(\User::ROLE_OWNER, \User::ROLE_ADMIN),
+                    User::model()->findAllByAttributes(array(
+                        'role' => array(User::ROLE_OWNER, User::ROLE_ADMIN),
                     )),
                     'user_id',
                     function($user) {

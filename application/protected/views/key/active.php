@@ -1,5 +1,5 @@
 <?php
-/* @var $this KeyController */
+/* @var $this \Sil\DevPortal\controllers\KeyController */
 /* @var $activeKeysDataProvider CDataProvider */
 
 // Set up the breadcrumbs.

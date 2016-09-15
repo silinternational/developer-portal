@@ -1,5 +1,5 @@
 <?php
-/* @var $this SiteController */
+/* @var $this \Sil\DevPortal\controllers\SiteController */
 /* @var $error array */
 
 $this->breadcrumbs = array(

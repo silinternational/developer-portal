@@ -1,9 +1,11 @@
 <?php
+namespace Sil\DevPortal\models;
 
-class Event extends EventBase
+class Event extends \EventBase
 {
-    use Sil\DevPortal\components\FormatModelErrorsTrait;
-    use Sil\DevPortal\components\ModelFindByPkTrait;
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
+    use \Sil\DevPortal\components\FormatModelErrorsTrait;
+    use \Sil\DevPortal\components\ModelFindByPkTrait;
     
     /**
      * @return array customized attribute labels (name=>label)
@@ -47,14 +49,14 @@ class Event extends EventBase
             $event->acting_user_id = \Yii::app()->user->getUserId();
             
             if ($event->save()) {
-                \Yii::log($description, CLogger::LEVEL_INFO);
+                \Yii::log($description, \CLogger::LEVEL_INFO);
             } else {
                 \Yii::log(sprintf(
                     'Unable to log event: %s. Error: %s%s.',
                     $event->toJson(),
                     PHP_EOL,
                     $event->getErrorsAsFlatTextList()
-                ), CLogger::LEVEL_WARNING);
+                ), \CLogger::LEVEL_WARNING);
             }
         } catch (\Exception $exception) {
             \Yii::log(sprintf(
@@ -62,7 +64,7 @@ class Event extends EventBase
                 $event->toJson(),
                 $exception->getCode(),
                 $exception->getMessage()
-            ), CLogger::LEVEL_WARNING);
+            ), \CLogger::LEVEL_WARNING);
         }
     }
 
@@ -85,7 +87,7 @@ class Event extends EventBase
                  * Events, rather than letting the user specify it.  */
                 'created',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false, // setOnEmpty means "only set when empty"
                 'on' => 'insert',
             ),

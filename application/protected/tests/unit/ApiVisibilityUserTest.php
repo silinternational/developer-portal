@@ -1,21 +1,23 @@
 <?php
 namespace Sil\DevPortal\tests\unit;
 
+use Sil\DevPortal\models\ApiVisibilityUser;
+
 /**
- * @method \ApiVisibilityUser apiVisibilityUsers(string $fixtureName)
+ * @method ApiVisibilityUser apiVisibilityUsers(string $fixtureName)
  */
 class ApiVisibilityUserTest extends \CDbTestCase
 {
     public $fixtures = array(
-        'apiVisibilityUsers' => 'ApiVisibilityUser',
-        'users' => 'User',
+        'apiVisibilityUsers' => '\Sil\DevPortal\models\ApiVisibilityUser',
+        'users' => '\Sil\DevPortal\models\User',
     );
     
     public function testGetInviteeEmailAddress_hasInvitedUserEmail()
     {
         // Arrange:
         $expected = 'someone@example.com';
-        $apiVisibilityUser = new \ApiVisibilityUser();
+        $apiVisibilityUser = new ApiVisibilityUser();
         $apiVisibilityUser->invited_user_email = $expected;
         
         // Act:

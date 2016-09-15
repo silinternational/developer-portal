@@ -1,5 +1,5 @@
  <?php
-/* @var $this ApiController */
+/* @var $this \Sil\DevPortal\controllers\ApiController */
 /* @var $keyId integer|string */
 /* @var $method string */
 /* @var $apiOptions array */
@@ -11,7 +11,7 @@
 /* @var $rawApiRequest string */
 /* @var $responseSyntax string */
 /* @var $debugText string */
-/* @var $currentUser \User */
+/* @var $currentUser \Sil\DevPortal\models\User */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(

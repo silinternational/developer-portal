@@ -1,5 +1,9 @@
 <?php
-/* @var $this ApiController */
+
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\User;
+
+/* @var $this \Sil\DevPortal\controllers\ApiController */
 /* @var $actionLinks ActionLink[] */
 /* @var $api Api */
 /* @var $webUser WebUser */

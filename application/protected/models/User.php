@@ -1,17 +1,19 @@
 <?php
+namespace Sil\DevPortal\models;
 
 /**
  * Additional model relations (defined here, not in base class):
  * @property int $approvedKeyCount
  * @property int $pendingKeyCount
  * @property int $keysProcessed
- * @property \Event[] $affectedByEvents
- * @property \Event[] $causedEvents
+ * @property Event[] $affectedByEvents
+ * @property Event[] $causedEvents
  */
-class User extends UserBase 
+class User extends \UserBase 
 {
-    use Sil\DevPortal\components\FormatModelErrorsTrait;
-    use Sil\DevPortal\components\ModelFindByPkTrait;
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
+    use \Sil\DevPortal\components\FormatModelErrorsTrait;
+    use \Sil\DevPortal\components\ModelFindByPkTrait;
     
     const ROLE_USER = 'user';
     const ROLE_OWNER = 'owner';
@@ -37,8 +39,8 @@ class User extends UserBase
      */
     protected function acceptAnyPendingInvitations()
     {
-        /* @var $pendingInvitations \ApiVisibilityUser[] */
-        $pendingInvitations = \ApiVisibilityUser::model()->findAllByAttributes(array(
+        /* @var $pendingInvitations ApiVisibilityUser[] */
+        $pendingInvitations = ApiVisibilityUser::model()->findAllByAttributes(array(
             'invited_user_email' => $this->email,
         ));
         foreach ($pendingInvitations as $pendingInvitation) {
@@ -46,7 +48,7 @@ class User extends UserBase
             /* Re-save the invitation in order to trigger it's logic for finding
              * the user with the matching email address (if applicable).  */
             if ($pendingInvitation->save()) {
-                \Event::log(sprintf(
+                Event::log(sprintf(
                     '%s (%s) is now able to see the "%s" API.',
                     $this->getDisplayName(),
                     $this->email,
@@ -61,7 +63,7 @@ class User extends UserBase
         parent::afterDelete();
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-        \Event::log(sprintf(
+        Event::log(sprintf(
             '%s (user_id %s) was deleted%s.',
             $this->getDisplayName(),
             $this->user_id,
@@ -75,7 +77,7 @@ class User extends UserBase
         
         $nameOfCurrentWebUser = \Yii::app()->user->getDisplayName();
         
-        \Event::log(sprintf(
+        Event::log(sprintf(
             'User %s (%s) was %s%s.',
             $this->user_id,
             $this->getDisplayName(),
@@ -92,7 +94,7 @@ class User extends UserBase
             return false;
         }
         
-        $apiVisibilityDomainsGranted = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+        $apiVisibilityDomainsGranted = ApiVisibilityDomain::model()->findAllByAttributes(array(
             'invited_by_user_id' => $this->user_id,
         ));
         if (count($apiVisibilityDomainsGranted) > 0) {
@@ -103,7 +105,7 @@ class User extends UserBase
             return false;
         }
         
-        $apiVisibilityUsersGranted = \ApiVisibilityUser::model()->findAllByAttributes(array(
+        $apiVisibilityUsersGranted = ApiVisibilityUser::model()->findAllByAttributes(array(
             'invited_by_user_id' => $this->user_id,
         ));
         if (count($apiVisibilityUsersGranted) > 0) {
@@ -147,8 +149,8 @@ class User extends UserBase
             }
         }
         
-        /* @var $apiVisibilityUsersReceived \ApiVisibilityUser */
-        $apiVisibilityUsersReceived = \ApiVisibilityUser::model()->findAllByAttributes(array(
+        /* @var $apiVisibilityUsersReceived ApiVisibilityUser */
+        $apiVisibilityUsersReceived = ApiVisibilityUser::model()->findAllByAttributes(array(
             'invited_user_id' => $this->user_id,
         ));
         foreach ($apiVisibilityUsersReceived as $apiVisibilityUserReceived) {
@@ -166,8 +168,8 @@ class User extends UserBase
         /* NOTE: Simply using $this->affectedByEvents was retrieving a cached
          *       list of Events, and so we were failing to update Events created
          *       earlier in this beforeDelete() method.  */
-        /* @var $eventsAffectingUser \Event[] */
-        $eventsAffectingUser = \Event::model()->findAllByAttributes(array(
+        /* @var $eventsAffectingUser Event[] */
+        $eventsAffectingUser = Event::model()->findAllByAttributes(array(
             'affected_user_id' => $this->user_id,
         ));
         foreach ($eventsAffectingUser as $eventAffectingUser) {
@@ -185,8 +187,8 @@ class User extends UserBase
         
         /* NOTE: Simply using $this->causedEvents fails to retrieve the most
          *       current list of Events caused by this User.  */
-        /* @var $eventsCausedByUser \Event[] */
-        $eventsCausedByUser = \Event::model()->findAllByAttributes(array(
+        /* @var $eventsCausedByUser Event[] */
+        $eventsCausedByUser = Event::model()->findAllByAttributes(array(
             'acting_user_id' => $this->user_id,
         ));
         foreach ($eventsCausedByUser as $eventCausedByUser) {
@@ -208,13 +210,13 @@ class User extends UserBase
     /**
      * Find out whether this User is allowed to approve the given (pending) Key.
      * 
-     * @param \Key $key The (pending) Key to be approved.
+     * @param Key $key The (pending) Key to be approved.
      * @return boolean
      */
     public function isAuthorizedToApproveKey($key)
     {
         // If no Key was given, say no.
-        if ( ! ($key instanceof \Key)) {
+        if ( ! ($key instanceof Key)) {
             return false;
         }
         
@@ -230,7 +232,7 @@ class User extends UserBase
     /**
      * Find out whether this User is allowed to deny the given (pending) Key.
      * 
-     * @param \Key $key The (pending) Key.
+     * @param Key $key The (pending) Key.
      * @return boolean
      */
     public function isAuthorizedToDenyKey($key)
@@ -248,19 +250,19 @@ class User extends UserBase
      */
     public function canDeleteKey($key)
     {
-        return (($key instanceof \Key) && $key->canBeDeletedBy($this));
+        return (($key instanceof Key) && $key->canBeDeletedBy($this));
     }
     
     /**
      * Find out whether this User is allowed to invite all users with email
      * addresses in a particular domain name to see the given Api.
      * 
-     * @param \Api $api The Api in question.
+     * @param Api $api The Api in question.
      * @return boolean
      */
     public function canInviteDomainToSeeApi($api)
     {
-        if ( ! ($api instanceof \Api)) {
+        if ( ! ($api instanceof Api)) {
             return false;
         }
         
@@ -271,12 +273,12 @@ class User extends UserBase
      * Find out whether this User is allowed to invite a user (by email address)
      * to see the given Api.
      * 
-     * @param \Api $api The Api in question.
+     * @param Api $api The Api in question.
      * @return boolean
      */
     public function canInviteUserToSeeApi($api)
     {
-        if ( ! ($api instanceof \Api)) {
+        if ( ! ($api instanceof Api)) {
             return false;
         }
         
@@ -296,7 +298,7 @@ class User extends UserBase
             return false;
         }
         
-        if ($key->status !== \Key::STATUS_APPROVED) {
+        if ($key->status !== Key::STATUS_APPROVED) {
             return false;
         }
         
@@ -310,13 +312,8 @@ class User extends UserBase
             return true;
         }
         
-        // If the user is an admin, say yes.
-        if ($this->role === \User::ROLE_ADMIN) {
-            return true;
-        }
-        
-        // Otherwise, say no.
-        return false;
+        // If the user is an admin, say yes. Otherwise, say no.
+        return ($this->role === self::ROLE_ADMIN);
     }
     
     /**
@@ -332,7 +329,7 @@ class User extends UserBase
             return false;
         }
         
-        if ($key->status !== \Key::STATUS_APPROVED) {
+        if ($key->status !== Key::STATUS_APPROVED) {
             return false;
         }
         
@@ -347,7 +344,7 @@ class User extends UserBase
         }
         
         // If the user is an admin, say yes.
-        if ($this->role === \User::ROLE_ADMIN) {
+        if ($this->role === self::ROLE_ADMIN) {
             return true;
         }
         
@@ -369,7 +366,7 @@ class User extends UserBase
         }
         
         // If the user is an admin, say yes.
-        if ($this->role === \User::ROLE_ADMIN) {
+        if ($this->role === self::ROLE_ADMIN) {
             return true;
         }
         
@@ -401,7 +398,7 @@ class User extends UserBase
         }
         
         // If the user is an admin, say yes.
-        if ($this->role === \User::ROLE_ADMIN) {
+        if ($this->role === self::ROLE_ADMIN) {
             return true;
         }
         
@@ -456,7 +453,7 @@ class User extends UserBase
         }
         
         // Get all of this user's keys, but also include the API names.
-        return \Key::model()->with('api')->findAllByAttributes(array(
+        return Key::model()->with('api')->findAllByAttributes(array(
             'user_id' => $currentUserId,
         ), array(
             'order' => 'api.display_name',
@@ -483,7 +480,7 @@ class User extends UserBase
     public static function getRoleString($roleValue)
     {
         // Get the array of roles.
-        $roles = User::getRoles();
+        $roles = self::getRoles();
         
         // Return the one associated with the given value (if any).
         if (isset($roles[$roleValue])) {
@@ -513,7 +510,7 @@ class User extends UserBase
     public static function getStatusString($statusValue)
     {
         // Get the array of statuses.
-        $statuses = User::getStatuses();
+        $statuses = self::getStatuses();
         
         // Return the one associated with the given value (if any).
         if (isset($statuses[$statusValue])) {
@@ -543,8 +540,8 @@ class User extends UserBase
         }
         
         // Get the list of all APIs.
-        /* @var $apis \Api[] */
-        $apis = \Api::model()->findAll();
+        /* @var $apis Api[] */
+        $apis = Api::model()->findAll();
 
         // Get the APIs' usage.
         $usageStats = new \UsageStats($interval);
@@ -600,8 +597,8 @@ class User extends UserBase
     public function getUsageStatsForKeys($interval)
     {
         // Get all of this user's Keys.
-        $keys = \Key::model()->with('api')->findAllByAttributes(array(
-            'status' => \Key::STATUS_APPROVED,
+        $keys = Key::model()->with('api')->findAllByAttributes(array(
+            'status' => Key::STATUS_APPROVED,
             'user_id' => $this->user_id,
         ), array(
             'order' => 'api.display_name',
@@ -641,8 +638,8 @@ class User extends UserBase
         }
         
         // Get the list of all APIs.
-        /* @var $apis \Api[] */
-        $apis = \Api::model()->findAll();
+        /* @var $apis Api[] */
+        $apis = Api::model()->findAll();
         
         // Get the total, combined usage of all APIs.
         $usageStats = new \UsageStats($interval);
@@ -653,7 +650,7 @@ class User extends UserBase
                 // Try to get the usage for this API. If that worked, add it
                 // to our total.
                 $apiUsage = $api->getUsage($interval);
-                $totalUsage = UsageStats::combineUsageCategoryArrays(
+                $totalUsage = \UsageStats::combineUsageCategoryArrays(
                     $totalUsage,
                     $apiUsage
                 );
@@ -677,7 +674,7 @@ class User extends UserBase
      * given Api (if any such Key exists).
      * 
      * @param Api $api The Api in question.
-     * @return \Key|null The Key, or null if it doesn't exist.
+     * @return Key|null The Key, or null if it doesn't exist.
      */
     public function getActiveKeyToApi($api)
     {
@@ -686,10 +683,10 @@ class User extends UserBase
             return null;
         }
         
-        return \Key::model()->findByAttributes(array(
+        return Key::model()->findByAttributes(array(
             'api_id' => $api->api_id,
             'user_id' => $this->user_id,
-            'status' => \Key::STATUS_APPROVED,
+            'status' => Key::STATUS_APPROVED,
         ));
     }
     
@@ -719,7 +716,7 @@ class User extends UserBase
         }
         
         // If the user is an admin, then yes.
-        if ($this->role === \User::ROLE_ADMIN) {
+        if ($this->role === self::ROLE_ADMIN) {
             return true;
         }
         
@@ -735,18 +732,14 @@ class User extends UserBase
     public function hasOwnerPrivileges()
     {
         $role = $this->role;
-        if (($role === \User::ROLE_ADMIN) || ($role === \User::ROLE_OWNER)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (($role === self::ROLE_ADMIN) || ($role === self::ROLE_OWNER));
     }
     
     /**
      * Retrieve the User's pending Key (if such a Key exists) for the given Api.
      * 
      * @param Api $api The Api in question.
-     * @return \Key|null The pending Key, or null if no such Key exists.
+     * @return Key|null The pending Key, or null if no such Key exists.
      */
     public function getPendingKeyForApi($api)
     {
@@ -755,10 +748,10 @@ class User extends UserBase
             return null;
         }
         
-        return \Key::model()->findByAttributes(array(
+        return Key::model()->findByAttributes(array(
             'api_id' => $api->api_id,
             'user_id' => $this->user_id,
-            'status' => \Key::STATUS_PENDING,
+            'status' => Key::STATUS_PENDING,
         ));
     }
     
@@ -780,7 +773,7 @@ class User extends UserBase
      */
     public function isAdmin()
     {
-        return ($this->role === \User::ROLE_ADMIN);
+        return ($this->role === self::ROLE_ADMIN);
     }
     
     public function isDisabled()
@@ -793,7 +786,7 @@ class User extends UserBase
     
     public static function isEmailAddressInUse($emailAddress)
     {
-        $user = \User::model()->findByAttributes(array(
+        $user = self::model()->findByAttributes(array(
             'email' => $emailAddress,
         ));
         return ($user !== null);
@@ -822,12 +815,12 @@ class User extends UserBase
     /**
      * Find out whether this User has been individually invited to see this Api.
      * 
-     * @param \Api $api The Api in question.
+     * @param Api $api The Api in question.
      * @return boolean
      */
     public function isIndividuallyInvitedToSeeApi($api)
     {
-        $apiVisibilityUser = \ApiVisibilityUser::model()->findByAttributes(array(
+        $apiVisibilityUser = ApiVisibilityUser::model()->findByAttributes(array(
             'api_id' => $api->api_id,
             'invited_user_id' => $this->user_id,
         ));
@@ -838,7 +831,7 @@ class User extends UserBase
      * Find out whether this User has an email address domain that has been
      * invited to see this Api. This should be case-insensitive.
      * 
-     * @param \Api $api The Api in question.
+     * @param Api $api The Api in question.
      * @param integer|null $excludedAvdId (Optional:) The ID of an
      *     ApiVisibilityDomain that should be ignored. Useful for seeing whether
      *     a Key depends on a particular ApiVisibilityDomain.
@@ -853,7 +846,7 @@ class User extends UserBase
                 array($excludedAvdId)
             );
         }
-        $apiVisibilityDomain = \ApiVisibilityDomain::model()->findByAttributes(array(
+        $apiVisibilityDomain = ApiVisibilityDomain::model()->findByAttributes(array(
             'api_id' => $api->api_id,
             'domain' => $this->getEmailAddressDomain(),
         ), $criteria);
@@ -896,14 +889,14 @@ class User extends UserBase
             array(
                 'updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'update',
             ),
             array(
                 'created,updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => true,
                 'on' => 'insert',
             ),
@@ -926,25 +919,25 @@ class User extends UserBase
     public function relations()
     {
         return array(
-            'apis' => array(self::HAS_MANY, 'Api', 'owner_id'),
-            'affectedByEvents' => array(self::HAS_MANY, 'Event', 'affected_user_id'),
-            'causedEvents' => array(self::HAS_MANY, 'Event', 'acting_user_id'),
+            'apis' => array(self::HAS_MANY, '\Sil\DevPortal\models\Api', 'owner_id'),
+            'affectedByEvents' => array(self::HAS_MANY, '\Sil\DevPortal\models\Event', 'affected_user_id'),
+            'causedEvents' => array(self::HAS_MANY, '\Sil\DevPortal\models\Event', 'acting_user_id'),
             'approvedKeyCount' => array(
                 self::STAT,
-                'Key',
+                '\Sil\DevPortal\models\Key',
                 'user_id',
                 'condition' => 'status = :status',
-                'params' => array(':status' => \Key::STATUS_APPROVED),
+                'params' => array(':status' => Key::STATUS_APPROVED),
             ),
             'pendingKeyCount' => array(
                 self::STAT,
-                'Key',
+                '\Sil\DevPortal\models\Key',
                 'user_id',
                 'condition' => 'status = :status',
-                'params' => array(':status' => \Key::STATUS_PENDING),
+                'params' => array(':status' => Key::STATUS_PENDING),
             ),
-            'keys' => array(self::HAS_MANY, 'Key', 'user_id'),
-            'keysProcessed' => array(self::HAS_MANY, 'Key', 'processed_by'),
+            'keys' => array(self::HAS_MANY, '\Sil\DevPortal\models\Key', 'user_id'),
+            'keysProcessed' => array(self::HAS_MANY, '\Sil\DevPortal\models\Key', 'processed_by'),
         );
     }
     

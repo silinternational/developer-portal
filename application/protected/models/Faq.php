@@ -1,15 +1,17 @@
 <?php
+namespace Sil\DevPortal\models;
 
-class Faq extends FaqBase
+class Faq extends \FaqBase
 {
-    use Sil\DevPortal\components\ModelFindByPkTrait;
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
+    use \Sil\DevPortal\components\ModelFindByPkTrait;
     
     public function afterDelete()
     {
         parent::afterDelete();
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-        \Event::log(sprintf(
+        Event::log(sprintf(
             'Faq %s was deleted%s: %s',
             $this->faq_id,
             (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser),
@@ -23,7 +25,7 @@ class Faq extends FaqBase
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
         
-        \Event::log(sprintf(
+        Event::log(sprintf(
             'Faq %s was %s%s (%s).',
             $this->faq_id,
             ($this->isNewRecord ? 'created' : 'updated'),
@@ -38,14 +40,14 @@ class Faq extends FaqBase
             array(
                 'updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'update',
             ),
             array(
                 'created,updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => true,
                 'on' => 'insert',
             ),
@@ -62,16 +64,16 @@ class Faq extends FaqBase
      * models according to data in model fields.
      * - Pass data provider to CGridView, CListView or any similar widget.
      *
-     * @return CActiveDataProvider the data provider that can return the models
+     * @return \CActiveDataProvider the data provider that can return the models
      * based on the search/filter conditions.
      */
     public function search() {
-        $criteria = new CDbCriteria;
+        $criteria = new \CDbCriteria;
 
         $criteria->compare('question', $this->question, true);
         $criteria->compare('answer', $this->answer, true);
 
-        return new CActiveDataProvider($this, array(
+        return new \CActiveDataProvider($this, array(
             'criteria' => $criteria,
         ));
     }

@@ -1,23 +1,25 @@
 <?php
 namespace Sil\DevPortal\tests\unit;
 
+use Sil\DevPortal\models\Event;
+
 class EventTest extends \CDbTestCase
 {
     public $fixtures = array(
-        'events' => 'Event',
+        'events' => '\Sil\DevPortal\models\Event',
     );
     
     public function testFixtureDataValidity()
     {
         foreach ($this->events as $fixtureName => $fixtureData) {
-            /* @var $event \Event */
+            /* @var $event Event */
             $event = $this->events($fixtureName);
             $this->assertTrue($event->delete(), sprintf(
                 'Could not delete event fixture %s: %s',
                 $fixtureName,
                 print_r($event->getErrors(), true)
             ));
-            $eventOnInsert = new \Event();
+            $eventOnInsert = new Event();
             $eventOnInsert->setAttributes($fixtureData, false);
             $this->assertTrue($eventOnInsert->save(), sprintf(
                 'Event fixture "%s" (ID %s) does not have valid data: %s',
@@ -36,7 +38,7 @@ class EventTest extends \CDbTestCase
     public function testRules_created_noValueGiven()
     {
         // Arrange:
-        $event = new \Event();
+        $event = new Event();
         $event->attributes = array(
             'description' => 'A unit test created a dummy event.',
         );
@@ -61,7 +63,7 @@ class EventTest extends \CDbTestCase
     {
         // Arrange:
         $originalCreatedValue = '2016-06-27 13:47:04';
-        $event = new \Event();
+        $event = new Event();
         $event->attributes = array(
             'description' => 'A unit test created a dummy event.',
             'created' => $originalCreatedValue,
