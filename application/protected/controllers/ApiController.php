@@ -587,12 +587,20 @@ class ApiController extends \Controller
         /* @var $webUser WebUser */
         $webUser = \Yii::app()->user;
         
+        $sortSettings = array(
+            'attributes' => array('display_name', 'owner_id'),
+            'defaultOrder' => array(
+                'display_name' => \CSort::SORT_ASC,
+            ),
+        );
+        
         // If the website user is an admin, get the list of all APIs.
         if ($webUser->isAdmin()) {
-            $apiList = new \CActiveDataProvider('\Sil\DevPortal\models\Api', array(
+            $apiList = new \CActiveDataProvider(Api::class, array(
                 'criteria' => array(
                     'with' => array('approvedKeyCount', 'pendingKeyCount'),
                 ),
+                'sort' => $sortSettings,
             ));
         } else {
             
@@ -608,11 +616,7 @@ class ApiController extends \Controller
             }
             $apiList = new \CArrayDataProvider($visibleApis, array(
                 'keyField' => 'api_id',
-                'sort' => array(
-                    'attributes' => array(
-                        'display_name',
-                    ),
-                ),
+                'sort' => $sortSettings,
             ));
         }
         
