@@ -1,24 +1,31 @@
 <?php
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\ApiVisibilityDomain;
+use Sil\DevPortal\models\ApiVisibilityUser;
+use Sil\DevPortal\models\Event;
+use Sil\DevPortal\models\Key;
+use Sil\DevPortal\models\User;
+
 /**
- * @method \Api apis(string $fixtureName) Get the Api with that fixture name.
- * @method \ApiVisibilityDomain apiVisibilityDomains(string $fixtureName) Get
+ * @method Api apis(string $fixtureName) Get the Api with that fixture name.
+ * @method ApiVisibilityDomain apiVisibilityDomains(string $fixtureName) Get
  *     the ApiVisibilityDomain with that fixture name.
- * @method \ApiVisibilityUser apiVisibilityUsers(string $fixtureName) Get the
+ * @method ApiVisibilityUser apiVisibilityUsers(string $fixtureName) Get the
  *     ApiVisibilityUser with that fixture name.
- * @method \Event events(string $fixtureName) Get the Event with that fixture name.
- * @method \Key keys(string $fixtureName) Get the Key with that fixture name.
- * @method \User users(string $fixtureName) Get the User with that fixture name.
+ * @method Event events(string $fixtureName) Get the Event with that fixture name.
+ * @method Key keys(string $fixtureName) Get the Key with that fixture name.
+ * @method User users(string $fixtureName) Get the User with that fixture name.
  */
 class UserTest extends DeveloperPortalTestCase
 {
     public $fixtures = array(
-        'apis' => 'Api',
-        'apiVisibilityDomains' => 'ApiVisibilityDomain',
-        'apiVisibilityUsers' => 'ApiVisibilityUser',
-        'events' => 'Event',
-        'keys' => 'Key',
-        'users' => 'User',
+        'apis' => '\Sil\DevPortal\models\Api',
+        'apiVisibilityDomains' => '\Sil\DevPortal\models\ApiVisibilityDomain',
+        'apiVisibilityUsers' => '\Sil\DevPortal\models\ApiVisibilityUser',
+        'events' => '\Sil\DevPortal\models\Event',
+        'keys' => '\Sil\DevPortal\models\Key',
+        'users' => '\Sil\DevPortal\models\User',
     );
     
     public function setUp()
@@ -33,9 +40,9 @@ class UserTest extends DeveloperPortalTestCase
     public function testFixtureDataValidity()
     {
         foreach ($this->users as $fixtureName => $fixtureData) {
-            /* @var $user \User */
+            /* @var $user User */
             $user = $this->users($fixtureName);
-            $avdGrants = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+            $avdGrants = ApiVisibilityDomain::model()->findAllByAttributes(array(
                 'invited_by_user_id' => $user->user_id,
             ));
             foreach ($avdGrants as $avdGrant) {
@@ -44,7 +51,7 @@ class UserTest extends DeveloperPortalTestCase
                     print_r($avdGrant->getErrors(), true)
                 ));
             }
-            $avuGrants = \ApiVisibilityUser::model()->findAllByAttributes(array(
+            $avuGrants = ApiVisibilityUser::model()->findAllByAttributes(array(
                 'invited_by_user_id' => $user->user_id,
             ));
             foreach ($avuGrants as $avuGrant) {
@@ -53,7 +60,7 @@ class UserTest extends DeveloperPortalTestCase
                     print_r($avuGrant->getErrors(), true)
                 ));
             }
-            $keysProcessed = \Key::model()->findAllByAttributes(array(
+            $keysProcessed = Key::model()->findAllByAttributes(array(
                 'processed_by' => $user->user_id,
             ));
             foreach ($keysProcessed as $keyProcessed) {
@@ -79,7 +86,7 @@ class UserTest extends DeveloperPortalTestCase
                 $fixtureName,
                 print_r($user->getErrors(), true)
             ));
-            $userOnInsert = new \User();
+            $userOnInsert = new User();
             $userOnInsert->setAttributes($fixtureData, false);
             $this->assertTrue($userOnInsert->save(), sprintf(
                 'User fixture "%s" (ID %s) does not have valid data: %s',
@@ -163,7 +170,7 @@ class UserTest extends DeveloperPortalTestCase
     public function testAuthProviderRequired_emptyString()
     {
         // Arrange:
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('user1');
         
         // Pre-assert:
@@ -186,7 +193,7 @@ class UserTest extends DeveloperPortalTestCase
     public function testAuthProviderRequired_false()
     {
         // Arrange:
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('user1');
         
         // Pre-assert:
@@ -209,7 +216,7 @@ class UserTest extends DeveloperPortalTestCase
     public function testAuthProviderRequired_null()
     {
         // Arrange:
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('user1');
         
         // Pre-assert:
@@ -232,7 +239,7 @@ class UserTest extends DeveloperPortalTestCase
     public function testBeforeDelete()
     {
         // Arrange:
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithKeyToApiOwnedByUser18');
         
         // Act:
@@ -877,16 +884,22 @@ class UserTest extends DeveloperPortalTestCase
     {
         // Make sure the role constants differ (both in their values and
         // in their user-friendly versions).
-        $this->confirmConstantsDiffer('User', 'ROLE_',
-                User::getRoles());
+        $this->confirmConstantsDiffer(
+            '\Sil\DevPortal\models\User',
+            'ROLE_',
+            User::getRoles()
+        );
     }
     
     public function testConfirmStatusesDiffer()
     {
         // Make sure the status constants differ (both in their values and
         // in their user-friendly versions).
-        $this->confirmConstantsDiffer('User', 'STATUS_',
-                User::getStatuses());
+        $this->confirmConstantsDiffer(
+            '\Sil\DevPortal\models\User',
+            'STATUS_',
+            User::getStatuses()
+        );
     }
     
     public function testGetDisplayName_isDefined()
@@ -934,7 +947,7 @@ class UserTest extends DeveloperPortalTestCase
     public function testGetEmailAddressDomain()
     {
         // Arrange:
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithEmailDomainNotInvitedToSeeAnyApi');
         $expected = 'not-invited-domain.example.com';
         
@@ -949,7 +962,7 @@ class UserTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $constantPrefix = 'ROLE_';
-        $rolesFound = self::getConstantsWithPrefix('User', $constantPrefix);
+        $rolesFound = self::getConstantsWithPrefix('\Sil\DevPortal\models\User', $constantPrefix);
         $roleValuesFound = array_values($rolesFound);
         $this->assertTrue(
             sort($roleValuesFound),
@@ -957,7 +970,7 @@ class UserTest extends DeveloperPortalTestCase
         );
         
         // Act:
-        $rolesReturned = \User::getRoles();
+        $rolesReturned = User::getRoles();
         $roleValuesReturned = array_keys($rolesReturned);
         $this->assertTrue(
             sort($roleValuesReturned),
@@ -977,7 +990,7 @@ class UserTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $constantPrefix = 'STATUS_';
-        $statusesFound = self::getConstantsWithPrefix('User', $constantPrefix);
+        $statusesFound = self::getConstantsWithPrefix('\Sil\DevPortal\models\User', $constantPrefix);
         $statusValuesFound = array_values($statusesFound);
         $this->assertTrue(
             sort($statusValuesFound),
@@ -985,7 +998,7 @@ class UserTest extends DeveloperPortalTestCase
         );
         
         // Act:
-        $statusesReturned = \User::getStatuses();
+        $statusesReturned = User::getStatuses();
         $statusValuesReturned = array_keys($statusesReturned);
         $this->assertTrue(
             sort($statusValuesReturned),
@@ -1026,7 +1039,7 @@ class UserTest extends DeveloperPortalTestCase
         $keys = $user->getKeysWithApiNames();
         $foundOne = false;
         foreach ($keys as $key) {
-            if ($key->status === \Key::STATUS_APPROVED) {
+            if ($key->status === Key::STATUS_APPROVED) {
                 $foundOne = true;
             }
         }
@@ -1048,7 +1061,7 @@ class UserTest extends DeveloperPortalTestCase
         $keys = $user->getKeysWithApiNames();
         $foundOne = false;
         foreach ($keys as $key) {
-            if ($key->status === \Key::STATUS_DENIED) {
+            if ($key->status === Key::STATUS_DENIED) {
                 $foundOne = true;
             }
         }
@@ -1070,7 +1083,7 @@ class UserTest extends DeveloperPortalTestCase
         $keys = $user->getKeysWithApiNames();
         $foundOne = false;
         foreach ($keys as $key) {
-            if ($key->status === \Key::STATUS_PENDING) {
+            if ($key->status === Key::STATUS_PENDING) {
                 $foundOne = true;
             }
         }
@@ -1092,7 +1105,7 @@ class UserTest extends DeveloperPortalTestCase
         $keys = $user->getKeysWithApiNames();
         $foundOne = false;
         foreach ($keys as $key) {
-            if ($key->status === \Key::STATUS_REVOKED) {
+            if ($key->status === Key::STATUS_REVOKED) {
                 $foundOne = true;
             }
         }
@@ -1108,7 +1121,7 @@ class UserTest extends DeveloperPortalTestCase
     public function testGetUsageStatsForAllApis_notAdmin_no()
     {
         // Arrange:
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithRoleOfOwner');
         
         // (Pre-assert and) Act:
@@ -1125,7 +1138,7 @@ class UserTest extends DeveloperPortalTestCase
     public function testGetUsageStatsForAllApis_admin_returnsUsageStats()
     {
         // Arrange:
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithRoleOfAdmin');
         
         // Act:
@@ -1142,7 +1155,7 @@ class UserTest extends DeveloperPortalTestCase
     public function testGetUsageStatsTotals_notAdmin_no()
     {
         // Arrange:
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithRoleOfOwner');
         
         // (Pre-assert and) Act:
@@ -1159,7 +1172,7 @@ class UserTest extends DeveloperPortalTestCase
     public function testGetUsageStatsTotals_admin_returnsUsageStats()
     {
         // Arrange:
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithRoleOfAdmin');
         
         // Act:
@@ -1259,13 +1272,13 @@ class UserTest extends DeveloperPortalTestCase
 	public function testHasApisRelationship()
     {
         // Confirm that the relationship is set up between the classes.
-        $this->assertClassHasRelation(new User(), 'apis', 'Api');
+        $this->assertClassHasRelation(new User(), 'apis', '\Sil\DevPortal\models\Api');
     }
     
 	public function testHasKeysRelationship()
     {
         // Confirm that the relationship is set up between the classes.
-        $this->assertClassHasRelation(new User(), 'keys', 'Key');
+        $this->assertClassHasRelation(new User(), 'keys', '\Sil\DevPortal\models\Key');
     }
     
     public function testGetActiveKeyToApi_noApiGiven()
@@ -1372,8 +1385,8 @@ class UserTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $api = new Api();
-        /* @var $user \User */
-        $user = \Phake::mock('\User');
+        /* @var $user User */
+        $user = \Phake::mock('\Sil\DevPortal\models\User');
         \Phake::when($user)->hasActiveKeyToApi->thenCallParent();
         \Phake::when($user)->getActiveKeyToApi->thenReturn(null);
         
@@ -1392,8 +1405,8 @@ class UserTest extends DeveloperPortalTestCase
         // Arrange:
         $api = new Api();
         $key = new Key();
-        /* @var $user \User */
-        $user = \Phake::mock('\User');
+        /* @var $user User */
+        $user = \Phake::mock('\Sil\DevPortal\models\User');
         \Phake::when($user)->hasActiveKeyToApi->thenCallParent();
         \Phake::when($user)->getActiveKeyToApi->thenReturn($key);
         
@@ -1607,9 +1620,9 @@ class UserTest extends DeveloperPortalTestCase
     public function testIsAuthorizedToApproveKey_no()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('pendingKeyForApiOwnedByUser18');
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithRoleOfOwner'); // NOT owner of Key's Api.
         
         // Act:
@@ -1626,7 +1639,7 @@ class UserTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $key = null;
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithRoleOfOwner'); // NOT owner of Key's Api.
         
         // Act:
@@ -1642,9 +1655,9 @@ class UserTest extends DeveloperPortalTestCase
     public function testIsAuthorizedToApproveKey_yes()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('pendingKeyForApiOwnedByUser18');
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('user18');
         
         // Act:
@@ -1663,7 +1676,7 @@ class UserTest extends DeveloperPortalTestCase
         $user = new User;
         /* Note: The value is cast to a string because Yii returns all integers
          *       as strings to avoid hitting max-value limits.  */
-        $user->status = (string)\User::STATUS_ACTIVE;
+        $user->status = (string)User::STATUS_ACTIVE;
         
         // Act:
         $result = $user->isDisabled();
@@ -1681,7 +1694,7 @@ class UserTest extends DeveloperPortalTestCase
         $user = new User;
         /* Note: The value is cast to a string because Yii returns all integers
          *       as strings to avoid hitting max-value limits.  */
-        $user->status = (string)\User::STATUS_INACTIVE;
+        $user->status = (string)User::STATUS_INACTIVE;
         
         // Act:
         $result = $user->isDisabled();
@@ -1702,7 +1715,7 @@ class UserTest extends DeveloperPortalTestCase
         );
         
         // Act:
-        $result = \User::isEmailAddressInUse($unusedEmailAddress);
+        $result = User::isEmailAddressInUse($unusedEmailAddress);
         
         // Assert:
         $this->assertFalse(
@@ -1733,7 +1746,7 @@ class UserTest extends DeveloperPortalTestCase
         );
         
         // Act:
-        $result = \User::isEmailAddressInUse($user['email']);
+        $result = User::isEmailAddressInUse($user['email']);
         
         // Assert:
         $this->assertTrue(
@@ -1745,13 +1758,13 @@ class UserTest extends DeveloperPortalTestCase
     public function testIsIndividuallyInvitedToSeeApi_no()
     {
         // Arrange:
-        /* @var $api \Api */
+        /* @var $api Api */
         $api = $this->apis('apiVisibleByInvitationOnly');
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userNotIndividuallyInvitedToSeeAnyApi');
         
         // Pre-assert:
-        $apiVisibilityUsers = \ApiVisibilityUser::model()->findAllByAttributes(array(
+        $apiVisibilityUsers = ApiVisibilityUser::model()->findAllByAttributes(array(
             'invited_user_id' => $user->user_id,
         ));
         $this->assertCount(
@@ -1773,9 +1786,9 @@ class UserTest extends DeveloperPortalTestCase
     public function testIsIndividuallyInvitedToSeeApi_yes()
     {
         // Arrange:
-        /* @var $api \Api */
+        /* @var $api Api */
         $api = $this->apis('apiVisibleByInvitationOnly');
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userIndividuallyInvitedToSeeApi');
         
         // Act:
@@ -1791,13 +1804,13 @@ class UserTest extends DeveloperPortalTestCase
     public function testIsInvitedByDomainToSeeApi_no()
     {
         // Arrange:
-        /* @var $api \Api */
+        /* @var $api Api */
         $api = $this->apis('apiVisibleByInvitationOnly');
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithEmailDomainNotInvitedToSeeAnyApi');
         
         // Pre-assert:
-        $apiVisibilityDomains = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+        $apiVisibilityDomains = ApiVisibilityDomain::model()->findAllByAttributes(array(
             'domain' => $user->getEmailAddressDomain(),
         ));
         $this->assertCount(
@@ -1819,9 +1832,9 @@ class UserTest extends DeveloperPortalTestCase
     public function testIsInvitedByDomainToSeeApi_yes()
     {
         // Arrange:
-        /* @var $api \Api */
+        /* @var $api Api */
         $api = $this->apis('apiVisibleByInvitationOnly');
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithEmailDomainInvitedToSeeApi');
         
         // Act:
@@ -1843,7 +1856,7 @@ class UserTest extends DeveloperPortalTestCase
         $user = $this->users('userWithEmailDomainInvitedToSeeApi');
         
         // Pre-assert:
-        $numAvdsForThisApiAndDomain = \ApiVisibilityDomain::model()->countByAttributes(array(
+        $numAvdsForThisApiAndDomain = ApiVisibilityDomain::model()->countByAttributes(array(
             'api_id' => $apiVisibilityDomain->api_id,
             'domain' => $domainName,
         ));

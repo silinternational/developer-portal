@@ -1,5 +1,5 @@
 <?php
-/* @var $this ApiController */
+/* @var $this \Sil\DevPortal\controllers\ApiController */
 /* @var $invitedUsersDataProvider CDataProvider */
 /* @var $api Api */
 

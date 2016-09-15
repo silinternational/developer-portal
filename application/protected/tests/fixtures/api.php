@@ -1,4 +1,7 @@
 <?php
+
+use Sil\DevPortal\models\Api;
+
 return array(
     'api1'  => array(
         'api_id'          => 1,

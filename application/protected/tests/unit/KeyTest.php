@@ -1,16 +1,20 @@
 <?php
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\Key;
+use Sil\DevPortal\models\User;
+
 /**
- * @method \Api apis(string $fixtureName)
- * @method \Key keys(string $fixtureName)
- * @method \User users(string $fixtureName)
+ * @method Api apis(string $fixtureName)
+ * @method Key keys(string $fixtureName)
+ * @method User users(string $fixtureName)
  */
 class KeyTest extends DeveloperPortalTestCase
 {
     public $fixtures = array(
-        'apis'        => 'Api',
-        'users'       => 'User',
-        'keys'        => 'Key',
+        'apis' => '\Sil\DevPortal\models\Api',
+        'users' => '\Sil\DevPortal\models\User',
+        'keys' => '\Sil\DevPortal\models\Key',
     );  
     
     public function deleteKeys()
@@ -34,14 +38,14 @@ class KeyTest extends DeveloperPortalTestCase
     public function testFixtureDataValidity()
     {
         foreach ($this->keys as $fixtureName => $fixtureData) {
-            /* @var $key \Key */
+            /* @var $key Key */
             $key = $this->keys($fixtureName);
             $this->assertTrue($key->delete(), sprintf(
                 'Could not delete key fixture %s: %s',
                 $fixtureName,
                 print_r($key->getErrors(), true)
             ));
-            $keyOnInsert = new \Key();
+            $keyOnInsert = new Key();
             $keyOnInsert->setAttributes($fixtureData, false);
             $this->assertTrue($keyOnInsert->save(), sprintf(
                 'Key fixture "%s" (ID %s) does not have valid data: %s',
@@ -94,13 +98,13 @@ class KeyTest extends DeveloperPortalTestCase
     public function testApprove_requiresApproval_noUserGiven()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('pendingKeyToPublicApiThatRequiresApproval');
         $approvingUser = null;
         
         // Pre-assert:
         $this->assertSame(
-            \Key::STATUS_PENDING,
+            Key::STATUS_PENDING,
             $key->status,
             'This test requires a pending key.'
         );
@@ -113,13 +117,13 @@ class KeyTest extends DeveloperPortalTestCase
     public function testApprove_requiresApproval_unauthorizedUser()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('pendingKeyToPublicApiThatRequiresApproval');
         $approvingUser = $this->users('userThatDoesNotOwnAnyApis');
         
         // Pre-assert:
         $this->assertSame(
-            \Key::STATUS_PENDING,
+            Key::STATUS_PENDING,
             $key->status,
             'This test requires a pending key.'
         );
@@ -144,7 +148,7 @@ class KeyTest extends DeveloperPortalTestCase
         );
         $key->refresh();
         $this->assertNotSame(
-            \Key::STATUS_APPROVED,
+            Key::STATUS_APPROVED,
             $key->status,
             'Incorrectly set the Key as approved.'
         );
@@ -153,12 +157,12 @@ class KeyTest extends DeveloperPortalTestCase
     public function testApprove_autoApproval()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('pendingKeyToPublicApiThatAutoApprovesKeys');
         
         // Pre-assert:
         $this->assertSame(
-            \Key::STATUS_PENDING,
+            Key::STATUS_PENDING,
             $key->status,
             'This test requires a pending key.'
         );
@@ -173,7 +177,7 @@ class KeyTest extends DeveloperPortalTestCase
         );
         $key->refresh();
         $this->assertSame(
-            \Key::STATUS_APPROVED,
+            Key::STATUS_APPROVED,
             $key->status,
             'Failed to set the Key as approved.'
         );
@@ -182,13 +186,13 @@ class KeyTest extends DeveloperPortalTestCase
     public function testApprove_requiresApproval_authorizedUser()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('pendingKeyToPublicApiThatRequiresApproval');
         $approvingUser = $this->users('userWithRoleOfOwner');
         
         // Pre-assert:
         $this->assertSame(
-            \Key::STATUS_PENDING,
+            Key::STATUS_PENDING,
             $key->status,
             'This test requires a pending key.'
         );
@@ -208,7 +212,7 @@ class KeyTest extends DeveloperPortalTestCase
         );
         $key->refresh();
         $this->assertSame(
-            \Key::STATUS_APPROVED,
+            Key::STATUS_APPROVED,
             $key->status,
             'Failed to set the Key as approved.'
         );
@@ -222,7 +226,7 @@ class KeyTest extends DeveloperPortalTestCase
     public function testCanBeDeletedBy_nullUser()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('deniedKeyUser5');
         $user = null;
         
@@ -239,9 +243,9 @@ class KeyTest extends DeveloperPortalTestCase
     public function testCanBeDeletedBy_ownApprovedKey()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('approvedKey');
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithApprovedKey');
         
         // Pre-assert:
@@ -250,7 +254,7 @@ class KeyTest extends DeveloperPortalTestCase
             'This test requires a Key owned by the given User.'
         );
         $this->assertEquals(
-            \Key::STATUS_APPROVED,
+            Key::STATUS_APPROVED,
             $key->status,
             'This test requires an approved Key.'
         );
@@ -268,9 +272,9 @@ class KeyTest extends DeveloperPortalTestCase
     public function testCanBeDeletedBy_ownDeniedKey()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('deniedKeyUser5');
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithDeniedKey');
         
         // Pre-assert:
@@ -279,7 +283,7 @@ class KeyTest extends DeveloperPortalTestCase
             'This test requires a Key owned by the given User.'
         );
         $this->assertEquals(
-            \Key::STATUS_DENIED,
+            Key::STATUS_DENIED,
             $key->status,
             'This test requires a denied Key.'
         );
@@ -297,9 +301,9 @@ class KeyTest extends DeveloperPortalTestCase
     public function testCanBeDeletedBy_ownPendingKey()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('pendingKeyUser6');
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithPendingKey');
         
         // Pre-assert:
@@ -308,7 +312,7 @@ class KeyTest extends DeveloperPortalTestCase
             'This test requires a Key owned by the given User.'
         );
         $this->assertEquals(
-            \Key::STATUS_PENDING,
+            Key::STATUS_PENDING,
             $key->status,
             'This test requires a pending Key.'
         );
@@ -326,9 +330,9 @@ class KeyTest extends DeveloperPortalTestCase
     public function testCanBeDeletedBy_ownRevokedKey()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('revokedKeyUser7');
-        /* @var $user \User */
+        /* @var $user User */
         $user = $this->users('userWithRevokedKey');
         
         // Pre-assert:
@@ -337,7 +341,7 @@ class KeyTest extends DeveloperPortalTestCase
             'This test requires a Key owned by the given User.'
         );
         $this->assertEquals(
-            \Key::STATUS_REVOKED,
+            Key::STATUS_REVOKED,
             $key->status,
             'This test requires a revoked Key.'
         );
@@ -361,7 +365,7 @@ class KeyTest extends DeveloperPortalTestCase
     {
         // Make sure the status constants have different values. (There aren't
         // any separate user-friendly versions of the constants to check).
-        $this->confirmConstantsDiffer('Key', 'STATUS_');
+        $this->confirmConstantsDiffer('\Sil\DevPortal\models\Key', 'STATUS_');
     }
     
     public function testDeny_alreadyDeniedKey()
@@ -411,7 +415,7 @@ class KeyTest extends DeveloperPortalTestCase
         
         // Pre-assert:
         $this->assertSame(
-            \Key::STATUS_PENDING,
+            Key::STATUS_PENDING,
             $key->status,
             'This test requires a pending key.'
         );
@@ -431,7 +435,7 @@ class KeyTest extends DeveloperPortalTestCase
         );
         $key->refresh();
         $this->assertSame(
-            \Key::STATUS_DENIED,
+            Key::STATUS_DENIED,
             $key->status,
             'Failed to set the Key as denied.'
         );
@@ -451,7 +455,7 @@ class KeyTest extends DeveloperPortalTestCase
         
         // Pre-assert:
         $this->assertSame(
-            \Key::STATUS_PENDING,
+            Key::STATUS_PENDING,
             $key->status,
             'This test requires a pending key.'
         );
@@ -473,7 +477,7 @@ class KeyTest extends DeveloperPortalTestCase
         );
         $key->refresh();
         $this->assertSame(
-            \Key::STATUS_PENDING,
+            Key::STATUS_PENDING,
             $key->status,
             'Failed to leave Key\'s status as pending.'
         );
@@ -489,12 +493,12 @@ class KeyTest extends DeveloperPortalTestCase
         // Arrange: (n/a)
         
         // Act:
-        $activeKeysDataProvider = \Key::getActiveKeysDataProvider();
+        $activeKeysDataProvider = Key::getActiveKeysDataProvider();
         
         // Assert:
         foreach ($activeKeysDataProvider->getData() as $key) {
-            /* @var $key \Key */
-            $this->assertSame($key->status, \Key::STATUS_APPROVED);
+            /* @var $key Key */
+            $this->assertSame($key->status, Key::STATUS_APPROVED);
         }
     }
     
@@ -504,7 +508,7 @@ class KeyTest extends DeveloperPortalTestCase
         $keysFixtureData = $this->keys;
         
         // Act:
-        $activeKeysDataProvider = \Key::getActiveKeysDataProvider();
+        $activeKeysDataProvider = Key::getActiveKeysDataProvider();
         
         // Assert:
         $activeKeysFromDP = $activeKeysDataProvider->getData();
@@ -513,7 +517,7 @@ class KeyTest extends DeveloperPortalTestCase
             $activeKeyIdsFromDP[] = $activeKeyFromDP->key_id;
         }
         foreach ($keysFixtureData as $fixtureName => $fixtureData) {
-            if ($fixtureData['status'] === \Key::STATUS_APPROVED) {
+            if ($fixtureData['status'] === Key::STATUS_APPROVED) {
                 $key = $this->keys($fixtureName);
                 $this->assertContains($key->key_id, $activeKeyIdsFromDP);
             }
@@ -530,12 +534,12 @@ class KeyTest extends DeveloperPortalTestCase
         // Arrange: (n/a)
         
         // Act:
-        $pendingKeysDataProvider = \Key::getPendingKeysDataProvider();
+        $pendingKeysDataProvider = Key::getPendingKeysDataProvider();
         
         // Assert:
         foreach ($pendingKeysDataProvider->getData() as $key) {
-            /* @var $key \Key */
-            $this->assertSame($key->status, \Key::STATUS_PENDING);
+            /* @var $key Key */
+            $this->assertSame($key->status, Key::STATUS_PENDING);
         }
     }
     
@@ -545,7 +549,7 @@ class KeyTest extends DeveloperPortalTestCase
         $keysFixtureData = $this->keys;
         
         // Act:
-        $pendingKeysDataProvider = \Key::getPendingKeysDataProvider();
+        $pendingKeysDataProvider = Key::getPendingKeysDataProvider();
         
         // Assert:
         $pendingKeysFromDP = $pendingKeysDataProvider->getData();
@@ -554,7 +558,7 @@ class KeyTest extends DeveloperPortalTestCase
             $pendingKeyIdsFromDP[] = $pendingKeyFromDP->key_id;
         }
         foreach ($keysFixtureData as $fixtureName => $fixtureData) {
-            if ($fixtureData['status'] === \Key::STATUS_PENDING) {
+            if ($fixtureData['status'] === Key::STATUS_PENDING) {
                 $key = $this->keys($fixtureName);
                 $this->assertContains($key->key_id, $pendingKeyIdsFromDP);
             }
@@ -565,7 +569,7 @@ class KeyTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $key = new Key();
-        $key->status = \Key::STATUS_APPROVED;
+        $key->status = Key::STATUS_APPROVED;
         
         // Act:
         $result = $key->getStyledStatusHtml();
@@ -581,7 +585,7 @@ class KeyTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $key = new Key();
-        $key->status = \Key::STATUS_DENIED;
+        $key->status = Key::STATUS_DENIED;
         
         // Act:
         $result = $key->getStyledStatusHtml();
@@ -597,7 +601,7 @@ class KeyTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $key = new Key();
-        $key->status = \Key::STATUS_PENDING;
+        $key->status = Key::STATUS_PENDING;
         
         // Act:
         $result = $key->getStyledStatusHtml();
@@ -613,7 +617,7 @@ class KeyTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $key = new Key();
-        $key->status = \Key::STATUS_REVOKED;
+        $key->status = Key::STATUS_REVOKED;
         
         // Act:
         $result = $key->getStyledStatusHtml();
@@ -649,13 +653,13 @@ class KeyTest extends DeveloperPortalTestCase
         $results = array();
         
         // Act:
-        $key->status = \Key::STATUS_APPROVED;
+        $key->status = Key::STATUS_APPROVED;
         $results[] = $key->getStyledStatusHtml();
-        $key->status = \Key::STATUS_DENIED;
+        $key->status = Key::STATUS_DENIED;
         $results[] = $key->getStyledStatusHtml();
-        $key->status = \Key::STATUS_PENDING;
+        $key->status = Key::STATUS_PENDING;
         $results[] = $key->getStyledStatusHtml();
-        $key->status = \Key::STATUS_REVOKED;
+        $key->status = Key::STATUS_REVOKED;
         $results[] = $key->getStyledStatusHtml();
         $key->status = 'fake-status';
         $results[] = $key->getStyledStatusHtml();
@@ -671,13 +675,13 @@ class KeyTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $allStatusConstantsByKey = self::getConstantsWithPrefix(
-            'Key',
+            '\Sil\DevPortal\models\Key',
             'STATUS_'
         );
         $allStatusValues = array_values($allStatusConstantsByKey);
         
         // Act:
-        $actual = \Key::getValidStatusValues();
+        $actual = Key::getValidStatusValues();
         
         // Assert:
         $this->assertEquals(
@@ -690,19 +694,19 @@ class KeyTest extends DeveloperPortalTestCase
 	public function testHasApiRelationship()
     {
         // Confirm that the relationship is set up between the classes.
-        $this->assertClassHasRelation(new Key(), 'api', 'Api');
+        $this->assertClassHasRelation(new Key(), 'api', '\Sil\DevPortal\models\Api');
     }
     
 	public function testHasProcessedByRelationship()
     {
         // Confirm that the relationship is set up between the classes.
-        $this->assertClassHasRelation(new Key(), 'processedBy', 'User');
+        $this->assertClassHasRelation(new Key(), 'processedBy', '\Sil\DevPortal\models\User');
     }
     
 	public function testHasUserRelationship()
     {
         // Confirm that the relationship is set up between the classes.
-        $this->assertClassHasRelation(new Key(), 'user', 'User');
+        $this->assertClassHasRelation(new Key(), 'user', '\Sil\DevPortal\models\User');
     }
     
     public function testIsToApiOwnedBy_no()
@@ -1018,7 +1022,7 @@ class KeyTest extends DeveloperPortalTestCase
         $newKey->domain = 'local';
         $newKey->queries_second = 10;
         $newKey->queries_day = 10000;
-        $newKey->status = \Key::STATUS_PENDING;
+        $newKey->status = Key::STATUS_PENDING;
         
         // Act:
         $result = $newKey->validate();
@@ -1035,7 +1039,7 @@ class KeyTest extends DeveloperPortalTestCase
     public function testOnlyAllowOneKeyPerApi_hasPendingKey()
     {
         // Arrange:
-        /* @var $existingKey \Key */
+        /* @var $existingKey Key */
         $existingKey = $this->keys('pendingKeyUser6');
         $newKey = new Key();
         $newKey->api_id = $existingKey->api_id;
@@ -1044,7 +1048,7 @@ class KeyTest extends DeveloperPortalTestCase
         $newKey->domain = 'local';
         $newKey->queries_second = 10;
         $newKey->queries_day = 10000;
-        $newKey->status = \Key::STATUS_PENDING;
+        $newKey->status = Key::STATUS_PENDING;
         
         // Act:
         $result = $newKey->validate();
@@ -1061,7 +1065,7 @@ class KeyTest extends DeveloperPortalTestCase
     public function testOnlyAllowOneKeyPerApi_hasDeniedKey()
     {
         // Arrange:
-        /* @var $existingKey \Key */
+        /* @var $existingKey Key */
         $existingKey = $this->keys('deniedKeyUser5');
         $newKey = new Key();
         $newKey->api_id = $existingKey->api_id;
@@ -1070,7 +1074,7 @@ class KeyTest extends DeveloperPortalTestCase
         $newKey->domain = 'local';
         $newKey->queries_second = 10;
         $newKey->queries_day = 10000;
-        $newKey->status = \Key::STATUS_PENDING;
+        $newKey->status = Key::STATUS_PENDING;
         
         // Act:
         $result = $newKey->validate();
@@ -1091,7 +1095,7 @@ class KeyTest extends DeveloperPortalTestCase
     public function testOnlyAllowOneKeyPerApi_hasRevokedKey()
     {
         // Arrange:
-        /* @var $existingKey \Key */
+        /* @var $existingKey Key */
         $existingKey = $this->keys('revokedKeyUser7');
         $newKey = new Key();
         $newKey->api_id = $existingKey->api_id;
@@ -1100,7 +1104,7 @@ class KeyTest extends DeveloperPortalTestCase
         $newKey->domain = 'local';
         $newKey->queries_second = 10;
         $newKey->queries_day = 10000;
-        $newKey->status = \Key::STATUS_PENDING;
+        $newKey->status = Key::STATUS_PENDING;
         
         // Act:
         $result = $newKey->validate();
@@ -1130,7 +1134,7 @@ class KeyTest extends DeveloperPortalTestCase
         $newKey->domain = 'local';
         $newKey->queries_second = 10;
         $newKey->queries_day = 10000;
-        $newKey->status = \Key::STATUS_PENDING;
+        $newKey->status = Key::STATUS_PENDING;
         
         // Act:
         $result = $newKey->validate();
@@ -1160,7 +1164,7 @@ class KeyTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $user = $this->users('user18');
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('pendingKeyForApiOwnedByUser18');
         $key->processed_by = $user->user_id;
         
@@ -1187,7 +1191,7 @@ class KeyTest extends DeveloperPortalTestCase
     public function testRecordDateWhenProcessed_processedByNotSet()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('pendingKeyForApiOwnedByUser18');
         
         // Pre-assert:
@@ -1213,7 +1217,7 @@ class KeyTest extends DeveloperPortalTestCase
     public function testRecordDateWhenProcessed_processedOnNotChangedIfAlreadySet()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('keyToApiOwnedByUser18');
         $originalProcessedOnValue = $key->processed_on;
         
@@ -1241,7 +1245,7 @@ class KeyTest extends DeveloperPortalTestCase
     public function testRequiresApproval_no()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('pendingKeyToPublicApiThatRequiresApproval');
         
         // Act:
@@ -1254,7 +1258,7 @@ class KeyTest extends DeveloperPortalTestCase
     public function testRequiresApproval_yes()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('pendingKeyToPublicApiThatAutoApprovesKeys');
         
         // Act:
@@ -1324,7 +1328,7 @@ class KeyTest extends DeveloperPortalTestCase
     public function testRevoke_ensureStatusSetToRevoked()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('approvedKey');
         $user = $this->users('userWithRoleOfAdmin');
         
@@ -1338,7 +1342,7 @@ class KeyTest extends DeveloperPortalTestCase
         );
         $key->refresh();
         $this->assertEquals(
-            \Key::STATUS_REVOKED,
+            Key::STATUS_REVOKED,
             $key->status,
             'Failed to set status of the key to revoked when revoking it.'
         );
@@ -1386,13 +1390,13 @@ class KeyTest extends DeveloperPortalTestCase
     public function testRevoke_noUserGiven()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('approvedKey');
         $revokingUser = null;
         
         // Pre-assert:
         $this->assertSame(
-            \Key::STATUS_APPROVED,
+            Key::STATUS_APPROVED,
             $key->status,
             'This test requires an approved key.'
         );
@@ -1405,13 +1409,13 @@ class KeyTest extends DeveloperPortalTestCase
     public function testRevoke_unauthorizedUser()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('approvedKey');
         $revokingUser = $this->users('ownerThatDoesNotOwnAnyApisOrKeys');
         
         // Pre-assert:
         $this->assertSame(
-            \Key::STATUS_APPROVED,
+            Key::STATUS_APPROVED,
             $key->status,
             'This test requires an approved key.'
         );
@@ -1441,7 +1445,7 @@ class KeyTest extends DeveloperPortalTestCase
         );
         $key->refresh();
         $this->assertNotSame(
-            \Key::STATUS_REVOKED,
+            Key::STATUS_REVOKED,
             $key->status,
             'Incorrectly set the Key as revoked.'
         );
@@ -1450,13 +1454,13 @@ class KeyTest extends DeveloperPortalTestCase
     public function testRevoke_byKeyOwner()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('approvedKey');
         $revokingUser = $key->user; // The owner of the Key.
         
         // Pre-assert:
         $this->assertSame(
-            \Key::STATUS_APPROVED,
+            Key::STATUS_APPROVED,
             $key->status,
             'This test requires an approved key.'
         );
@@ -1474,13 +1478,13 @@ class KeyTest extends DeveloperPortalTestCase
     public function testRevoke_byApiOwner()
     {
         // Arrange:
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = $this->keys('approvedKey');
         $revokingUser = $key->api->owner; // The owner of the Api.
         
         // Pre-assert:
         $this->assertSame(
-            \Key::STATUS_APPROVED,
+            Key::STATUS_APPROVED,
             $key->status,
             'This test requires an approved key.'
         );
@@ -1500,7 +1504,7 @@ class KeyTest extends DeveloperPortalTestCase
         );
         $key->refresh();
         $this->assertSame(
-            \Key::STATUS_REVOKED,
+            Key::STATUS_REVOKED,
             $key->status,
             'Failed to set the Key as revoked.'
         );
@@ -1605,7 +1609,7 @@ class KeyTest extends DeveloperPortalTestCase
         // Arrange:
         /* @var $key Key */
         $key = $this->keys('key1');
-        $key->status = \Key::STATUS_PENDING;
+        $key->status = Key::STATUS_PENDING;
         
         // Act:
         $result = $key->validate(array('status'));

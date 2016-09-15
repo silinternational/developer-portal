@@ -1,5 +1,9 @@
 <?php
-/* @var $this DashboardController */
+
+use Sil\DevPortal\controllers\DashboardController;
+use Sil\DevPortal\models\Key;
+
+/* @var $this \Sil\DevPortal\controllers\DashboardController */
 /* @var $user User */
 /* @var $keys Key[] */
 /* @var $usageStats UsageStats */
@@ -39,20 +43,20 @@ if ($user->hasOwnerPrivileges()) {
 
 ?>
 <ul class="nav nav-tabs">
-  <li<?php echo ($chart === \DashboardController::CHART_MY_KEYS ? ' class="active"' : ''); ?>>
+  <li<?php echo ($chart === DashboardController::CHART_MY_KEYS ? ' class="active"' : ''); ?>>
     <a href="<?php echo $this->createUrl('', array(
         'interval' => $currentInterval,
-        //'chart' => \DashboardController::CHART_MY_KEYS, // Automatic default.
+        //'chart' => DashboardController::CHART_MY_KEYS, // Automatic default.
     )); ?>">My Usage</a>
   </li>
   <?php
 
   if ($user->hasOwnerPrivileges()) {
       ?>
-      <li<?php echo ($chart === \DashboardController::CHART_MY_APIS ? ' class="active"' : ''); ?>>
+      <li<?php echo ($chart === DashboardController::CHART_MY_APIS ? ' class="active"' : ''); ?>>
         <a href="<?php echo $this->createUrl('', array(
             'interval' => $currentInterval,
-            'chart' => \DashboardController::CHART_MY_APIS,
+            'chart' => DashboardController::CHART_MY_APIS,
         )); ?>">My APIs</a>
       </li>
       <?php
@@ -60,16 +64,16 @@ if ($user->hasOwnerPrivileges()) {
 
   if ($user->isAdmin()) {
       ?>
-      <li<?php echo ($chart === \DashboardController::CHART_ALL_APIS ? ' class="active"' : ''); ?>>
+      <li<?php echo ($chart === DashboardController::CHART_ALL_APIS ? ' class="active"' : ''); ?>>
         <a href="<?php echo $this->createUrl('', array(
             'interval' => $currentInterval,
-            'chart' => \DashboardController::CHART_ALL_APIS,
+            'chart' => DashboardController::CHART_ALL_APIS,
         )); ?>">All APIs</a>
       </li>
-      <li<?php echo ($chart === \DashboardController::CHART_TOTALS ? ' class="active"' : ''); ?>>
+      <li<?php echo ($chart === DashboardController::CHART_TOTALS ? ' class="active"' : ''); ?>>
         <a href="<?php echo $this->createUrl('', array(
             'interval' => $currentInterval,
-            'chart' => \DashboardController::CHART_TOTALS,
+            'chart' => DashboardController::CHART_TOTALS,
         )); ?>">Totals</a>
       </li>
       <?php
@@ -160,7 +164,7 @@ if ($user->hasOwnerPrivileges()) {
         $cardActionLinksHtml = null;
         $cardDetailsHtml = null;
         switch($key->status) {
-          case \Key::STATUS_APPROVED:
+          case Key::STATUS_APPROVED:
 
             // Assemble the info/links to show for this key/api.
             $cardActionLinksHtml = sprintf(
@@ -212,7 +216,7 @@ if ($user->hasOwnerPrivileges()) {
             );
             break;
 
-          case \Key::STATUS_DENIED:
+          case Key::STATUS_DENIED:
             $cardActionLinksHtml = LinksManager::generateActionsDropdownHtml(
                 LinksManager::getDashboardKeyActionLinks($key),
                 LinksManager::BUTTON_SIZE_SMALL
@@ -223,7 +227,7 @@ if ($user->hasOwnerPrivileges()) {
               . '</div>';
             break;
 
-          case \Key::STATUS_PENDING:
+          case Key::STATUS_PENDING:
             $cardActionLinksHtml = LinksManager::generateActionsDropdownHtml(
                 LinksManager::getDashboardKeyActionLinks($key),
                 LinksManager::BUTTON_SIZE_SMALL
@@ -234,7 +238,7 @@ if ($user->hasOwnerPrivileges()) {
               . '</div>';
             break;
 
-          case \Key::STATUS_REVOKED:
+          case Key::STATUS_REVOKED:
             $cardActionLinksHtml = LinksManager::generateActionsDropdownHtml(
                 LinksManager::getDashboardKeyActionLinks($key),
                 LinksManager::BUTTON_SIZE_SMALL

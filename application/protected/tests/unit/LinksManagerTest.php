@@ -3,9 +3,9 @@
 class LinksManagerTest extends CDbTestCase
 {
     public $fixtures = array(
-        'apis' => 'Api',
-        'keys' => 'Key',
-        'users' => 'User',
+        'apis' => '\Sil\DevPortal\models\Api',
+        'keys' => '\Sil\DevPortal\models\Key',
+        'users' => '\Sil\DevPortal\models\User',
     );
     
     public function testGenerateActionsDropdownHtml_emptyLinksArray()

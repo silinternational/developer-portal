@@ -1,6 +1,9 @@
 <?php
+namespace Sil\DevPortal\controllers;
 
-class DashboardController extends Controller
+use Sil\DevPortal\models\User;
+
+class DashboardController extends \Controller
 {
     const CHART_ALL_APIS = 'all-api';
     const CHART_MY_APIS = 'api';
@@ -17,7 +20,7 @@ class DashboardController extends Controller
         $interval = $this->getIntervalToShow();
         
         // Get the user model.
-        /* @var $currentUser \User */
+        /* @var $currentUser User */
         $currentUser = \Yii::app()->user->user;
         
         // If we should include API Owner content on the dashboard...
@@ -57,7 +60,7 @@ class DashboardController extends Controller
         $interval = $this->getIntervalToShow();
         
         // Get the user model.
-        /* @var $currentUser \User */
+        /* @var $currentUser User */
         $currentUser = \Yii::app()->user->user;
         
         // Get the list of the APIs that the user either has a Key for (of any

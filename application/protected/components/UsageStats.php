@@ -52,7 +52,7 @@ class UsageStats extends CComponent
      * Add a set of usage data to this collection of usage statistics.
      * 
      * @param string $displayName The name to show for this usage data.
-     * @param array $usageData The usage data as returned by \Key->getUsage().
+     * @param array $usageData The usage data as returned by Key->getUsage().
      *     Note that the Key referred to here is the Key model, NOT the ApiAxle
      *     Key class.
      * @throws \Exception

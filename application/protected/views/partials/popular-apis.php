@@ -1,6 +1,6 @@
 <?php
 /* @var $this Controller */
-/* @var $popularApis \Api[] */
+/* @var $popularApis \Sil\DevPortal\models\Api[] */
 ?>
 <h2>Popular&nbsp;APIs</h2>
 <dl>

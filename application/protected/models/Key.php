@@ -1,13 +1,15 @@
 <?php
+namespace Sil\DevPortal\models;
 
 use ApiAxle\Api\Api as AxleApi;
 use ApiAxle\Api\Key as AxleKey;
 use ApiAxle\Api\Keyring as AxleKeyring;
 
-class Key extends KeyBase
+class Key extends \KeyBase
 {
-    use Sil\DevPortal\components\FormatModelErrorsTrait;
-    use Sil\DevPortal\components\ModelFindByPkTrait;
+    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
+    use \Sil\DevPortal\components\FormatModelErrorsTrait;
+    use \Sil\DevPortal\components\ModelFindByPkTrait;
     
     const STATUS_APPROVED = 'approved';
     const STATUS_DENIED = 'denied';
@@ -35,14 +37,14 @@ class Key extends KeyBase
             array(
                 'updated',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'update',
             ),
             array(
                 'created,updated,requested_on',
                 'default',
-                'value' => new CDbExpression('NOW()'),
+                'value' => new \CDbExpression('NOW()'),
                 'setOnEmpty' => false,
                 'on' => 'insert',
             ),
@@ -81,7 +83,7 @@ class Key extends KeyBase
         
         if ($this->status === self::STATUS_APPROVED) {
         
-            $axleKey = new AxleKey(Yii::app()->params['apiaxle']);
+            $axleKey = new AxleKey(\Yii::app()->params['apiaxle']);
             $keyData = array(
                 'sharedSecret' => $this->secret,
                 'qpd' => (int)$this->queries_day,
@@ -98,7 +100,7 @@ class Key extends KeyBase
              *       related to this.
              */
             $keyringName = md5($user->email);
-            $axleKeyring = new AxleKeyring(Yii::app()->params['apiaxle']);
+            $axleKeyring = new AxleKeyring(\Yii::app()->params['apiaxle']);
             try {
                 $axleKeyring->get($keyringName);
             } catch (\Exception $e) {
@@ -124,7 +126,7 @@ class Key extends KeyBase
                     
                     // Link key to Api.
                     $api = Api::model()->findByPk($this->api_id);
-                    $axleApi = new AxleApi(Yii::app()->params['apiaxle'], $api->code);
+                    $axleApi = new AxleApi(\Yii::app()->params['apiaxle'], $api->code);
                     $axleApi->linkKey($axleKey);
                     return true;
                 } catch (\Exception $e) {
@@ -148,7 +150,7 @@ class Key extends KeyBase
                      * Link key to Api
                      */
                     $api = Api::model()->findByPk($this->api_id);
-                    $axleApi = new AxleApi(Yii::app()->params['apiaxle'], $api->code);
+                    $axleApi = new AxleApi(\Yii::app()->params['apiaxle'], $api->code);
                     $axleApi->linkKey($axleKey);
                 } else {
                     /**
@@ -209,7 +211,7 @@ class Key extends KeyBase
         parent::afterDelete();
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-        \Event::log(sprintf(
+        Event::log(sprintf(
             '%s\'s (user_id %s) Key (key_id %s) to the "%s" API (api_id %s) was deleted%s.',
             (isset($this->user) ? $this->user->getDisplayName() : 'A User'),
             $this->user_id,
@@ -226,7 +228,7 @@ class Key extends KeyBase
      * Attempt to approve a pending (i.e. - requested) Key, receiving back an
      * indicator of whether it was successful.
      * 
-     * @param \User $approvingUser The user to record as the one who approved
+     * @param User $approvingUser The user to record as the one who approved
      *     the request for this Key (for Keys to Apis that require approval).
      *     Defaults to null (used for auto-approved Keys).
      * @return boolean True if the Key was successfully approved. If not, check
@@ -241,7 +243,7 @@ class Key extends KeyBase
         }
         
         if ($this->requiresApproval()) {
-            if ( ! $approvingUser instanceof \User) {
+            if ( ! $approvingUser instanceof User) {
                 // This should not happen in the normal flow of things... thus
                 // the exception.
                 throw new \Exception(
@@ -321,7 +323,7 @@ class Key extends KeyBase
      */
     public function canBeDeletedBy($user)
     {
-        if ( ! ($user instanceof \User)) {
+        if ( ! ($user instanceof User)) {
             return false;
         }
         
@@ -358,7 +360,7 @@ class Key extends KeyBase
     
     public static function getActiveKeysDataProvider()
     {
-        return new \CActiveDataProvider('Key', array(
+        return new \CActiveDataProvider('\Sil\DevPortal\models\Key', array(
             'criteria' => array(
                 'condition' => 'status = :status',
                 'params' => array(
@@ -370,7 +372,7 @@ class Key extends KeyBase
     
     public static function getPendingKeysDataProvider()
     {
-        return new \CActiveDataProvider('Key', array(
+        return new \CActiveDataProvider('\Sil\DevPortal\models\Key', array(
             'criteria' => array(
                 'condition' => 'status = :status',
                 'params' => array(
@@ -414,7 +416,7 @@ class Key extends KeyBase
             '<span%s%s>%s</span>',
             ($cssClass ? ' class="' . $cssClass . '"' : ''),
             ($cssStyle ? ' style="' . $cssStyle . '"' : ''),
-            CHtml::encode($displayText)
+            \CHtml::encode($displayText)
         );
     }
     
@@ -452,7 +454,7 @@ class Key extends KeyBase
      * Attempt to deny a pending (i.e. - requested) Key, receiving back an
      * indicator of whether it was successful.
      * 
-     * @param \User $userDenyingKey The User to record as the one who denied the
+     * @param User $userDenyingKey The User to record as the one who denied the
      *     request for this Key.
      * @return boolean True if the Key was successfully denied. If not, check
      *     the Key's list of errors to find out why.
@@ -481,12 +483,12 @@ class Key extends KeyBase
         if ($this->save()) {
             try {
                 $this->notifyUserOfDeniedKey();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 \Yii::log(sprintf(
                     'Error sending key-denied notification email: (%s) %s',
                     $e->getCode(),
                     $e->getMessage()
-                ), CLogger::LEVEL_WARNING);
+                ), \CLogger::LEVEL_WARNING);
             }
             
             $this->log('denied');
@@ -555,7 +557,7 @@ class Key extends KeyBase
         $includeCurrentInterval = true
     ) {
         // Get the ApiAxle Key object for this Key model.
-        $axleKey = new AxleKey(Yii::app()->params['apiaxle'], $this->value);
+        $axleKey = new AxleKey(\Yii::app()->params['apiaxle'], $this->value);
         
         // Get the starting timestamp for the data we care about.
         $timeStart = \UsageStats::getTimeStart(
@@ -586,11 +588,11 @@ class Key extends KeyBase
         }
         
         // Sum the cached and uncached hits, then sum that with the errors.
-        $successfulUsage = UsageStats::combineUsageCategoryArrays(
+        $successfulUsage = \UsageStats::combineUsageCategoryArrays(
             $dataByCategory['uncached'],
             $dataByCategory['cached']
         );
-        $usage = UsageStats::combineUsageCategoryArrays(
+        $usage = \UsageStats::combineUsageCategoryArrays(
             $successfulUsage,
             $dataByCategory['error']
         );
@@ -667,19 +669,19 @@ class Key extends KeyBase
     public function isVisibleToUser($user)
     {
         // If the user is a guest...
-        if ( ! ($user instanceof \User)) {
+        if ( ! ($user instanceof User)) {
             
             // They can't see any Keys.
             return false;
         }
         
         // If the user is an Admin, then they can see the key.
-        if ($user->role === \User::ROLE_ADMIN) {
+        if ($user->role === User::ROLE_ADMIN) {
             return true;
         }
         
         // If the user is an API Owner...
-        if ($user->role === \User::ROLE_OWNER) {
+        if ($user->role === User::ROLE_OWNER) {
             
             // They can see this key if it belongs to them or if it is to one of
             // of their APIs.
@@ -687,7 +689,7 @@ class Key extends KeyBase
         }
         
         // If the user is a Developer...
-        if ($user->role === \User::ROLE_USER) {
+        if ($user->role === User::ROLE_USER) {
             
             // They can see this key if it belongs to them.
             return $this->isOwnedBy($user);
@@ -721,7 +723,7 @@ class Key extends KeyBase
         
         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
         
-        \Event::log(sprintf(
+        Event::log(sprintf(
             'Key %s was %s%s%s.',
             $this->key_id,
             $pastTenseAction,
@@ -734,16 +736,16 @@ class Key extends KeyBase
      * Try to send a notification email to the Owner of the Api that this
      * (pending) Key is for. If no owner email address is available, send it to
      * the admins.
-     * 
-     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     *
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
     public function notifyApiOwnerOfPendingRequest(
-        YiiMailer $mailer = null,
+        \YiiMailer $mailer = null,
         array $appParams = null
     ) {
         // If not given the Yii app params, retrieve them.
@@ -774,7 +776,7 @@ class Key extends KeyBase
                 
                 // Try to send a notification email.
                 if ($mailer === null) {
-                    $mailer = Utils::getMailer();
+                    $mailer = \Utils::getMailer();
                 }
                 $mailer->setView('key-request');
                 $mailer->setTo($sendToEmail);
@@ -798,7 +800,7 @@ class Key extends KeyBase
                     \Yii::log(
                         'Unable to send pending key approval request email: '
                         . $mailer->ErrorInfo,
-                        CLogger::LEVEL_WARNING
+                        \CLogger::LEVEL_WARNING
                     );
                 }
             }
@@ -809,15 +811,15 @@ class Key extends KeyBase
      * Try to send a notification email to the User that requested a Key that
      * the request was denied.
      * 
-     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
     public function notifyUserOfDeniedKey(
-        YiiMailer $mailer = null,
+        \YiiMailer $mailer = null,
         array $appParams = null
     ) {
         // If not given the Yii app params, retrieve them.
@@ -835,7 +837,7 @@ class Key extends KeyBase
 
                 // Try to send them a notification email.
                 if ($mailer === null) {
-                    $mailer = Utils::getMailer();
+                    $mailer = \Utils::getMailer();
                 }
                 $mailer->setView('key-request-denied');
                 $mailer->setTo($this->user->email);
@@ -856,7 +858,7 @@ class Key extends KeyBase
                     \Yii::log(
                         'Unable to send key-request-denied notification email '
                         . 'to user: ' . $mailer->ErrorInfo,
-                        CLogger::LEVEL_WARNING
+                        \CLogger::LEVEL_WARNING
                     );
                 }
             }
@@ -867,15 +869,15 @@ class Key extends KeyBase
      * Try to send a notification email to the Owner of an Api that a Key to
      * their Api has been revoked.
      * 
-     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
     public function notifyApiOwnerOfRevokedKey(
-        YiiMailer $mailer = null,
+        \YiiMailer $mailer = null,
         array $appParams = null
     ) {
         // If not given the Yii app params, retrieve them.
@@ -893,7 +895,7 @@ class Key extends KeyBase
 
             // Try to send them a notification email.
             if ($mailer === null) {
-                $mailer = Utils::getMailer();
+                $mailer = \Utils::getMailer();
             }
             $mailer->setView('key-revoked-api-owner');
             $mailer->setTo($this->api->owner->email);
@@ -917,7 +919,7 @@ class Key extends KeyBase
                 \Yii::log(
                     'Unable to send key-revoked notification email to API '
                     . 'owner: ' . $mailer->ErrorInfo,
-                    CLogger::LEVEL_WARNING
+                    \CLogger::LEVEL_WARNING
                 );
             }
         }
@@ -927,15 +929,15 @@ class Key extends KeyBase
      * Try to send a notification email to the User that one of their pending
      * Keys has been approved.
      * 
-     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
     public function notifyUserOfApprovedKey(
-        YiiMailer $mailer = null,
+        \YiiMailer $mailer = null,
         array $appParams = null
     ) {
         // If not given the Yii app params, retrieve them.
@@ -953,7 +955,7 @@ class Key extends KeyBase
 
             // Try to send them a notification email.
             if ($mailer === null) {
-                $mailer = Utils::getMailer();
+                $mailer = \Utils::getMailer();
             }
             $mailer->setView('key-approved');
             $mailer->setTo($this->user->email);
@@ -987,7 +989,7 @@ class Key extends KeyBase
                 \Yii::log(
                     'Unable to send key-approved notification email to user: '
                     . $mailer->ErrorInfo,
-                    CLogger::LEVEL_WARNING
+                    \CLogger::LEVEL_WARNING
                 );
             }
         }
@@ -997,15 +999,15 @@ class Key extends KeyBase
      * Try to send a notification email to the User that one of their Keys has
      * been revoked.
      * 
-     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
     public function notifyUserOfRevokedKey(
-        YiiMailer $mailer = null,
+        \YiiMailer $mailer = null,
         array $appParams = null
     ) {
         // If not given the Yii app params, retrieve them.
@@ -1023,7 +1025,7 @@ class Key extends KeyBase
 
             // Try to send them a notification email.
             if ($mailer === null) {
-                $mailer = Utils::getMailer();
+                $mailer = \Utils::getMailer();
             }
             $mailer->setView('key-revoked-user');
             $mailer->setTo($this->user->email);
@@ -1046,7 +1048,7 @@ class Key extends KeyBase
                 \Yii::log(
                     'Unable to send key-revoked notification email to user: '
                     . $mailer->ErrorInfo,
-                    CLogger::LEVEL_WARNING
+                    \CLogger::LEVEL_WARNING
                 );
             }
         }
@@ -1079,6 +1081,9 @@ class Key extends KeyBase
         }
     }
     
+    /**
+     * @return boolean
+     */
     public function requiresSignature()
     {
         return $this->api->requiresSignature();
@@ -1118,7 +1123,7 @@ class Key extends KeyBase
          *  - the Key instance or a string as an error message
          */
         
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = self::model()->findByPk($key_id);  
         if (is_null($key)) { return array(false, 'Bad key_id');}
         
@@ -1134,15 +1139,15 @@ class Key extends KeyBase
             
             // If we are in an environment where we should send email
             // notifications...
-            if (Yii::app()->params['mail'] !== FALSE) {
+            if (\Yii::app()->params['mail'] !== FALSE) {
                 
                 // Send notification to owner of key that it was reset.
-                $mail = Utils::getMailer();
+                $mail = \Utils::getMailer();
                 $mail->setView('key-reset');
                 $mail->setTo($key->user->email);
                 $mail->setSubject('API key reset for '.$key->api->display_name.' API');
-                if (isset(Yii::app()->params['mail']['bcc'])) {
-                    $mail->setBcc(Yii::app()->params['mail']['bcc']);
+                if (isset(\Yii::app()->params['mail']['bcc'])) {
+                    $mail->setBcc(\Yii::app()->params['mail']['bcc']);
                 }
                 $mail->setData(array(
                     'key' => $key,
@@ -1169,14 +1174,14 @@ class Key extends KeyBase
      * Attempt to revoke a Key, receiving back an indicator of whether it was
      * successful.
      * 
-     * @param \User $revokingUser The User trying to revoke this Key.
+     * @param User $revokingUser The User trying to revoke this Key.
      * @return boolean True if the Key was successfully revoked. If not, check
      *     the Key's list of errors to find out why.
      * @throws \Exception
      */
     public function revoke($revokingUser)
     {
-        if ( ! $revokingUser instanceof \User) {
+        if ( ! $revokingUser instanceof User) {
             // This should not happen in the normal flow of things... thus
             // the exception.
             throw new \Exception(
@@ -1213,12 +1218,12 @@ class Key extends KeyBase
             try {
                 $this->notifyUserOfRevokedKey();
                 $this->notifyApiOwnerOfRevokedKey();
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 \Yii::log(sprintf(
                     'Error sending key-revoked notification email(s): (%s) %s',
                     $e->getCode(),
                     $e->getMessage()
-                ), CLogger::LEVEL_WARNING);
+                ), \CLogger::LEVEL_WARNING);
             }
 
             // Indicate success.
@@ -1237,7 +1242,7 @@ class Key extends KeyBase
          *  - a boolean as to whether the revokation worked
          *  - the Key instance or a string as an error message
          */
-        /* @var $key \Key */
+        /* @var $key Key */
         $key = self::model()->findByPk($key_id);  
         if (is_null($key)) {
             return array(false, 'Bad key_id');
@@ -1275,7 +1280,7 @@ class Key extends KeyBase
     {
         if ( ! empty($this->processed_by)) {
             if (empty($this->processed_on)) {
-                $this->processed_on = new CDbExpression('NOW()');
+                $this->processed_on = new \CDbExpression('NOW()');
             }
         }
     }
@@ -1285,11 +1290,11 @@ class Key extends KeyBase
      * pending Key is for. If no owner email address is available, send it to
      * the admins.
      * 
-     * @param YiiMailer $mailer See sendKeyDeletionNotification for details.
+     * @param \YiiMailer $mailer See sendKeyDeletionNotification for details.
      * @param array $appParams See sendKeyDeletionNotification for details.
      */
     protected function sendPendingKeyDeletionNotification(
-        YiiMailer $mailer,
+        \YiiMailer $mailer,
         array $appParams
     ) {
         // Figure out what email address to send the notification to.
@@ -1327,7 +1332,7 @@ class Key extends KeyBase
             \Yii::log(
                 'Unable to send pending-key deletion email: '
                 . $mailer->ErrorInfo,
-                CLogger::LEVEL_WARNING
+                \CLogger::LEVEL_WARNING
             );
         }
     }
@@ -1335,11 +1340,11 @@ class Key extends KeyBase
     /**
      * Try to notify the owner of this key that it has been deleted.
      * 
-     * @param YiiMailer $mailer See sendKeyDeletionNotification for details.
+     * @param \YiiMailer $mailer See sendKeyDeletionNotification for details.
      * @param array $appParams See sendKeyDeletionNotification for details.
      */
     protected function sendNonPendingKeyDeletionNotification(
-        YiiMailer $mailer,
+        \YiiMailer $mailer,
         array $appParams
     ) {
         if ($this->user && $this->user->email) {
@@ -1365,7 +1370,7 @@ class Key extends KeyBase
                 \Yii::log(
                     'Unable to send key deletion email: '
                     . $mailer->ErrorInfo,
-                    CLogger::LEVEL_WARNING
+                    \CLogger::LEVEL_WARNING
                 );
             }
         }
@@ -1375,15 +1380,15 @@ class Key extends KeyBase
      * Try to send a notification email to the appropriate person about this
      * Key having been deleted.
      * 
-     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
     public function sendKeyDeletionNotification(
-        YiiMailer $mailer = null,
+        \YiiMailer $mailer = null,
         array $appParams = null
     ) {
         // If not given the Yii app params, retrieve them.
@@ -1398,7 +1403,7 @@ class Key extends KeyBase
         }
         
         if ($mailer === null) {
-            $mailer = Utils::getMailer();
+            $mailer = \Utils::getMailer();
         }
         
         if ($this->status === self::STATUS_PENDING) {

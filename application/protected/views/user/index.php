@@ -1,5 +1,5 @@
 <?php
-/* @var $this UserController */
+/* @var $this \Sil\DevPortal\controllers\UserController */
 /* @var $usersDataProvider CDataProvider*/
 
 // Set up the breadcrumbs.
@@ -18,7 +18,7 @@ $this->pageTitle = 'Users';
             'type' => 'striped hover',
             'dataProvider' => $usersDataProvider,
             'rowCssClassExpression' => '('
-            . '    ($data->status == \User::STATUS_ACTIVE) ? "" : "muted"'
+            . '    ($data->status == \Sil\DevPortal\models\User::STATUS_ACTIVE) ? "" : "muted"'
             . ')',
             'template' => '{items}{pager}',
             'columns' => array(
@@ -29,12 +29,12 @@ $this->pageTitle = 'Users';
                 array(
                     'name' => 'role',
                     'header' => 'Role',
-                    'value' => 'User::getRoleString($data->role)',
+                    'value' => '\Sil\DevPortal\models\User::getRoleString($data->role)',
                 ),
                 array(
                     'name' => 'status',
                     'header' => 'Status',
-                    'value' => 'User::getStatusString($data->status)',
+                    'value' => '\Sil\DevPortal\models\User::getStatusString($data->status)',
                 ),
                 array(
                     'class' => 'ActionLinksColumn',

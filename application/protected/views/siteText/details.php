@@ -1,5 +1,5 @@
 <?php
-/* @var $this SiteTextController */
+/* @var $this \Sil\DevPortal\controllers\SiteTextController */
 /* @var $siteText SiteText */
 
 // Set up the breadcrumbs.

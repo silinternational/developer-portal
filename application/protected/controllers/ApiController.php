@@ -1,15 +1,21 @@
 <?php
+namespace Sil\DevPortal\controllers;
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\ApiVisibilityDomain;
+use Sil\DevPortal\models\ApiVisibilityUser;
+use Sil\DevPortal\models\Key;
+use Sil\DevPortal\models\User;
 use Stringy\StaticStringy as SS;
 
-class ApiController extends Controller
+class ApiController extends \Controller
 {
     public $layout = '//layouts/one-column-with-title';
     
     public function actionActiveKeys($code)
     {
         // Make sure the specified API exists.
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // Get a reference to the current website user's User model.
         $currentUser = \Yii::app()->user->user;
@@ -17,7 +23,7 @@ class ApiController extends Controller
         // Prevent information about it from being seen by user's without
         // permission to see the specified API.
         if (( ! $api) || ( ! $api->isVisibleToUser($currentUser))) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 404,
                 'Either there is no "' . $code . '" API or you do not have '
                 . 'permission to view it.'
@@ -27,7 +33,7 @@ class ApiController extends Controller
         // Prevent this list of keys from being seen by anyone who is not
         // authorized to see them.
         if (( ! ($currentUser instanceof User)) || ( ! $currentUser->canSeeKeysForApi($api))) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 403,
                 'You do not have permission to see its list of active keys for '
                 . 'the "' . $api->display_name . '" API.'
@@ -37,11 +43,11 @@ class ApiController extends Controller
         // Get the list of active keys for that API.
         $activeKeys = array();
         foreach ($api->keys as $key) {
-            if ($key->status === \Key::STATUS_APPROVED) {
+            if ($key->status === Key::STATUS_APPROVED) {
                 $activeKeys[] = $key;
             }
         }
-        $activeKeysDataProvider = new CArrayDataProvider($activeKeys, array(
+        $activeKeysDataProvider = new \CArrayDataProvider($activeKeys, array(
             'keyField' => 'key_id',
         ));
         
@@ -74,13 +80,13 @@ class ApiController extends Controller
         $api->owner_id = $currentUser->user_id;
 
         // Get the form object.
-        $form = new YbHorizForm('application.views.forms.apiForm', $api);
+        $form = new \YbHorizForm('application.views.forms.apiForm', $api);
 
         // If the form was submitted...
         if ($form->submitted('yt0')) {
 
             // If the user making this change is NOT an admin...
-            if ($currentUser->role !== \User::ROLE_ADMIN) {
+            if ($currentUser->role !== User::ROLE_ADMIN) {
 
                 // Make sure they are still set as the owner.
                 $api->owner_id = $currentUser->user_id;
@@ -94,9 +100,9 @@ class ApiController extends Controller
                 if ($api->save(false)) {
 
                     // Record that in the log.
-                    Yii::log('API created: code "' . $api->code . '", ID ' . 
+                    \Yii::log('API created: code "' . $api->code . '", ID ' . 
                              $api->api_id,
-                            CLogger::LEVEL_INFO,
+                            \CLogger::LEVEL_INFO,
                             __CLASS__ . '.' . __FUNCTION__);
 
                     // Send the user to the details page for the new Api.
@@ -109,14 +115,14 @@ class ApiController extends Controller
                 else {
 
                     // Record that in the log.
-                    Yii::log(
+                    \Yii::log(
                         'API creation FAILED: code "' . $api->code . '"',
-                        CLogger::LEVEL_ERROR,
+                        \CLogger::LEVEL_ERROR,
                         __CLASS__ . '.' . __FUNCTION__
                     );
 
                     // Tell the user.
-                    Yii::app()->user->setFlash(
+                    \Yii::app()->user->setFlash(
                         'error',
                         '<strong>Error!</strong> We were unable to create that '
                         . 'API: ' . $api->getErrorsAsFlatHtmlList()
@@ -131,28 +137,28 @@ class ApiController extends Controller
 
     public function actionCancelDomainInvitation($id)
     {
-        /* @var $apiVisibilityDomain \ApiVisibilityDomain */
-        $apiVisibilityDomain = \ApiVisibilityDomain::model()->findByPk($id);
+        /* @var $apiVisibilityDomain ApiVisibilityDomain */
+        $apiVisibilityDomain = ApiVisibilityDomain::model()->findByPk($id);
         $api = (is_null($apiVisibilityDomain) ? null : $apiVisibilityDomain->api);
         
         /* @var $currentUser User */
         $currentUser = \Yii::app()->user->user;
         
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 403,
                 'That is not an invitation to an API that you have permission to manage.'
             );
         }
         
         if ($apiVisibilityDomain === null) {
-            throw new CHttpException(404, 'We could not find that invitation.');
+            throw new \CHttpException(404, 'We could not find that invitation.');
         }
         
         $hasDependentKey = $apiVisibilityDomain->hasDependentKey();
         if ($hasDependentKey) {
             
-            Yii::app()->user->setFlash('error', sprintf(
+            \Yii::app()->user->setFlash('error', sprintf(
                 '<b>Oops!</b> Before you can uninvite "%s" users, you must '
                 . 'first revoke/deny the following keys, which depend on '
                 . 'this invitation: %s',
@@ -160,29 +166,29 @@ class ApiController extends Controller
                 $apiVisibilityDomain->getLinksToDependentKeysAsHtmlList()
             ));
             
-        } elseif (Yii::app()->request->isPostRequest) {
+        } elseif (\Yii::app()->request->isPostRequest) {
             
             if ( ! $apiVisibilityDomain->delete()) {
                 
-                Yii::log(
+                \Yii::log(
                     'ApiVisibilityDomain deletion FAILED: ID ' . $id,
-                    CLogger::LEVEL_ERROR,
+                    \CLogger::LEVEL_ERROR,
                     __CLASS__ . '.' . __FUNCTION__
                 );
 
-                Yii::app()->user->setFlash(
+                \Yii::app()->user->setFlash(
                     'error',
                     '<strong>Error!</strong> Unable to withdraw invitation: '
                     . $apiVisibilityDomain->getErrorsAsFlatHtmlList()
                 );
             } else {
-                Yii::log(
+                \Yii::log(
                     'ApiVisibilityDomain deleted: ID ' . $id,
-                    CLogger::LEVEL_INFO,
+                    \CLogger::LEVEL_INFO,
                     __CLASS__ . '.' . __FUNCTION__
                 );
 
-                Yii::app()->user->setFlash(
+                \Yii::app()->user->setFlash(
                     'success',
                     '<strong>Success!</strong> Invitation withdrawn.'
                 );
@@ -205,15 +211,15 @@ class ApiController extends Controller
 
     public function actionCancelUserInvitation($id)
     {
-        /* @var $apiVisibilityUser \ApiVisibilityUser */
-        $apiVisibilityUser = \ApiVisibilityUser::model()->findByPk($id);
+        /* @var $apiVisibilityUser ApiVisibilityUser */
+        $apiVisibilityUser = ApiVisibilityUser::model()->findByPk($id);
         $api = (is_null($apiVisibilityUser) ? null : $apiVisibilityUser->api);
         
         /* @var $currentUser User */
         $currentUser = \Yii::app()->user->user;
         
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 403,
                 'That is not an invitation to an API that you have permission to manage.'
             );
@@ -228,7 +234,7 @@ class ApiController extends Controller
         $hasDependentKey = $apiVisibilityUser->hasDependentKey();
         if ($hasDependentKey) {
             
-            Yii::app()->user->setFlash('error', sprintf(
+            \Yii::app()->user->setFlash('error', sprintf(
                 '<b>Oops!</b> Before you can uninvite %s, you must first '
                 . 'first revoke/deny the following keys, which depend on '
                 . 'this invitation: %s',
@@ -236,29 +242,29 @@ class ApiController extends Controller
                 $apiVisibilityUser->getLinksToDependentKeysAsHtmlList()
             ));
             
-        } elseif (Yii::app()->request->isPostRequest) {
+        } elseif (\Yii::app()->request->isPostRequest) {
             
             if ( ! $apiVisibilityUser->delete()) {
                 
-                Yii::log(
+                \Yii::log(
                     'ApiVisibilityUser deletion FAILED: ID ' . $id,
-                    CLogger::LEVEL_ERROR,
+                    \CLogger::LEVEL_ERROR,
                     __CLASS__ . '.' . __FUNCTION__
                 );
 
-                Yii::app()->user->setFlash(
+                \Yii::app()->user->setFlash(
                     'error',
                     '<strong>Error!</strong> Unable to withdraw invitation: '
                     . $apiVisibilityUser->getErrorsAsFlatHtmlList()
                 );
             } else {
-                Yii::log(
+                \Yii::log(
                     'ApiVisibilityUser deleted: ID ' . $id,
-                    CLogger::LEVEL_INFO,
+                    \CLogger::LEVEL_INFO,
                     __CLASS__ . '.' . __FUNCTION__
                 );
 
-                Yii::app()->user->setFlash(
+                \Yii::app()->user->setFlash(
                     'success',
                     '<strong>Success!</strong> Invitation withdrawn.'
                 );
@@ -291,14 +297,14 @@ class ApiController extends Controller
         
         // If that is NOT an Api that the User has permission to manage, say so.
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'
             );
         }
         
         // If the form has been submitted (POSTed)...
-        if (Yii::app()->request->isPostRequest) {
+        if (\Yii::app()->request->isPostRequest) {
             
             try {
                 
@@ -306,14 +312,14 @@ class ApiController extends Controller
                 if ($api->delete()) {
                     
                     // Record that in the log.
-                    Yii::log(
+                    \Yii::log(
                         'API deleted: ID ' . $api->api_id,
-                        CLogger::LEVEL_INFO,
+                        \CLogger::LEVEL_INFO,
                         __CLASS__ . '.' . __FUNCTION__
                     );
 
                     // Tell the user.
-                    Yii::app()->user->setFlash(
+                    \Yii::app()->user->setFlash(
                         'success',
                         '<strong>Success!</strong> API deleted.'
                     );
@@ -325,14 +331,14 @@ class ApiController extends Controller
                 else {
 
                     // Record that in the log.
-                    Yii::log(
+                    \Yii::log(
                         'API deletion FAILED: ID ' . $api->api_id,
-                        CLogger::LEVEL_ERROR,
+                        \CLogger::LEVEL_ERROR,
                         __CLASS__ . '.' . __FUNCTION__
                     );
 
                     // Tell the user.
-                    Yii::app()->user->setFlash(
+                    \Yii::app()->user->setFlash(
                         'error',
                         '<strong>Error!</strong> Unable to delete that API: '
                         . $api->getErrorsAsFlatHtmlList()
@@ -343,18 +349,18 @@ class ApiController extends Controller
                     ));
                 }
             }
-            catch (CDbException $ex) {
+            catch (\CDbException $ex) {
                 
                 // Record that in the log.
-                Yii::log(
+                \Yii::log(
                     'API deletion FAILED: ID ' . $api->api_id . ', '
                     . 'CDbException thrown',
-                    CLogger::LEVEL_ERROR,
+                    \CLogger::LEVEL_ERROR,
                     __CLASS__ . '.' . __FUNCTION__
                 );
 
                 // Tell the user.
-                Yii::app()->user->setFlash(
+                \Yii::app()->user->setFlash(
                     'error',
                     '<strong>Error!</strong> Unable to delete that API. It is '
                     . 'possible that the Keys and/or Key Requests were not '
@@ -362,14 +368,14 @@ class ApiController extends Controller
                     . 'deleted.'
                 );
                 
-                Yii::trace($ex->getMessage());
+                \Yii::trace($ex->getMessage());
             }
         }
         
         // Get the list of all Keys to this API.
-        $criteria = new CDbCriteria;
+        $criteria = new \CDbCriteria;
         $criteria->compare('api_id', $api->api_id);
-        $keyList = new CActiveDataProvider('Key',
+        $keyList = new \CActiveDataProvider('\Sil\DevPortal\models\Key',
             array('criteria' => $criteria)
         );
         
@@ -395,7 +401,7 @@ class ApiController extends Controller
         //    OR
         // if the Api isn't visible to the current user... say so.
         if (($api === null) || ( ! $api->isVisibleToUser($currentUser))) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 404,
                 'Either there is no "' . $code . '" API or you do not have '
                 . 'permission to view it.'
@@ -403,7 +409,7 @@ class ApiController extends Controller
         }
         
         // Get the list of action links that should be shown.
-        $actionLinks = LinksManager::getApiDetailsActionLinksForUser(
+        $actionLinks = \LinksManager::getApiDetailsActionLinksForUser(
             $api,
             $currentUser
         );
@@ -428,7 +434,7 @@ class ApiController extends Controller
         
         // If that is NOT an Api that the User has permission to manage, say so.
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'
             );
@@ -439,13 +445,13 @@ class ApiController extends Controller
         $apiOwnerId = $api->owner_id;
         
         // Get the form object.
-        $form = new YbHorizForm('application.views.forms.apiDocsForm', $api);
+        $form = new \YbHorizForm('application.views.forms.apiDocsForm', $api);
         
         // If the form was submitted...
         if ($form->submitted('yt0')) {
 
             // If the user making this change is NOT an admin...
-            if ($currentUser->role !== \User::ROLE_ADMIN) {
+            if ($currentUser->role !== User::ROLE_ADMIN) {
 
                 // Make sure they didn't change the owner_id.
                 $api->owner_id = $apiOwnerId;
@@ -459,9 +465,9 @@ class ApiController extends Controller
                 if ($api->save(false)) {
 
                     // Record that in the log.
-                    Yii::log(
+                    \Yii::log(
                         'API docs updated: ID ' . $api->api_id,
-                        CLogger::LEVEL_INFO,
+                        \CLogger::LEVEL_INFO,
                         __CLASS__ . '.' . __FUNCTION__
                     );
 
@@ -474,14 +480,14 @@ class ApiController extends Controller
                 else {
 
                     // Record that in the log.
-                    Yii::log(
+                    \Yii::log(
                         'API docs update FAILED: ID ' . $api->api_id,
-                        CLogger::LEVEL_ERROR,
+                        \CLogger::LEVEL_ERROR,
                         __CLASS__ . '.' . __FUNCTION__
                     );
 
                     // Tell the user.
-                    Yii::app()->user->setFlash(
+                    \Yii::app()->user->setFlash(
                         'error',
                         '<strong>Error!</strong> We were unable to save your '
                         . 'changes to the API documentation: '
@@ -509,7 +515,7 @@ class ApiController extends Controller
         
         // If that is NOT an Api that the User has permission to manage, say so.
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'
             );
@@ -520,13 +526,13 @@ class ApiController extends Controller
         $apiOwnerId = $api->owner_id;
         
         // Get the form object.
-        $form = new YbHorizForm('application.views.forms.apiForm', $api);
+        $form = new \YbHorizForm('application.views.forms.apiForm', $api);
         
         // If the form was submitted...
         if ($form->submitted('yt0')) {
             
             // If the user making this change is NOT an admin...
-            if ($currentUser->role !== \User::ROLE_ADMIN) {
+            if ($currentUser->role !== User::ROLE_ADMIN) {
 
                 // Make sure they didn't change the owner_id.
                 $api->owner_id = $apiOwnerId;
@@ -540,9 +546,9 @@ class ApiController extends Controller
                 if ($api->save(false)) {
 
                     // Record that in the log.
-                    Yii::log(
+                    \Yii::log(
                         'API updated: ID ' . $api->api_id,
-                        CLogger::LEVEL_INFO,
+                        \CLogger::LEVEL_INFO,
                         __CLASS__ . '.' . __FUNCTION__
                     );
 
@@ -553,14 +559,14 @@ class ApiController extends Controller
                 else {
 
                     // Record that in the log.
-                    Yii::log(
+                    \Yii::log(
                         'API update FAILED: ID ' . $api->api_id,
-                        CLogger::LEVEL_ERROR,
+                        \CLogger::LEVEL_ERROR,
                         __CLASS__ . '.' . __FUNCTION__
                     );
 
                     // Tell the user.
-                    Yii::app()->user->setFlash(
+                    \Yii::app()->user->setFlash(
                         'error',
                         '<strong>Error!</strong> We were unable to save your '
                         . 'changes to the API: '
@@ -583,7 +589,7 @@ class ApiController extends Controller
         
         // If the website user is an admin, get the list of all APIs.
         if ($webUser->isAdmin()) {
-            $apiList = new CActiveDataProvider('Api',array(
+            $apiList = new \CActiveDataProvider('\Sil\DevPortal\models\Api', array(
                 'criteria' => array(
                     'with' => array('approvedKeyCount', 'pendingKeyCount'),
                 ),
@@ -593,14 +599,14 @@ class ApiController extends Controller
             // Otherwise, get the list of APIs that should be visible to the
             // current user.
             $visibleApis = array();
-            /* @var $allApis \Api[] */
+            /* @var $allApis Api[] */
             $allApis = Api::model()->findAll();
             foreach ($allApis as $api) {
                 if ($api->isVisibleToUser($webUser->getUser())) {
                     $visibleApis[] = $api;
                 }
             }
-            $apiList = new CArrayDataProvider($visibleApis, array(
+            $apiList = new \CArrayDataProvider($visibleApis, array(
                 'keyField' => 'api_id',
                 'sort' => array(
                     'attributes' => array(
@@ -620,21 +626,21 @@ class ApiController extends Controller
     public function actionInvitedDomains($code)
     {
         // Make sure the specified API exists.
-        /* @var $api \Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        /* @var $api Api */
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // Get a reference to the current website user's User model.
-        /* @var $currentUser \User */
+        /* @var $currentUser User */
         $currentUser = \Yii::app()->user->user;
         
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'
             );
         }
         
-        $apiVisibilityDomains = \ApiVisibilityDomain::model()->findAllByAttributes(array(
+        $apiVisibilityDomains = ApiVisibilityDomain::model()->findAllByAttributes(array(
             'api_id' => $api->api_id,
         ));
         $invitedDomainsDataProvider = new \CArrayDataProvider(
@@ -661,7 +667,7 @@ class ApiController extends Controller
         $currentUser = \Yii::app()->user->user;
         
         /* @var $api Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         if ( ! $currentUser->canInviteDomainToSeeApi($api)) {
             throw new \CHttpException(403, sprintf(
@@ -669,7 +675,7 @@ class ApiController extends Controller
             ));
         }
         
-        $apiVisibilityDomain = new \ApiVisibilityDomain();
+        $apiVisibilityDomain = new ApiVisibilityDomain();
         
         // If the form was submitted...
         if (\Yii::app()->request->isPostRequest) {
@@ -683,7 +689,7 @@ class ApiController extends Controller
             );
             if ($apiVisibilityDomain->validate(array('domain'))) {
                 if ($apiVisibilityDomain->save()) {
-                    Yii::app()->user->setFlash('success', sprintf(
+                    \Yii::app()->user->setFlash('success', sprintf(
                         '<strong>Success!</strong> You have successfully '
                         . 'enabled anyone with an email address ending with '
                         . '"@%s" to see the "%s" API.',
@@ -708,21 +714,21 @@ class ApiController extends Controller
     public function actionInvitedUsers($code)
     {
         // Make sure the specified API exists.
-        /* @var $api \Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        /* @var $api Api */
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // Get a reference to the current website user's User model.
-        /* @var $currentUser \User */
+        /* @var $currentUser User */
         $currentUser = \Yii::app()->user->user;
         
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'
             );
         }
         
-        $apiVisibilityUsers = \ApiVisibilityUser::model()->findAllByAttributes(array(
+        $apiVisibilityUsers = ApiVisibilityUser::model()->findAllByAttributes(array(
             'api_id' => $api->api_id,
         ));
         $invitedUsersDataProvider = new \CArrayDataProvider(
@@ -749,7 +755,7 @@ class ApiController extends Controller
         $currentUser = \Yii::app()->user->user;
         
         /* @var $api Api */
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         if ( ! $currentUser->canInviteUserToSeeApi($api)) {
             throw new \CHttpException(403, sprintf(
@@ -757,7 +763,7 @@ class ApiController extends Controller
             ));
         }
         
-        $apiVisibilityUser = new \ApiVisibilityUser();
+        $apiVisibilityUser = new ApiVisibilityUser();
         
         // If the form was submitted...
         if (\Yii::app()->request->isPostRequest) {
@@ -771,7 +777,7 @@ class ApiController extends Controller
             );
             if ($apiVisibilityUser->validate(array('invited_user_email'))) {
                 if ($apiVisibilityUser->save()) {
-                    Yii::app()->user->setFlash('success', sprintf(
+                    \Yii::app()->user->setFlash('success', sprintf(
                         '<strong>Success!</strong> You have successfully '
                         . 'invited %s to see the "%s" API.',
                         \CHtml::encode($postedData['invited_user_email']),
@@ -797,9 +803,9 @@ class ApiController extends Controller
      */
     public function actionPlayground()
     {
-        /* @var $currentUser \User */
+        /* @var $currentUser User */
         $currentUser = \Yii::app()->user->user;
-        $request = Yii::app()->request;
+        $request = \Yii::app()->request;
 
         /* Initialize variables in case this is a GET request or in case there
          * are errors during POST processing.  */
@@ -829,8 +835,8 @@ class ApiController extends Controller
              * begins with a forward-slash (/).  */
             $path = SS::ensureLeft($requestPath, '/');
             
-            /* @var $key \Key */
-            $key = \Key::model()->findByPk($keyId);
+            /* @var $key Key */
+            $key = Key::model()->findByPk($keyId);
             if ($key && $key->isOwnedBy($currentUser)) {
                 
                 // Create a single dimension parameter array from parameters
@@ -853,8 +859,8 @@ class ApiController extends Controller
                 }
                 
                 // Figure out proxy domain to form URL.
-                $proxyProtocol = parse_url(Yii::app()->params['apiaxle']['endpoint'], PHP_URL_SCHEME);
-                $apiAxleEndpointDomain = parse_url(Yii::app()->params['apiaxle']['endpoint'], PHP_URL_HOST);
+                $proxyProtocol = parse_url(\Yii::app()->params['apiaxle']['endpoint'], PHP_URL_SCHEME);
+                $apiAxleEndpointDomain = parse_url(\Yii::app()->params['apiaxle']['endpoint'], PHP_URL_HOST);
                 $proxyDomain = str_replace('apiaxle.', '', $apiAxleEndpointDomain);
                 
                 // Build url from components.
@@ -879,7 +885,7 @@ class ApiController extends Controller
 
                 // If GET request, merge paramsForm into paramsQuery.
                 if ($method == 'GET') {
-                    $paramsQuery = CMap::mergeArray($paramsQuery, $paramsForm);
+                    $paramsQuery = \CMap::mergeArray($paramsQuery, $paramsForm);
                     $paramsForm = null;
                     $apiRequestBody = null;
                 } else {
@@ -899,9 +905,9 @@ class ApiController extends Controller
                 }
 
                 // Create Guzzle client for making API call
-                $client = new GuzzleHttp\Client();
+                $client = new \GuzzleHttp\Client();
                 $debugStream = fopen('php://temp', 'w+');
-                $guzzleRequest = new GuzzleHttp\Psr7\Request(
+                $guzzleRequest = new \GuzzleHttp\Psr7\Request(
                     $method,
                     $url,
                     $paramsHeader,
@@ -913,7 +919,7 @@ class ApiController extends Controller
                     'headers' => $paramsHeader,
                     'query' => $paramsQuery,
                     'http_errors' => false,
-                    'verify' => Yii::app()->params['apiaxle']['ssl_verifypeer'],
+                    'verify' => \Yii::app()->params['apiaxle']['ssl_verifypeer'],
                 ]);
                 rewind($debugStream);
                 $debugText = stream_get_contents($debugStream);
@@ -922,9 +928,9 @@ class ApiController extends Controller
                 $requestedUrl = $guzzleRequest->getUri();
                 
                 // Get the response headers and body.
-                $responseHeadersFormatter = new GuzzleHttp\MessageFormatter('{res_headers}');
+                $responseHeadersFormatter = new \GuzzleHttp\MessageFormatter('{res_headers}');
                 $responseHeaders = $responseHeadersFormatter->format($guzzleRequest, $response);
-                $responseBodyFormatter = new GuzzleHttp\MessageFormatter('{res_body}');
+                $responseBodyFormatter = new \GuzzleHttp\MessageFormatter('{res_body}');
                 $responseBody = $responseBodyFormatter->format($guzzleRequest, $response);
                 
                 // Get the content type.
@@ -938,7 +944,7 @@ class ApiController extends Controller
                  *       type, content length).
                  */
                 $requestHeaders = $this->getActualRequestHeadersFromDebugText($debugText);
-                $requestBodyFormatter = new GuzzleHttp\MessageFormatter('{req_body}');
+                $requestBodyFormatter = new \GuzzleHttp\MessageFormatter('{req_body}');
                 $requestBody = $requestBodyFormatter->format($guzzleRequest);
                 $rawApiRequest = trim($requestHeaders . $requestBody);
                 
@@ -950,12 +956,12 @@ class ApiController extends Controller
 
             } else {
                 // Display an error
-                Yii::app()->user->setFlash('error', 'Invalid API selected');
+                \Yii::app()->user->setFlash('error', 'Invalid API selected');
             }
         }
         
         // Get list of APIs that user has a key for.
-        $apiOptions = \Key::model()->findAllByAttributes(array(
+        $apiOptions = Key::model()->findAllByAttributes(array(
             'user_id' => $currentUser->user_id,
         ));
         
@@ -963,7 +969,7 @@ class ApiController extends Controller
             
             // Attempt to pretty print the response body.
             if (isset($response) && substr_count($responseContentType, 'xml') > 0) {
-                $dom = new DOMDocument('1.0');
+                $dom = new \DOMDocument('1.0');
                 $dom->preserveWhiteSpace = false;
                 $dom->formatOutput = true;
                 if ($dom->loadXML($responseBody)) {
@@ -973,7 +979,7 @@ class ApiController extends Controller
                     }
                 }
             } elseif (isset($response) && substr_count($responseContentType, 'json') > 0) {
-                $responseBody = Utils::pretty_json($responseBody);
+                $responseBody = \Utils::pretty_json($responseBody);
             }
 
             $this->render('playground', array(
@@ -1011,7 +1017,7 @@ class ApiController extends Controller
     public function actionPendingKeys($code)
     {
         // Make sure the specified API exists.
-        $api = \Api::model()->findByAttributes(array('code' => $code));
+        $api = Api::model()->findByAttributes(array('code' => $code));
         
         // Get a reference to the current website user's User model.
         $currentUser = \Yii::app()->user->user;
@@ -1019,7 +1025,7 @@ class ApiController extends Controller
         // Prevent information about it from being seen by users without
         // permission to see the specified API.
         if (( ! $api) || ( ! $api->isVisibleToUser($currentUser))) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 404,
                 'Either there is no "' . $code . '" API or you do not have '
                 . 'permission to view it.'
@@ -1029,7 +1035,7 @@ class ApiController extends Controller
         // Prevent this list of keys from being seen by anyone who is not
         // authorized to see them.
         if (( ! ($currentUser instanceof User)) || ( ! $currentUser->canSeeKeysForApi($api))) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 403,
                 'You do not have permission to see the list of pending keys '
                 . 'for the "' . $api->display_name . '" API.'
@@ -1039,11 +1045,11 @@ class ApiController extends Controller
         // Get the list of pending keys for that API.
         $pendingKeys = array();
         foreach ($api->keys as $key) {
-            if ($key->status === \Key::STATUS_PENDING) {
+            if ($key->status === Key::STATUS_PENDING) {
                 $pendingKeys[] = $key;
             }
         }
-        $pendingKeysDataProvider = new CArrayDataProvider($pendingKeys, array(
+        $pendingKeysDataProvider = new \CArrayDataProvider($pendingKeys, array(
             'keyField' => 'key_id',
         ));
         
@@ -1111,7 +1117,7 @@ class ApiController extends Controller
             $key->domain = isset($formData['domain']) ? $formData['domain'] : null;
             $key->purpose = isset($formData['purpose']) ? $formData['purpose'] : null;
             if ($acceptedTerms) {
-                $key->accepted_terms_on = new CDbExpression('NOW()');
+                $key->accepted_terms_on = new \CDbExpression('NOW()');
             }
             
             // Also record the extra data it needs (not submitted by the user).
@@ -1131,15 +1137,15 @@ class ApiController extends Controller
                     if ( ! $key->approve()) {
                         
                         // If not successful, record that in the log.
-                        Yii::log(
+                        \Yii::log(
                             'Key request auto-approval FAILED: User ID '
                             . $currentUser->user_id . ', API ID ' . $api->api_id,
-                            CLogger::LEVEL_ERROR,
+                            \CLogger::LEVEL_ERROR,
                             __CLASS__ . '.' . __FUNCTION__
                         );
 
                         // Tell the user.
-                        Yii::app()->user->setFlash(
+                        \Yii::app()->user->setFlash(
                             'error',
                             '<strong>Error!</strong> Unable to create key: '
                             . $key->getErrorsAsFlatHtmlList()
@@ -1149,16 +1155,16 @@ class ApiController extends Controller
                     else {
                         
                         // Record that in the log.
-                        Yii::log(
+                        \Yii::log(
                             'Key request auto-approved: User ID '
                             . $currentUser->user_id . ', API ID ' . $api->api_id
                             . ', Key ID ' . $key->key_id,
-                            CLogger::LEVEL_INFO,
+                            \CLogger::LEVEL_INFO,
                             __CLASS__ . '.' . __FUNCTION__
                         );
 
                         // Tell the user.
-                        Yii::app()->user->setFlash(
+                        \Yii::app()->user->setFlash(
                             'success',
                             '<strong>Success!</strong> Key created.'
                         );
@@ -1174,10 +1180,10 @@ class ApiController extends Controller
                     
                     // Save the new pending Key to the database.
                     if ( ! $key->save()) {
-                        Yii::log(
+                        \Yii::log(
                             'Saving validated pending Key FAILED: User ID '
                             . $currentUser->user_id . ', API ID ' . $api->api_id,
-                            CLogger::LEVEL_ERROR,
+                            \CLogger::LEVEL_ERROR,
                             __CLASS__ . '.' . __FUNCTION__
                         );
                         throw new \CHttpException(
@@ -1188,15 +1194,15 @@ class ApiController extends Controller
                     }
 
                     // Record that in the log.
-                    Yii::log(
+                    \Yii::log(
                         'Key requested: User ID ' . $currentUser->user_id . ', API ID '
                         . $api->api_id,
-                        CLogger::LEVEL_INFO,
+                        \CLogger::LEVEL_INFO,
                         __CLASS__ . '.' . __FUNCTION__
                     );
                     
                     // Tell the user the status.
-                    Yii::app()->user->setFlash(
+                    \Yii::app()->user->setFlash(
                         'success',
                         '<strong>Success!</strong> Key requested.'
                     );
@@ -1233,7 +1239,7 @@ class ApiController extends Controller
         
         // If that is NOT an Api that the User has permission to manage, say so.
         if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
-            throw new CHttpException(
+            throw new \CHttpException(
                 403,
                 'That is not an API that you have permission to manage.'
             );

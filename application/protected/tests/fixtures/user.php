@@ -1,4 +1,7 @@
 <?php
+
+use Sil\DevPortal\models\User;
+
 return array(
     'user1'  => array(
         'user_id'       => 1,

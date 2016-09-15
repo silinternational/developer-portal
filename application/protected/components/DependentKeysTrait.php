@@ -1,6 +1,8 @@
 <?php
 namespace Sil\DevPortal\components;
 
+use Sil\DevPortal\models\Key;
+
 /**
  * Trait to add various functions related to Keys dependent upon an invitation
  * (such as an ApiVisibilityUser or ApiVisibilityDomain) in order to exist.
@@ -51,7 +53,7 @@ trait DependentKeysTrait
      * Get the list of Keys (active or pending) where the owner of the Key can
      * only see that Api because of this invitation.
      *
-     * @return \Key[] The list of keys.
+     * @return Key[] The list of keys.
      */
     abstract public function getDependentKeys();
 }

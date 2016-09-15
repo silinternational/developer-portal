@@ -1,5 +1,5 @@
 <?php
-/* @var $this EventController */
+/* @var $this \Sil\DevPortal\controllers\EventController */
 /* @var $eventDataProvider CDataProvider */
 
 // Set up the breadcrumbs.

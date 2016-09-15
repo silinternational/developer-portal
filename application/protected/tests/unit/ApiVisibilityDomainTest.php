@@ -1,19 +1,24 @@
 <?php
 namespace Sil\DevPortal\tests\unit;
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\ApiVisibilityDomain;
+use Sil\DevPortal\models\Key;
+use Sil\DevPortal\models\User;
+
 /**
- * @method \Api apis(string $fixtureName)
- * @method \ApiVisibilityDomain apiVisibilityDomains(string $fixtureName)
- * @method \Key keys(string $fixtureName)
- * @method \User users(string $fixtureName)
+ * @method Api apis(string $fixtureName)
+ * @method ApiVisibilityDomain apiVisibilityDomains(string $fixtureName)
+ * @method Key keys(string $fixtureName)
+ * @method User users(string $fixtureName)
  */
 class ApiVisibilityDomainTest extends \CDbTestCase
 {
     public $fixtures = array(
-        'api' => 'Api',
-        'apiVisibilityDomains' => 'ApiVisibilityDomain',
-        'keys' => 'Key',
-        'users' => 'User',
+        'api' => '\Sil\DevPortal\models\Api',
+        'apiVisibilityDomains' => '\Sil\DevPortal\models\ApiVisibilityDomain',
+        'keys' => '\Sil\DevPortal\models\Key',
+        'users' => '\Sil\DevPortal\models\User',
     );
     
     public function testFixtureDataValidity()
@@ -25,7 +30,7 @@ class ApiVisibilityDomainTest extends \CDbTestCase
                 $fixtureName,
                 print_r($apiVisibilityDomain->getErrors(), true)
             ));
-            $apiVisibilityDomainOnInsert = new \ApiVisibilityDomain();
+            $apiVisibilityDomainOnInsert = new ApiVisibilityDomain();
             $apiVisibilityDomainOnInsert->setAttributes($fixtureData, false);
             $this->assertTrue($apiVisibilityDomainOnInsert->save(), sprintf(
                 'ApiVisibilityDomain fixture "%s" (ID %s) does not have valid data: %s',
@@ -108,7 +113,7 @@ class ApiVisibilityDomainTest extends \CDbTestCase
     public function testIsApparentlyValidDomain_valid()
     {
         // Arrange:
-        $apiVisibilityDomain = new \ApiVisibilityDomain();
+        $apiVisibilityDomain = new ApiVisibilityDomain();
         $apiVisibilityDomain->domain = 'example.com';
         
         // Act:
@@ -121,7 +126,7 @@ class ApiVisibilityDomainTest extends \CDbTestCase
     public function testIsApparentlyValidDomain_hasSpace()
     {
         // Arrange:
-        $apiVisibilityDomain = new \ApiVisibilityDomain();
+        $apiVisibilityDomain = new ApiVisibilityDomain();
         $apiVisibilityDomain->domain = 'exam ple.com';
         
         // Act:
@@ -137,7 +142,7 @@ class ApiVisibilityDomainTest extends \CDbTestCase
     public function testIsApparentlyValidDomain_noDomain()
     {
         // Arrange:
-        $apiVisibilityDomain = new \ApiVisibilityDomain();
+        $apiVisibilityDomain = new ApiVisibilityDomain();
         
         // Act:
         $apiVisibilityDomain->isApparentlyValidDomain('domain');
