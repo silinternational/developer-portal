@@ -736,11 +736,11 @@ class Key extends \KeyBase
      * Try to send a notification email to the Owner of the Api that this
      * (pending) Key is for. If no owner email address is available, send it to
      * the admins.
-     * 
-     * @param \YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     *
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
@@ -811,10 +811,10 @@ class Key extends \KeyBase
      * Try to send a notification email to the User that requested a Key that
      * the request was denied.
      * 
-     * @param \YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
@@ -869,10 +869,10 @@ class Key extends \KeyBase
      * Try to send a notification email to the Owner of an Api that a Key to
      * their Api has been revoked.
      * 
-     * @param \YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
@@ -929,10 +929,10 @@ class Key extends \KeyBase
      * Try to send a notification email to the User that one of their pending
      * Keys has been approved.
      * 
-     * @param \YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
@@ -999,10 +999,10 @@ class Key extends \KeyBase
      * Try to send a notification email to the User that one of their Keys has
      * been revoked.
      * 
-     * @param \YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
@@ -1377,10 +1377,10 @@ class Key extends \KeyBase
      * Try to send a notification email to the appropriate person about this
      * Key having been deleted.
      * 
-     * @param \YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */

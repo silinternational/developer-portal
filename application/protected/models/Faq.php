@@ -64,7 +64,7 @@ class Faq extends \FaqBase
      * models according to data in model fields.
      * - Pass data provider to CGridView, CListView or any similar widget.
      *
-     * @return CActiveDataProvider the data provider that can return the models
+     * @return \CActiveDataProvider the data provider that can return the models
      * based on the search/filter conditions.
      */
     public function search() {

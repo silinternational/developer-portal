@@ -215,10 +215,10 @@ class ApiVisibilityUser extends \ApiVisibilityUserBase
     /**
      * Try to send a notification email to the person invited to see this Api.
      *
-     * @param YiiMailer $mailer (Optional:) The YiiMailer instance for sending
-     *     the email. Unless performing tests, it is best leave this out so that
-     *     our normal process for creating this will be followed.
-     * @param array $appParams (Optional:) The Yii app's params. If not
+     * @param \YiiMailer|null $mailer (Optional:) The YiiMailer instance for
+     *     sending the email. Unless performing tests, it is best leave this out
+     *     so that our normal process for creating this will be followed.
+     * @param array|null $appParams (Optional:) The Yii app's params. If not
      *     provided, they will be retrieved. This parameter is primarily to make
      *     testing easier.
      */
