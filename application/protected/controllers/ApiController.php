@@ -680,7 +680,9 @@ class ApiController extends \Controller
         // If the form was submitted...
         if (\Yii::app()->request->isPostRequest) {
             
-            $postedData = \Yii::app()->request->getParam('ApiVisibilityDomain');
+            $postedData = \Yii::app()->request->getPost(
+                \CHtml::modelName($apiVisibilityDomain)
+            );
             
             $apiVisibilityDomain->attributes = array(
                 'api_id' => $api->api_id,
@@ -768,7 +770,9 @@ class ApiController extends \Controller
         // If the form was submitted...
         if (\Yii::app()->request->isPostRequest) {
             
-            $postedData = \Yii::app()->request->getParam('ApiVisibilityUser');
+            $postedData = \Yii::app()->request->getPost(
+                \CHtml::modelName($apiVisibilityUser)
+            );
             
             $apiVisibilityUser->attributes = array(
                 'api_id' => $api->api_id,
