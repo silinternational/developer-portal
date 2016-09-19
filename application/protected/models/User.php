@@ -19,6 +19,7 @@ class User extends \UserBase
     const AUTH_PROVIDER_GITHUB = 'GitHub';
     const AUTH_PROVIDER_GOOGLE = 'Google';
     const AUTH_PROVIDER_INSITE = 'Insite';
+    const AUTH_PROVIDER_TEST = 'TEST';
     
     const ROLE_USER = 'user';
     const ROLE_OWNER = 'owner';
@@ -702,6 +703,7 @@ class User extends \UserBase
             self::AUTH_PROVIDER_GITHUB,
             self::AUTH_PROVIDER_GOOGLE,
             self::AUTH_PROVIDER_INSITE,
+            self::AUTH_PROVIDER_TEST,
         );
     }
     
@@ -989,7 +991,8 @@ class User extends \UserBase
         if ( ! in_array($this->$attribute, self::getAuthProviders())) {
             $this->addError(
                 $attribute,
-                'An unknown authentication provider was specified.'
+                'An unknown authentication provider was specified: '
+                . $this->$attribute
             );
         }
     }
