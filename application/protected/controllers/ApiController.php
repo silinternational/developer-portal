@@ -1113,7 +1113,7 @@ class ApiController extends \Controller
 
             /* Retrieve ONLY the applicable pieces of data that we trust the
              * user to provide when requesting a Key.  */
-            $formData = $request->getPost('Key');
+            $formData = $request->getPost(\CHtml::modelName($key));
             $key->domain = isset($formData['domain']) ? $formData['domain'] : null;
             $key->purpose = isset($formData['purpose']) ? $formData['purpose'] : null;
             if ($acceptedTerms) {
