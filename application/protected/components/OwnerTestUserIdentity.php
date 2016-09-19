@@ -2,6 +2,7 @@
 namespace Sil\DevPortal\components;
 
 use Sil\DevPortal\components\UserAuthenticationData;
+use Sil\DevPortal\models\User;
 
 class OwnerTestUserIdentity extends UserIdentity
 {
@@ -42,5 +43,29 @@ class OwnerTestUserIdentity extends UserIdentity
     public function getLogoutUrl()
     {
         return null;
+    }
+    
+    /**
+     * Create (and return) a new User record with the applicable data from the
+     * given user auth. data.
+     * 
+     * @param UserAuthenticationData $userAuthData
+     * @return User The new User.
+     */
+    protected function createUserRecord($userAuthData)
+    {
+        $user = parent::createUserRecord($userAuthData);
+        $user->role = User::ROLE_OWNER;
+        
+        if ( ! $user->save()) {
+            throw new \Exception(
+                'Failed to update new (TEST) API Owner user record to have '
+                . 'owner privileges: '
+                . PHP_EOL . $user->getErrorsAsFlatTextList(),
+                1474309286
+            );
+        }
+        
+        return $user;
     }
 }
