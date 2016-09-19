@@ -973,6 +973,11 @@ class ApiController extends \Controller
             'user_id' => $currentUser->user_id,
         ));
         
+        // Sort the list of APIs (that the user has a key to) by display name.
+        usort($apiOptions, function($first, $second) {
+            return $first->api->display_name > $second->api->display_name;
+        });
+        
         if ( ! $download) {
             
             // Attempt to pretty print the response body.
