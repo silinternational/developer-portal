@@ -14,5 +14,5 @@ $this->pageTitle = 'Error ' . $code;
     <?php if (isset($errorCode)) { echo CHtml::encode('Code ' . $errorCode); } ?>
 </div>
 <div class="error">
-    <?php echo CHtml::encode($message); ?>
+    <?php echo nl2br(CHtml::encode($message)); ?>
 </div>

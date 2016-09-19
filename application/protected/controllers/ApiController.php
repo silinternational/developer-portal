@@ -680,7 +680,9 @@ class ApiController extends \Controller
         // If the form was submitted...
         if (\Yii::app()->request->isPostRequest) {
             
-            $postedData = \Yii::app()->request->getParam('ApiVisibilityDomain');
+            $postedData = \Yii::app()->request->getPost(
+                \CHtml::modelName($apiVisibilityDomain)
+            );
             
             $apiVisibilityDomain->attributes = array(
                 'api_id' => $api->api_id,
@@ -768,7 +770,9 @@ class ApiController extends \Controller
         // If the form was submitted...
         if (\Yii::app()->request->isPostRequest) {
             
-            $postedData = \Yii::app()->request->getParam('ApiVisibilityUser');
+            $postedData = \Yii::app()->request->getPost(
+                \CHtml::modelName($apiVisibilityUser)
+            );
             
             $apiVisibilityUser->attributes = array(
                 'api_id' => $api->api_id,
@@ -1113,7 +1117,7 @@ class ApiController extends \Controller
 
             /* Retrieve ONLY the applicable pieces of data that we trust the
              * user to provide when requesting a Key.  */
-            $formData = $request->getPost('Key');
+            $formData = $request->getPost(\CHtml::modelName($key));
             $key->domain = isset($formData['domain']) ? $formData['domain'] : null;
             $key->purpose = isset($formData['purpose']) ? $formData['purpose'] : null;
             if ($acceptedTerms) {

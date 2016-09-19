@@ -1381,6 +1381,27 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testGetAuthProviders_isCompleteList()
+    {
+        // Arrange:
+        $allAuthProviderConstantsByKey = self::getConstantsWithPrefix(
+            User::class,
+            'AUTH_PROVIDER_'
+        );
+        $allAuthProviderValues = array_values($allAuthProviderConstantsByKey);
+        
+        // Act:
+        $actual = User::getAuthProviders();
+        
+        // Assert:
+        $this->assertEquals(
+            $allAuthProviderValues,
+            $actual,
+            'User::getAuthProviders() failed to include the full list of '
+            . 'auth. provider values (see User::AUTH_PROVIDER_*).'
+        );
+    }
+    
     public function testHasActiveKeyToApi_no()
     {
         // Arrange:
@@ -1958,6 +1979,29 @@ class UserTest extends DeveloperPortalTestCase
             2,
             $actual,
             'Failed to return correct number of pending keys for a user that has two.'
+        );
+    }
+    
+    public function testValidAuthProviderRequired_invalidValue()
+    {
+        // Arrange:
+        $invalidValue = 'invalid';
+        $user = $this->users('user1');
+        
+        // Pre-assert:
+        $this->assertTrue($user->validate(), sprintf(
+            'This test requires a user that has valid attributes: %s',
+            $user->getErrorsForConsole()
+        ));
+        
+        // Act:
+        $user->auth_provider = $invalidValue;
+        $result = $user->validate();
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Failed to reject an invalid auth_provider value: ' . $invalidValue
         );
     }
 }

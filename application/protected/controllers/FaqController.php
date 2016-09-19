@@ -16,7 +16,7 @@ class FaqController extends \Controller
         $form = new \YbHorizForm('application.views.forms.faqForm', $faq);
         
         // Collect the user input data (if any).
-        $postData = \Yii::app()->request->getPost('Faq', false);
+        $postData = \Yii::app()->request->getPost(\CHtml::modelName($faq), false);
         
         // If form has been submitted (as evidenced by the presence of POSTed
         // user input data)...
@@ -77,7 +77,7 @@ class FaqController extends \Controller
         $form = new \YbHorizForm('application.views.forms.faqForm', $faq);
         
         // Collect the user input data (if any).
-        $postData = \Yii::app()->request->getPost('Faq', false);
+        $postData = \Yii::app()->request->getPost(\CHtml::modelName($faq), false);
         
         // If form has been submitted (as evidenced by the presence of POSTed
         // user input data)...

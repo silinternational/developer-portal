@@ -16,6 +16,8 @@ class AuthManager
     private $knownAuthTypes = array(
         'hybrid' => '\Sil\DevPortal\components\HybridAuthUserIdentity',
         'saml' => '\Sil\DevPortal\components\SamlUserIdentity',
+        'test-owner' => '\Sil\DevPortal\components\OwnerTestUserIdentity',
+        'test-user' => '\Sil\DevPortal\components\UserTestUserIdentity',
     );
     
     /**
@@ -159,6 +161,16 @@ class AuthManager
                 'authType' => 'hybrid',
             ));
         }
+        if ($this->isAuthTypeEnabled('test-user')) {
+            $loginOptions['Test (User)'] = \Yii::app()->createUrl('auth/login', array(
+                'authType' => 'test-user',
+            ));
+        }
+        if ($this->isAuthTypeEnabled('test-owner')) {
+            $loginOptions['Test (Owner)'] = \Yii::app()->createUrl('auth/login', array(
+                'authType' => 'test-owner',
+            ));
+        }
         return $loginOptions;
     }
     
@@ -179,6 +191,9 @@ class AuthManager
                 return $this->isSamlAuthEnabled();
             case 'hybrid':
                 return $this->isHybridAuthEnabled();
+            case 'test-user':
+            case 'test-owner':
+                return $this->isTestAuthEnabled();
             default:
                 return false;
         }
@@ -195,6 +210,11 @@ class AuthManager
     protected function isSamlAuthEnabled()
     {
         return \Yii::app()->params['saml']['enabled'];
+    }
+    
+    protected function isTestAuthEnabled()
+    {
+        return defined('APPLICATION_ENV') && (APPLICATION_ENV === 'testing');
     }
     
     /**

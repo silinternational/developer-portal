@@ -32,7 +32,7 @@ class SiteTextController extends \Controller
         $form = new \YbHorizForm('application.views.forms.siteTextForm', $siteText);
         
         // Collect the user input data (if any).
-        $postData = \Yii::app()->request->getPost('SiteText', false);
+        $postData = \Yii::app()->request->getPost(\CHtml::modelName($siteText), false);
         
         // If form has been submitted (as evidenced by the presence of POSTed
         // user input data)...
