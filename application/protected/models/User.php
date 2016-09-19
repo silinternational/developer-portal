@@ -15,6 +15,11 @@ class User extends \UserBase
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     
+    const AUTH_PROVIDER_BITBUCKET = 'Bitbucket';
+    const AUTH_PROVIDER_GITHUB = 'GitHub';
+    const AUTH_PROVIDER_GOOGLE = 'Google';
+    const AUTH_PROVIDER_INSITE = 'Insite';
+    
     const ROLE_USER = 'user';
     const ROLE_OWNER = 'owner';
     const ROLE_ADMIN = 'admin';
@@ -690,6 +695,16 @@ class User extends \UserBase
         ));
     }
     
+    public static function getAuthProviders()
+    {
+        return array(
+            self::AUTH_PROVIDER_BITBUCKET,
+            self::AUTH_PROVIDER_GITHUB,
+            self::AUTH_PROVIDER_GOOGLE,
+            self::AUTH_PROVIDER_INSITE,
+        );
+    }
+    
     /**
      * Find out whether the User has an active (i.e. - approved, not revoked)
      * Key to the given Api.
@@ -886,6 +901,7 @@ class User extends \UserBase
     {
         return \CMap::mergeArray(array(
             array('email', 'email'),
+            array('auth_provider', 'validateAuthProvider'),
             array(
                 'updated',
                 'default',
@@ -961,5 +977,20 @@ class User extends \UserBase
     public static function model($className = __CLASS__) {
         return parent::model($className);
     }
-
+    
+    /**
+     * Validate that the specified auth_provider is an acceptable value.
+     * 
+     * @param string $attribute The name of the attribute to be validated.
+     * @param array $params The options specified in the validation rule.
+     */
+    public function validateAuthProvider($attribute, $params)
+    {
+        if ( ! in_array($this->$attribute, self::getAuthProviders())) {
+            $this->addError(
+                $attribute,
+                'An unknown authentication provider was specified.'
+            );
+        }
+    }
 }
