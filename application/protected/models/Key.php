@@ -4,6 +4,7 @@ namespace Sil\DevPortal\models;
 use ApiAxle\Api\Api as AxleApi;
 use ApiAxle\Api\Key as AxleKey;
 use ApiAxle\Api\Keyring as AxleKeyring;
+use Exception;
 
 class Key extends \KeyBase
 {
@@ -1416,6 +1417,26 @@ class Key extends \KeyBase
                 $mailer,
                 $appParams
             );
+        }
+    }
+    
+    /**
+     * Sort the given array of Keys based on the APIs' display names
+     * (case-insensitively).
+     * 
+     * WARNING: This changes the given array.
+     * 
+     * @param Key[] $keys The list of Keys to sort.
+     * @return void
+     * @throws Exception
+     */
+    public static function sortKeysByApiName(&$keys)
+    {
+        $successful = usort($keys, function($keyA, $keyB) {
+            return strcasecmp($keyA->api->display_name, $keyB->api->display_name);
+        });
+        if ( ! $successful) {
+            throw new Exception('Failed to sort list of keys by API name.', 1474403506);
         }
     }
 }
