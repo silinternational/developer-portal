@@ -12,8 +12,6 @@ COPY build/developer-portal.conf /etc/apache2/sites-enabled/
 # Copy in syslog config
 RUN rm -f /etc/rsyslog.d/*
 COPY build/rsyslog.conf /etc/rsyslog.conf
-RUN mkdir -p /opt/ssl
-COPY build/logentries.all.crt /opt/ssl/logentries.all.crt
 
 # Copy in updated php.ini
 COPY build/php.ini /etc/php5/apache2/
