@@ -1553,6 +1553,37 @@ class KeyTest extends DeveloperPortalTestCase
         //       fail.
     }
     
+    public function testSortKeysByApiName()
+    {
+        // Arrange:
+        $keys = array(
+            $this->keys('key1'),
+            $this->keys('firstKeyForApiWithTwoKeys'),
+            $this->keys('keyToApiOwnedByUser18'),
+        );
+        $unsortedKeys = $keys; // Make a copy of the array.
+        $expectedSortedApiNames = array(
+            $keys[2]->api->display_name, // API O...
+            $keys[0]->api->display_name, // Api t...
+            $keys[1]->api->display_name, // API W...
+        );
+        
+        // Act:
+        Key::sortKeysByApiName($keys);
+        
+        // Assert:
+        $this->assertNotEquals($unsortedKeys, $keys);
+        $actualSortedApiNames = array_map(
+            function($key) { return $key->api->display_name; },
+            $keys
+        );
+        $this->assertEquals(
+            $expectedSortedApiNames,
+            $actualSortedApiNames,
+            'Failed to return the keys in alphabetical order based on API name.'
+        );
+    }
+    
     public function testStatusHasValidValue_no_emptyString()
     {
         // Arrange:

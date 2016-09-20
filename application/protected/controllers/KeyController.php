@@ -312,6 +312,8 @@ class KeyController extends \Controller
                 $nonActiveKeys[] = $key;
             }
         }
+        Key::sortKeysByApiName($activeKeys);
+        Key::sortKeysByApiName($nonActiveKeys);
         $activeKeysDataProvider = new \CArrayDataProvider($activeKeys, array(
             'keyField' => 'key_id',
         ));
