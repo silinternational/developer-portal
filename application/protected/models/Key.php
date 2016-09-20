@@ -361,7 +361,7 @@ class Key extends \KeyBase
     
     public static function getActiveKeysDataProvider()
     {
-        return new \CActiveDataProvider('\Sil\DevPortal\models\Key', array(
+        return new \CActiveDataProvider(self::class, array(
             'criteria' => array(
                 'condition' => 'status = :status',
                 'params' => array(
@@ -373,7 +373,7 @@ class Key extends \KeyBase
     
     public static function getPendingKeysDataProvider()
     {
-        return new \CActiveDataProvider('\Sil\DevPortal\models\Key', array(
+        return new \CActiveDataProvider(self::class, array(
             'criteria' => array(
                 'condition' => 'status = :status',
                 'params' => array(
