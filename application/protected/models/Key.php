@@ -4,8 +4,18 @@ namespace Sil\DevPortal\models;
 use ApiAxle\Api\Api as AxleApi;
 use ApiAxle\Api\Key as AxleKey;
 use ApiAxle\Api\Keyring as AxleKeyring;
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\Event;
+use Sil\DevPortal\models\User;
 use Exception;
 
+/**
+ * The followings are the available model relations:
+ * @property Event[] $events
+ * @property Api $api
+ * @property User $processedBy
+ * @property User $user
+ */
 class Key extends \KeyBase
 {
     use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
