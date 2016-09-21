@@ -1,11 +1,10 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\ApiController */
 /* @var $invitedDomainsDataProvider CDataProvider */
-/* @var $api Api */
+/* @var $api \Sil\DevPortal\models\Api */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Home' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'APIs' => array('api/'),
     $api->display_name => array('/api/details/', 'code' => $api->code),
     'Invited Domains',

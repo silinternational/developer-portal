@@ -4,8 +4,7 @@
 /* @var $apiVisibilityUser \Sil\DevPortal\models\ApiVisibilityUser */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Home' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'APIs' => array('/api/'),
     $api->display_name => array(
         '/api/details/',

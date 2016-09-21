@@ -1,11 +1,10 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\ApiController */
 /* @var $pendingKeysDataProvider CDataProvider */
-/* @var $api Api */
+/* @var $api \Sil\DevPortal\models\Api */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Home' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'APIs' => array('api/'),
     $api->display_name => array('/api/details/', 'code' => $api->code),
     'Pending Keys',
@@ -23,7 +22,6 @@ $this->pageSubtitle = 'Pending Keys for this API';
             'type' => 'striped hover',
             'dataProvider' => $pendingKeysDataProvider,
             'template' => '{items}{pager}',
-            //'filter' => new Key(),
             'columns' => array(
                 array(
                     'name' => 'user.display_name',

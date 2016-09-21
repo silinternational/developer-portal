@@ -22,7 +22,7 @@ class Controller extends CController
      * be assigned to {@link CBreadcrumbs::links}. Please refer to {@link CBreadcrumbs::links}
      * for more details on how to specify this property.
      */
-    public $breadcrumbs = array();
+    public $breadcrumbs = array('Home' => '/');
     
     /**
      * @var string|null The (optional) subtitle for the page.
@@ -236,11 +236,11 @@ class Controller extends CController
                 'actions'       => array('index', 'usageChart'),
                 'roles'         => array('owner', 'user'),
             ),
-            array( // Authenticated users can read the FAQs.
+            array( // Anyone can read the FAQs.
                 'allow',
                 'controllers' => array('faq'),
                 'actions' => array('details', 'index'),
-                'roles' => array('@'),
+                'roles' => array('*'),
             ),
             array( // Authenticated users can view very limited info about APIs.
                 'allow',

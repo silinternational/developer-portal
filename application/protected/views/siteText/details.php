@@ -1,10 +1,9 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\SiteTextController */
-/* @var $siteText SiteText */
+/* @var $siteText \Sil\DevPortal\models\SiteText */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Home' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'Site Texts' => array('/site-text/'),
     $siteText->name,
 );

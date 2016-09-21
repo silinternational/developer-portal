@@ -4,10 +4,10 @@ use Sil\DevPortal\controllers\DashboardController;
 use Sil\DevPortal\models\Key;
 
 /* @var $this \Sil\DevPortal\controllers\DashboardController */
-/* @var $user User */
+/* @var $user \Sil\DevPortal\models\User */
 /* @var $keys Key[] */
 /* @var $usageStats UsageStats */
-/* @var $apisOwnedByUser Api[]|null */
+/* @var $apisOwnedByUser \Sil\DevPortal\models\Api[]|null */
 /* @var $currentInterval string */
 /* @var $chart string */
 

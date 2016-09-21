@@ -8,8 +8,7 @@ use Sil\DevPortal\models\Key;
 /* @var $currentUser \Sil\DevPortal\models\User */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Home' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'Keys' => array('/key/'),
     'Key Details',
 );

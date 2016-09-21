@@ -5,6 +5,7 @@
 /* @var $homeLowerRightHtml string|null */
 /* @var $popularApis \Sil\DevPortal\models\Api[]|null */
 
+$this->breadcrumbs = array();
 $this->pageTitle = 'Welcome';
 ?>
 <div class="home-page">

@@ -9,8 +9,7 @@ use Sil\DevPortal\models\User;
 /* @var $webUser WebUser */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Home' => $webUser->getHomeUrl(),
+$this->breadcrumbs += array(
     'APIs' => array('/api/'),
     $api->display_name,
 );

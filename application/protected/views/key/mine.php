@@ -4,8 +4,7 @@
 /* @var $nonActiveKeysDataProvider CDataProvider */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Home' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'My Keys',
 );
 
