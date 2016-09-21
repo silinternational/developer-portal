@@ -4,8 +4,7 @@
 /* @var $webUser WebUser */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Home' => $webUser->getHomeUrl(),
+$this->breadcrumbs += array(
     'APIs',
 );
 

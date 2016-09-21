@@ -3,8 +3,7 @@
 /* @var $form CForm */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Home' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'Site Texts' => array('/site-text/'),
     $form->model->name => array(
         '/site-text/details/',

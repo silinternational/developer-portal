@@ -5,8 +5,7 @@
 /* @var $acceptedTerms bool */
 
 $this->pageTitle = $api->getRequestKeyText();
-$this->breadcrumbs = array(
-    'Home' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'APIs' => array('/api/'),
     $api->display_name => array('/api/details/', 'code' => $api->code),
     $this->pageTitle,

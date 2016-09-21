@@ -3,8 +3,7 @@
 /* @var $siteText SiteText */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Home' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'Site Texts' => array('/site-text/'),
     $siteText->name,
 );

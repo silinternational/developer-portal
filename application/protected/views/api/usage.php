@@ -3,8 +3,7 @@
 /* @var $api Api */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Home' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'APIs' => array('/api/'),
     $api->display_name => array('/api/details/', 'code' => $api->code),
     'API Usage',
