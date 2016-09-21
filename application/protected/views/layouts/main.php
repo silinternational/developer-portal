@@ -80,7 +80,6 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'label' => 'FAQs',
                     'url' => array('/faq/'),
                     'active' => ($this->id == 'faq'),
-                    'visible' => ( ! Yii::app()->user->isGuest),
                 ),
                 array(
                     'label' => 'Site Text',
