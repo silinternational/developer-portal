@@ -336,6 +336,82 @@ class UserTest extends DeveloperPortalTestCase
             'Incorrectly reported that a normal user could delete a key that was not theirs.'
         );
     }
+    
+    /**
+     * For a more readable version of who should be allowed to do what to a
+     * User's Key, see the following Google Sheet:
+     * https://docs.google.com/spreadsheets/d/1aTPVjPoy_VZAehx1Ipsom7HUuzGn8tmBJTaTrzw9QCI/edit#gid=0
+     */
+    public function testCanDeleteKey()
+    {
+        // Arrange:
+        $pendingKey = $this->keys('pendingKeyUser6');
+        $approvedKey = $this->keys('approvedKey');
+        $deniedKey = $this->keys('deniedKeyUser5');
+        $revokedKey = $this->keys('revokedKeyUser7');
+        $anAdmin = $this->users('userWithRoleOfAdminButNoKeys');
+        $keyTypes = [
+            Key::STATUS_PENDING => [
+                'key' => $pendingKey,
+                'tests' => [
+                    ['actor' => $pendingKey->user,       'allowed' => true],
+                    ['actor' => $pendingKey->api->owner, 'allowed' => false],
+                    ['actor' => $anAdmin,                'allowed' => false],
+                ],
+            ],
+            Key::STATUS_APPROVED => [
+                'key' => $approvedKey,
+                'tests' => [
+                    ['actor' => $approvedKey->user,       'allowed' => true],
+                    ['actor' => $approvedKey->api->owner, 'allowed' => false],
+                    ['actor' => $anAdmin,                 'allowed' => false],
+                ],
+            ],
+            Key::STATUS_DENIED => [
+                'key' => $deniedKey,
+                'tests' => [
+                    ['actor' => $deniedKey->user,       'allowed' => true],
+                    ['actor' => $deniedKey->api->owner, 'allowed' => false],
+                    ['actor' => $anAdmin,               'allowed' => true],
+                ],
+            ],
+            Key::STATUS_REVOKED => [
+                'key' => $revokedKey,
+                'tests' => [
+                    ['actor' => $revokedKey->user,       'allowed' => true],
+                    ['actor' => $revokedKey->api->owner, 'allowed' => false],
+                    ['actor' => $anAdmin,                'allowed' => true],
+                ],
+            ],
+        ];
+        foreach ($keyTypes as $keyStatus => $testData) {
+            /* @var $key Key */
+            $key = $testData['key'];
+            foreach ($testData['tests'] as $test) {
+                /* @var $actor User */
+                $actor = $test['actor'];
+                
+                // Pre-assert:
+                $this->assertSame($keyStatus, $key->status, sprintf(
+                    'This test requires a %s key, not a %s key.',
+                    $keyStatus,
+                    $key->status
+                ));
+                
+                // Act:
+                $actualResult = $actor->canDeleteKey($key);
+
+                // Assert:
+                $this->assertSame($test['allowed'], $actualResult, sprintf(
+                    '%s let a(n) %s delete %s %s key.',
+                    ($test['allowed'] ? 'Failed to' : 'Incorrectly'),
+                    $actor->role,
+                    (($key->user_id === $actor->user_id) ? 'their own' : "a user's"),
+                    $keyStatus
+                ));
+            }
+        }
+    }
 
     public function testCanDeleteKey_approvedKeyForApiOwnedByUser()
     {
