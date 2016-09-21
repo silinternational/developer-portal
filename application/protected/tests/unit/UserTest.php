@@ -167,6 +167,42 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testApprovedKeys_none()
+    {
+        // Arrange:
+        $user = $this->users('ownerThatDoesNotOwnAnyApisOrKeys');
+        $expected = array();
+        
+        // Act:
+        $actual = $user->approvedKeys;
+        
+        // Assert:
+        $this->assertEquals(
+            $expected,
+            $actual,
+            'Incorrectly returned keys for a user that has no approved keys.'
+        );
+    }
+    
+    public function testApprovedKeys_one()
+    {
+        // Arrange:
+        $user = $this->users('userWithOneApprovedKeyAndTwoPendingKeys');
+        $expected = array(
+            $this->keys('approvedKeyForUserWithOneApprovedKeyAndTwoPendingKeys'),
+        );
+        
+        // Act:
+        $actual = $user->approvedKeys;
+        
+        // Assert:
+        $this->assertEquals(
+            $expected,
+            $actual,
+            "Failed to a User's approved Key."
+        );
+    }
+    
     public function testAuthProviderRequired_emptyString()
     {
         // Arrange:

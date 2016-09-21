@@ -947,6 +947,13 @@ class User extends \UserBase
                 'condition' => 'status = :status',
                 'params' => array(':status' => Key::STATUS_APPROVED),
             ),
+            'approvedKeys' => array(
+                self::HAS_MANY,
+                Key::class,
+                'user_id',
+                'condition' => 'status = :status',
+                'params' => array(':status' => Key::STATUS_APPROVED),
+            ),
             'pendingKeyCount' => array(
                 self::STAT,
                 '\Sil\DevPortal\models\Key',

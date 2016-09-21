@@ -968,10 +968,8 @@ class ApiController extends \Controller
             }
         }
         
-        // Get list of APIs that user has a key for.
-        $apiOptions = Key::model()->findAllByAttributes(array(
-            'user_id' => $currentUser->user_id,
-        ));
+        // Get list of Apis that the User has an active Key for.
+        $apiOptions = $currentUser->approvedKeys;
         
         Key::sortKeysByApiName($apiOptions);
         
