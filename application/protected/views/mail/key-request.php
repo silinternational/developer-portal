@@ -1,8 +1,8 @@
 <?php
-/* @var $owner User */
-/* @var $api Api */
-/* @var $key Key */
-/* @var $requestingUser User */
+/* @var $owner \Sil\DevPortal\models\User */
+/* @var $api \Sil\DevPortal\models\Api */
+/* @var $key \Sil\DevPortal\models\Key */
+/* @var $requestingUser \Sil\DevPortal\models\User */
 ?>
 <p>
     Hello <?php echo ($owner ? CHtml::encode($owner->first_name) : 'API Developer Portal administrator'); ?>,

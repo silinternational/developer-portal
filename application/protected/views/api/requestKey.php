@@ -1,7 +1,7 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\ApiController */
-/* @var $api Api */
-/* @var $key Key */
+/* @var $api \Sil\DevPortal\models\Api */
+/* @var $key \Sil\DevPortal\models\Key */
 /* @var $acceptedTerms bool */
 
 $this->pageTitle = $api->getRequestKeyText();

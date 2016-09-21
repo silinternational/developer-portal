@@ -1,7 +1,7 @@
 <?php
-/* @var $api Api */
-/* @var $key Key */
-/* @var $keyOwner User */
+/* @var $api \Sil\DevPortal\models\Api */
+/* @var $key \Sil\DevPortal\models\Key */
+/* @var $keyOwner \Sil\DevPortal\models\User */
 ?>
 <p>
     Hello <?= \CHtml::encode($keyOwner->first_name) ?>,

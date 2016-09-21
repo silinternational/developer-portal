@@ -1,8 +1,8 @@
 <?php
-/* @var $apiOwner User */
-/* @var $api Api */
-/* @var $key Key */
-/* @var $keyOwner User */
+/* @var $apiOwner \Sil\DevPortal\models\User */
+/* @var $api \Sil\DevPortal\models\Api */
+/* @var $key \Sil\DevPortal\models\Key */
+/* @var $keyOwner \Sil\DevPortal\models\User */
 ?>
 <p>
     Hello <?php echo ($apiOwner ? $apiOwner->first_name : 'API Developer Portal administrator'); ?>,

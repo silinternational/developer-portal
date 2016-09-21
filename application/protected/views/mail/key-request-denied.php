@@ -1,5 +1,5 @@
 <?php
-/* @var $key Key */
+/* @var $key \Sil\DevPortal\models\Key */
 
 // Make sure we have retrieved the 'updated' time from the database.
 $key->refresh(); /** @todo Move this refresh() call out of the view file. */

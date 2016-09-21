@@ -1,7 +1,7 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\ApiController */
 /* @var $activeKeysDataProvider CDataProvider */
-/* @var $api Api */
+/* @var $api \Sil\DevPortal\models\Api */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs += array(

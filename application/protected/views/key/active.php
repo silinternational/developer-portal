@@ -14,7 +14,6 @@ $this->widget('bootstrap.widgets.TbGridView', array(
     'type' => 'striped hover',
     'dataProvider' => $activeKeysDataProvider,
     'template' => '{items}{pager}',
-    //'filter' => new Key(),
     'columns' => array(
         array('name' => 'user.display_name', 'header' => 'User'),
         array('name' => 'api.display_name', 'header' => 'API'),

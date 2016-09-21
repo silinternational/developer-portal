@@ -1,7 +1,7 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\ApiController */
 /* @var $pendingKeysDataProvider CDataProvider */
-/* @var $api Api */
+/* @var $api \Sil\DevPortal\models\Api */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs += array(
@@ -22,7 +22,6 @@ $this->pageSubtitle = 'Pending Keys for this API';
             'type' => 'striped hover',
             'dataProvider' => $pendingKeysDataProvider,
             'template' => '{items}{pager}',
-            //'filter' => new Key(),
             'columns' => array(
                 array(
                     'name' => 'user.display_name',

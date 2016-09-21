@@ -1,6 +1,6 @@
 <?php
-/* @var $addedByUser User */
-/* @var $api Api */
+/* @var $addedByUser \Sil\DevPortal\models\User */
+/* @var $api \Sil\DevPortal\models\Api */
 ?>
 <p>A new API has been added to the API Developer Portal. </p>
 <p><?php echo sprintf(

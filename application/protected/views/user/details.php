@@ -1,4 +1,7 @@
 <?php
+
+use Sil\DevPortal\models\User;
+
 /* @var $this \Sil\DevPortal\controllers\UserController */
 /* @var $apisDataProvider CDataProvider */
 /* @var $keysDataProvider CDataProvider */

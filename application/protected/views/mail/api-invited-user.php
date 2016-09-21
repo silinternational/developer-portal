@@ -1,7 +1,7 @@
 <?php
-/* @var $api Api */
+/* @var $api \Sil\DevPortal\models\Api */
 /* @var $apiVisibilityUser \Sil\DevPortal\models\ApiVisibilityUser */
-/* @var $invitedByUser User */
+/* @var $invitedByUser \Sil\DevPortal\models\User */
 /* @var $inviteeEmailAddress string */
 /* @var $this Controller */
 ?>

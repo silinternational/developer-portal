@@ -1,6 +1,6 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\SiteTextController */
-/* @var $siteText SiteText */
+/* @var $siteText \Sil\DevPortal\models\SiteText */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs += array(
