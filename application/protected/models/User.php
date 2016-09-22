@@ -736,18 +736,7 @@ class User extends \UserBase
             return false;
         }
         
-        // If the user is an admin, then yes.
-        if ($this->role === self::ROLE_ADMIN) {
-            return true;
-        }
-        
-        // If the user is the owner of the API, then yes.
-        if ($this->isOwnerOfApi($api)) {
-            return true;
-        }
-        
-        // Otherwise, say no.
-        return false;
+        return $this->isAdmin() || $this->isOwnerOfApi($api);
     }
     
     public function hasOwnerPrivileges()
