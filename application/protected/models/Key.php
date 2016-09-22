@@ -10,7 +10,9 @@ use Sil\DevPortal\models\User;
 use Exception;
 
 /**
- * The followings are the available model relations:
+ * The followings are the available model relations (defined in the parent
+ * class, re-documented here after proper 'use' statements to reflect the fixes
+ * implemented by FixRelationsClassPathsTrait):
  * @property Event[] $events
  * @property Api $api
  * @property User $processedBy

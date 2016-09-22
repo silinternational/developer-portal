@@ -1,6 +1,16 @@
 <?php
 namespace Sil\DevPortal\models;
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\User;
+
+/**
+ * The followings are the available model relations (defined in the parent
+ * class, re-documented here after proper 'use' statements to reflect the fixes
+ * implemented by FixRelationsClassPathsTrait):
+ * @property Api $api
+ * @property User $invitedByUser
+ */
 class ApiVisibilityDomain extends \ApiVisibilityDomainBase
 {
     use \Sil\DevPortal\components\DependentKeysTrait;

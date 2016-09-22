@@ -2,8 +2,22 @@
 namespace Sil\DevPortal\models;
 
 use ApiAxle\Api\Api as AxleApi;
+use Sil\DevPortal\models\ApiVisibilityDomain;
+use Sil\DevPortal\models\ApiVisibilityUser;
+use Sil\DevPortal\models\Event;
+use Sil\DevPortal\models\Key;
+use Sil\DevPortal\models\User;
 
 /**
+ * The followings are the available model relations (defined in the parent
+ * class, re-documented here after proper 'use' statements to reflect the fixes
+ * implemented by FixRelationsClassPathsTrait):
+ * @property User $owner
+ * @property ApiVisibilityDomain[] $apiVisibilityDomains
+ * @property ApiVisibilityUser[] $apiVisibilityUsers
+ * @property Event[] $events
+ * @property Key[] $keys
+ * 
  * Additional model relations (defined here, not in base class):
  * @property int $approvedKeyCount
  * @property int $pendingKeyCount

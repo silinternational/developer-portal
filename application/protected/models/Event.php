@@ -1,6 +1,19 @@
 <?php
 namespace Sil\DevPortal\models;
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\Key;
+use Sil\DevPortal\models\User;
+
+/**
+ * The followings are the available model relations (defined in the parent
+ * class, re-documented here after proper 'use' statements to reflect the fixes
+ * implemented by FixRelationsClassPathsTrait):
+ * @property Api $api
+ * @property Key $key
+ * @property User $actingUser
+ * @property User $affectedUser
+ */
 class Event extends \EventBase
 {
     use \Sil\DevPortal\components\FixRelationsClassPathsTrait;

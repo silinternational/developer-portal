@@ -1,13 +1,20 @@
 <?php
 namespace Sil\DevPortal\models;
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\Event;
+use Sil\DevPortal\models\Key;
+
 /**
- * Additional model relations (defined here, not in base class):
+ * Model relations (defined here, overriding base class):
+ * @property Api[] $apis
  * @property int $approvedKeyCount
  * @property int $pendingKeyCount
- * @property int $keysProcessed
+ * @property Key[] $keysProcessed
+ * @property Key[] $approvedKeys
  * @property Event[] $affectedByEvents
  * @property Event[] $causedEvents
+ * @property Key[] $keys
  */
 class User extends \UserBase 
 {
