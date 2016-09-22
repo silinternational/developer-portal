@@ -304,38 +304,6 @@ class UserTest extends DeveloperPortalTestCase
             'Incorrectly reported that a User can delete a null Key.'
         );
     }
-
-    public function testCanDeleteKey_ownKey()
-    {
-        // Arrange:
-        $key = $this->keys('pendingKey1_apiWithTwoPendingKeys');
-        $user = $this->users('userWith1stPKForApiWithTwoPendingKeys');
-        
-        // Act:
-        $result = $user->canDeleteKey($key);
-        
-        // Assert:
-        $this->assertTrue(
-            $result,
-            'Failed to report that a User can delete their own Key.'
-        );
-    }
-
-    public function testCanDeleteKey_notOwnKey()
-    {
-        // Arrange:
-        $key = $this->keys('pendingKey2_apiWithTwoPendingKeys');
-        $user = $this->users('userWith1stPKForApiWithTwoPendingKeys');
-        
-        // Act:
-        $result = $user->canDeleteKey($key);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly reported that a normal user could delete a key that was not theirs.'
-        );
-    }
     
     /**
      * For a more readable version of who should be allowed to do what to a
@@ -350,9 +318,13 @@ class UserTest extends DeveloperPortalTestCase
         $deniedKey = $this->keys('deniedKeyUser5');
         $revokedKey = $this->keys('revokedKeyUser7');
         $anAdmin = $this->users('userWithRoleOfAdminButNoKeys');
+        $aDifferentUser = $this->users('normalUserWithNoKeys');
+        $aDifferentOwner = $this->users('ownerThatDoesNotOwnAnyApisOrKeys');
         $expectedRoles = [
             'the user' => User::ROLE_USER,
+            'a different user' => User::ROLE_USER,
             'the API owner' => User::ROLE_OWNER,
+            'the owner of a different API' => User::ROLE_OWNER,
             'an admin' => User::ROLE_ADMIN,
         ];
         $keyTypes = [
@@ -367,10 +339,26 @@ class UserTest extends DeveloperPortalTestCase
                         'reset'   => false,
                         'delete'  => true,
                     ],
+                    'a different user' => [
+                        'actor'   => $aDifferentUser,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
                     'the API owner' => [
                         'actor'   => $pendingKey->api->owner,
                         'approve' => true,
                         'deny'    => true,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
+                    'the owner of a different API' => [
+                        'actor'   => $aDifferentOwner,
+                        'approve' => false,
+                        'deny'    => false,
                         'revoke'  => false,
                         'reset'   => false,
                         'delete'  => false,
@@ -396,11 +384,27 @@ class UserTest extends DeveloperPortalTestCase
                         'reset'   => true,
                         'delete'  => true,
                     ],
+                    'a different user' => [
+                        'actor'   => $aDifferentUser,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
                     'the API owner' => [
                         'actor'   => $approvedKey->api->owner,
                         'approve' => false,
                         'deny'    => false,
                         'revoke'  => true,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
+                    'the owner of a different API' => [
+                        'actor'   => $aDifferentOwner,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
                         'reset'   => false,
                         'delete'  => false,
                     ],
@@ -425,8 +429,24 @@ class UserTest extends DeveloperPortalTestCase
                         'reset'   => false,
                         'delete'  => true,
                     ],
+                    'a different user' => [
+                        'actor'   => $aDifferentUser,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
                     'the API owner' => [
                         'actor'   => $deniedKey->api->owner,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
+                    'the owner of a different API' => [
+                        'actor'   => $aDifferentOwner,
                         'approve' => false,
                         'deny'    => false,
                         'revoke'  => false,
@@ -454,8 +474,24 @@ class UserTest extends DeveloperPortalTestCase
                         'reset'   => false,
                         'delete'  => true,
                     ],
+                    'a different user' => [
+                        'actor'   => $aDifferentUser,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
                     'the API owner' => [
                         'actor'   => $revokedKey->api->owner,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
+                    'the owner of a different API' => [
+                        'actor'   => $aDifferentOwner,
                         'approve' => false,
                         'deny'    => false,
                         'revoke'  => false,
@@ -502,7 +538,6 @@ class UserTest extends DeveloperPortalTestCase
                 
                 // Assert:
                 foreach ($results as $permission => $actual) {
-                    //var_dump($expected, $permission, $actual, $kindOfUser, $keyStatus);
                     $this->assertSame($expected[$permission], $actual, sprintf(
                         '%s let %s %s %s %s key.',
                         ($expected[$permission] ? 'Failed to' : 'Incorrectly'),
@@ -514,76 +549,6 @@ class UserTest extends DeveloperPortalTestCase
                 }
             }
         }
-    }
-    
-    public function testCanDeleteKey_approvedKeyForApiOwnedByUser()
-    {
-        // Arrange:
-        $key = $this->keys('keyToApiOwnedByUser18');
-        $user = $this->users('user18');
-        
-        // Act:
-        $result = $user->canDeleteKey($key);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly reported that a User can delete an approved Key (to '
-            . 'an Api that they own) that is not their own Key. Approved Keys '
-            . 'belonging to another User must first be revoked.'
-        );
-    }
-
-    public function testCanDeleteKey_pendingKeyForApiOwnedByUser()
-    {
-        // Arrange:
-        $key = $this->keys('pendingKeyForApiOwnedByUser18');
-        $user = $this->users('user18');
-        
-        // Act:
-        $result = $user->canDeleteKey($key);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly reported that a User can delete a pending Key (to '
-            . 'an Api that they own) that is not their own Key. Pending Keys '
-            . 'belonging to another User must first be denied.'
-        );
-    }
-
-    public function testCanDeleteKey_deniedKeyForApiOwnedByUser()
-    {
-        // Arrange:
-        $key = $this->keys('deniedKeyForApiOwnedByUser18');
-        $user = $this->users('user18');
-        
-        // Act:
-        $result = $user->canDeleteKey($key);
-        
-        // Assert:
-        $this->assertTrue(
-            $result,
-            'Failed to report that a User can delete a denied Key for an Api '
-            . 'that they own.'
-        );
-    }
-
-    public function testCanDeleteKey_revokedKeyForApiOwnedByUser()
-    {
-        // Arrange:
-        $key = $this->keys('revokedKeyForApiOwnedByUser18');
-        $user = $this->users('user18');
-        
-        // Act:
-        $result = $user->canDeleteKey($key);
-        
-        // Assert:
-        $this->assertTrue(
-            $result,
-            'Failed to report that a User can delete a revoked Key for an Api '
-            . 'that they own.'
-        );
     }
 
     public function testCanInviteDomainToSeeApi_isOwnerOfThatApi()
@@ -687,40 +652,6 @@ class UserTest extends DeveloperPortalTestCase
             . 'see a null Api.'
         );
     }
-
-    public function testCanRevokeKey_approvedKeyNotOwnedByUserToApiNotOwnedByUser()
-    {
-        // Arrange:
-        $key = $this->keys('approvedKey');
-        $user = $this->users('ownerThatDoesNotOwnAnyApisOrKeys');
-        
-        // Act:
-        $result = $user->canRevokeKey($key);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly reported that a user with role "owner" could revoke '
-            . 'a Key that they do not own for an Api that they do not '
-            . 'own.'
-        );
-    }
-
-    public function testCanRevokeKey_pendingKeyByAdminUser()
-    {
-        // Arrange:
-        $key = $this->keys('pendingKey1_apiWithTwoPendingKeys');
-        $user = $this->users('userWithRoleOfAdminButNoKeys');
-        
-        // Act:
-        $result = $user->canRevokeKey($key);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly reported that a pending Key can be revoked.'
-        );
-    }
     
     public function testCanResetKey_nullKey()
     {
@@ -737,90 +668,7 @@ class UserTest extends DeveloperPortalTestCase
             'Incorrectly reported that a User can reset a null Key.'
         );
     }
-
-    public function testCanResetKey_ownKey()
-    {
-        // Arrange:
-        $key = $this->keys('firstKeyForApiWithTwoKeys');
-        $user = $this->users('userWithFirstKeyForApiWithTwoKeys');
-        
-        // Act:
-        $result = $user->canResetKey($key);
-        
-        // Assert:
-        $this->assertTrue(
-            $result,
-            'Failed to report that a User can reset their own Key.'
-        );
-    }
-
-    public function testCanResetKey_notOwnKey()
-    {
-        // Arrange:
-        $key = $this->keys('secondKeyForApiWithTwoKeys');
-        $user = $this->users('userWithFirstKeyForApiWithTwoKeys');
-        
-        // Act:
-        $result = $user->canResetKey($key);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly reported that a normal user could reset a Key that '
-            . 'they do not own.'
-        );
-    }
-
-    public function testCanResetKey_keyToApiOwnedByUser()
-    {
-        // Arrange:
-        $key = $this->keys('keyToApiOwnedByUser18');
-        $user = $this->users('user18');
-        
-        // Act:
-        $result = $user->canResetKey($key);
-        
-        // Assert:
-        $this->assertTrue(
-            $result,
-            'Failed to report that a User can reset a Key to an Api that they '
-            . 'own.'
-        );
-    }
-
-    public function testCanResetKey_keyNotOwnedByUserToApiNotOwnedByUser()
-    {
-        // Arrange:
-        $key = $this->keys('key1');
-        $user = $this->users('ownerThatDoesNotOwnAnyApisOrKeys');
-        
-        // Act:
-        $result = $user->canResetKey($key);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly reported that a user with role "owner" could reset '
-            . 'a Key that they do not own to an Api that they do not own.'
-        );
-    }
-
-    public function testCanResetKey_adminUserCanResetAnyApprovedKey()
-    {
-        // Arrange:
-        $key = $this->keys('approvedKey');
-        $user = $this->users('userWithRoleOfAdminButNoKeys');
-        
-        // Act:
-        $result = $user->canResetKey($key);
-        
-        // Assert:
-        $this->assertTrue(
-            $result,
-            'Failed to report that an admin User can reset any Key.'
-        );
-    }
-
+    
     public function testCanRevokeKey_nullKey()
     {
         // Arrange:
@@ -834,89 +682,6 @@ class UserTest extends DeveloperPortalTestCase
         $this->assertFalse(
             $result,
             'Incorrectly reported that a User can revoke a null Key.'
-        );
-    }
-
-    public function testCanRevokeKey_ownKey()
-    {
-        // Arrange:
-        $key = $this->keys('firstKeyForApiWithTwoKeys');
-        $user = $this->users('userWithFirstKeyForApiWithTwoKeys');
-        
-        // Act:
-        $result = $user->canRevokeKey($key);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly reported that a User can revoke their own Key.'
-        );
-    }
-
-    public function testCanRevokeKey_notOwnKey()
-    {
-        // Arrange:
-        $key = $this->keys('secondKeyForApiWithTwoKeys');
-        $user = $this->users('userWithFirstKeyForApiWithTwoKeys');
-        
-        // Act:
-        $result = $user->canRevokeKey($key);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly reported that a normal user could revoke a key that '
-            . 'they do not own.'
-        );
-    }
-
-    public function testCanRevokeKey_keyToApiOwnedByUser()
-    {
-        // Arrange:
-        $key = $this->keys('keyToApiOwnedByUser18');
-        $user = $this->users('user18');
-        
-        // Act:
-        $result = $user->canRevokeKey($key);
-        
-        // Assert:
-        $this->assertTrue(
-            $result,
-            'Failed to report that a User can revoke a Key to an Api that they '
-            . 'own.'
-        );
-    }
-
-    public function testCanRevokeKey_keyNotOwnedByUserToApiNotOwnedByUser()
-    {
-        // Arrange:
-        $key = $this->keys('key1');
-        $user = $this->users('ownerThatDoesNotOwnAnyApisOrKeys');
-        
-        // Act:
-        $result = $user->canRevokeKey($key);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly reported that a user with role "owner" could revoke '
-            . 'a Key that they do not own to an Api that they do not own.'
-        );
-    }
-
-    public function testCanRevokeKey_approvedKeyByAdminUser()
-    {
-        // Arrange:
-        $key = $this->keys('approvedKey');
-        $user = $this->users('userWithRoleOfAdminButNoKeys');
-        
-        // Act:
-        $result = $user->canRevokeKey($key);
-        
-        // Assert:
-        $this->assertTrue(
-            $result,
-            'Failed to report that an admin User can revoke any (approved) Key.'
         );
     }
     
@@ -1853,30 +1618,12 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testCanApproveKeyApproveKey_no()
-    {
-        // Arrange:
-        /* @var $key Key */
-        $key = $this->keys('pendingKeyForApiOwnedByUser18');
-        /* @var $user User */
-        $user = $this->users('userWithRoleOfOwner'); // NOT owner of Key's Api.
-        
-        // Act:
-        $result = $user->canApproveKey($key);
-        
-        // Assert:
-        $this->assertFalse(
-            $result,
-            'Incorrectly reported that a User is authorized to approve a Key to an Api that the User does NOT own.'
-        );
-    }
-    
-    public function testCanApproveKey_noKeyGiven()
+    public function testCanApproveKey_adminButNoKeyGiven()
     {
         // Arrange:
         $key = null;
         /* @var $user User */
-        $user = $this->users('userWithRoleOfOwner'); // NOT owner of Key's Api.
+        $user = $this->users('userWithRoleOfAdmin');
         
         // Act:
         $result = $user->canApproveKey($key);
@@ -1884,25 +1631,24 @@ class UserTest extends DeveloperPortalTestCase
         // Assert:
         $this->assertFalse(
             $result,
-            'Incorrectly reported that a User is authorized to approve a null Key.'
+            'Incorrectly reported that an admin can approve a null Key.'
         );
     }
     
-    public function testCanApproveKey_yes()
+    public function testCanApproveKey_ownerButNoKeyGiven()
     {
         // Arrange:
-        /* @var $key Key */
-        $key = $this->keys('pendingKeyForApiOwnedByUser18');
+        $key = null;
         /* @var $user User */
-        $user = $this->users('user18');
+        $user = $this->users('userWithRoleOfOwner');
         
         // Act:
         $result = $user->canApproveKey($key);
         
         // Assert:
-        $this->assertTrue(
+        $this->assertFalse(
             $result,
-            'Failed to report that a User is authorized to approve a Key to an Api that the User owns.'
+            'Incorrectly reported that an owner can approve a null Key.'
         );
     }
     
