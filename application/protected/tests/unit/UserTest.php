@@ -1750,7 +1750,7 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testIsAuthorizedToApproveKey_no()
+    public function testCanApproveKeyApproveKey_no()
     {
         // Arrange:
         /* @var $key Key */
@@ -1759,7 +1759,7 @@ class UserTest extends DeveloperPortalTestCase
         $user = $this->users('userWithRoleOfOwner'); // NOT owner of Key's Api.
         
         // Act:
-        $result = $user->isAuthorizedToApproveKey($key);
+        $result = $user->canApproveKey($key);
         
         // Assert:
         $this->assertFalse(
@@ -1768,7 +1768,7 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testIsAuthorizedToApproveKey_noKeyGiven()
+    public function testCanApproveKey_noKeyGiven()
     {
         // Arrange:
         $key = null;
@@ -1776,7 +1776,7 @@ class UserTest extends DeveloperPortalTestCase
         $user = $this->users('userWithRoleOfOwner'); // NOT owner of Key's Api.
         
         // Act:
-        $result = $user->isAuthorizedToApproveKey($key);
+        $result = $user->canApproveKey($key);
         
         // Assert:
         $this->assertFalse(
@@ -1785,7 +1785,7 @@ class UserTest extends DeveloperPortalTestCase
         );
     }
     
-    public function testIsAuthorizedToApproveKey_yes()
+    public function testCanApproveKey_yes()
     {
         // Arrange:
         /* @var $key Key */
@@ -1794,7 +1794,7 @@ class UserTest extends DeveloperPortalTestCase
         $user = $this->users('user18');
         
         // Act:
-        $result = $user->isAuthorizedToApproveKey($key);
+        $result = $user->canApproveKey($key);
         
         // Assert:
         $this->assertTrue(

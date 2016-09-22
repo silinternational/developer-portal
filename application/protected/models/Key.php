@@ -262,7 +262,7 @@ class Key extends \KeyBase
                     . 'requires approval.',
                     1465926569
                 );
-            } elseif ( ! $approvingUser->isAuthorizedToApproveKey($this)) {
+            } elseif ( ! $approvingUser->canApproveKey($this)) {
                 $this->addError('processed_by', sprintf(
                     'That user (%s) is not authorized to approve keys to that API.',
                     $approvingUser->getDisplayName()

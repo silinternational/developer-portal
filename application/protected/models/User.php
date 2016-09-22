@@ -219,7 +219,7 @@ class User extends \UserBase
      * @param Key $key The (pending) Key to be approved.
      * @return boolean
      */
-    public function isAuthorizedToApproveKey($key)
+    public function canApproveKey($key)
     {
         // If no Key was given, say no.
         if ( ! ($key instanceof Key)) {
@@ -245,7 +245,7 @@ class User extends \UserBase
     {
         /* NOTE: The authority to deny a key is the same as the authority to
          *       approve a key.  */
-        return $this->isAuthorizedToApproveKey($key);
+        return $this->canApproveKey($key);
     }
     
     /**
