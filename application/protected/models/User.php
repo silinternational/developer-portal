@@ -18,7 +18,6 @@ use Sil\DevPortal\models\Key;
  */
 class User extends \UserBase 
 {
-    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     
