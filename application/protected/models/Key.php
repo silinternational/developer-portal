@@ -478,7 +478,7 @@ class Key extends \KeyBase
             return false;
         }
         
-        if ( ! $userDenyingKey->isAuthorizedToDenyKey($this)) {
+        if ( ! $userDenyingKey->canDenyKey($this)) {
             $this->addError('processed_by', sprintf(
                 'That user (%s) is not authorized to deny keys for that API.',
                 $userDenyingKey->getDisplayName()

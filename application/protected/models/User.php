@@ -241,7 +241,7 @@ class User extends \UserBase
      * @param Key $key The (pending) Key.
      * @return boolean
      */
-    public function isAuthorizedToDenyKey($key)
+    public function canDenyKey($key)
     {
         /* NOTE: The authority to deny a key is the same as the authority to
          *       approve a key.  */
