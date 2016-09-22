@@ -342,7 +342,7 @@ class UserTest extends DeveloperPortalTestCase
      * User's Key, see the following Google Sheet:
      * https://docs.google.com/spreadsheets/d/1aTPVjPoy_VZAehx1Ipsom7HUuzGn8tmBJTaTrzw9QCI/edit#gid=0
      */
-    public function testCanDeleteKey()
+    public function testKeyPermissions()
     {
         // Arrange:
         $pendingKey = $this->keys('pendingKeyUser6');
@@ -350,69 +350,172 @@ class UserTest extends DeveloperPortalTestCase
         $deniedKey = $this->keys('deniedKeyUser5');
         $revokedKey = $this->keys('revokedKeyUser7');
         $anAdmin = $this->users('userWithRoleOfAdminButNoKeys');
+        $expectedRoles = [
+            'the user' => User::ROLE_USER,
+            'the API owner' => User::ROLE_OWNER,
+            'an admin' => User::ROLE_ADMIN,
+        ];
         $keyTypes = [
             Key::STATUS_PENDING => [
                 'key' => $pendingKey,
-                'tests' => [
-                    ['actor' => $pendingKey->user,       'allowed' => true],
-                    ['actor' => $pendingKey->api->owner, 'allowed' => false],
-                    ['actor' => $anAdmin,                'allowed' => false],
+                'testScenarios' => [
+                    'the user' => [
+                        'actor'   => $pendingKey->user,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => true,
+                    ],
+                    'the API owner' => [
+                        'actor'   => $pendingKey->api->owner,
+                        'approve' => true,
+                        'deny'    => true,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
+                    'an admin' => [
+                        'actor'   => $anAdmin,
+                        'approve' => true,
+                        'deny'    => true,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
                 ],
             ],
             Key::STATUS_APPROVED => [
                 'key' => $approvedKey,
-                'tests' => [
-                    ['actor' => $approvedKey->user,       'allowed' => true],
-                    ['actor' => $approvedKey->api->owner, 'allowed' => false],
-                    ['actor' => $anAdmin,                 'allowed' => false],
+                'testScenarios' => [
+                    'the user' => [
+                        'actor'   => $approvedKey->user,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => true,
+                        'delete'  => true,
+                    ],
+                    'the API owner' => [
+                        'actor'   => $approvedKey->api->owner,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => true,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
+                    'an admin' => [
+                        'actor'   => $anAdmin,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => true,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
                 ],
             ],
             Key::STATUS_DENIED => [
                 'key' => $deniedKey,
-                'tests' => [
-                    ['actor' => $deniedKey->user,       'allowed' => true],
-                    ['actor' => $deniedKey->api->owner, 'allowed' => false],
-                    ['actor' => $anAdmin,               'allowed' => true],
+                'testScenarios' => [
+                    'the user' => [
+                        'actor'   => $deniedKey->user,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => true,
+                    ],
+                    'the API owner' => [
+                        'actor'   => $deniedKey->api->owner,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
+                    'an admin' => [
+                        'actor'   => $anAdmin,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => true,
+                    ],
                 ],
             ],
             Key::STATUS_REVOKED => [
                 'key' => $revokedKey,
-                'tests' => [
-                    ['actor' => $revokedKey->user,       'allowed' => true],
-                    ['actor' => $revokedKey->api->owner, 'allowed' => false],
-                    ['actor' => $anAdmin,                'allowed' => true],
+                'testScenarios' => [
+                    'the user' => [
+                        'actor'   => $revokedKey->user,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => true,
+                    ],
+                    'the API owner' => [
+                        'actor'   => $revokedKey->api->owner,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => false,
+                    ],
+                    'an admin' => [
+                        'actor'   => $anAdmin,
+                        'approve' => false,
+                        'deny'    => false,
+                        'revoke'  => false,
+                        'reset'   => false,
+                        'delete'  => true,
+                    ],
                 ],
             ],
         ];
         foreach ($keyTypes as $keyStatus => $testData) {
             /* @var $key Key */
             $key = $testData['key'];
-            foreach ($testData['tests'] as $test) {
+            
+            // Pre-assert:
+            $this->assertSame($keyStatus, $key->status, sprintf(
+                'This test requires a key with status of "%s", not "%s".',
+                $keyStatus,
+                $key->status
+            ));
+            foreach ($testData['testScenarios'] as $kindOfUser => $expected) {
                 /* @var $actor User */
-                $actor = $test['actor'];
-                
-                // Pre-assert:
-                $this->assertSame($keyStatus, $key->status, sprintf(
-                    'This test requires a %s key, not a %s key.',
-                    $keyStatus,
-                    $key->status
+                $actor = $expected['actor'];
+                $this->assertSame($expectedRoles[$kindOfUser], $actor->role, sprintf(
+                    'This test requires a user with a role of "%s", not "%s".',
+                    $expectedRoles[$kindOfUser],
+                    $actor->role
                 ));
                 
                 // Act:
-                $actualResult = $actor->canDeleteKey($key);
-
+                $results = [];
+                $results['approve'] = $actor->canApproveKey($key);
+                $results['deny'] = $actor->canDenyKey($key);
+                $results['revoke'] = $actor->canRevokeKey($key);
+                $results['reset'] = $actor->canResetKey($key);
+                $results['delete'] = $actor->canDeleteKey($key);
+                
                 // Assert:
-                $this->assertSame($test['allowed'], $actualResult, sprintf(
-                    '%s let a(n) %s delete %s %s key.',
-                    ($test['allowed'] ? 'Failed to' : 'Incorrectly'),
-                    $actor->role,
-                    (($key->user_id === $actor->user_id) ? 'their own' : "a user's"),
-                    $keyStatus
-                ));
+                foreach ($results as $permission => $actual) {
+                    //var_dump($expected, $permission, $actual, $kindOfUser, $keyStatus);
+                    $this->assertSame($expected[$permission], $actual, sprintf(
+                        '%s let %s %s %s %s key.',
+                        ($expected[$permission] ? 'Failed to' : 'Incorrectly'),
+                        $kindOfUser,
+                        $permission,
+                        (($key->user_id === $actor->user_id) ? 'their own' : "a user's"),
+                        $keyStatus
+                    ));
+                }
             }
         }
     }
-
+    
     public function testCanDeleteKey_approvedKeyForApiOwnedByUser()
     {
         // Arrange:
