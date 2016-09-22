@@ -425,7 +425,6 @@ class Api extends \ApiBase
         return ($this->requiresApproval() ? 'Request' : 'Get') . ' Key';
     }
     
-    
     public function getRequiresSignatureText()
     {
         $options = self::getRequireSignatureOptions();

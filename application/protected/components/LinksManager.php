@@ -234,7 +234,7 @@ class LinksManager extends CComponent
             $actionLinks[] = new ActionLink(array(
                 '/key/delete/',
                 'id' => $key->key_id,
-            ), 'Delete Key', 'remove');
+            ), 'Delete ' . $key->getTypeText(), 'remove');
         }
         
         if ($user->canRevokeKey($key)) {

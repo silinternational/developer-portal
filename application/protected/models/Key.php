@@ -549,6 +549,17 @@ class Key extends \KeyBase
     }
     
     /**
+     * Get the string of text to use to refer to what type of thing this is.
+     * In other words, is this a key or a key request?
+     * 
+     * @return string
+     */
+    public function getTypeText()
+    {
+        return ($this->isPending() ? 'Key Request' : 'Key');
+    }
+    
+    /**
      * Get usage data for this Key.
      * 
      * @param string $granularity The time interval (e.g. - 'second', 'minute',
