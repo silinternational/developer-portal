@@ -36,7 +36,7 @@ class Key extends \KeyBase
         parent::afterSave();
         
         try {
-            if ($this->isNewRecord && ($this->status === self::STATUS_PENDING)) {
+            if ($this->isNewRecord && $this->isPending()) {
                 $this->notifyApiOwnerOfPendingRequest();
             }
         } finally {
@@ -94,7 +94,7 @@ class Key extends \KeyBase
         
         /* ***** ApiAxle-specific checks: ***** */
         
-        if ($this->status === self::STATUS_APPROVED) {
+        if ($this->isApproved()) {
         
             $axleKey = new AxleKey(\Yii::app()->params['apiaxle']);
             $keyData = array(
@@ -177,7 +177,7 @@ class Key extends \KeyBase
                 $this->addError('value',$e->getMessage());
                 return false;
             }
-        } elseif ($this->status === self::STATUS_DENIED) {
+        } elseif ($this->isDenied()) {
             
             /**
              * @todo Figure out what to do in ApiAxle when a Key in our database
@@ -191,7 +191,7 @@ class Key extends \KeyBase
             }
             return true;
             
-        } elseif ($this->status === self::STATUS_PENDING) {
+        } elseif ($this->isPending()) {
             
             /**
              * @todo Figure out what to do in ApiAxle (if anything) when a Key
@@ -202,7 +202,7 @@ class Key extends \KeyBase
             // TEMP
             return true;
             
-        } elseif ($this->status === self::STATUS_REVOKED) {
+        } elseif ($this->isRevoked()) {
             
             /**
              * @todo Figure out how to delete the key from Axle when the Key
@@ -250,7 +250,7 @@ class Key extends \KeyBase
      */
     public function approve($approvingUser = null)
     {
-        if ($this->status !== self::STATUS_PENDING) {
+        if ( ! $this->isPending()) {
             $this->addError('status', 'Only pending keys can be approved.');
             return false;
         }
@@ -475,7 +475,7 @@ class Key extends \KeyBase
      */
     public function deny(User $userDenyingKey)
     {
-        if ($this->status !== self::STATUS_PENDING) {
+        if ( ! $this->isPending()) {
             $this->addError('status', 'Only pending keys can be denied.');
             return false;
         }
@@ -632,8 +632,7 @@ class Key extends \KeyBase
      */
     public function isActiveOrPending()
     {
-        return ($this->status === self::STATUS_APPROVED) ||
-               ($this->status === self::STATUS_PENDING);
+        return $this->isApproved() || $this->isPending();
     }
     
     public function isApproved()
@@ -1229,7 +1228,7 @@ class Key extends \KeyBase
             return false;
         }
 
-        if ($this->status !== self::STATUS_APPROVED) {
+        if ( ! $this->isApproved()) {
             $this->addError('status', 'Only approved keys can be revoked.');
             return false;
         }
@@ -1439,7 +1438,7 @@ class Key extends \KeyBase
             $mailer = \Utils::getMailer();
         }
         
-        if ($this->status === self::STATUS_PENDING) {
+        if ($this->isPending()) {
             $this->sendPendingKeyDeletionNotification(
                 $mailer,
                 $appParams
