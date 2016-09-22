@@ -28,11 +28,7 @@ $this->pageTitle = 'Key Details';
     <div class="span4">
         <?php
         
-        // If the key is still pending
-        //    AND
-        // if the user has permission to grant/deny this request...
-        if (($key->status == Key::STATUS_PENDING) &&
-            $currentUser->hasAdminPrivilegesForApi($key->api)) {
+        if ($currentUser->canApproveKey($key)) {
             
             // Provide a way for this admin user to grant/deny the request.
             ?>

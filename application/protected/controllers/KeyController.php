@@ -105,8 +105,7 @@ class KeyController extends \Controller
             );
         }
         
-        if (\Yii::app()->request->isPostRequest &&
-            ($key->status == Key::STATUS_PENDING)) {
+        if (\Yii::app()->request->isPostRequest && $key->isPending()) {
             
             // If the User does NOT have permission to process requests
             // for keys to the corresponding API, say so.
@@ -299,6 +298,7 @@ class KeyController extends \Controller
     public function actionMine()
     {
         // Get the current user's model.
+        /* @var $currentUser User */
         $currentUser = \Yii::app()->user->user;
         
         // Get lists of the user's active and inactive keys (as data providers
@@ -306,7 +306,7 @@ class KeyController extends \Controller
         $activeKeys = array();
         $nonActiveKeys = array();
         foreach ($currentUser->keys as $key) {
-            if ($key->status === Key::STATUS_APPROVED) {
+            if ($key->isApproved()) {
                 $activeKeys[] = $key;
             } else {
                 $nonActiveKeys[] = $key;

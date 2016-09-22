@@ -1254,7 +1254,7 @@ class UserTest extends DeveloperPortalTestCase
         $keys = $user->getKeysWithApiNames();
         $foundOne = false;
         foreach ($keys as $key) {
-            if ($key->status === Key::STATUS_APPROVED) {
+            if ($key->isApproved()) {
                 $foundOne = true;
             }
         }
@@ -1276,7 +1276,7 @@ class UserTest extends DeveloperPortalTestCase
         $keys = $user->getKeysWithApiNames();
         $foundOne = false;
         foreach ($keys as $key) {
-            if ($key->status === Key::STATUS_DENIED) {
+            if ($key->isDenied()) {
                 $foundOne = true;
             }
         }
@@ -1298,7 +1298,7 @@ class UserTest extends DeveloperPortalTestCase
         $keys = $user->getKeysWithApiNames();
         $foundOne = false;
         foreach ($keys as $key) {
-            if ($key->status === Key::STATUS_PENDING) {
+            if ($key->isPending()) {
                 $foundOne = true;
             }
         }
@@ -1320,7 +1320,7 @@ class UserTest extends DeveloperPortalTestCase
         $keys = $user->getKeysWithApiNames();
         $foundOne = false;
         foreach ($keys as $key) {
-            if ($key->status === Key::STATUS_REVOKED) {
+            if ($key->isRevoked()) {
                 $foundOne = true;
             }
         }

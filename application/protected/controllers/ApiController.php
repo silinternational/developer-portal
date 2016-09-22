@@ -43,7 +43,7 @@ class ApiController extends \Controller
         // Get the list of active keys for that API.
         $activeKeys = array();
         foreach ($api->keys as $key) {
-            if ($key->status === Key::STATUS_APPROVED) {
+            if ($key->isApproved()) {
                 $activeKeys[] = $key;
             }
         }
@@ -1053,7 +1053,7 @@ class ApiController extends \Controller
         // Get the list of pending keys for that API.
         $pendingKeys = array();
         foreach ($api->keys as $key) {
-            if ($key->status === Key::STATUS_PENDING) {
+            if ($key->isPending()) {
                 $pendingKeys[] = $key;
             }
         }

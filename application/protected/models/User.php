@@ -220,9 +220,11 @@ class User extends \UserBase
     }
     
     /**
-     * Find out whether this User is allowed to approve the given (pending) Key.
+     * Find out whether this User is allowed to approve the given Key. Note that
+     * only pending Keys can be approved, so false will be returned for any
+     * non-pending Keys.
      * 
-     * @param Key $key The (pending) Key to be approved.
+     * @param Key $key The Key to be approved.
      * @return boolean
      */
     public function canApproveKey($key)
@@ -233,7 +235,7 @@ class User extends \UserBase
         }
         
         // Only pending keys can be approved.
-        if ( ! ($key->status === Key::STATUS_PENDING)) {
+        if ( ! $key->isPending()) {
             return false;
         }
         
@@ -312,7 +314,7 @@ class User extends \UserBase
         }
         
         // Only approved Keys can be reset.
-        if ($key->status !== Key::STATUS_APPROVED) {
+        if ( ! $key->isApproved()) {
             return false;
         }
         
@@ -333,7 +335,7 @@ class User extends \UserBase
             return false;
         }
         
-        if ($key->status !== Key::STATUS_APPROVED) {
+        if ( ! $key->isApproved()) {
             return false;
         }
         
@@ -443,6 +445,10 @@ class User extends \UserBase
         return $domain;
     }
     
+    /**
+     * @return Key[]
+     * @throws \Exception
+     */
     public function getKeysWithApiNames()
     {
         // Get the ID of the current user (as an integer).
