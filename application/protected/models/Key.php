@@ -343,7 +343,7 @@ class Key extends \KeyBase
             // Allow a User to delete their own Key regardless of status.
             return true;
             
-        } elseif ($this->isToApiOwnedBy($user) || $user->isAdmin()) {
+        } elseif ($user->isAdmin()) {
             
             /* Only allow someone else to delete a User's Key if they have the
              * appropriate authority and the Key has already been "terminated"

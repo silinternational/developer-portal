@@ -226,13 +226,14 @@ class User extends \UserBase
             return false;
         }
         
-        // If the Key is for an API that belongs to this user, say yes.
-        if ($key->isToApiOwnedBy($this)) {
-            return true;
+        // Only pending keys can be approved.
+        if ( ! ($key->status === Key::STATUS_PENDING)) {
+            return false;
         }
         
-        // Otherwise, say no.
-        return false;
+        // Otherwise, only say yes any of the following situations.
+        return $key->isToApiOwnedBy($this) ||
+               $this->isAdmin();
     }
     
     /**
@@ -299,27 +300,18 @@ class User extends \UserBase
      */
     public function canResetKey($key)
     {
-        // If no key was given, say no.
+        // If no Key was given, say no.
         if ($key === null) {
             return false;
         }
         
+        // Only approved Keys can be reset.
         if ($key->status !== Key::STATUS_APPROVED) {
             return false;
         }
         
-        // If the key belongs to this user, say yes.
-        if ($key->isOwnedBy($this)) {
-            return true;
-        }
-        
-        // If the key is to an API that belongs to this user, say yes.
-        if ($key->isToApiOwnedBy($this)) {
-            return true;
-        }
-        
-        // If the user is an admin, say yes. Otherwise, say no.
-        return ($this->role === self::ROLE_ADMIN);
+        // Finally, only allow it if the Key belongs to this User.
+        return $key->isOwnedBy($this);
     }
     
     /**
