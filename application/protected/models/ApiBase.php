@@ -26,6 +26,7 @@
  * @property string $terms
  * @property string $logo_url
  * @property string $require_signature
+ * @property string $how_to_get
  *
  * The followings are the available model relations:
  * @property User $owner
@@ -60,10 +61,10 @@ class ApiBase extends CActiveRecord
 			array('approval_type, protocol', 'length', 'max'=>5),
 			array('visibility', 'length', 'max'=>10),
 			array('require_signature', 'length', 'max'=>3),
-			array('documentation, terms', 'safe'),
+			array('documentation, terms, how_to_get', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('api_id, code, display_name, brief_description, endpoint, queries_second, queries_day, documentation, created, updated, approval_type, protocol, strict_ssl, endpoint_timeout, default_path, owner_id, technical_support, visibility, customer_support, terms, logo_url, require_signature', 'safe', 'on'=>'search'),
+			array('api_id, code, display_name, brief_description, endpoint, queries_second, queries_day, documentation, created, updated, approval_type, protocol, strict_ssl, endpoint_timeout, default_path, owner_id, technical_support, visibility, customer_support, terms, logo_url, require_signature, how_to_get', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -111,6 +112,7 @@ class ApiBase extends CActiveRecord
 			'terms' => 'Terms',
 			'logo_url' => 'Logo Url',
 			'require_signature' => 'Require Signature',
+			'how_to_get' => 'How To Get',
 		);
 	}
 
@@ -154,6 +156,7 @@ class ApiBase extends CActiveRecord
 		$criteria->compare('terms',$this->terms,true);
 		$criteria->compare('logo_url',$this->logo_url,true);
 		$criteria->compare('require_signature',$this->require_signature,true);
+		$criteria->compare('how_to_get',$this->how_to_get,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

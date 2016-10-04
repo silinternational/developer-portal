@@ -127,6 +127,17 @@ return array(
             ),
             'type' => 'text',
         ),
+        'how_to_get' => array(
+            'htmlOptions' => array(
+                'hint' => '<i class="icon-info-sign"></i> Use <a href="' .
+                          'http://en.wikipedia.org/wiki/Markdown" target="' .
+                          '_blank">Markdown</a> syntax to format your ' .
+                          'instructions to users about how to get access to ' .
+                          'this API.',
+                'style' => 'height: 25ex; width: 90%;'
+            ),
+            'type' => 'textarea',
+        ),
         'documentation' => array(
             'htmlOptions' => array(
                 'hint' => '<i class="icon-info-sign"></i> Use <a href="' .

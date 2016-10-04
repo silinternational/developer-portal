@@ -190,6 +190,19 @@ $attrLabels = $api->attributeLabels();
     </div>
 </div>
 
+<?php if ( ! empty($api->how_to_get)): ?>
+    <b>How to Get</b>
+    <div>
+        <div class="well">
+            <?php
+            $this->beginWidget('CMarkdown', array('purifyOutput' => true));
+            echo $api->how_to_get;
+            $this->endWidget();
+            ?>
+        </div>
+    </div>
+<?php endif; ?>
+
 <b>Documentation</b>
 <div>
     <?php if ($webUser->hasAdminPrivilegesForApi($api)): ?>
