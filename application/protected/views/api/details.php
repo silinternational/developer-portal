@@ -26,23 +26,14 @@ $attrLabels = $api->attributeLabels();
 ?>
 <div class="row">
     <div class="span12">
-        <?php
-        
-        if ( ! $webUser->hasActiveKeyToApi($api)) {
-            echo sprintf(
-                '<a href="%s" class="btn btn-success pull-right">'
-                . '<i class="icon-off icon-white"></i> %s'
-                . '</a>',
-                \CHtml::encode($this->createUrl('/api/request-key/', array(
-                    'code' => $api->code,
-                ))),
-                $api->getRequestKeyText()
-            );
-        } else {
-            echo LinksManager::generateActionsDropdownHtml($actionLinks);
-        }
-        
-        ?>
+        <div class="pull-right pad-horiz">
+            <?php if ($webUser->isGuest): ?>
+                <a href="<?= \CHtml::encode($this->createUrl('/auth/login/')); ?>"
+                   class="btn btn-success">Login to continue</a>
+            <?php else: ?>
+                <?= LinksManager::showActionLinks($actionLinks); ?>
+            <?php endif; ?>
+        </div>
         <dl class="dl-horizontal">
 
             <dt>Description</dt>

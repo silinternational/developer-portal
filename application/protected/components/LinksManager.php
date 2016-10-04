@@ -27,7 +27,7 @@ class LinksManager extends CComponent
         $buttonSize = self::BUTTON_SIZE_MEDIUM
     ) {
         // If no ActionLinks were given, then no HTML needs to be generated.
-        if (( ! is_array($actionLinks)) || (count($actionLinks) < 1)) {
+        if ( ! Utils::isArrayWithContent($actionLinks)) {
             return '';
         }
         
@@ -245,5 +245,28 @@ class LinksManager extends CComponent
         }
         
         return $actionLinks;
+    }
+    
+    /**
+     * Generate the HTML for the given ActionLinks. If only one is given, it
+     * will be shown as a single button. If multiple are given, they will be
+     * shown as a drop-down list.
+     * 
+     * @param ActionLink[] $actionLinks The list of ActionLinks representing the
+     *     buttons to include.
+     * @param string $buttonSize (Optional:) A constant representing the desired
+     *     size of the 'Actions' button. Defaults to
+     *     LinksManager::BUTTON_SIZE_MEDIUM.
+     * @return string The resulting HTML (if any).
+     */
+    public static function showActionLinks(
+        $actionLinks,
+        $buttonSize = self::BUTTON_SIZE_MEDIUM
+    ) {
+        if (count($actionLinks) === 1) {
+            return $actionLinks[0]->getAsHtml('btn');
+        } else {
+            return self::generateActionsDropdownHtml($actionLinks, $buttonSize);
+        }
     }
 }
