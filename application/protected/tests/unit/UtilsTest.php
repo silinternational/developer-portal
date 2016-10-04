@@ -149,4 +149,33 @@ class UtilsTest extends CDbTestCase
         
         $this->assertEquals($expected, $results);
     }
+    
+    public function testIsArrayWithContent()
+    {
+        // Arrange:
+        $testCases = [
+            [null, false],
+            ['', false],
+            ['abc', false],
+            [0, false],
+            [1, false],
+            [[], false],
+            [['a'], true],
+            [['a', 'b'], true],
+            [[null], true],
+        ];
+        foreach ($testCases as $testCase) {
+            $value = $testCase[0];
+            $expected = $testCase[1];
+            
+            // Act:
+            $actual = Utils::isArrayWithContent($value);
+
+            // Assert:
+            $this->assertSame($expected, $actual, sprintf(
+                'Returned the wrong response for %s.',
+                var_export($value, true)
+            ));
+        }
+    }
 }

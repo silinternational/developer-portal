@@ -364,4 +364,13 @@ return array(
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Insite',
     ),
+    'normalUserWithNoKeys' => array(
+        'user_id'       => 39,
+        'email'         => 'normalUserWithNoKeys@jaars.net',
+        'first_name'    => 'Normal User With',
+        'last_name'     => 'No Keys',
+        'status'        => User::STATUS_ACTIVE,
+        'role'          => User::ROLE_USER,
+        'auth_provider' => 'Google',
+    ),
 );

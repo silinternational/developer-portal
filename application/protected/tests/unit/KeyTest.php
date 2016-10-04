@@ -709,6 +709,106 @@ class KeyTest extends DeveloperPortalTestCase
         $this->assertClassHasRelation(new Key(), 'user', '\Sil\DevPortal\models\User');
     }
     
+    public function testIsApproved()
+    {
+        // Arrange:
+        $key = new Key();
+        $expectedResults = [
+            Key::STATUS_APPROVED => true,
+            Key::STATUS_DENIED => false,
+            Key::STATUS_PENDING => false,
+            Key::STATUS_REVOKED => false,
+        ];
+        foreach ($expectedResults as $keyStatus => $expectedResult) {
+            $key->status = $keyStatus;
+            
+            // Act:
+            $actualResult = $key->isApproved();
+
+            // Assert:
+            $this->assertSame($expectedResult, $actualResult, sprintf(
+                'A key with status of "%s" should%s be reported as approved.',
+                $key->status,
+                ($expectedResult ? '' : ' not')
+            ));
+        }
+    }
+    
+    public function testIsDenied()
+    {
+        // Arrange:
+        $key = new Key();
+        $expectedResults = [
+            Key::STATUS_APPROVED => false,
+            Key::STATUS_DENIED => true,
+            Key::STATUS_PENDING => false,
+            Key::STATUS_REVOKED => false,
+        ];
+        foreach ($expectedResults as $keyStatus => $expectedResult) {
+            $key->status = $keyStatus;
+            
+            // Act:
+            $actualResult = $key->isDenied();
+
+            // Assert:
+            $this->assertSame($expectedResult, $actualResult, sprintf(
+                'A key with status of "%s" should%s be reported as denied.',
+                $key->status,
+                ($expectedResult ? '' : ' not')
+            ));
+        }
+    }
+    
+    public function testIsPending()
+    {
+        // Arrange:
+        $key = new Key();
+        $expectedResults = [
+            Key::STATUS_APPROVED => false,
+            Key::STATUS_DENIED => false,
+            Key::STATUS_PENDING => true,
+            Key::STATUS_REVOKED => false,
+        ];
+        foreach ($expectedResults as $keyStatus => $expectedResult) {
+            $key->status = $keyStatus;
+            
+            // Act:
+            $actualResult = $key->isPending();
+
+            // Assert:
+            $this->assertSame($expectedResult, $actualResult, sprintf(
+                'A key with status of "%s" should%s be reported as pending.',
+                $key->status,
+                ($expectedResult ? '' : ' not')
+            ));
+        }
+    }
+    
+    public function testIsRevoked()
+    {
+        // Arrange:
+        $key = new Key();
+        $expectedResults = [
+            Key::STATUS_APPROVED => false,
+            Key::STATUS_DENIED => false,
+            Key::STATUS_PENDING => false,
+            Key::STATUS_REVOKED => true,
+        ];
+        foreach ($expectedResults as $keyStatus => $expectedResult) {
+            $key->status = $keyStatus;
+            
+            // Act:
+            $actualResult = $key->isRevoked();
+
+            // Assert:
+            $this->assertSame($expectedResult, $actualResult, sprintf(
+                'A key with status of "%s" should%s be reported as revoked.',
+                $key->status,
+                ($expectedResult ? '' : ' not')
+            ));
+        }
+    }
+    
     public function testIsToApiOwnedBy_no()
     {
         // Arrange:

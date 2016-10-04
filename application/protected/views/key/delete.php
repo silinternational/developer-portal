@@ -3,13 +3,11 @@
 /* @var $key \Sil\DevPortal\models\Key */
 /* @var $currentUser \Sil\DevPortal\models\User */
 
-// Set up the breadcrumbs.
+$this->pageTitle = 'Delete ' . $key->getTypeText();
 $this->breadcrumbs += array(
     'Keys' => array('/key/'),
-    'Delete Key',
+    $this->pageTitle,
 );
-
-$this->pageTitle = 'Delete Key';
 
 ?>
 <div class="row">

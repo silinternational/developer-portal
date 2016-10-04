@@ -4,8 +4,20 @@ namespace Sil\DevPortal\models;
 use ApiAxle\Api\Api as AxleApi;
 use ApiAxle\Api\Key as AxleKey;
 use ApiAxle\Api\Keyring as AxleKeyring;
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\Event;
+use Sil\DevPortal\models\User;
 use Exception;
 
+/**
+ * The followings are the available model relations (defined in the parent
+ * class, re-documented here after proper 'use' statements to reflect the fixes
+ * implemented by FixRelationsClassPathsTrait):
+ * @property Event[] $events
+ * @property Api $api
+ * @property User $processedBy
+ * @property User $user
+ */
 class Key extends \KeyBase
 {
     use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
@@ -24,7 +36,7 @@ class Key extends \KeyBase
         parent::afterSave();
         
         try {
-            if ($this->isNewRecord && ($this->status === self::STATUS_PENDING)) {
+            if ($this->isNewRecord && $this->isPending()) {
                 $this->notifyApiOwnerOfPendingRequest();
             }
         } finally {
@@ -82,7 +94,7 @@ class Key extends \KeyBase
         
         /* ***** ApiAxle-specific checks: ***** */
         
-        if ($this->status === self::STATUS_APPROVED) {
+        if ($this->isApproved()) {
         
             $axleKey = new AxleKey(\Yii::app()->params['apiaxle']);
             $keyData = array(
@@ -165,7 +177,7 @@ class Key extends \KeyBase
                 $this->addError('value',$e->getMessage());
                 return false;
             }
-        } elseif ($this->status === self::STATUS_DENIED) {
+        } elseif ($this->isDenied()) {
             
             /**
              * @todo Figure out what to do in ApiAxle when a Key in our database
@@ -179,7 +191,7 @@ class Key extends \KeyBase
             }
             return true;
             
-        } elseif ($this->status === self::STATUS_PENDING) {
+        } elseif ($this->isPending()) {
             
             /**
              * @todo Figure out what to do in ApiAxle (if anything) when a Key
@@ -190,7 +202,7 @@ class Key extends \KeyBase
             // TEMP
             return true;
             
-        } elseif ($this->status === self::STATUS_REVOKED) {
+        } elseif ($this->isRevoked()) {
             
             /**
              * @todo Figure out how to delete the key from Axle when the Key
@@ -238,7 +250,7 @@ class Key extends \KeyBase
      */
     public function approve($approvingUser = null)
     {
-        if ($this->status !== self::STATUS_PENDING) {
+        if ( ! $this->isPending()) {
             $this->addError('status', 'Only pending keys can be approved.');
             return false;
         }
@@ -252,7 +264,7 @@ class Key extends \KeyBase
                     . 'requires approval.',
                     1465926569
                 );
-            } elseif ( ! $approvingUser->isAuthorizedToApproveKey($this)) {
+            } elseif ( ! $approvingUser->canApproveKey($this)) {
                 $this->addError('processed_by', sprintf(
                     'That user (%s) is not authorized to approve keys to that API.',
                     $approvingUser->getDisplayName()
@@ -333,7 +345,7 @@ class Key extends \KeyBase
             // Allow a User to delete their own Key regardless of status.
             return true;
             
-        } elseif ($this->isToApiOwnedBy($user) || $user->isAdmin()) {
+        } elseif ($user->isAdmin()) {
             
             /* Only allow someone else to delete a User's Key if they have the
              * appropriate authority and the Key has already been "terminated"
@@ -463,12 +475,12 @@ class Key extends \KeyBase
      */
     public function deny(User $userDenyingKey)
     {
-        if ($this->status !== self::STATUS_PENDING) {
+        if ( ! $this->isPending()) {
             $this->addError('status', 'Only pending keys can be denied.');
             return false;
         }
         
-        if ( ! $userDenyingKey->isAuthorizedToDenyKey($this)) {
+        if ( ! $userDenyingKey->canDenyKey($this)) {
             $this->addError('processed_by', sprintf(
                 'That user (%s) is not authorized to deny keys for that API.',
                 $userDenyingKey->getDisplayName()
@@ -534,6 +546,17 @@ class Key extends \KeyBase
             }
         }
         return $changes;
+    }
+    
+    /**
+     * Get the string of text to use to refer to what type of thing this is.
+     * In other words, is this a key or a key request?
+     * 
+     * @return string
+     */
+    public function getTypeText()
+    {
+        return ($this->isPending() ? 'Key Request' : 'Key');
     }
     
     /**
@@ -611,7 +634,7 @@ class Key extends \KeyBase
             self::STATUS_REVOKED,
         );
     }
-           
+    
     /**
      * Indicate whether this Key is active or pending (i.e. - it has not been
      * terminated).
@@ -620,10 +643,29 @@ class Key extends \KeyBase
      */
     public function isActiveOrPending()
     {
-        return ($this->status === self::STATUS_APPROVED) ||
-               ($this->status === self::STATUS_PENDING);
+        return $this->isApproved() || $this->isPending();
     }
-           
+    
+    public function isApproved()
+    {
+        return ($this->status === self::STATUS_APPROVED);
+    }
+    
+    public function isDenied()
+    {
+        return ($this->status === self::STATUS_DENIED);
+    }
+    
+    public function isPending()
+    {
+        return ($this->status === self::STATUS_PENDING);
+    }
+    
+    public function isRevoked()
+    {
+        return ($this->status === self::STATUS_REVOKED);
+    }
+    
     /**
      * Indicate whether this Key belongs to the given User. Note that this is a
      * User model, not a Yii CWebUser. If no user is given, then false is
@@ -1197,7 +1239,7 @@ class Key extends \KeyBase
             return false;
         }
 
-        if ($this->status !== self::STATUS_APPROVED) {
+        if ( ! $this->isApproved()) {
             $this->addError('status', 'Only approved keys can be revoked.');
             return false;
         }
@@ -1407,7 +1449,7 @@ class Key extends \KeyBase
             $mailer = \Utils::getMailer();
         }
         
-        if ($this->status === self::STATUS_PENDING) {
+        if ($this->isPending()) {
             $this->sendPendingKeyDeletionNotification(
                 $mailer,
                 $appParams

@@ -62,7 +62,7 @@ if ($currentUser->canSeeKey($key)) {
                 ?></dd>
         <?php endif; ?>
         
-        <?php if ($key->status === Key::STATUS_APPROVED): ?>
+        <?php if ($key->isApproved()): ?>
             <dt>Secret</dt>
             <?php if ($key->secret !== null): ?>
                 <dd>

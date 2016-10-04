@@ -1,17 +1,23 @@
 <?php
 namespace Sil\DevPortal\models;
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\Event;
+use Sil\DevPortal\models\Key;
+
 /**
- * Additional model relations (defined here, not in base class):
+ * Model relations (defined here, overriding base class):
+ * @property Api[] $apis
  * @property int $approvedKeyCount
  * @property int $pendingKeyCount
- * @property int $keysProcessed
+ * @property Key[] $keysProcessed
+ * @property Key[] $approvedKeys
  * @property Event[] $affectedByEvents
  * @property Event[] $causedEvents
+ * @property Key[] $keys
  */
 class User extends \UserBase 
 {
-    use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     
@@ -214,25 +220,28 @@ class User extends \UserBase
     }
     
     /**
-     * Find out whether this User is allowed to approve the given (pending) Key.
+     * Find out whether this User is allowed to approve the given Key. Note that
+     * only pending Keys can be approved, so false will be returned for any
+     * non-pending Keys.
      * 
-     * @param Key $key The (pending) Key to be approved.
+     * @param Key $key The Key to be approved.
      * @return boolean
      */
-    public function isAuthorizedToApproveKey($key)
+    public function canApproveKey($key)
     {
         // If no Key was given, say no.
         if ( ! ($key instanceof Key)) {
             return false;
         }
         
-        // If the Key is for an API that belongs to this user, say yes.
-        if ($key->isToApiOwnedBy($this)) {
-            return true;
+        // Only pending keys can be approved.
+        if ( ! $key->isPending()) {
+            return false;
         }
         
-        // Otherwise, say no.
-        return false;
+        // Otherwise, only say yes any of the following situations.
+        return $key->isToApiOwnedBy($this) ||
+               $this->isAdmin();
     }
     
     /**
@@ -241,11 +250,11 @@ class User extends \UserBase
      * @param Key $key The (pending) Key.
      * @return boolean
      */
-    public function isAuthorizedToDenyKey($key)
+    public function canDenyKey($key)
     {
         /* NOTE: The authority to deny a key is the same as the authority to
          *       approve a key.  */
-        return $this->isAuthorizedToApproveKey($key);
+        return $this->canApproveKey($key);
     }
     
     /**
@@ -299,27 +308,18 @@ class User extends \UserBase
      */
     public function canResetKey($key)
     {
-        // If no key was given, say no.
+        // If no Key was given, say no.
         if ($key === null) {
             return false;
         }
         
-        if ($key->status !== Key::STATUS_APPROVED) {
+        // Only approved Keys can be reset.
+        if ( ! $key->isApproved()) {
             return false;
         }
         
-        // If the key belongs to this user, say yes.
-        if ($key->isOwnedBy($this)) {
-            return true;
-        }
-        
-        // If the key is to an API that belongs to this user, say yes.
-        if ($key->isToApiOwnedBy($this)) {
-            return true;
-        }
-        
-        // If the user is an admin, say yes. Otherwise, say no.
-        return ($this->role === self::ROLE_ADMIN);
+        // Finally, only allow it if the Key belongs to this User.
+        return $key->isOwnedBy($this);
     }
     
     /**
@@ -335,7 +335,7 @@ class User extends \UserBase
             return false;
         }
         
-        if ($key->status !== Key::STATUS_APPROVED) {
+        if ( ! $key->isApproved()) {
             return false;
         }
         
@@ -445,6 +445,10 @@ class User extends \UserBase
         return $domain;
     }
     
+    /**
+     * @return Key[]
+     * @throws \Exception
+     */
     public function getKeysWithApiNames()
     {
         // Get the ID of the current user (as an integer).
@@ -732,18 +736,7 @@ class User extends \UserBase
             return false;
         }
         
-        // If the user is an admin, then yes.
-        if ($this->role === self::ROLE_ADMIN) {
-            return true;
-        }
-        
-        // If the user is the owner of the API, then yes.
-        if ($this->isOwnerOfApi($api)) {
-            return true;
-        }
-        
-        // Otherwise, say no.
-        return false;
+        return $this->isAdmin() || $this->isOwnerOfApi($api);
     }
     
     public function hasOwnerPrivileges()

@@ -7,13 +7,11 @@ use Sil\DevPortal\models\Key;
 /* @var $key Key */
 /* @var $currentUser \Sil\DevPortal\models\User */
 
-// Set up the breadcrumbs.
+$this->pageTitle = $key->getTypeText() . ' Details';
 $this->breadcrumbs += array(
     'Keys' => array('/key/'),
-    'Key Details',
+    $this->pageTitle
 );
-
-$this->pageTitle = 'Key Details';
 
 ?>
 <div class="row">
@@ -27,17 +25,10 @@ $this->pageTitle = 'Key Details';
     </div>
     <div class="span4">
         <?php
-        
-        // If the key is still pending
-        //    AND
-        // if the user has permission to grant/deny this request...
-        if (($key->status == Key::STATUS_PENDING) &&
-            $currentUser->hasAdminPrivilegesForApi($key->api)) {
-            
-            // Provide a way for this admin user to grant/deny the request.
+        if ($currentUser->canApproveKey($key)) {
             ?>
             <h3>Actions</h3>
-            <p>What do you want to do with this key? </p>
+            <p>What do you want to do with this key request? </p>
             <?php $form = $this->beginWidget('CActiveForm'); ?>
                 <dl>
                     <dd>
@@ -60,11 +51,8 @@ $this->pageTitle = 'Key Details';
         } else {
             
             // Otherwise, show any (normal) action links.
-            echo LinksManager::generateActionsDropdownHtml(
-                LinksManager::getKeyDetailsActionLinksForUser($key, $currentUser)
-            );
+            echo LinksManager::generateActionsDropdownHtml($actionLinks);
         }
-
         ?>
     </div>
 </div>
