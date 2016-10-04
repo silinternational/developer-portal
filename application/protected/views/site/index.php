@@ -1,6 +1,7 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\SiteController */
 /* @var $loginOptions array<string,string> */
+/* @var $logoUrls string[] */
 /* @var $homeLowerLeftHtml string|null */
 /* @var $homeLowerRightHtml string|null */
 /* @var $popularApis \Sil\DevPortal\models\Api[]|null */
@@ -53,13 +54,15 @@ $this->pageTitle = 'Welcome';
                 <?php endif; ?>
             </div>
         </div>
-    
-        <div id="logo-strip">
-            <div>
-                <img src="/img/logos/one.png" />
-                <img src="/img/logos/two.png" />
-                <img src="/img/logos/three.png" />
+        
+        <?php if ( ! empty($logoUrls)): ?>
+            <div id="logo-strip">
+                <div>
+                    <?php foreach ($logoUrls as $logoUrl): ?>
+                        <img src="<?= \CHtml::encode($logoUrl); ?>" />
+                    <?php endforeach; ?>
+                </div>
             </div>
-        </div>
+        <?php endif; ?>
     </div>
 </div>

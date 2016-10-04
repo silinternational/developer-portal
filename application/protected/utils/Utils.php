@@ -238,6 +238,29 @@ Rand_Gen_Loop:
         return $results;
     }
     
+    public static function getLogoUrls()
+    {
+        try {
+            $logoStripDir = __DIR__ . '/../../public/img/logos';
+            $logoFiles = CFileHelper::findFiles($logoStripDir, [
+                'fileTypes' => ['png', 'jpg', 'jpeg'],
+                'exclude' => ['site-logo.png'],
+                'level' => 0,
+                'absolutePaths' => false,
+            ]);
+            sort($logoFiles);
+            return array_map(
+                function($logoFilename) { return '/img/logos/' . $logoFilename; },
+                $logoFiles
+            );
+        } catch (\Exception $e) {
+            Yii::log(
+                'Failed to get logo files: ' . $e->getMessage(),
+                \CLogger::LEVEL_WARNING
+            );
+            return [];
+        }
+    }
     
     public static function getMailer()
     {

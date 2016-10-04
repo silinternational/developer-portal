@@ -47,6 +47,7 @@ class SiteController extends \Controller
         
         $this->render('index', array(
             'loginOptions' => $loginOptions,
+            'logoUrls' => \Utils::getLogoUrls(),
             'popularApis' => $popularApis,
             'homeLowerLeftHtml' => SiteText::getHtml('home-lower-left'),
             'homeLowerRightHtml' => SiteText::getHtml('home-lower-right'),
