@@ -207,35 +207,21 @@ Rand_Gen_Loop:
     }
     
     /**
-     * Function loads the protected/data/version.txt file and parses out
-     * application version number and build date and returns as an indexed
-     * array
+     * Get the build date (from the protected/data/version.txt file) of this
+     * version of this application.
      * 
-     * $results = array(
-     *    'version' => 'vx.x.x',
-     *    'build'   => 'Thurs, 09 Jan 2014  08:59:23 -0600',
-     * );
-     * 
-     * @return array
+     * @return string|null
      */
-    public static function getApplicationVersion()
+    public static function getApplicationBuildDate()
     {
-        $results = array(
-            'version' => 'Error',
-            'build' => 'Error',
-        );
-        if(file_exists(__DIR__.'/../data/version.txt')){
-            $line = file_get_contents(__DIR__.'/../data/version.txt');
-            if($line && $line != ''){
-                $info = explode('|', $line);
-                if(is_array($info)){
-                    $results['version'] = $info[0];
-                    $results['build'] = $info[1];
-                }
-            }
-        }
+        /* Use false (rather than null) to simplify check for a valid value
+         * used at the end of this function.  */
+        $buildDate = false;
         
-        return $results;
+        if (file_exists(__DIR__ . '/../data/version.txt')) {
+            $buildDate = file_get_contents(__DIR__ . '/../data/version.txt');
+        }
+        return ($buildDate !== false) ? $buildDate : null;
     }
     
     public static function getLogoUrls()

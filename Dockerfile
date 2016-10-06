@@ -31,4 +31,8 @@ RUN curl -o /usr/local/bin/s3-expand https://raw.githubusercontent.com/silintern
 
 EXPOSE 80
 ENTRYPOINT ["/usr/local/bin/s3-expand"]
+
+# Record now as the build date/time (in a friendly format).
+RUN date -u +"%B %-d, %Y, %-I:%M%P (%Z)" > /data/protected/data/version.txt
+
 CMD ["/data/run.sh"]

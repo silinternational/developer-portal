@@ -139,17 +139,9 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
         <img src="/img/logos/site-logo.png" class="pull-left footer-logo" />
         &copy; <?php echo date('Y'); ?> by SIL International Inc. | All Rights Reserved.<br/>
         Delivered by GTIS, USA Studio<br />
-        <?php
-        if ( ! Yii::app()->user->isGuest) {
-            $versionInfo = Utils::getApplicationVersion();
-            echo sprintf(
-                '%s version <em>%s</em> built on <em>%s</em><br />',
-                CHtml::encode(Yii::app()->name),
-                CHtml::encode($versionInfo['version']),
-                CHtml::encode($versionInfo['build'])
-            );
-        }
-        ?>
+        <?php if ( ! Yii::app()->user->isGuest): ?>
+            Built <?= \CHtml::encode(Utils::getApplicationBuildDate()); ?><br />
+        <?php endif; ?>
         <a href="<?php echo Yii::app()->createUrl('/site/privacy-policy'); ?>">Privacy Policy</a>
         <?php if (( ! \Yii::app()->user->isGuest) && isset(\Yii::app()->params['adminEmail'])): ?>
         | <a href="mailto:<?php echo CHtml::encode(Yii::app()->params['adminEmail']); ?>">Contact Us</a>
