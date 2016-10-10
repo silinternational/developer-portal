@@ -138,6 +138,18 @@ return array(
             ),
             'type' => 'textarea',
         ),
+        'embedded_docs_url' => array(
+            'type' => 'text',
+            'maxlength' => 255,
+            'htmlOptions' => array(
+                'class' => 'input-xxlarge',
+                'hint' => '<i class="icon-info-sign"></i> If you would like ' .
+                          'to embed a Google Doc as the documentation for this ' .
+                          'API, enter that URL here. <br />Example: <code>' .
+                          'https://docs.google.com/document/d/.../pub?embedded=true' .
+                          '</code>',
+            ),
+        ),
         'documentation' => array(
             'htmlOptions' => array(
                 'hint' => '<i class="icon-info-sign"></i> Use <a href="' .

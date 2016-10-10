@@ -27,6 +27,7 @@
  * @property string $logo_url
  * @property string $require_signature
  * @property string $how_to_get
+ * @property string $embedded_docs_url
  *
  * The followings are the available model relations:
  * @property User $owner
@@ -57,14 +58,14 @@ class ApiBase extends CActiveRecord
 			array('queries_second, queries_day, strict_ssl, endpoint_timeout, owner_id', 'numerical', 'integerOnly'=>true),
 			array('code', 'length', 'max'=>32),
 			array('display_name', 'length', 'max'=>64),
-			array('brief_description, endpoint, default_path, technical_support, customer_support, logo_url', 'length', 'max'=>255),
+			array('brief_description, endpoint, default_path, technical_support, customer_support, logo_url, embedded_docs_url', 'length', 'max'=>255),
 			array('approval_type, protocol', 'length', 'max'=>5),
 			array('visibility', 'length', 'max'=>10),
 			array('require_signature', 'length', 'max'=>3),
 			array('documentation, terms, how_to_get', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('api_id, code, display_name, brief_description, endpoint, queries_second, queries_day, documentation, created, updated, approval_type, protocol, strict_ssl, endpoint_timeout, default_path, owner_id, technical_support, visibility, customer_support, terms, logo_url, require_signature, how_to_get', 'safe', 'on'=>'search'),
+			array('api_id, code, display_name, brief_description, endpoint, queries_second, queries_day, documentation, created, updated, approval_type, protocol, strict_ssl, endpoint_timeout, default_path, owner_id, technical_support, visibility, customer_support, terms, logo_url, require_signature, how_to_get, embedded_docs_url', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -113,6 +114,7 @@ class ApiBase extends CActiveRecord
 			'logo_url' => 'Logo Url',
 			'require_signature' => 'Require Signature',
 			'how_to_get' => 'How To Get',
+			'embedded_docs_url' => 'Embedded Docs Url',
 		);
 	}
 
@@ -157,6 +159,7 @@ class ApiBase extends CActiveRecord
 		$criteria->compare('logo_url',$this->logo_url,true);
 		$criteria->compare('require_signature',$this->require_signature,true);
 		$criteria->compare('how_to_get',$this->how_to_get,true);
+		$criteria->compare('embedded_docs_url',$this->embedded_docs_url,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

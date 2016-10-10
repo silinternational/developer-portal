@@ -205,22 +205,27 @@ $attrLabels = $api->attributeLabels();
 
 <b>Documentation</b>
 <div>
-    <?php if ($webUser->hasAdminPrivilegesForApi($api)): ?>
-        <a href="<?php echo $this->createUrl('/api/docs-edit/', array('code' => $api->code)); ?>" 
-           class="nowrap space-after-icon pull-right btn btn-xs" style="margin: 5px;">
-            <i class="icon-pencil"></i>Edit documentation
-        </a>
+    <?php if ( ! empty($api->embedded_docs_url)): ?>
+        <iframe src="<?= \CHtml::encode($api->embedded_docs_url); ?>"
+                class="embedded-docs"></iframe>
+    <?php else: ?>
+        <?php if ($webUser->hasAdminPrivilegesForApi($api)): ?>
+            <a href="<?php echo $this->createUrl('/api/docs-edit/', array('code' => $api->code)); ?>" 
+               class="nowrap space-after-icon pull-right btn btn-xs" style="margin: 5px;">
+                <i class="icon-pencil"></i>Edit documentation
+            </a>
+        <?php endif; ?>
+
+        <div class="well">
+            <?php
+
+            $this->beginWidget('CMarkdown', array('purifyOutput' => true));
+            echo $api->documentation;
+            $this->endWidget();
+
+            ?>
+        </div>
     <?php endif; ?>
-
-    <div class="well">
-        <?php
-
-        $this->beginWidget('CMarkdown', array('purifyOutput' => true));
-        echo $api->documentation;
-        $this->endWidget();
-
-        ?>
-    </div>
 </div>
 
 <?php if ($api->hasTerms()): ?>

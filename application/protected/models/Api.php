@@ -229,6 +229,7 @@ class Api extends \ApiBase
             'protocol' => 'Endpoint Protocol',
             'strict_ssl' => 'Endpoint Strict SSL',
             'endpoint_timeout' => 'Endpoint Timeout',
+            'embedded_docs_url' => 'Embedded Docs URL',
         ));
     }
     
@@ -642,6 +643,8 @@ class Api extends \ApiBase
                 . implode('/', array_keys(self::getRequireSignatureOptions()))
                 . ') for whether calls to this API will require a signature.'
             ),
+            array('embedded_docs_url', 'filter', 'filter' => 'trim'),
+            array('embedded_docs_url', 'url'),
         ), parent::rules());
     }
     

@@ -42,6 +42,12 @@ dd { margin-bottom: 10px; }
   cursor: help;
 }
 
+.embedded-docs {
+  box-sizing: border-box;
+  min-height: 2in;
+  width: 100%;
+}
+
 .fixed { font-family: monospace; }
 
 #footer {
