@@ -644,7 +644,13 @@ class Api extends \ApiBase
                 . ') for whether calls to this API will require a signature.'
             ),
             array('embedded_docs_url', 'filter', 'filter' => 'trim'),
-            array('embedded_docs_url', 'url'),
+            array(
+                'embedded_docs_url',
+                'url',
+                'pattern' => '/^https:\/\/docs\.google\.com\/document\/d\/[A-Z0-9]+\/pub\?embedded=true/i',
+                'message' => 'That does not look like a valid Google Doc embedding URL. '
+                . 'Please check the example and try again.'
+            ),
         ), parent::rules());
     }
     
