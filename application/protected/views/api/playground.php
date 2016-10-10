@@ -69,11 +69,11 @@ echo CHtml::form(array('/api/playground/'), 'post');
         <select name="key_id" class="input-block-level">
             <?php
                 foreach($apiOptions as $apiOption){
-                    echo "<option value='".$apiOption->key_id."' ";
+                    echo "<option value='".\CHtml::encode($apiOption->key_id)."' ";
                     if (isset($keyId) && $keyId == $apiOption->key_id) {
                         echo "selected='selected'";
                     }
-                    echo ">".$apiOption->api->display_name."</option>".PHP_EOL;
+                    echo ">".\CHtml::encode($apiOption->api->display_name)."</option>".PHP_EOL;
                 }
             ?>
         </select>
@@ -165,7 +165,7 @@ if($responseBody){
         <pre style="overflow: auto;"><code class="language-http"><?= \CHtml::encode($responseHeaders); ?></code></pre>
         
         <h4>Response Body:</h4>
-        <pre style="overflow: auto; max-height: 400px;"><code class="language-<?php echo $responseSyntax; ?>"><?php echo CHtml::encode($responseBody); ?></code></pre>
+        <pre style="overflow: auto; max-height: 400px;"><code class="language-<?= \CHtml::encode($responseSyntax); ?>"><?php echo CHtml::encode($responseBody); ?></code></pre>
     </div>
 </div>
 <?php
