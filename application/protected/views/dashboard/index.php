@@ -100,6 +100,29 @@ if ($user->hasOwnerPrivileges()) {
       }
       ?>
     </div>
+    <div class="btn-group shrink-below-480" style="margin: 5px auto;">
+      <?php
+      $intervalSize = \UsageStats::getSecondsPerInterval($currentInterval);
+      $numIntervalsShown = \UsageStats::getNumIntervalsToShow($intervalSize);
+      echo sprintf(
+          '<a class="btn" href="%s" title="Previous">&lt;&lt;</a>',
+          $this->createUrl('', array(
+              'interval' => $currentInterval,
+              'chart' => $chart,
+              'rewindBy' => $rewindBy + $numIntervalsShown,
+          ))
+      );
+      echo sprintf(
+          '<a class="btn" href="%s" title="Next"%s>&gt;&gt;</a>',
+          $this->createUrl('', array(
+              'interval' => $currentInterval,
+              'chart' => $chart,
+              'rewindBy' => max(0, $rewindBy - $numIntervalsShown),
+          )),
+          ($rewindBy === 0 ? ' disabled=disabled' : '')
+      );
+      ?>
+    </div>
   </div>
   <div id="ajax-usage-chart-destination" style="height: 368px; overflow: hidden;">
     <div style="height: 100%; text-align: center;">
@@ -110,7 +133,8 @@ if ($user->hasOwnerPrivileges()) {
   $('#ajax-usage-chart-destination').load(
     '<?= $this->createUrl('dashboard/usage-chart', array(
            'interval' => $currentInterval,
-           'chart' => $chart
+           'chart' => $chart,
+           'rewindBy' => $rewindBy
          )); ?>',
     null,
     function(responseText, textStatus, jqXHR) {

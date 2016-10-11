@@ -77,7 +77,9 @@ return array(
             'urlFormat' => 'path',
             'showScriptName' => false,
             'rules' => array(
+                'dashboard/<interval:[a-z]+>/<chart:[a-z-]+>/usage-chart/<rewindBy:[0-9]+>' => 'dashboard/usage-chart',
                 'dashboard/<interval:[a-z]+>/<chart:[a-z-]+>/usage-chart' => 'dashboard/usage-chart',
+                'dashboard/<interval:[a-z]+>/<chart:[a-z-]+>/<rewindBy:[0-9]+>' => 'dashboard/index',
                 'dashboard/<interval:[a-z]+>/<chart:[a-z-]+>' => 'dashboard/index',
                 'dashboard/<interval:[a-z]+>' => 'dashboard/index',
                 '<controller:[\w\-]+>/api<apiAction:[\w\-]+>/<code:([a-z0-9]{1}[a-z0-9\-]{1,}[a-z0-9]{1})>' => '<controller>/api<apiAction>',

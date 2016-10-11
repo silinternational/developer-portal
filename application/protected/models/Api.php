@@ -461,6 +461,8 @@ class Api extends \ApiBase
      * @param boolean $includeCurrentInterval (Optional:) Whether to include the
      *     current time interval, even though we only have incomplete data for
      *     it. Defaults to true.
+     * @param int $rewindBy (Optional:) How many intervals to "back up"
+     *     the starting point by. Used for getting older data.
      * @return array A hash with timestamps (in $granularity intervals) as keys,
      *     and arrays of http_response_code(or error_name) => num_hits as
      *     values.  
@@ -475,7 +477,9 @@ class Api extends \ApiBase
      */
     public function getUsage(
         $granularity = 'minute',
-        $includeCurrentInterval = true
+        $includeCurrentInterval = true,
+        $rewindBy = 0
+
     ) {
         // Get the ApiAxle Api object for this Api model.
         $axleApi = new AxleApi(\Yii::app()->params['apiaxle'], $this->code);
@@ -483,7 +487,8 @@ class Api extends \ApiBase
         // Get the starting timestamp for the data we care about.
         $timeStart = \UsageStats::getTimeStart(
             $granularity,
-            $includeCurrentInterval
+            $includeCurrentInterval,
+            $rewindBy
         );
         
         // Retrieve the stats from ApiAxle.

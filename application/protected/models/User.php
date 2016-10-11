@@ -536,9 +536,11 @@ class User extends \UserBase
      * @param string $interval The name of the time interval (e.g. -
      *     'second', 'minute',  'hour', 'day') by which the data should be
      *     grouped.
+     * @param int $rewindBy (Optional:) How many intervals to "back up"
+     *     the starting point by. Used for getting older data.
      * @return \UsageStats
      */
-    public function getUsageStatsForAllApis($interval)
+    public function getUsageStatsForAllApis($interval, $rewindBy = 0)
     {
         // Ensure that only admins can do this.
         if ( ! $this->isAdmin()) {
@@ -554,10 +556,10 @@ class User extends \UserBase
         $apis = Api::model()->findAll();
 
         // Get the APIs' usage.
-        $usageStats = new \UsageStats($interval);
+        $usageStats = new \UsageStats($interval, $rewindBy);
         foreach ($apis as $api) {
             try {
-                $usage = $api->getUsage($interval);
+                $usage = $api->getUsage($interval, true, $rewindBy);
             } catch (\Exception $e) {
                 $usage = $e->getMessage();
             }
@@ -574,18 +576,20 @@ class User extends \UserBase
      * @param string $interval The name of the time interval (e.g. -
      *     'second', 'minute',  'hour', 'day') by which the data should be
      *     grouped.
+     * @param int $rewindBy (Optional:) How many intervals to "back up"
+     *     the starting point by. Used for getting older data.
      * @return \UsageStats
      */
-    public function getUsageStatsForApis($interval)
+    public function getUsageStatsForApis($interval, $rewindBy = 0)
     {
         // Get the APIs that this user owns.
         $apis = $this->apis;
 
         // Get the APIs' usage.
-        $usageStats = new \UsageStats($interval);
+        $usageStats = new \UsageStats($interval, $rewindBy);
         foreach ($apis as $api) {
             try {
-                $usage = $api->getUsage($interval);
+                $usage = $api->getUsage($interval, true, $rewindBy);
             } catch (\Exception $e) {
                 $usage = $e->getMessage();
             }
@@ -602,9 +606,11 @@ class User extends \UserBase
      * @param string $interval The name of the time interval (e.g. -
      *     'second', 'minute',  'hour', 'day') by which the data should be
      *     grouped.
+     * @param int $rewindBy (Optional:) How many intervals to "back up"
+     *     the starting point by. Used for getting older data.
      * @return \UsageStats
      */
-    public function getUsageStatsForKeys($interval)
+    public function getUsageStatsForKeys($interval, $rewindBy = 0)
     {
         // Get all of this user's Keys.
         $keys = Key::model()->with('api')->findAllByAttributes(array(
@@ -615,10 +621,10 @@ class User extends \UserBase
         ));
 
         // Get the keys' usage.
-        $usageStats = new \UsageStats($interval);
+        $usageStats = new \UsageStats($interval, $rewindBy);
         foreach ($keys as $key) {
             try {
-                $usage = $key->getUsage($interval);
+                $usage = $key->getUsage($interval, true, $rewindBy);
             } catch (\Exception $e) {
                 $usage = $e->getMessage();
             }
@@ -635,9 +641,11 @@ class User extends \UserBase
      * @param string $interval The name of the time interval (e.g. -
      *     'second', 'minute',  'hour', 'day') by which the data should be
      *     grouped.
+     * @param int $rewindBy (Optional:) How many intervals to "back up"
+     *     the starting point by. Used for getting older data.
      * @return \UsageStats
      */
-    public function getUsageStatsTotals($interval)
+    public function getUsageStatsTotals($interval, $rewindBy = 0)
     {
         // Ensure that only admins can do this.
         if ( ! $this->isAdmin()) {
@@ -652,14 +660,14 @@ class User extends \UserBase
         $apis = Api::model()->findAll();
         
         // Get the total, combined usage of all APIs.
-        $usageStats = new \UsageStats($interval);
+        $usageStats = new \UsageStats($interval, $rewindBy);
         $totalUsage = array();
         foreach ($apis as $api) {
             try {
                 
                 // Try to get the usage for this API. If that worked, add it
                 // to our total.
-                $apiUsage = $api->getUsage($interval);
+                $apiUsage = $api->getUsage($interval, true, $rewindBy);
                 $totalUsage = \UsageStats::combineUsageCategoryArrays(
                     $totalUsage,
                     $apiUsage

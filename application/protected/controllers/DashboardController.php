@@ -12,7 +12,7 @@ class DashboardController extends \Controller
     
     public $layout = '//layouts/left-menu';
     
-    public function actionUsageChart()
+    public function actionUsageChart($rewindBy = 0)
     {
         $defaultChart = $this->getDefaultChart();
         
@@ -38,13 +38,13 @@ class DashboardController extends \Controller
 
         // Get the appropriate set of usage data for the chart.
         if ($chart === self::CHART_MY_KEYS) {
-            $usageStats = $currentUser->getUsageStatsForKeys($interval);
+            $usageStats = $currentUser->getUsageStatsForKeys($interval, $rewindBy);
         } elseif ($chart === self::CHART_ALL_APIS) {
-            $usageStats = $currentUser->getUsageStatsForAllApis($interval);
+            $usageStats = $currentUser->getUsageStatsForAllApis($interval, $rewindBy);
         } elseif ($chart === self::CHART_TOTALS) {
-            $usageStats = $currentUser->getUsageStatsTotals($interval);
+            $usageStats = $currentUser->getUsageStatsTotals($interval, $rewindBy);
         } else {
-            $usageStats = $currentUser->getUsageStatsForApis($interval);
+            $usageStats = $currentUser->getUsageStatsForApis($interval, $rewindBy);
         }
         
         $this->renderPartial('usage-chart', [
@@ -52,7 +52,7 @@ class DashboardController extends \Controller
         ]);
     }
     
-    public function actionIndex()
+    public function actionIndex($rewindBy = 0)
     {
         $defaultChart = $this->getDefaultChart();
         
@@ -92,6 +92,7 @@ class DashboardController extends \Controller
             'apisOwnedByUser' => $apisOwnedByUser,
             'currentInterval' => $interval,
             'chart' => $chart,
+            'rewindBy' => (int)$rewindBy,
         ));
     }
     

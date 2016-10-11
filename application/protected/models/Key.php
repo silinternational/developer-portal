@@ -567,6 +567,8 @@ class Key extends \KeyBase
      * @param boolean $includeCurrentInterval (Optional:) Whether to include the
      *     current time interval, even though we only have incomplete data for
      *     it. Defaults to true.
+     * @param int $rewindBy (Optional:) How many intervals to "back up"
+     *     the starting point by. Used for getting older data.
      * @return array A hash with timestamps (in $granularity intervals) as keys,
      *     and arrays of http_response_code(or error_name) => num_hits as
      *     values.  
@@ -578,7 +580,9 @@ class Key extends \KeyBase
      */
     public function getUsage(
         $granularity = 'minute',
-        $includeCurrentInterval = true
+        $includeCurrentInterval = true,
+        $rewindBy = 0
+
     ) {
         // Get the ApiAxle Key object for this Key model.
         $axleKey = new AxleKey(\Yii::app()->params['apiaxle'], $this->value);
@@ -586,7 +590,8 @@ class Key extends \KeyBase
         // Get the starting timestamp for the data we care about.
         $timeStart = \UsageStats::getTimeStart(
             $granularity,
-            $includeCurrentInterval
+            $includeCurrentInterval,
+            $rewindBy
         );
         
         // Retrieve the stats from ApiAxle.
