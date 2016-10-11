@@ -924,10 +924,10 @@ class ApiController extends \Controller
             
             /* We expect results to be either JSON, XML, or CSV, so set  *
              * headers appropriately.                                    */
-            if (isset($response) && $response->isJson()) {
+            if ($response->isJson()) {
                 header('Content-disposition: attachment; filename=results.json');
                 header('Content-type: application/json');
-            } elseif (isset($response) && $response->isXml()) {
+            } elseif ($response->isXml()) {
                 header('Content-disposition: attachment; filename=results.xml');
                 header('Content-type: application/xml');
             } else {
