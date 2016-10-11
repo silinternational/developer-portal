@@ -13,14 +13,30 @@ class Response
     protected $rawRequest;
     protected $requestedUrl;
     
-    public function __construct($data = [])
-    {
-        $this->body = isset($data['body']) ? $data['body'] : null;
-        $this->contentType = isset($data['contentType']) ? $data['contentType'] : null;
-        $this->debugText = isset($data['debugText']) ? $data['debugText'] : null;
-        $this->headers = isset($data['headers']) ? $data['headers'] : [];
-        $this->rawRequest = isset($data['rawRequest']) ? $data['rawRequest'] : null;
-        $this->requestedUrl = isset($data['requestedUrl']) ? $data['requestedUrl'] : null;
+    /**
+     * Create a Response object.
+     * 
+     * @param string|null $contentType The content type of the response.
+     * @param string|null $headers The raw response headers.
+     * @param string|null $body The raw response body.
+     * @param string|null $requestedUrl The requested URL.
+     * @param string|null $rawRequest The full raw request.
+     * @param string|null $debugText Any related debug text.
+     */
+    public function __construct(
+        $contentType = null,
+        $headers = null,
+        $body = null,
+        $requestedUrl = null,
+        $rawRequest = null,
+        $debugText = null
+    ) {
+        $this->body = $body;
+        $this->contentType = $contentType;
+        $this->debugText = $debugText;
+        $this->headers = $headers;
+        $this->rawRequest = $rawRequest;
+        $this->requestedUrl = $requestedUrl;
     }
     
     public function getBody()

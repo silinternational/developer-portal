@@ -134,13 +134,13 @@ class Client
         $requestBody = $requestBodyFormatter->format($guzzleRequest);
         $rawApiRequest = trim($requestHeaders . $requestBody);
         
-        return new Response([
-            'contentType' => $responseContentType,
-            'headers' => $responseHeaders,
-            'body' => $responseBody,
-            'requestedUrl' => $guzzleRequest->getUri(),
-            'rawRequest' => $rawApiRequest,
-            'debugText' => $debugText,
-        ]);
+        return new Response(
+            $responseContentType,
+            $responseHeaders,
+            $responseBody,
+            $guzzleRequest->getUri(),
+            $rawApiRequest,
+            $debugText
+        );
     }
 }
