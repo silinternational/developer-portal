@@ -1,6 +1,8 @@
 <?php
 namespace Sil\DevPortal\controllers;
 
+use Sil\DevPortal\components\Http\Client;
+use Sil\DevPortal\components\Http\Response;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\ApiVisibilityDomain;
 use Sil\DevPortal\models\ApiVisibilityUser;
@@ -821,11 +823,9 @@ class ApiController extends \Controller
         $debugText = null;
         $method = $request->getPost('method', 'GET');
         $requestPath = $request->getPost('path', '');
-        $responseBody = null;
-        $responseHeaders = null;
-        $responseContentType = null;
         $requestedUrl = null;
         $rawApiRequest = null;
+        $response = new Response();
         $responseSyntax = null;
         $params = $request->getPost('param', [
             [
@@ -847,26 +847,7 @@ class ApiController extends \Controller
             $key = Key::model()->findByPk($keyId);
             if ($key && $key->isOwnedBy($currentUser)) {
                 
-                // Create a single dimension parameter array from parameters
-                // submitted divided by form and header parameters
-                $paramsForm = $paramsHeader = array();
-                if ($params && is_array($params)) {
-                    foreach ($params as $param) {
-                        if (isset($param['name']) && isset($param['value']) 
-                                && $param['name'] != '' && $param['value'] != ''
-                                && !is_null($param['name']) && !is_null($param['value'])) {
-
-                            // Determine if parameter is supposed to be form based or header
-                            if (isset($param['type']) && $param['type'] == 'form') {
-                                $paramsForm[$param['name']] = $param['value'];
-                            } elseif (isset($param['type']) && $param['type'] == 'header') {
-                                $paramsHeader[$param['name']] = $param['value'];
-                            }
-                        }
-                    }
-                }
-                
-                // Figure out proxy domain to form URL.
+                // Figure out proxy domain (to create the URL to call).
                 $proxyProtocol = parse_url(\Yii::app()->params['apiaxle']['endpoint'], PHP_URL_SCHEME);
                 $apiAxleEndpointDomain = parse_url(\Yii::app()->params['apiaxle']['endpoint'], PHP_URL_HOST);
                 $proxyDomain = str_replace('apiaxle.', '', $apiAxleEndpointDomain);
@@ -881,87 +862,38 @@ class ApiController extends \Controller
                 );
 
                 // Calculate the necessary parameters for the ApiAxle call.
-                $paramsQuery = array(
-                    'api_key' => $key->value,
-                );
+                $paramsFromKey = [
+                    [
+                        'name' => 'api_key',
+                        'value' => $key->value,
+                        'type' => 'query',
+                    ]
+                ];
                 if ($key->api->requiresSignature()) {
-                    $paramsQuery['api_sig'] = \CalcApiSig\HmacSigner::CalcApiSig(
-                        $key->value,
-                        $key->secret
-                    );
-                }
-
-                // If GET request, merge paramsForm into paramsQuery.
-                if ($method == 'GET') {
-                    $paramsQuery = \CMap::mergeArray($paramsQuery, $paramsForm);
-                    $paramsForm = null;
-                    $apiRequestBody = null;
-                } else {
-                    $apiRequestBody = http_build_query($paramsForm);
+                    $paramsFromKey[] = [
+                        'name' => 'api_sig',
+                        'value' => \CalcApiSig\HmacSigner::CalcApiSig(
+                            $key->value,
+                            $key->secret
+                        ),
+                        'type' => 'query',
+                    ];
                 }
                 
-                // Append the query string parameters to the URL.
-                if ( ! empty($paramsQuery)) {
-                    list($urlMinusFragment, ) = explode('#', $url);
-                    $urlMinusFragment .= SS::contains($url, '?') ? '&' : '?';
-                    $paramsQueryPairs = [];
-                    foreach ($paramsQuery as $name => $value) {
-                        $paramsQueryPairs[] = rawurlencode($name) . '=' . rawurlencode($value);
-                    }
-                    $urlMinusFragment .= implode('&', $paramsQueryPairs);
-                    $url = $urlMinusFragment;
-                }
-
-                // Create Guzzle client for making API call
-                $client = new \GuzzleHttp\Client();
-                $debugStream = fopen('php://temp', 'w+');
-                $guzzleRequest = new \GuzzleHttp\Psr7\Request(
+                $response = Client::request(
                     $method,
                     $url,
-                    $paramsHeader,
-                    $apiRequestBody
+                    \CMap::mergeArray($paramsFromKey, $params)
                 );
-                $response = $client->send($guzzleRequest, [
-                    'debug' => $debugStream,
-                    'form_params' => $paramsForm,
-                    'headers' => $paramsHeader,
-                    'query' => $paramsQuery,
-                    'http_errors' => false,
-                    'verify' => \Yii::app()->params['apiaxle']['ssl_verifypeer'],
-                ]);
-                rewind($debugStream);
-                $debugText = stream_get_contents($debugStream);
-                fclose($debugStream);
+                $debugText = $response->getDebugText();
+                $rawApiRequest = $response->getRawRequest();
+                $requestedUrl = $response->getRequestedUrl();
                 
-                $requestedUrl = $guzzleRequest->getUri();
-                
-                // Get the response headers and body.
-                $responseHeadersFormatter = new \GuzzleHttp\MessageFormatter('{res_headers}');
-                $responseHeaders = $responseHeadersFormatter->format($guzzleRequest, $response);
-                $responseBodyFormatter = new \GuzzleHttp\MessageFormatter('{res_body}');
-                $responseBody = $responseBodyFormatter->format($guzzleRequest, $response);
-                
-                // Get the content type.
-                $responseContentTypes = $response->getHeader('Content-Type');
-                $responseContentType = end($responseContentTypes);
-                
-                /* Get the raw request that was sent to the API.
-                 * 
-                 * NOTE: Just getting the raw request from the Guzzle request
-                 *       object leaves out several headers (user agent, content
-                 *       type, content length).
-                 */
-                $requestHeaders = $this->getActualRequestHeadersFromDebugText($debugText);
-                $requestBodyFormatter = new \GuzzleHttp\MessageFormatter('{req_body}');
-                $requestBody = $requestBodyFormatter->format($guzzleRequest);
-                $rawApiRequest = trim($requestHeaders . $requestBody);
-                
-                if ($responseContentType === 'applicaton/json') {
+                if ($response->isJson()) {
                     $responseSyntax = 'javascript';
                 } else {
                     $responseSyntax = 'markup';
                 }
-
             } else {
                 // Display an error
                 \Yii::app()->user->setFlash('error', 'Invalid API selected');
@@ -974,30 +906,14 @@ class ApiController extends \Controller
         Key::sortKeysByApiName($apiOptions);
         
         if ( ! $download) {
-            
-            // Attempt to pretty print the response body.
-            if (isset($response) && substr_count($responseContentType, 'xml') > 0) {
-                $dom = new \DOMDocument('1.0');
-                $dom->preserveWhiteSpace = false;
-                $dom->formatOutput = true;
-                if ($dom->loadXML($responseBody)) {
-                    $asString = $dom->saveXML();
-                    if ($asString) {
-                        $responseBody = $asString;
-                    }
-                }
-            } elseif (isset($response) && substr_count($responseContentType, 'json') > 0) {
-                $responseBody = \Utils::pretty_json($responseBody);
-            }
-
             $this->render('playground', array(
                 'keyId' => $keyId,
                 'method' => $method,
                 'apiOptions' => $apiOptions,
                 'params' => $params,
                 'path' => $requestPath,
-                'responseBody' => $responseBody,
-                'responseHeaders' => $responseHeaders,
+                'responseBody' => $response->getPrettyPrintedBody(),
+                'responseHeaders' => $response->getHeaders(),
                 'requestedUrl' => $requestedUrl,
                 'rawApiRequest' => $rawApiRequest,
                 'responseSyntax' => $responseSyntax,
@@ -1006,19 +922,19 @@ class ApiController extends \Controller
             ));
         } else {
             
-            /* We expect results to be either JSON, XML, or CSV. So we test if
-             * they can be parsed as JSON and set headers appropriately.  */
-            if (isset($response) && substr_count($responseContentType, 'json') > 0) {
+            /* We expect results to be either JSON, XML, or CSV, so set  *
+             * headers appropriately.                                    */
+            if (isset($response) && $response->isJson()) {
                 header('Content-disposition: attachment; filename=results.json');
                 header('Content-type: application/json');
-            } elseif (isset($response) && substr_count($responseContentType, 'xml') > 0) {
+            } elseif (isset($response) && $response->isXml()) {
                 header('Content-disposition: attachment; filename=results.xml');
                 header('Content-type: application/xml');
             } else {
                 header('Content-disposition: attachment; filename=results.csv');
                 header('Content-type: text/csv');
             }
-            echo $responseBody;
+            echo $response->getBody();
         }
     }
     
@@ -1257,33 +1173,5 @@ class ApiController extends \Controller
         $this->render('usage', array(
             'api' => $api,
         ));
-    }
-    
-    protected function getActualRequestHeadersFromDebugText($debugText)
-    {
-        $fullRequest = '';
-        $lines = explode("\n", $debugText);
-        $line = array_shift($lines);
-        
-        // Find the beginning of the request section.
-        while ($line !== null) {
-            if (SS::startsWith($line, '> ')) {
-                $fullRequest .= substr($line, 2);
-                break;
-            }
-            $line = array_shift($lines);
-        }
-        $line = array_shift($lines);
-        
-        // Collect lines until the end of the request section.
-        while ($line !== null) {
-            if (SS::startsWith($line, '* ') || SS::startsWith($line, '< ')) {
-                break;
-            }
-            $fullRequest .= $line;
-            $line = array_shift($lines);
-        }
-        
-        return $fullRequest;
     }
 }
