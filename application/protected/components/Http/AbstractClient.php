@@ -29,7 +29,7 @@ abstract class AbstractClient
         // If GET request, merge paramsForm into paramsQuery.
         if ($method == 'GET') {
             $paramsQuery = \CMap::mergeArray($paramsQuery, $paramsForm);
-            $paramsForm = null;
+            $paramsForm = [];
             $requestBody = null;
         } else {
             $requestBody = http_build_query($paramsForm);
