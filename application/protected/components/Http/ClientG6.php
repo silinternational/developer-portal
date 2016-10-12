@@ -86,7 +86,7 @@ class ClientG6 extends AbstractClient
         
         // Get the content type.
         $responseContentTypes = $response->getHeader('Content-Type');
-        $responseContentType = end($responseContentTypes);
+        $responseContentType = end($responseContentTypes) ?: null;
         
         /* Get the raw request that was sent to the API.
          * 
@@ -103,7 +103,7 @@ class ClientG6 extends AbstractClient
             $responseContentType,
             $responseHeaders,
             $responseBody,
-            $guzzleRequest->getUri(),
+            (string)$guzzleRequest->getUri(),
             $rawApiRequest,
             $debugText
         );
