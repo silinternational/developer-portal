@@ -1,7 +1,7 @@
 <?php
 namespace Sil\DevPortal\controllers;
 
-use Sil\DevPortal\components\Http\ClientG6;
+use Sil\DevPortal\components\Http\ClientG5 as Client;
 use Sil\DevPortal\components\Http\ParamsCollection;
 use Sil\DevPortal\components\Http\Response;
 use Sil\DevPortal\models\Api;
@@ -893,7 +893,7 @@ class ApiController extends \Controller
                     }
                 }
                 
-                $client = new ClientG6();
+                $client = new Client();
                 $response = $client->request(
                     $method,
                     $url,
