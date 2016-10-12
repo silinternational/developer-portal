@@ -6,7 +6,7 @@ use Stringy\StaticStringy as SS;
 /**
  * A simple wrapper class around Guzzle (version 6).
  */
-class ClientG6 extends Client
+class ClientG6 extends AbstractClient
 {
     protected function getActualRequestHeadersFromDebugText($debugText)
     {

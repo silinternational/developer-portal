@@ -6,7 +6,7 @@ use Stringy\StaticStringy as SS;
 /**
  * The base class for our Guzzle wrapper classes.
  */
-abstract class Client
+abstract class AbstractClient
 {
     /**
      * Send the specified request and get the response.
