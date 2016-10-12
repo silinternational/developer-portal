@@ -8,34 +8,6 @@ use Stringy\StaticStringy as SS;
  */
 class ClientG6 extends AbstractClient
 {
-    protected function getActualRequestHeadersFromDebugText($debugText)
-    {
-        $fullRequest = '';
-        $lines = explode("\n", $debugText);
-        $line = array_shift($lines);
-        
-        // Find the beginning of the request section.
-        while ($line !== null) {
-            if (SS::startsWith($line, '> ')) {
-                $fullRequest .= substr($line, 2);
-                break;
-            }
-            $line = array_shift($lines);
-        }
-        $line = array_shift($lines);
-        
-        // Collect lines until the end of the request section.
-        while ($line !== null) {
-            if (SS::startsWith($line, '* ') || SS::startsWith($line, '< ')) {
-                break;
-            }
-            $fullRequest .= $line;
-            $line = array_shift($lines);
-        }
-        
-        return $fullRequest;
-    }
-    
     /**
      * Have Guzzle actually send the specified request and get the response.
      * 
