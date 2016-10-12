@@ -1,7 +1,8 @@
 <?php
 namespace Sil\DevPortal\controllers;
 
-use Sil\DevPortal\components\Http\Client;
+use Sil\DevPortal\components\Http\ClientG6;
+use Sil\DevPortal\components\Http\ParamsCollection;
 use Sil\DevPortal\components\Http\Response;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\ApiVisibilityDomain;
@@ -827,7 +828,7 @@ class ApiController extends \Controller
         $rawApiRequest = null;
         $response = new Response();
         $responseSyntax = null;
-        $params = $request->getPost('param', [
+        $params = (array)$request->getPost('param', [
             [
                 'type' => null,
                 'name' => null,
@@ -860,30 +861,43 @@ class ApiController extends \Controller
                     $proxyDomain,
                     $path
                 );
+                
+                $paramsCollection = new ParamsCollection();
 
                 // Calculate the necessary parameters for the ApiAxle call.
-                $paramsFromKey = [
-                    [
-                        'name' => 'api_key',
-                        'value' => $key->value,
-                        'type' => 'query',
-                    ]
-                ];
+                $paramsCollection->addParam(
+                    ParamsCollection::TYPE_QUERY,
+                    'api_key',
+                    $key->value
+                );
                 if ($key->api->requiresSignature()) {
-                    $paramsFromKey[] = [
-                        'name' => 'api_sig',
-                        'value' => \CalcApiSig\HmacSigner::CalcApiSig(
+                    $paramsCollection->addParam(
+                        ParamsCollection::TYPE_QUERY,
+                        'api_sig',
+                        \CalcApiSig\HmacSigner::CalcApiSig(
                             $key->value,
                             $key->secret
-                        ),
-                        'type' => 'query',
-                    ];
+                        )
+                    );
                 }
                 
-                $response = Client::request(
+                foreach ($params as $param) {
+                    $paramName = (empty($param['name']) ? null : $param['name']);
+                    $paramType = (empty($param['type']) ? null : $param['type']);
+                    if ($paramName && ParamsCollection::isValidType($paramType)) {
+                        $paramsCollection->addParam(
+                            $paramType,
+                            $paramName,
+                            $param['value']
+                        );
+                    }
+                }
+                
+                $client = new ClientG6();
+                $response = $client->request(
                     $method,
                     $url,
-                    \CMap::mergeArray($paramsFromKey, $params)
+                    $paramsCollection
                 );
                 $debugText = $response->getDebugText();
                 $rawApiRequest = $response->getRawRequest();
