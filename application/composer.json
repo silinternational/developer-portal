@@ -10,6 +10,8 @@
         "forevermatt/calc-api-sig": "0.1.1",
         "hybridauth/hybridauth": "2.*",
         "silinternational/php-env": "0.*",
+        "silinternational/apiaxle-sdk-php": "^1.0",
+        "guzzlehttp/guzzle-services": "dev-master",
         "roave/security-advisories": "dev-master"
     },
     "require-dev": {

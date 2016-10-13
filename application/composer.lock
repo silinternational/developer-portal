@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "dc2ae8387fd17131f2e627301f097ab3",
-    "content-hash": "0605753b55c1a539c15cadd497568b7f",
+    "hash": "d6725d7123a537a7e74bdbeb594d51fb",
+    "content-hash": "ab6b9cd58999276e4118cf23a4d8559c",
     "packages": [
         {
             "name": "danielstjules/stringy",
@@ -144,6 +144,52 @@
             "time": "2015-09-03 15:21:29"
         },
         {
+            "name": "guzzlehttp/command",
+            "version": "0.7.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/command.git",
+                "reference": "2e8286ff81f75f97b00f7dcc2f51e2efafb373bd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/command/zipball/2e8286ff81f75f97b00f7dcc2f51e2efafb373bd",
+                "reference": "2e8286ff81f75f97b00f7dcc2f51e2efafb373bd",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "~5.0",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.7-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\Command\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                }
+            ],
+            "description": "Provides the foundation for building command based web service clients",
+            "time": "2015-01-14 18:54:57"
+        },
+        {
             "name": "guzzlehttp/guzzle",
             "version": "5.3.1",
             "source": {
@@ -194,6 +240,105 @@
                 "web service"
             ],
             "time": "2016-07-15 19:28:39"
+        },
+        {
+            "name": "guzzlehttp/guzzle-services",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/guzzle-services.git",
+                "reference": "8adb1d160b19eeb8320d2f846bc3b8dac8a878a4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/guzzle-services/zipball/8adb1d160b19eeb8320d2f846bc3b8dac8a878a4",
+                "reference": "8adb1d160b19eeb8320d2f846bc3b8dac8a878a4",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/command": "0.7.*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\Command\\Guzzle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                }
+            ],
+            "description": "Provides an implementation of the Guzzle Command library that uses Guzzle service descriptions to describe web services, serialize requests, and parse responses into easy to use model structures.",
+            "time": "2016-01-31 05:11:31"
+        },
+        {
+            "name": "guzzlehttp/retry-subscriber",
+            "version": "2.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/retry-subscriber.git",
+                "reference": "f13a4c640b823e9eaf06975d8e8981f9551250e8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/retry-subscriber/zipball/f13a4c640b823e9eaf06975d8e8981f9551250e8",
+                "reference": "f13a4c640b823e9eaf06975d8e8981f9551250e8",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "~5.1",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "guzzlehttp/log-subscriber": "~1.0",
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\Subscriber\\Retry\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                }
+            ],
+            "description": "Retries failed HTTP requests using customizable retry strategies (Guzzle 4+)",
+            "homepage": "http://guzzlephp.org/",
+            "keywords": [
+                "Guzzle",
+                "http",
+                "retry"
+            ],
+            "time": "2014-12-19 20:42:37"
         },
         {
             "name": "guzzlehttp/ringphp",
@@ -519,6 +664,56 @@
             ],
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it",
             "time": "2016-10-07 16:42:29"
+        },
+        {
+            "name": "silinternational/apiaxle-sdk-php",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/silinternational/apiaxle-sdk-php.git",
+                "reference": "ccfe508e69ab5baa495555e4ae87d3cbbb93718e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/silinternational/apiaxle-sdk-php/zipball/ccfe508e69ab5baa495555e4ae87d3cbbb93718e",
+                "reference": "ccfe508e69ab5baa495555e4ae87d3cbbb93718e",
+                "shasum": ""
+            },
+            "require": {
+                "forevermatt/calc-api-sig": "^0.1.1",
+                "guzzlehttp/guzzle": "^5.3.1",
+                "guzzlehttp/guzzle-services": "dev-master",
+                "guzzlehttp/retry-subscriber": "^2.0.2",
+                "php": ">=5.4",
+                "roave/security-advisories": "dev-master"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.5.6",
+                "satooshi/php-coveralls": "^1.0.1",
+                "silinternational/php-env": "^0.2.0"
+            },
+            "suggest": {
+                "roave/security-advisories": "Make sure you don't install dependencies with known issues. Install dev-master version."
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Apiaxle\\": "src/",
+                    "ApiaxleTests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Phillip Shipley",
+                    "email": "phillip.shipley@gmail.com"
+                }
+            ],
+            "description": "PHP client for ApiAxle APIs",
+            "time": "2016-10-10 14:07:32"
         },
         {
             "name": "silinternational/php-env",
@@ -1718,6 +1913,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "guzzlehttp/guzzle-services": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": false,
