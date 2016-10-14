@@ -146,18 +146,18 @@ class AxleTest extends DeveloperPortalTestCase
             $approveKeyResult,
             'Failed to create/approve Key: ' . print_r($key->getErrors(), true)
         );
-        $axleApi = new AxleApi($this->config, $api->code);
-        $axleApiKeysAfterCreate = $axleApi->getKeyList();
+        $apiAxle = new ApiAxleClient($this->config);
+        $keyInfoListAfterCreate = $apiAxle->listKeysForApi($api->code);
         $hasKeyAfterCreate = false;
-        foreach ($axleApiKeysAfterCreate as $axleApiKey) {
-            if ($axleApiKey->getKey() == $key->value) {
+        foreach ($keyInfoListAfterCreate as $keyInfo) {
+            if ($keyInfo->getKeyValue() == $key->value) {
                 $hasKeyAfterCreate = true;
                 break;
             }
         }
         $this->assertTrue(
             $hasKeyAfterCreate,
-            'New key is not linked to AxleApi. Key errors (if any): '
+            'New key is not linked to API in ApiAxle. Key errors (if any): '
             . print_r($key, true)
         );
         $initialKeyValue = $key->value;
@@ -171,17 +171,17 @@ class AxleTest extends DeveloperPortalTestCase
             $resetKeyResult[0],
             'Unable to reset key: ' . print_r($resetKeyResult[1], true)
         );
-        $axleApiKeysAfterReset = $axleApi->getKeyList();
+        $keyInfoListAfterReset = $apiAxle->listKeysForApi($api->code);
         $hasKeyAfterReset = false;
-        foreach ($axleApiKeysAfterReset as $axleApiKey) {
-            if ($axleApiKey->getKey() == $resetKeyResult[1]->value) {
+        foreach ($keyInfoListAfterReset as $keyInfo) {
+            if ($keyInfo->getKeyValue() == $resetKeyResult[1]->value) {
                 $hasKeyAfterReset = true;
                 break;
             }
         }
         $this->assertTrue(
             $hasKeyAfterReset,
-            'Reset key is not linked to AxleApi. Key errors (if any): '
+            'Reset key is not linked to API in ApiAxle. Key errors (if any): '
             . print_r($resetKeyResult[1], true)
         );
         $changedKeyValue = $resetKeyResult[1]->value;
@@ -206,17 +206,17 @@ class AxleTest extends DeveloperPortalTestCase
             $revokeKeyResult[0],
             'Unable to revoke key: ' . print_r($revokeKeyResult[1], true)
         );
-        $axleApiKeysAfterRevoke = $axleApi->getKeyList();
+        $keyInfoListAfterRevoke = $apiAxle->listKeysForApi($api->code);
         $hasKeyAfterRevoke = false;
-        foreach ($axleApiKeysAfterRevoke as $axleApiKey) {
-            if ($axleApiKey->getKey() == $key->value) {
+        foreach ($keyInfoListAfterRevoke as $keyInfo) {
+            if ($keyInfo->getKeyValue() == $key->value) {
                 $hasKeyAfterRevoke = true;
                 break;
             }
         }
         $this->assertFalse(
             $hasKeyAfterRevoke,
-            'Revoked key was not deleted from AxleApi. Key errors (if any): '
+            'Revoked key was not deleted from API in ApiAxle. Key errors (if any): '
             . print_r($revokeKeyResult[1], true)
         );
     }
