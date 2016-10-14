@@ -1,7 +1,7 @@
 <?php
 namespace Sil\DevPortal\models;
 
-use ApiAxle\Api\Api as AxleApi;
+use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
 use Sil\DevPortal\models\ApiVisibilityDomain;
 use Sil\DevPortal\models\ApiVisibilityUser;
 use Sil\DevPortal\models\Event;
@@ -482,7 +482,7 @@ class Api extends \ApiBase
 
     ) {
         // Get the ApiAxle Api object for this Api model.
-        $axleApi = new AxleApi(\Yii::app()->params['apiaxle'], $this->code);
+        $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
         
         // Get the starting timestamp for the data we care about.
         $timeStart = \UsageStats::getTimeStart(
@@ -492,7 +492,7 @@ class Api extends \ApiBase
         );
         
         // Retrieve the stats from ApiAxle.
-        $axleStats = $axleApi->getStats($timeStart, false, $granularity, 'false');
+        $axleStats = $apiAxle->getApiStats($this->code, $timeStart, $granularity);
         
         // Reformat the data for easier use.
         $dataByCategory = array();
@@ -704,10 +704,10 @@ class Api extends \ApiBase
                     ? (int)$this->endpoint_timeout : 2,
         );
         
-        $axleApi = new AxleApi(\Yii::app()->params['apiaxle']);
+        $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
         if ($this->getIsNewRecord()) {
             try {
-                $axleApi->create($this->code, $apiData);
+                $apiAxle->createApi($this->code, $apiData);
                 return true;
             } catch (\Exception $e) {
                 $this->addError(
@@ -718,8 +718,7 @@ class Api extends \ApiBase
             }
         } else {
             try {
-                $axleApi->get($this->code);
-                $axleApi->update($apiData);
+                $apiAxle->updateApi($this->code, $apiData);
                 return true;
             } catch (\Exception $e) {
                 
@@ -730,7 +729,7 @@ class Api extends \ApiBase
                 );
                 if (($e->getCode() == 201) && ($notFoundMessage === $e->getMessage())) {
                     try {
-                        $axleApi->create($this->code, $apiData);
+                        $apiAxle->createApi($this->code, $apiData);
                         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
                         Event::log(sprintf(
                             'The "%s" API (%s, ID %s) was re-added to ApiAxle%s.',
@@ -834,9 +833,9 @@ class Api extends \ApiBase
             return true;
         }
         
-        $axleApi = new AxleApi(\Yii::app()->params['apiaxle']);
+        $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
         try{
-            $axleApi->delete($this->code);
+            $apiAxle->deleteApi($this->code);
             return true;
         } catch (\Exception $e) {
             $this->addError('code',$e->getMessage());

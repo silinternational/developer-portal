@@ -1,6 +1,7 @@
 <?php
 namespace Sil\DevPortal\controllers;
 
+use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
 use Sil\DevPortal\components\AuthManager;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\SiteText;
@@ -80,9 +81,9 @@ class SiteController extends \Controller
             /**
              * Get an apixle object and try to fetch details about 'apiaxle' api
              */
-            $axle = new \ApiAxle\Api\Api(\Yii::app()->params['apiaxle']);
-            $check = $axle->get('apiaxle');
-            $data = $check->getData();
+            $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
+            $axleApi = $apiAxle->getApi('apiaxle');
+            $data = $axleApi->getData();
 
             if (!is_null($data['protocol'])) {
                 /**
