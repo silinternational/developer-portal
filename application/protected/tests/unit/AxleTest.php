@@ -1,8 +1,8 @@
 <?php
 
 use ApiAxle\Api\Api as AxleApi;
-use ApiAxle\Api\Key as AxleKey;
 use ApiAxle\Shared\ApiException;
+use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\Key;
 
@@ -37,39 +37,28 @@ class AxleTest extends DeveloperPortalTestCase
     public static function tearDownAfterClass()
     {
         try {
-            
-            // Set up our ApiAxle Api class.
-            $api = new AxleApi(self::getConfig());
+            $apiAxle = new ApiAxleClient(self::getConfig());
             
             // Delete all the APIs that start with the string we use to identify
             // test APIs.
-            $apiList = $api->getList(0,1000);
-            foreach($apiList as $item){
-                if(strpos($item->getName(),'test-') !== false){
-                    $api->delete($item->getName());
+            $apiInfoList = $apiAxle->listApis(0, 1000);
+            foreach ($apiInfoList as $apiInfo) {
+                if (strpos($apiInfo->getName(), 'test-') !== false) {
+                    $apiAxle->deleteApi($apiInfo->getName());
                 }
             }
             
-            // Set up our ApiAxle Key class.
-            $key = new AxleKey(self::getConfig());
-            
-            // Get the list of Keys from ApiAxle.
-            $keyList = $key->getList(0, 1000);
+            // Get the list of keys from ApiAxle.
+            $keyInfoList = $apiAxle->listKeys(0, 1000);
             
             // For each key that ApiAxle returned...
-            foreach ($keyList as $item) {
+            foreach ($keyInfoList as $keyInfo) {
                 
-                // If it starts with the string we use to identify test Keys,
+                // If it starts with the string we use to identify test keys,
                 // delete it.
-                if (strpos($item->getKey(), 'test-') !== false) {
-                    $key->delete($item->getKey());
+                if (strpos($keyInfo->getKeyValue(), 'test-') !== false) {
+                    $apiAxle->deleteKey($keyInfo->getKeyValue());
                 }
-                
-                // QUESTION: Why was this here?
-                // 
-                //if(preg_match('/[0-9a-z]{32}/',$item->getKey())){
-                //    $key->delete($item->getKey());
-                //}
             }
         } catch(ApiException $ae){
             echo $ae;

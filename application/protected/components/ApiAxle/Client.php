@@ -166,6 +166,46 @@ class Client extends BaseClient
     }
     
     /**
+     * Get a list of existing APIs.
+     * 
+     * @param int $fromIndex Integer for the index of the first API you want to
+     *     see. Starts at zero.
+     * @param int $toIndex Integer for the index of the last API you want to
+     *     see. Starts at zero.
+     * @return ApiInfo[]
+     */
+    public function listApis($fromIndex, $toIndex)
+    {
+        $list = [];
+        $apiAxleApiList = $this->api()->getList($fromIndex, $toIndex);
+        foreach ($apiAxleApiList as $apiAxleApi) {
+            /* @var $apiAxleApi ApiAxleApi */
+            $list[] = new ApiInfo($apiAxleApi->getName(), $apiAxleApi->getData());
+        }
+        return $list;
+    }
+    
+    /**
+     * Get a list of existing keys.
+     * 
+     * @param int $fromIndex Integer for the index of the first API you want to
+     *     see. Starts at zero.
+     * @param int $toIndex Integer for the index of the last API you want to
+     *     see. Starts at zero.
+     * @return KeyInfo[]
+     */
+    public function listKeys($fromIndex, $toIndex)
+    {
+        $list = [];
+        $apiAxleKeyList = $this->key()->getList($fromIndex, $toIndex);
+        foreach ($apiAxleKeyList as $apiAxleKey) {
+            /* @var $apiAxleKey ApiAxleKey */
+            $list[] = new KeyInfo($apiAxleKey->getKey(), $apiAxleKey->getData());
+        }
+        return $list;
+    }
+    
+    /**
      * Update an object in ApiAxle. What it is depends on what type of internal
      * client for ApiAxle was provided.
      *
