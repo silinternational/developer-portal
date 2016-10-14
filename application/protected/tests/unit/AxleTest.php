@@ -241,11 +241,11 @@ class AxleTest extends DeveloperPortalTestCase
         $result = $api->save();
         $this->assertTrue($result,'Failed to create API: '.print_r($api->getErrors(),true));
         
-        $axleApi = new AxleApi($this->config);
-        $apiList = $axleApi->getList(0,1000);
+        $apiAxle = new ApiAxleClient($this->config);
+        $apiInfoList = $apiAxle->listApis(0, 1000);
         $hasApi = false;
-        foreach($apiList as $a){
-            if($a->getName() == $api->code){
+        foreach ($apiInfoList as $apiInfo) {
+            if ($apiInfo->getName() == $api->code) {
                 $hasApi = true;
                 break;
             }
@@ -253,15 +253,15 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertTrue($hasApi,'New API not found on server.');
         
         $api->delete();
-        $apiList = $axleApi->getList(0,1000);
-        $hasApi = false;
-        foreach($apiList as $a){
-            if($a->getName() == $api->code){
-                $hasApi = true;
+        $apiInfoListAfterDelete = $apiAxle->listApis(0, 1000);
+        $hasApiAfterDelete = false;
+        foreach ($apiInfoListAfterDelete as $apiInfo) {
+            if ($apiInfo->getName() == $api->code) {
+                $hasApiAfterDelete = true;
                 break;
             }
         }
-        $this->assertFalse($hasApi,'New API still found after delete.');
+        $this->assertFalse($hasApiAfterDelete, 'New API still found after delete.');
     }
     
     public function disabletestAxleCreate100Apis()
