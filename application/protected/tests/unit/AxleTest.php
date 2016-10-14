@@ -89,16 +89,16 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertTrue($result, 'Failed to create API: ' . PHP_EOL .
             self::getModelErrorsForConsole($api->getErrors()));
         
-        $axleApi = new AxleApi($this->config);
-        $apiList = $axleApi->getList(0,1000);
+        $apiAxle = new ApiAxleClient($this->config);
+        $apiInfoList = $apiAxle->listApis(0, 1000);
         $inList = false;
-        foreach($apiList as $a){
-            if($a->getName() == $apiData['code']){
+        foreach ($apiInfoList as $apiInfo) {
+            if ($apiInfo->getName() == $apiData['code']) {
                 $inList = true;
                 break;
             }
         }
-        $this->assertTrue($inList,'Api was created locally but not found on ApiAxle');
+        $this->assertTrue($inList, 'Api was created locally but not found on ApiAxle');
     }
     
     public function testAxleCreateResetAndRevokeKey()
