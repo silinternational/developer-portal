@@ -1,6 +1,5 @@
 <?php
 
-use ApiAxle\Api\Api as AxleApi;
 use ApiAxle\Shared\ApiException;
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
 use Sil\DevPortal\models\Api;
@@ -264,14 +263,12 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertFalse($hasApiAfterDelete, 'New API still found after delete.');
     }
     
-    public function disabletestAxleCreate100Apis()
+    public function testAxleCreate100Apis()
     {
         $count = 0;
-        $howMany = 500;
+        $howMany = 100;
         $apiData = array(
-            'display_name' => __FUNCTION__,
             'endpoint' => 'localhost',
-            'default_path' => '/path/' . __FUNCTION__,
             'queries_second' => 3,
             'queries_day' => 1000,
             'visibility' => Api::VISIBILITY_PUBLIC,
@@ -281,22 +278,32 @@ class AxleTest extends DeveloperPortalTestCase
             'endpoint_timeout' => 2,
         );
         
-        while($count < $howMany){
-            $apiData['code'] = 'test-'.$count++;
+        $uniqId = uniqid();
+        while ($count < $howMany) {
+            $apiData['code'] = 'test-' . $uniqId . '-' . $count;
+            $apiData['display_name'] = __FUNCTION__ . $uniqId . '-' . $count;
+            $apiData['default_path'] = '/path/' . $apiData['code'];
             $api = new Api();
             $api->setAttributes($apiData);
-            $api->save();
+            if ( ! $api->save()) {
+                $this->fail(sprintf(
+                    'Failed to create API "%s": %s',
+                    $apiData['code'],
+                    $api->getErrorsForConsole()
+                ));
+            }
+            $count++;
         }
         
         $inList = 0;
-        $axleApi = new AxleApi($this->config);
-        $apiList = $axleApi->getList(0,1000);
-        foreach($apiList as $a){
-            if(preg_match('/test\-[0-9]{1,3}/',$a->getName())){
+        $apiAxle = new ApiAxleClient($this->config);
+        $apiInfoList = $apiAxle->listApis(0, 1000);
+        foreach ($apiInfoList as $apiInfo) {
+            if (preg_match('/test\-' . $uniqId . '-[0-9]{1,3}/', $apiInfo->getName())) {
                 $inList++;
             }
         }
         
-        $this->assertEquals($howMany-1,$inList);
+        $this->assertEquals($howMany, $inList);
     }
 }
