@@ -667,16 +667,16 @@
         },
         {
             "name": "silinternational/apiaxle-sdk-php",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silinternational/apiaxle-sdk-php.git",
-                "reference": "ccfe508e69ab5baa495555e4ae87d3cbbb93718e"
+                "reference": "9394011654d9ed38f41fd19f83177a966b4947b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silinternational/apiaxle-sdk-php/zipball/ccfe508e69ab5baa495555e4ae87d3cbbb93718e",
-                "reference": "ccfe508e69ab5baa495555e4ae87d3cbbb93718e",
+                "url": "https://api.github.com/repos/silinternational/apiaxle-sdk-php/zipball/9394011654d9ed38f41fd19f83177a966b4947b5",
+                "reference": "9394011654d9ed38f41fd19f83177a966b4947b5",
                 "shasum": ""
             },
             "require": {
@@ -713,7 +713,7 @@
                 }
             ],
             "description": "PHP client for ApiAxle APIs",
-            "time": "2016-10-10 14:07:32"
+            "time": "2016-10-24 20:49:55"
         },
         {
             "name": "silinternational/php-env",
