@@ -1,7 +1,6 @@
 <?php
 namespace Sil\DevPortal\models;
 
-use ApiAxle\Api\Key as AxleKey;
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\Event;
@@ -502,9 +501,6 @@ class Key extends \KeyBase
         $rewindBy = 0
 
     ) {
-        // Get the ApiAxle Key object for this Key model.
-        $axleKey = new AxleKey(\Yii::app()->params['apiaxle'], $this->value);
-        
         // Get the starting timestamp for the data we care about.
         $timeStart = \UsageStats::getTimeStart(
             $granularity,
@@ -513,7 +509,8 @@ class Key extends \KeyBase
         );
         
         // Retrieve the stats from ApiAxle.
-        $axleStats = $axleKey->getStats($timeStart, false, $granularity, 'false');
+        $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
+        $axleStats = $apiAxle->getKeyStats($this->value, $timeStart, $granularity);
         
         // Reformat the data for easier use.
         $dataByCategory = array();

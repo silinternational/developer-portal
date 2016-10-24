@@ -128,6 +128,21 @@ class Client extends BaseClient
     }
     
     /**
+     * Get usage statistics for the specified key.
+     * 
+     * @param string $keyValue The value of the Key whose stats are desired.
+     * @param integer $timeStart A Unix timestamp.
+     * @param string $granularity The desired granularity (e.g. - 'second',
+     *     'minute', 'hour', or 'day').
+     * @return \stdClass The stats data.
+     */
+    public function getKeyStats($keyValue, $timeStart, $granularity)
+    {
+        $apiAxleKey = $this->key()->get($keyValue);
+        return $apiAxleKey->getStats($timeStart, false, $granularity, 'false');
+    }
+    
+    /**
      * @param string $keyringName
      * @return KeyringInfo
      */
