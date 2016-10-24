@@ -361,8 +361,8 @@ class Key extends \KeyBase
     protected function deleteFromApiAxle()
     {
         try{
-            $axleKey = new AxleKey(\Yii::app()->params['apiaxle']);
-            $axleKey->delete($this->value);
+            $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
+            $apiAxle->deleteKey($this->value);
             return true;
         } catch (\Exception $e) {
 
