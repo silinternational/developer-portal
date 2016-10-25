@@ -2,6 +2,7 @@
 namespace Sil\DevPortal\models;
 
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
+use Sil\DevPortal\components\Exception\NotFoundException;
 use Sil\DevPortal\models\ApiVisibilityDomain;
 use Sil\DevPortal\models\ApiVisibilityUser;
 use Sil\DevPortal\models\Event;
@@ -722,12 +723,7 @@ class Api extends \ApiBase
                 return true;
             } catch (\Exception $e) {
                 
-                // If the Api was not found, try recreating it.
-                $notFoundMessage = sprintf(
-                    'API returned error: Api \'%s\' not found.',
-                    $this->code
-                );
-                if (($e->getCode() == 201) && ($notFoundMessage === $e->getMessage())) {
+                if ($e instanceof NotFoundException) {
                     try {
                         $apiAxle->createApi($this->code, $apiData);
                         $nameOfCurrentUser = \Yii::app()->user->getDisplayName();

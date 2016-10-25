@@ -196,6 +196,7 @@ return array(
             'pass' => $mailerPassword,
         ),
         "apiaxle" => array(
+            'baseUrl' => $apiaxleEndpoint,
             "endpoint" => $apiaxleEndpoint,
             "key" => $apiaxleKey,
             "secret" => $apiaxleSecret,

@@ -5,6 +5,7 @@ use ApiAxle\Api\Api as ApiAxleApi;
 use ApiAxle\Api\Key as ApiAxleKey;
 use ApiAxle\Api\Keyring as ApiAxleKeyring;
 use Sil\DevPortal\components\ApiAxle\ItemInfo;
+use Sil\DevPortal\components\Exception\NotFoundException;
 
 class Client extends BaseClient
 {
@@ -15,10 +16,11 @@ class Client extends BaseClient
      */
     public function createApi($apiName, $data)
     {
-        $apiAxleApi = $this->api()->create($apiName, $data);
+        $data['id'] = $apiName;
+        $response = $this->api()->create($data);
         return new ApiInfo(
-            $apiAxleApi->getName(),
-            $apiAxleApi->getData()
+            $apiName,
+            $this->getDataFromResponse($response)
         );
     }
     
@@ -55,7 +57,10 @@ class Client extends BaseClient
      */
     public function deleteApi($apiName)
     {
-        return $this->api()->delete($apiName);
+        $response = $this->api()->delete([
+            'id' => $apiName,
+        ]);
+        return $this->getDataFromResponse($response);
     }
     
     /**
@@ -82,7 +87,13 @@ class Client extends BaseClient
      */
     public function getApiInfo($apiName)
     {
-        return ApiInfo::from($this->getInfo($this->api(), $apiName));
+        $response = $this->api()->get([
+            'id' => $apiName,
+        ]);
+        return new ApiInfo(
+            $apiName,
+            $this->getDataFromResponse($response)
+        );
     }
     
     /**
@@ -96,8 +107,26 @@ class Client extends BaseClient
      */
     public function getApiStats($apiName, $timeStart, $granularity)
     {
-        $apiAxleApi = $this->api()->get($apiName);
-        return $apiAxleApi->getStats($timeStart, false, $granularity, 'false');
+        $response = $this->api()->getStats([
+            'id' => $apiName,
+            'from' => $timeStart,
+            'granularity' => $granularity,
+            'format_timeseries' => false,
+        ]);
+        return $this->getDataFromResponse($response);
+    }
+    
+    protected function getDataFromResponse($response)
+    {
+        $statusCode = $response['statusCode'];
+        if ($statusCode < 200 || $statusCode >= 300) {
+            throw new Exception(sprintf(
+                'Unexpected status code (%s) in response: %s',
+                $statusCode,
+                var_export($response, true)
+            ), 1477334316);
+        }
+        return $response['results'];
     }
     
     /**
@@ -148,8 +177,15 @@ class Client extends BaseClient
      */
     public function keyringExists($keyringName)
     {
-        $apiAxleKeyring = $this->keyring()->get($keyringName);
-        return !empty($apiAxleKeyring->getCreatedAt());
+        try {
+            $apiAxleKeyring = $this->keyring()->get($keyringName);
+            return !empty($apiAxleKeyring->getCreatedAt());
+        } catch (\Exception $e) {
+            if (preg_match('/API returned error: Keyring \'[^\']+\' not found./', $e->getMessage()) === 0) {
+                return false;
+            }
+            throw $e;
+        }
     }
     
     /**
@@ -160,10 +196,10 @@ class Client extends BaseClient
      */
     public function linkKeyToApi($keyValue, $apiName)
     {
-        $apiAxleApi = $this->api()->get($apiName);
-        $apiAxleKey = $this->key()->get($keyValue);
-        
-        $apiAxleApi->linkKey($apiAxleKey);
+        $this->api()->linkKey([
+            'id' => $apiName,
+            'key' => $keyValue,
+        ]);
     }
     
     /**
@@ -187,17 +223,15 @@ class Client extends BaseClient
      *     see. Starts at zero.
      * @param int $toIndex Integer for the index of the last API you want to
      *     see. Starts at zero.
-     * @return ApiInfo[]
+     * @return string[] The list of API code names.
      */
     public function listApis($fromIndex, $toIndex)
     {
-        $list = [];
-        $apiAxleApiList = $this->api()->getList($fromIndex, $toIndex);
-        foreach ($apiAxleApiList as $apiAxleApi) {
-            /* @var $apiAxleApi ApiAxleApi */
-            $list[] = new ApiInfo($apiAxleApi->getName(), $apiAxleApi->getData());
-        }
-        return $list;
+        $response = $this->api()->list([
+            'from' => $fromIndex,
+            'to' => $toIndex,
+        ]);
+        return $this->getDataFromResponse($response);
     }
     
     /**
@@ -228,18 +262,16 @@ class Client extends BaseClient
      *     see. Starts at zero.
      * @param int $toIndex Integer for the index of the last API you want to
      *     see. Starts at zero.
-     * @return KeyInfo[]
+     * @return string[] The list of key values (aka. key identifiers).
      */
     public function listKeysForApi($apiName, $fromIndex = 0, $toIndex = 100)
     {
-        $list = [];
-        $apiAxleApi = $this->api()->get($apiName);
-        $apiAxleKeyList = $apiAxleApi->getKeyList($fromIndex, $toIndex);
-        foreach ($apiAxleKeyList as $apiAxleKey) {
-            /* @var $apiAxleKey ApiAxleKey */
-            $list[] = new KeyInfo($apiAxleKey->getKey(), $apiAxleKey->getData());
-        }
-        return $list;
+        $response = $this->api()->listKeys([
+            'id' => $apiName,
+            'from' => $fromIndex,
+            'to' => $toIndex,
+        ]);
+        return $this->getDataFromResponse($response);
     }
     
     /**
@@ -267,10 +299,28 @@ class Client extends BaseClient
      * @param string $apiName
      * @param array $data
      * @return ApiInfo
+     * @throws NotFoundException
+     * @throws \Exception
      */
     public function updateApi($apiName, $data)
     {
-        return ApiInfo::from($this->update($this->api(), $apiName, $data));
+        try {
+            $data['id'] = $apiName;
+            $response = $this->api()->update($data);
+            $responseData = $this->getDataFromResponse($response);
+            return new ApiInfo(
+                $apiName,
+                $responseData['new']
+            );
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                throw new NotFoundException(sprintf(
+                    'Api "%s" not found.',
+                    $apiName
+                ), 1477414149, $e);
+            }
+            throw $e;
+        }
     }
     
     /**

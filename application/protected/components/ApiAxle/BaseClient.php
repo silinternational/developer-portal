@@ -21,11 +21,11 @@ class BaseClient
      * Get the client that we use (internally) for communicating with ApiAxle
      * about APIs.
      * 
-     * @return \ApiAxle\Api\Api
+     * @return \Apiaxle\Api
      */
     protected function api()
     {
-        return new \ApiAxle\Api\Api($this->config);
+        return new \Apiaxle\Api($this->config);
     }
     
     /**
