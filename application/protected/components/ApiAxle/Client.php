@@ -1,10 +1,6 @@
 <?php
 namespace Sil\DevPortal\components\ApiAxle;
 
-use ApiAxle\Api\Api as ApiAxleApi;
-use ApiAxle\Api\Key as ApiAxleKey;
-use ApiAxle\Api\Keyring as ApiAxleKeyring;
-use Sil\DevPortal\components\ApiAxle\ItemInfo;
 use Sil\DevPortal\components\Exception\NotFoundException;
 
 class Client extends BaseClient
@@ -31,24 +27,34 @@ class Client extends BaseClient
      */
     public function createKey($keyValue, $data)
     {
-        $apiAxleKey = $this->key()->create($keyValue, $data);
+        $data['id'] = $keyValue;
+        $response = $this->key()->create($data);
         return new KeyInfo(
-            $apiAxleKey->getKey(),
-            $apiAxleKey->getData()
+            $keyValue,
+            $this->getDataFromResponse($response)
         );
     }
     
     /**
      * @param string $keyringName
      * @return KeyringInfo
+     * @throws \Exception
      */
     public function createKeyring($keyringName)
     {
-        $apiAxleKeyring = $this->keyring()->create($keyringName);
-        return new KeyringInfo(
-            $apiAxleKeyring->getName(),
-            null
-        );
+        try {
+            $response = $this->keyring()->create(['id' => $keyringName]);
+            return new KeyringInfo(
+                $keyringName,
+                $this->getDataFromResponse($response)
+            );
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            throw new \Exception(
+                $e->getResponse()->getBody()->getContents(),
+                1477426036,
+                $e
+            );
+        }
     }
     
     /**
@@ -57,9 +63,7 @@ class Client extends BaseClient
      */
     public function deleteApi($apiName)
     {
-        $response = $this->api()->delete([
-            'id' => $apiName,
-        ]);
+        $response = $this->api()->delete(['id' => $apiName]);
         return $this->getDataFromResponse($response);
     }
     
@@ -69,7 +73,8 @@ class Client extends BaseClient
      */
     public function deleteKey($keyValue)
     {
-        return $this->key()->delete($keyValue);
+        $response = $this->key()->delete(['id' => $keyValue]);
+        return $this->getDataFromResponse($response);
     }
     
     /**
@@ -78,7 +83,8 @@ class Client extends BaseClient
      */
     public function deleteKeyring($keyringName)
     {
-        return $this->keyring()->delete($keyringName);
+        $response = $this->keyring()->delete(['id' => $keyringName]);
+        return $this->getDataFromResponse($response);
     }
     
     /**
@@ -87,9 +93,7 @@ class Client extends BaseClient
      */
     public function getApiInfo($apiName)
     {
-        $response = $this->api()->get([
-            'id' => $apiName,
-        ]);
+        $response = $this->api()->get(['id' => $apiName]);
         return new ApiInfo(
             $apiName,
             $this->getDataFromResponse($response)
@@ -103,7 +107,7 @@ class Client extends BaseClient
      * @param integer $timeStart A Unix timestamp.
      * @param string $granularity The desired granularity (e.g. - 'second',
      *     'minute', 'hour', or 'day').
-     * @return \stdClass The stats data.
+     * @return array The stats data.
      */
     public function getApiStats($apiName, $timeStart, $granularity)
     {
@@ -130,30 +134,16 @@ class Client extends BaseClient
     }
     
     /**
-     * Get the info about something in ApiAxle. What it is depends on what type
-     * of internal client for ApiAxle was provided.
-     * 
-     * @param ApiAxleApi|ApiAxleKey|ApiAxleKeyring $apiAxle The internal client
-     *     to use for communicating with ApiAxle.
-     * @param string $name The name of the thing to be retrieved.
-     * @return ItemInfo The information returned by ApiAxle about that thing.
-     */
-    protected function getInfo($apiAxle, $name)
-    {
-        $result = $apiAxle->get($name);
-        return new ItemInfo(
-            $result->getName(),
-            $result->getData()
-        );
-    }
-    
-    /**
      * @param string $keyValue
      * @return KeyInfo
      */
     public function getKeyInfo($keyValue)
     {
-        return KeyInfo::from($this->getInfo($this->key(), $keyValue));
+        $response = $this->key()->get(['id' => $keyValue]);
+        return new KeyInfo(
+            $keyValue,
+            $this->getDataFromResponse($response)
+        );
     }
     
     /**
@@ -163,25 +153,31 @@ class Client extends BaseClient
      * @param integer $timeStart A Unix timestamp.
      * @param string $granularity The desired granularity (e.g. - 'second',
      *     'minute', 'hour', or 'day').
-     * @return \stdClass The stats data.
+     * @return array The stats data.
      */
     public function getKeyStats($keyValue, $timeStart, $granularity)
     {
-        $apiAxleKey = $this->key()->get($keyValue);
-        return $apiAxleKey->getStats($timeStart, false, $granularity, 'false');
+        $response = $this->key()->getStats([
+            'id' => $keyValue,
+            'from' => $timeStart,
+            'granularity' => $granularity,
+            'format_timeseries' => false,
+        ]);
+        return $this->getDataFromResponse($response);
     }
     
     /**
      * @param string $keyringName
-     * @return KeyringInfo
+     * @return bool
+     * @throws \Exception
      */
     public function keyringExists($keyringName)
     {
         try {
-            $apiAxleKeyring = $this->keyring()->get($keyringName);
-            return !empty($apiAxleKeyring->getCreatedAt());
+            $this->keyring()->get(['id' => $keyringName]);
+            return true;
         } catch (\Exception $e) {
-            if (preg_match('/API returned error: Keyring \'[^\']+\' not found./', $e->getMessage()) === 0) {
+            if ($e->getCode() === 404) {
                 return false;
             }
             throw $e;
@@ -196,10 +192,21 @@ class Client extends BaseClient
      */
     public function linkKeyToApi($keyValue, $apiName)
     {
-        $this->api()->linkKey([
-            'id' => $apiName,
-            'key' => $keyValue,
-        ]);
+        try {
+            $this->api()->linkKey([
+                'id' => $apiName,
+                'key' => $keyValue,
+            ]);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                throw new NotFoundException(sprintf(
+                    'Either the key (%s) or the API (%s) was not found.',
+                    $keyValue,
+                    $apiName
+                ), 1477428053, $e);
+            }
+            throw $e;
+        }
     }
     
     /**
@@ -207,13 +214,26 @@ class Client extends BaseClient
      * 
      * @param string $keyValue
      * @param string $keyringName
+     * @throws NotFoundException
+     * @throws \Exception
      */
     public function linkKeyToKeyring($keyValue, $keyringName)
     {
-        $apiAxleKeyring = $this->keyring()->get($keyringName);
-        $apiAxleKey = $this->key()->get($keyValue);
-        
-        $apiAxleKeyring->linkKey($apiAxleKey);
+        try {
+            $this->keyring()->linkKey([
+                'id' => $keyringName,
+                'key' => $keyValue,
+            ]);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                throw new NotFoundException(sprintf(
+                    'Either the key (%s) or the keyring (%s) was not found.',
+                    $keyValue,
+                    $keyringName
+                ), 1477419154, $e);
+            }
+            throw $e;
+        }
     }
     
     /**
@@ -241,21 +261,19 @@ class Client extends BaseClient
      *     see. Starts at zero.
      * @param int $toIndex Integer for the index of the last API you want to
      *     see. Starts at zero.
-     * @return KeyInfo[]
+     * @return string[] The list of key values (aka. key identifiers).
      */
     public function listKeys($fromIndex, $toIndex)
     {
-        $list = [];
-        $apiAxleKeyList = $this->key()->getList($fromIndex, $toIndex);
-        foreach ($apiAxleKeyList as $apiAxleKey) {
-            /* @var $apiAxleKey ApiAxleKey */
-            $list[] = new KeyInfo($apiAxleKey->getKey(), $apiAxleKey->getData());
-        }
-        return $list;
+        $response = $this->key()->list([
+            'from' => $fromIndex,
+            'to' => $toIndex,
+        ]);
+        return $this->getDataFromResponse($response);
     }
     
     /**
-     * Get a list of existing keys.
+     * Get a list of existing keys for the specified API.
      * 
      * @param string $apiName The code name of the API whose keys are desired.
      * @param int $fromIndex Integer for the index of the first API you want to
@@ -272,27 +290,6 @@ class Client extends BaseClient
             'to' => $toIndex,
         ]);
         return $this->getDataFromResponse($response);
-    }
-    
-    /**
-     * Update an object in ApiAxle. What it is depends on what type of internal
-     * client for ApiAxle was provided.
-     *
-     * @param ApiAxleApi|ApiAxleKey $apiAxle The internal client to use for
-     *     communicating with ApiAxle.
-     * @param string $name The name of the thing to be retrieved.
-     * @param array $data The new data.
-     * @return ItemInfo The information returned by ApiAxle about the updated
-     *     object.
-     */
-    protected function update($apiAxle, $name, $data)
-    {
-        $result = $apiAxle->get($name);
-        $result->update($data);
-        return new ItemInfo(
-            $result->getName(),
-            $result->getData()
-        );
     }
     
     /**
@@ -327,11 +324,27 @@ class Client extends BaseClient
      * @param string $keyValue
      * @param array $data
      * @return KeyInfo
+     * @throws NotFoundException
+     * @throws \Exception
      */
     public function updateKey($keyValue, $data)
     {
-        return KeyInfo::from($this->update($this->key(), $keyValue, $data));
+        try {
+            $data['id'] = $keyValue;
+            $response = $this->key()->update($data);
+            $responseData = $this->getDataFromResponse($response);
+            return new KeyInfo(
+                $keyValue,
+                $responseData['new']
+            );
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                throw new NotFoundException(sprintf(
+                    'Key "%s" not found.',
+                    $keyValue
+                ), 1477419988, $e);
+            }
+            throw $e;
+        }
     }
-    
-    // NOTE: There is no update function for ApiAxle\Api\Keyring.
 }

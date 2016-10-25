@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d6725d7123a537a7e74bdbeb594d51fb",
-    "content-hash": "ab6b9cd58999276e4118cf23a4d8559c",
+    "hash": "952ca63e3686d2c06a991946a4a36f9b",
+    "content-hash": "0481c9a8df6e92c372cffb8191e8b7fe",
     "packages": [
         {
             "name": "danielstjules/stringy",
@@ -62,53 +62,6 @@
                 "utils"
             ],
             "time": "2016-05-02 15:18:10"
-        },
-        {
-            "name": "fillup/apiaxle",
-            "version": "0.7.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/fillup/apiaxle-module.git",
-                "reference": "155a752c48e4723a042a7c31851c791943fb77c1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/fillup/apiaxle-module/zipball/155a752c48e4723a042a7c31851c791943fb77c1",
-                "reference": "155a752c48e4723a042a7c31851c791943fb77c1",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "require-dev": {
-                "apigen/apigen": "2.*",
-                "phpunit/phpunit": "3.7.*",
-                "satooshi/php-coveralls": "dev-master"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "ApiAxle\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0+"
-            ],
-            "authors": [
-                {
-                    "name": "Phillip Shipley",
-                    "email": "phillip@phillipshipley.com",
-                    "homepage": "http://phillipshipley.com/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "PHP library/module for interacting with ApiAxle APIs.",
-            "homepage": "https://github.com/fillup/apiaxle",
-            "keywords": [
-                "apiaxle"
-            ],
-            "time": "2015-02-12 18:37:57"
         },
         {
             "name": "forevermatt/calc-api-sig",

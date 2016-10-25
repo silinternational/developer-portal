@@ -48,15 +48,15 @@ class AxleTest extends DeveloperPortalTestCase
             }
             
             // Get the list of keys from ApiAxle.
-            $keyInfoList = $apiAxle->listKeys(0, 1000);
+            $keyValues = $apiAxle->listKeys(0, 1000);
             
             // For each key that ApiAxle returned...
-            foreach ($keyInfoList as $keyInfo) {
+            foreach ($keyValues as $keyValue) {
                 
                 // If it starts with the string we use to identify test keys,
                 // delete it.
-                if (strpos($keyInfo->getKeyValue(), 'test-') !== false) {
-                    $apiAxle->deleteKey($keyInfo->getKeyValue());
+                if (strpos($keyValue, 'test-') !== false) {
+                    $apiAxle->deleteKey($keyValue);
                 }
             }
         } catch(ApiException $ae){

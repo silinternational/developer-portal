@@ -32,21 +32,21 @@ class BaseClient
      * Get the client that we use (internally) for communicating with ApiAxle
      * about keys.
      * 
-     * @return \ApiAxle\Api\Key
+     * @return \Apiaxle\Key
      */
     protected function key()
     {
-        return new \ApiAxle\Api\Key($this->config);
+        return new \Apiaxle\Key($this->config);
     }
     
     /**
      * Get the client that we use (internally) for communicating with ApiAxle
      * about keyrings.
      * 
-     * @return \ApiAxle\Api\Keyring
+     * @return \Apiaxle\Keyring
      */
     protected function keyring()
     {
-        return new \ApiAxle\Api\Keyring($this->config);
+        return new \Apiaxle\Keyring($this->config);
     }
 }
