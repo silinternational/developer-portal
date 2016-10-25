@@ -1,8 +1,7 @@
 <?php
 
-use ApiAxle\Api\Api as AxleApi;
-use ApiAxle\Api\Key as AxleKey;
 use ApiAxle\Shared\ApiException;
+use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\Key;
 
@@ -37,39 +36,28 @@ class AxleTest extends DeveloperPortalTestCase
     public static function tearDownAfterClass()
     {
         try {
-            
-            // Set up our ApiAxle Api class.
-            $api = new AxleApi(self::getConfig());
+            $apiAxle = new ApiAxleClient(self::getConfig());
             
             // Delete all the APIs that start with the string we use to identify
             // test APIs.
-            $apiList = $api->getList(0,1000);
-            foreach($apiList as $item){
-                if(strpos($item->getName(),'test-') !== false){
-                    $api->delete($item->getName());
+            $apiCodeNames = $apiAxle->listApis(0, 1000);
+            foreach ($apiCodeNames as $apiCodeName) {
+                if (strpos($apiCodeName, 'test-') !== false) {
+                    $apiAxle->deleteApi($apiCodeName);
                 }
             }
             
-            // Set up our ApiAxle Key class.
-            $key = new AxleKey(self::getConfig());
-            
-            // Get the list of Keys from ApiAxle.
-            $keyList = $key->getList(0, 1000);
+            // Get the list of keys from ApiAxle.
+            $keyValues = $apiAxle->listKeys(0, 1000);
             
             // For each key that ApiAxle returned...
-            foreach ($keyList as $item) {
+            foreach ($keyValues as $keyValue) {
                 
-                // If it starts with the string we use to identify test Keys,
+                // If it starts with the string we use to identify test keys,
                 // delete it.
-                if (strpos($item->getKey(), 'test-') !== false) {
-                    $key->delete($item->getKey());
+                if (strpos($keyValue, 'test-') !== false) {
+                    $apiAxle->deleteKey($keyValue);
                 }
-                
-                // QUESTION: Why was this here?
-                // 
-                //if(preg_match('/[0-9a-z]{32}/',$item->getKey())){
-                //    $key->delete($item->getKey());
-                //}
             }
         } catch(ApiException $ae){
             echo $ae;
@@ -100,16 +88,16 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertTrue($result, 'Failed to create API: ' . PHP_EOL .
             self::getModelErrorsForConsole($api->getErrors()));
         
-        $axleApi = new AxleApi($this->config);
-        $apiList = $axleApi->getList(0,1000);
+        $apiAxle = new ApiAxleClient($this->config);
+        $apiCodeNames = $apiAxle->listApis(0, 1000);
         $inList = false;
-        foreach($apiList as $a){
-            if($a->getName() == $apiData['code']){
+        foreach ($apiCodeNames as $apiCodeName) {
+            if ($apiCodeName == $apiData['code']) {
                 $inList = true;
                 break;
             }
         }
-        $this->assertTrue($inList,'Api was created locally but not found on ApiAxle');
+        $this->assertTrue($inList, 'Api was created locally but not found on ApiAxle');
     }
     
     public function testAxleCreateResetAndRevokeKey()
@@ -157,18 +145,18 @@ class AxleTest extends DeveloperPortalTestCase
             $approveKeyResult,
             'Failed to create/approve Key: ' . print_r($key->getErrors(), true)
         );
-        $axleApi = new AxleApi($this->config, $api->code);
-        $axleApiKeysAfterCreate = $axleApi->getKeyList();
+        $apiAxle = new ApiAxleClient($this->config);
+        $keyValuesAfterCreate = $apiAxle->listKeysForApi($api->code);
         $hasKeyAfterCreate = false;
-        foreach ($axleApiKeysAfterCreate as $axleApiKey) {
-            if ($axleApiKey->getKey() == $key->value) {
+        foreach ($keyValuesAfterCreate as $keyValue) {
+            if ($keyValue == $key->value) {
                 $hasKeyAfterCreate = true;
                 break;
             }
         }
         $this->assertTrue(
             $hasKeyAfterCreate,
-            'New key is not linked to AxleApi. Key errors (if any): '
+            'New key is not linked to API in ApiAxle. Key errors (if any): '
             . print_r($key, true)
         );
         $initialKeyValue = $key->value;
@@ -182,17 +170,17 @@ class AxleTest extends DeveloperPortalTestCase
             $resetKeyResult[0],
             'Unable to reset key: ' . print_r($resetKeyResult[1], true)
         );
-        $axleApiKeysAfterReset = $axleApi->getKeyList();
+        $keyValuesAfterReset = $apiAxle->listKeysForApi($api->code);
         $hasKeyAfterReset = false;
-        foreach ($axleApiKeysAfterReset as $axleApiKey) {
-            if ($axleApiKey->getKey() == $resetKeyResult[1]->value) {
+        foreach ($keyValuesAfterReset as $keyValue) {
+            if ($keyValue == $resetKeyResult[1]->value) {
                 $hasKeyAfterReset = true;
                 break;
             }
         }
         $this->assertTrue(
             $hasKeyAfterReset,
-            'Reset key is not linked to AxleApi. Key errors (if any): '
+            'Reset key is not linked to API in ApiAxle. Key errors (if any): '
             . print_r($resetKeyResult[1], true)
         );
         $changedKeyValue = $resetKeyResult[1]->value;
@@ -217,17 +205,17 @@ class AxleTest extends DeveloperPortalTestCase
             $revokeKeyResult[0],
             'Unable to revoke key: ' . print_r($revokeKeyResult[1], true)
         );
-        $axleApiKeysAfterRevoke = $axleApi->getKeyList();
+        $keyValuesAfterRevoke = $apiAxle->listKeysForApi($api->code);
         $hasKeyAfterRevoke = false;
-        foreach ($axleApiKeysAfterRevoke as $axleApiKey) {
-            if ($axleApiKey->getKey() == $key->value) {
+        foreach ($keyValuesAfterRevoke as $keyValue) {
+            if ($keyValue == $key->value) {
                 $hasKeyAfterRevoke = true;
                 break;
             }
         }
         $this->assertFalse(
             $hasKeyAfterRevoke,
-            'Revoked key was not deleted from AxleApi. Key errors (if any): '
+            'Revoked key was not deleted from API in ApiAxle. Key errors (if any): '
             . print_r($revokeKeyResult[1], true)
         );
     }
@@ -252,11 +240,11 @@ class AxleTest extends DeveloperPortalTestCase
         $result = $api->save();
         $this->assertTrue($result,'Failed to create API: '.print_r($api->getErrors(),true));
         
-        $axleApi = new AxleApi($this->config);
-        $apiList = $axleApi->getList(0,1000);
+        $apiAxle = new ApiAxleClient($this->config);
+        $apiCodeNames = $apiAxle->listApis(0, 1000);
         $hasApi = false;
-        foreach($apiList as $a){
-            if($a->getName() == $api->code){
+        foreach ($apiCodeNames as $apiCodeName) {
+            if ($apiCodeName == $api->code) {
                 $hasApi = true;
                 break;
             }
@@ -264,25 +252,23 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertTrue($hasApi,'New API not found on server.');
         
         $api->delete();
-        $apiList = $axleApi->getList(0,1000);
-        $hasApi = false;
-        foreach($apiList as $a){
-            if($a->getName() == $api->code){
-                $hasApi = true;
+        $apiCodeNamesAfterDelete = $apiAxle->listApis(0, 1000);
+        $hasApiAfterDelete = false;
+        foreach ($apiCodeNamesAfterDelete as $apiCodeName) {
+            if ($apiCodeName == $api->code) {
+                $hasApiAfterDelete = true;
                 break;
             }
         }
-        $this->assertFalse($hasApi,'New API still found after delete.');
+        $this->assertFalse($hasApiAfterDelete, 'New API still found after delete.');
     }
     
-    public function disabletestAxleCreate100Apis()
+    public function testAxleCreate100Apis()
     {
         $count = 0;
-        $howMany = 500;
+        $howMany = 100;
         $apiData = array(
-            'display_name' => __FUNCTION__,
             'endpoint' => 'localhost',
-            'default_path' => '/path/' . __FUNCTION__,
             'queries_second' => 3,
             'queries_day' => 1000,
             'visibility' => Api::VISIBILITY_PUBLIC,
@@ -292,22 +278,32 @@ class AxleTest extends DeveloperPortalTestCase
             'endpoint_timeout' => 2,
         );
         
-        while($count < $howMany){
-            $apiData['code'] = 'test-'.$count++;
+        $uniqId = uniqid();
+        while ($count < $howMany) {
+            $apiData['code'] = 'test-' . $uniqId . '-' . $count;
+            $apiData['display_name'] = __FUNCTION__ . $uniqId . '-' . $count;
+            $apiData['default_path'] = '/path/' . $apiData['code'];
             $api = new Api();
             $api->setAttributes($apiData);
-            $api->save();
+            if ( ! $api->save()) {
+                $this->fail(sprintf(
+                    'Failed to create API "%s": %s',
+                    $apiData['code'],
+                    $api->getErrorsForConsole()
+                ));
+            }
+            $count++;
         }
         
         $inList = 0;
-        $axleApi = new AxleApi($this->config);
-        $apiList = $axleApi->getList(0,1000);
-        foreach($apiList as $a){
-            if(preg_match('/test\-[0-9]{1,3}/',$a->getName())){
+        $apiAxle = new ApiAxleClient($this->config);
+        $apiCodeNames = $apiAxle->listApis(0, 1000);
+        foreach ($apiCodeNames as $apiCodeName) {
+            if (preg_match('/test\-' . $uniqId . '-[0-9]{1,3}/', $apiCodeName)) {
                 $inList++;
             }
         }
         
-        $this->assertEquals($howMany-1,$inList);
+        $this->assertEquals($howMany, $inList);
     }
 }
