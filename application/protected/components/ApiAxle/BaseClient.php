@@ -14,6 +14,19 @@ class BaseClient
      */
     public function __construct($config = [])
     {
+        /* If told how/whether to verify SSL peers, set the appropriate config
+         * value.  */
+        if (array_key_exists('ssl_verifypeer', $config)) {
+            $config = \CMap::mergeArray($config, [
+                'http_client_options' => [
+                    'defaults' => [
+                        'verify' => $config['ssl_verifypeer'],
+                    ],
+                ],
+            ]);
+            unset($config['ssl_verifypeer']);
+        }
+        
         $this->config = $config;
     }
     

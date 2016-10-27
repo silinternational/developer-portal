@@ -199,11 +199,7 @@ return array(
             "endpoint" => $apiaxleEndpoint,
             "key" => $apiaxleKey,
             "secret" => $apiaxleSecret,
-            'http_client_options' => [
-                'defaults' => [
-                    'verify' => $apiaxleSslVerifyPeer,
-                ],
-            ],
+            "ssl_verifypeer" => $apiaxleSslVerifyPeer,
         ),
         "google_analytics" => array(
             "enabled" => $gaEnabled,
