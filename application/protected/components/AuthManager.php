@@ -40,6 +40,11 @@ class AuthManager
         return ($numUsableAuthTypes > 1);
     }
     
+    public function getApplicationEnv()
+    {
+        return (defined('APPLICATION_ENV') ? APPLICATION_ENV : null);
+    }
+    
     /**
      * Try to get the default authentication type to use. Returns null if there
      * is no obvious default.
@@ -214,7 +219,8 @@ class AuthManager
     
     protected function isTestAuthEnabled()
     {
-        return defined('APPLICATION_ENV') && (APPLICATION_ENV === 'testing');
+        $applicationEnv = $this->getApplicationEnv();
+        return ($applicationEnv === 'development') || ($applicationEnv === 'testing');
     }
     
     /**
