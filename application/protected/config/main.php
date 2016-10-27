@@ -19,7 +19,6 @@ $apiaxleEndpoint = Env::get('APIAXLE_ENDPOINT');
 $apiaxleKey = Env::get('APIAXLE_KEY');
 $apiaxleSecret = Env::get('APIAXLE_SECRET');
 $apiaxleSslVerifyPeer = Env::get('APIAXLE_SSL_VERIFYPEER', true);
-$apiaxleProxyEnable = Env::get('APIAXLE_PROXY_ENABLE');
 $gaEnabled = Env::get('GA_ENABLED', false);
 $gaTrackingId = Env::get('GA_TRACKING_ID');
 $googleOAuthClientId = Env::get('GOOGLE_OAUTH_CLIENT_ID');
@@ -200,8 +199,7 @@ return array(
             "endpoint" => $apiaxleEndpoint,
             "key" => $apiaxleKey,
             "secret" => $apiaxleSecret,
-            "ssl_verifypeer" => $apiaxleSslVerifyPeer,
-            "proxy_enable" => $apiaxleProxyEnable,
+            "verify" => $apiaxleSslVerifyPeer,
         ),
         "google_analytics" => array(
             "enabled" => $gaEnabled,

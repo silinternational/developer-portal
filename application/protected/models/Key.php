@@ -2,6 +2,7 @@
 namespace Sil\DevPortal\models;
 
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
+use Sil\DevPortal\components\Exception\NotFoundException;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\Event;
 use Sil\DevPortal\models\User;
@@ -363,17 +364,15 @@ class Key extends \KeyBase
             $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
             $apiAxle->deleteKey($this->value);
             return true;
-        } catch (\Exception $e) {
-
+        } catch (NotFoundException $e) {
             // If the key was not found, consider the deletion successful.
-            $notFoundMessage = sprintf(
-                'API returned error: Key \'%s\' not found.',
-                $this->value
-            );
-            if (($e->getCode() == 201) && ($notFoundMessage === $e->getMessage())) {
-                return true;
-            }
-
+            \Yii::log(sprintf(
+                'Key was not found, so deletion was considered successful: (%s) %s',
+                $e->getCode(),
+                $e->getMessage()
+            ), \CLogger::LEVEL_WARNING);
+            return true;
+        } catch (\Exception $e) {
             // Otherwise, consider it not successful.
             $this->addError('value', $e->getMessage());
             return false;

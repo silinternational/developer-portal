@@ -73,8 +73,19 @@ class Client extends BaseClient
      */
     public function deleteKey($keyValue)
     {
-        $response = $this->key()->delete(['id' => $keyValue]);
-        return $this->getDataFromResponse($response);
+        try {
+            $response = $this->key()->delete(['id' => $keyValue]);
+            return $this->getDataFromResponse($response);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                throw new NotFoundException(sprintf(
+                    'That key (%s%s) was not found.',
+                    substr($keyValue, 0, 12),
+                    ((strlen($keyValue) > 12) ? '...' : '')
+                ), 1477584689, $e);
+            }
+            throw $e;
+        }
     }
     
     /**
@@ -124,7 +135,7 @@ class Client extends BaseClient
     {
         $statusCode = $response['statusCode'];
         if ($statusCode < 200 || $statusCode >= 300) {
-            throw new Exception(sprintf(
+            throw new \Exception(sprintf(
                 'Unexpected status code (%s) in response: %s',
                 $statusCode,
                 var_export($response, true)

@@ -71,6 +71,24 @@ class AuthManagerTest extends \CTestCase
         );
     }
     
+    public function testGetApplicationEnv()
+    {
+        // Arrange:
+        $authManager = new AuthManager();
+        
+        // Pre-assert:
+        $this->assertTrue(
+            defined('APPLICATION_ENV'),
+            'This test requires that the APPLICATION_ENV constant is set.'
+        );
+        
+        // Act:
+        $result = $authManager->getApplicationEnv();
+        
+        // Assert:
+        $this->assertSame($result, APPLICATION_ENV);
+    }
+    
     public function testGetDefaultAuthType_0()
     {
         // Arrange:
@@ -198,6 +216,30 @@ class AuthManagerTest extends \CTestCase
         
         // Assert:
         \Phake::verify($authManager)->isSamlAuthEnabled;
+    }
+    
+    public function testIsTestAuthEnabled()
+    {
+        // Arrange:
+        $nonTestAuthApplicationEnvValues = ['production', 'prod', null, false, ''];
+        /* @var $authManager AuthManager */
+        $authManager = \Phake::mock('\Sil\DevPortal\components\AuthManager');
+        \Phake::when($authManager)->isTestAuthEnabled->thenCallParent();
+        foreach ($nonTestAuthApplicationEnvValues as $applicationEnvValue) {
+            \Phake::when($authManager)->getApplicationEnv->thenReturn(
+                $applicationEnvValue
+            );
+            
+            // Act:
+            $actual = \Phake::makeVisible($authManager)->isTestAuthEnabled();
+
+            // Assert:
+            $this->assertFalse($actual, sprintf(
+                'When the APPLICATION_ENV was %s, TestAuth was INCORRECTLY '
+                . 'allowed.',
+                var_export($applicationEnvValue, true)
+            ));
+        }
     }
     
     public function testLogout_webUserLogoutAndClearStatesAreCalled()

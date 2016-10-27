@@ -57,9 +57,10 @@ class KeyController extends \Controller
                     '<strong>Error!</strong> Unable to delete key: '
                     . $key->getErrorsAsFlatHtmlList()
                 );
-            }
-            // Otherwise...
-            else {
+                
+                // Send the user back to this page (to get past the POST).
+                $this->redirect(['/key/delete/', 'id' => $id]);
+            } else {
                 
                 // Record that in the log.
                 \Yii::log(
@@ -73,10 +74,10 @@ class KeyController extends \Controller
                     'success',
                     '<strong>Success!</strong> Key deleted.'
                 );
+                
+                // Send the user back to the list of Keys.
+                $this->redirect(array('/key/'));
             }
-            
-            // Send the user back to the list of Keys.
-            $this->redirect(array('/key/'));
         }
         
         // Show the page.
