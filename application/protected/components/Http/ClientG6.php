@@ -44,7 +44,7 @@ class ClientG6 extends AbstractClient
             'headers' => $headerParams,
             'query' => $queryParams,
             'http_errors' => false,
-            'verify' => \Yii::app()->params['apiaxle']['ssl_verifypeer'],
+            'verify' => $this->getSslVerifyPeerSetting(),
         ]);
         rewind($debugStream);
         $debugText = stream_get_contents($debugStream);

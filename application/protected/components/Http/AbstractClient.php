@@ -36,6 +36,11 @@ abstract class AbstractClient
         return $fullRequest;
     }
     
+    protected function getSslVerifyPeerSetting()
+    {
+        return \Yii::app()->params['apiaxle']['ssl_verifypeer'];
+    }
+    
     /**
      * Send the specified request and get the response.
      * 

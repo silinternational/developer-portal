@@ -38,7 +38,7 @@ class ClientG5 extends AbstractClient
             'body' => empty($formParams) ? $body : $formParams,
             'query' => $queryParams,
             'exceptions' => false,
-            'verify' => \Yii::app()->params['apiaxle']['ssl_verifypeer'],
+            'verify' => $this->getSslVerifyPeerSetting(),
         ]);
         $response = $guzzleClient->send($guzzleRequest);
         rewind($debugStream);
