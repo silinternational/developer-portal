@@ -135,7 +135,7 @@ class Client extends BaseClient
     {
         $statusCode = $response['statusCode'];
         if ($statusCode < 200 || $statusCode >= 300) {
-            throw new Exception(sprintf(
+            throw new \Exception(sprintf(
                 'Unexpected status code (%s) in response: %s',
                 $statusCode,
                 var_export($response, true)
