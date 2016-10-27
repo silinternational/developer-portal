@@ -200,7 +200,7 @@ return array(
             "endpoint" => $apiaxleEndpoint,
             "key" => $apiaxleKey,
             "secret" => $apiaxleSecret,
-            "ssl_verifypeer" => $apiaxleSslVerifyPeer,
+            "verify" => $apiaxleSslVerifyPeer,
             "proxy_enable" => $apiaxleProxyEnable,
         ),
         "google_analytics" => array(
