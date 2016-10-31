@@ -100,6 +100,48 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertTrue($inList, 'Api was created locally but not found on ApiAxle');
     }
     
+    public function testAxleCreateApiWithAdditionalHeaders()
+    {
+        // Arrange:
+        $apiAxle = new ApiAxleClient($this->config);
+        $apiData = array(
+            'code' => 'test-' . uniqid(),
+            'display_name' => __FUNCTION__,
+            'endpoint' => 'localhost',
+            'default_path' => '/path/' . __FUNCTION__,
+            'queries_second' => 3,
+            'queries_day' => 1000,
+            'visibility' => Api::VISIBILITY_PUBLIC,
+            'protocol' => 'http',
+            'strict_ssl' => 1,
+            'approval_type' => 'auto',
+            'endpoint_timeout' => 2,
+            'additional_headers' => 'One=1&Two=2',
+        );
+        $api = new Api();
+        $api->setAttributes($apiData);
+        
+        // Act:
+        $result = $api->save();
+        
+        // Assert:
+        $this->assertTrue($result, sprintf(
+            "Failed to create API: \n%s",
+            $api->getErrorsForConsole()
+        ));
+        $apiInfo = $apiAxle->getApiInfo($api->code);
+        $dataFromAxle = $apiInfo->getData();
+        $this->assertArrayHasKey(
+            'additionalHeaders',
+            $dataFromAxle,
+            'No additional headers found in data returned by ApiAxle.'
+        );
+        $this->assertEquals(
+            $apiData['additional_headers'],
+            $dataFromAxle['additionalHeaders']
+        );
+    }
+    
     public function testAxleCreateResetAndRevokeKey()
     {
         // Arrange:

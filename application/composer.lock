@@ -64,6 +64,63 @@
             "time": "2016-05-02 15:18:10"
         },
         {
+            "name": "facebook/graph-sdk",
+            "version": "5.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/facebook/php-graph-sdk.git",
+                "reference": "a5a6b6cc493d8dc417f588c7c0bdfc6396198350"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/facebook/php-graph-sdk/zipball/a5a6b6cc493d8dc417f588c7c0bdfc6396198350",
+                "reference": "a5a6b6cc493d8dc417f588c7c0bdfc6396198350",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.4|^7.0"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "~5.0",
+                "mockery/mockery": "~0.8",
+                "phpunit/phpunit": "~4.0"
+            },
+            "suggest": {
+                "guzzlehttp/guzzle": "Allows for implementation of the Guzzle HTTP client"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Facebook\\": "src/Facebook/"
+                },
+                "files": [
+                    "src/Facebook/polyfills.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Facebook Platform"
+            ],
+            "authors": [
+                {
+                    "name": "Facebook",
+                    "homepage": "https://github.com/facebook/php-graph-sdk/contributors"
+                }
+            ],
+            "description": "Facebook SDK for PHP",
+            "homepage": "https://github.com/facebook/php-graph-sdk",
+            "keywords": [
+                "facebook",
+                "sdk"
+            ],
+            "time": "2016-10-18 19:19:03"
+        },
+        {
             "name": "forevermatt/calc-api-sig",
             "version": "0.1.1",
             "source": {
@@ -396,20 +453,21 @@
         },
         {
             "name": "hybridauth/hybridauth",
-            "version": "v2.7.0",
+            "version": "v2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hybridauth/hybridauth.git",
-                "reference": "d4e5bc34008e8c187c302eb4e94200ee4a208c63"
+                "reference": "0cffedb5c039a8925b25284dd7181e711d02016d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/d4e5bc34008e8c187c302eb4e94200ee4a208c63",
-                "reference": "d4e5bc34008e8c187c302eb4e94200ee4a208c63",
+                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/0cffedb5c039a8925b25284dd7181e711d02016d",
+                "reference": "0cffedb5c039a8925b25284dd7181e711d02016d",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
+                "facebook/graph-sdk": "^5.4",
                 "php": ">=5.2.0"
             },
             "type": "library",
@@ -444,7 +502,7 @@
                 "twitter",
                 "yahoo"
             ],
-            "time": "2016-09-05 03:02:22"
+            "time": "2016-10-29 18:05:43"
         },
         {
             "name": "react/promise",

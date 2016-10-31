@@ -260,6 +260,21 @@ class Api extends \ApiBase
         );
     }
     
+    public function getAdditionalHeadersArray()
+    {
+        $array = [];
+        $rawPairs = explode('&', $this->additional_headers);
+        foreach ($rawPairs as $rawPair) {
+            $keyValue = explode('=', $rawPair, 2);
+            if (count($keyValue) > 0) {
+                $key = $keyValue[0];
+                $value = (count($keyValue) > 1 ? $keyValue[1] : null);
+                $array[rawurldecode($key)] = rawurldecode($value);
+            }
+        }
+        return $array;
+    }
+    
     /**
      * Get the apiProxyDomain config data. Throws an exception if it has not
      * been set.
@@ -703,6 +718,7 @@ class Api extends \ApiBase
             'strictSSL' => $this->strict_ssl ? true : false,
             'endPointTimeout' => !is_null($this->endpoint_timeout) 
                     ? (int)$this->endpoint_timeout : 2,
+            'additionalHeaders' => $this->additional_headers ?: '',
         );
         
         $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
@@ -710,6 +726,18 @@ class Api extends \ApiBase
             try {
                 $apiAxle->createApi($this->code, $apiData);
                 return true;
+            } catch (\GuzzleHttp\Exception\RequestException $e) {
+                $response = $e->getResponse();
+                if ($response === null) {
+                    $errorMessage = $e->getMessage();
+                } else {
+                    $errorMessage = $response->getBody()->getContents();
+                }
+                $this->addError('code', sprintf(
+                    'Error creating API: %s',
+                    $errorMessage
+                ));
+                return false;
             } catch (\Exception $e) {
                 $this->addError(
                     'code',
@@ -721,29 +749,26 @@ class Api extends \ApiBase
             try {
                 $apiAxle->updateApi($this->code, $apiData);
                 return true;
-            } catch (\Exception $e) {
-                
-                if ($e instanceof NotFoundException) {
-                    try {
-                        $apiAxle->createApi($this->code, $apiData);
-                        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-                        Event::log(sprintf(
-                            'The "%s" API (%s, ID %s) was re-added to ApiAxle%s.',
-                            $this->display_name,
-                            $this->code,
-                            $this->api_id,
-                            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-                        ), $this->api_id);
-                        return true;
-                    } catch (\Exception $e) {
-                        $this->addError(
-                            'code',
-                            'Failed to recreate API on the proxy: ' . $e->getMessage()
-                        );
-                        return false;
-                    }
+            } catch (NotFoundException $e) {
+                try {
+                    $apiAxle->createApi($this->code, $apiData);
+                    $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+                    Event::log(sprintf(
+                        'The "%s" API (%s, ID %s) was re-added to ApiAxle%s.',
+                        $this->display_name,
+                        $this->code,
+                        $this->api_id,
+                        (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+                    ), $this->api_id);
+                    return true;
+                } catch (\Exception $e) {
+                    $this->addError(
+                        'code',
+                        'Failed to recreate API on the proxy: ' . $e->getMessage()
+                    );
+                    return false;
                 }
-
+            } catch (\Exception $e) {
                 $this->addError(
                     'code',
                     'Failed to update API on the proxy: ' . $e->getMessage()
