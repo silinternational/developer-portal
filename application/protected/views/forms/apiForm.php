@@ -63,6 +63,13 @@ return array(
             ),
             'type' => 'text',
         ),
+        'additional_headers' => [
+            'htmlOptions' => [
+                'placeholder' => 'SampleHeader=Value&Header2=OtherValue',
+                'class' => 'input-xxlarge',
+            ],
+            'type' => 'text',
+        ],
         'endpoint_timeout' => array(
             'htmlOptions' => array(
                 'placeholder' => '10',

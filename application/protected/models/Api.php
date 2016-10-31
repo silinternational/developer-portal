@@ -260,6 +260,21 @@ class Api extends \ApiBase
         );
     }
     
+    public function getAdditionalHeadersArray()
+    {
+        $array = [];
+        $rawPairs = explode('&', $this->additional_headers);
+        foreach ($rawPairs as $rawPair) {
+            $keyValue = explode('=', $rawPair, 2);
+            if (count($keyValue) > 0) {
+                $key = $keyValue[0];
+                $value = (count($keyValue) > 1 ? $keyValue[1] : null);
+                $array[rawurldecode($key)] = rawurldecode($value);
+            }
+        }
+        return $array;
+    }
+    
     /**
      * Get the apiProxyDomain config data. Throws an exception if it has not
      * been set.
@@ -703,6 +718,7 @@ class Api extends \ApiBase
             'strictSSL' => $this->strict_ssl ? true : false,
             'endPointTimeout' => !is_null($this->endpoint_timeout) 
                     ? (int)$this->endpoint_timeout : 2,
+            'additionalHeaders' => $this->additional_headers ?: '',
         );
         
         $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);

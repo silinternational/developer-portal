@@ -156,6 +156,17 @@ $attrLabels = $api->attributeLabels();
                         echo CHtml::encode($api->getInternalApiEndpoint());
                     ?>&nbsp</dd>
 
+                    <dt>Additional Headers</dt>
+                    <dd class="fixed">
+                        <?php foreach ($api->getAdditionalHeadersArray() as $header => $value): ?>
+                            <?= sprintf(
+                                '<div><b>%s:</b> %s</div>',
+                                CHtml::encode($header),
+                                CHtml::encode($value)
+                            ); ?>
+                        <?php endforeach; ?>
+                    </dd>
+
                     <dt><?php echo CHtml::encode($attrLabels['endpoint_timeout']); ?></dt>
                     <dd><?php echo (int)$api->endpoint_timeout; ?> seconds</dd>
 
