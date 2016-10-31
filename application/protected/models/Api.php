@@ -711,9 +711,15 @@ class Api extends \ApiBase
                 $apiAxle->createApi($this->code, $apiData);
                 return true;
             } catch (\GuzzleHttp\Exception\RequestException $e) {
+                $response = $e->getResponse();
+                if ($response === null) {
+                    $errorMessage = $e->getMessage();
+                } else {
+                    $errorMessage = $response->getBody()->getContents();
+                }
                 $this->addError('code', sprintf(
                     'Error creating API: %s',
-                    $e->getResponse()->getBody()->getContents()
+                    $errorMessage
                 ));
                 return false;
             } catch (\Exception $e) {
