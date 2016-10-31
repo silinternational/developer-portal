@@ -10,25 +10,33 @@ redis:
     image: redis:latest
 
 api:
-    image: silintl/apiaxle:latest
+    image: apiaxle/apiaxle:develop
+    environment:
+        REDIS_HOST: redis
+        REDIS_PORT: 6379
+        DEBUG_MODE: 'false'
+        API_NAME_REGEX: "^(.+?)\\.api\\."
+        NODE_ENV: production
     links:
         - redis
     ports:
         - "80"
-    environment:
-        NODE_ENV: docker
-    command: whenavail redis 6379 100 apiaxle-api -h 0.0.0.0 -p 80
+    command: api 80
 
 proxy:
-    image: silintl/apiaxle:latest
+    image: apiaxle/apiaxle:develop
+    environment:
+        REDIS_HOST: redis
+        REDIS_PORT: 6379
+        DEBUG_MODE: 'false'
+        API_NAME_REGEX: "^(.+?)\\.api\\."
+        NODE_ENV: production
     links:
         - api
         - redis
     ports:
         - "80"
-    environment:
-        NODE_ENV: docker
-    command: whenavail redis 6379 100 apiaxle-proxy -h 0.0.0.0 -p 80
+    command: proxy 80
 
 portal:
     build:
