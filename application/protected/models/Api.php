@@ -710,6 +710,12 @@ class Api extends \ApiBase
             try {
                 $apiAxle->createApi($this->code, $apiData);
                 return true;
+            } catch (\GuzzleHttp\Exception\RequestException $e) {
+                $this->addError('code', sprintf(
+                    'Error creating API: %s',
+                    $e->getResponse()->getBody()->getContents()
+                ));
+                return false;
             } catch (\Exception $e) {
                 $this->addError(
                     'code',
@@ -721,29 +727,26 @@ class Api extends \ApiBase
             try {
                 $apiAxle->updateApi($this->code, $apiData);
                 return true;
-            } catch (\Exception $e) {
-                
-                if ($e instanceof NotFoundException) {
-                    try {
-                        $apiAxle->createApi($this->code, $apiData);
-                        $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-                        Event::log(sprintf(
-                            'The "%s" API (%s, ID %s) was re-added to ApiAxle%s.',
-                            $this->display_name,
-                            $this->code,
-                            $this->api_id,
-                            (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-                        ), $this->api_id);
-                        return true;
-                    } catch (\Exception $e) {
-                        $this->addError(
-                            'code',
-                            'Failed to recreate API on the proxy: ' . $e->getMessage()
-                        );
-                        return false;
-                    }
+            } catch (NotFoundException $e) {
+                try {
+                    $apiAxle->createApi($this->code, $apiData);
+                    $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+                    Event::log(sprintf(
+                        'The "%s" API (%s, ID %s) was re-added to ApiAxle%s.',
+                        $this->display_name,
+                        $this->code,
+                        $this->api_id,
+                        (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
+                    ), $this->api_id);
+                    return true;
+                } catch (\Exception $e) {
+                    $this->addError(
+                        'code',
+                        'Failed to recreate API on the proxy: ' . $e->getMessage()
+                    );
+                    return false;
                 }
-
+            } catch (\Exception $e) {
                 $this->addError(
                     'code',
                     'Failed to update API on the proxy: ' . $e->getMessage()
