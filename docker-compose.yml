@@ -101,7 +101,7 @@ redis:
     image: redis:latest
 
 api:
-    image: silintl/apiaxle:develop
+    image: apiaxle/apiaxle:1.14.0
     environment:
         REDIS_HOST: redis
         REDIS_PORT: 6379
@@ -115,7 +115,7 @@ api:
     command: api 80
 
 proxy:
-    image: silintl/apiaxle:develop
+    image: apiaxle/apiaxle:1.14.0
     environment:
         REDIS_HOST: redis
         REDIS_PORT: 6379
