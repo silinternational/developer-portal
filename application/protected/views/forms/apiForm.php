@@ -94,6 +94,16 @@ return array(
                 . 'whether keys to this API will have a secret value).',
             ),
         ),
+        'signature_window' => array(
+            'type' => 'text',
+            'htmlOptions' => array(
+                'placeholder' => '3',
+                'class' => 'input-mini',
+                'hint' => '<i class="icon-info-sign"></i> This how many '
+                . 'seconds off the signature can be and still be considered '
+                . 'valid.',
+            ),
+        ),
         'queries_second' => array(
             'htmlOptions' => array(
                 'placeholder' => '3',

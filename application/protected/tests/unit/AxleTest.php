@@ -142,6 +142,49 @@ class AxleTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testAxleCreateApiWithCustomSignatureWindow()
+    {
+        // Arrange:
+        $apiAxle = new ApiAxleClient($this->config);
+        $apiData = array(
+            'code' => 'test-' . uniqid(),
+            'display_name' => __FUNCTION__,
+            'endpoint' => 'localhost',
+            'default_path' => '/path/' . __FUNCTION__,
+            'queries_second' => 3,
+            'queries_day' => 1000,
+            'visibility' => Api::VISIBILITY_PUBLIC,
+            'protocol' => 'http',
+            'strict_ssl' => 1,
+            'approval_type' => 'auto',
+            'endpoint_timeout' => 2,
+            'signature_window' => 5,
+        );
+        $api = new Api();
+        $api->setAttributes($apiData);
+        
+        // Act:
+        $result = $api->save();
+        
+        // Assert:
+        $this->assertTrue($result, sprintf(
+            "Failed to create API: \n%s",
+            $api->getErrorsForConsole()
+        ));
+        $apiInfo = $apiAxle->getApiInfo($api->code);
+        $dataFromAxle = $apiInfo->getData();
+        $this->assertArrayHasKey(
+            'tokenSkewProtectionCount',
+            $dataFromAxle,
+            'No custom signature window found in data returned by ApiAxle.'
+        );
+        $this->assertEquals(
+            $apiData['signature_window'],
+            $dataFromAxle['tokenSkewProtectionCount'],
+            'Did not correctly save the signature_window value.'
+        );
+    }
+    
     public function testAxleCreateResetAndRevokeKey()
     {
         // Arrange:
