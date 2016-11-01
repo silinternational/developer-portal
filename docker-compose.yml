@@ -87,6 +87,7 @@ services:
         links:
             - testDb
             - proxy:apiaxle.api.proxy
+            - proxy:test.api.proxy
         env_file:
             - ./common.env
             - ./local.env

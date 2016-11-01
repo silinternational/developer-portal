@@ -373,4 +373,13 @@ return array(
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Google',
     ),
+    'userWithKeyToCallableTestApi' => array(
+        'user_id'       => 40,
+        'email'         => 'userWithKeyToCallableTestApi@jaars.net',
+        'first_name'    => 'User With Key',
+        'last_name'     => 'To Callable Test API',
+        'status'        => User::STATUS_ACTIVE,
+        'role'          => User::ROLE_USER,
+        'auth_provider' => 'Google',
+    ),
 );

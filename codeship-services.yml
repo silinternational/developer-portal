@@ -46,6 +46,7 @@ portal:
     links:
         - db
         - proxy:apiaxle.api.proxy
+        - proxy:test.api.proxy
         - api
     environment:
         MYSQL_HOST: db

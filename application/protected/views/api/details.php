@@ -120,6 +120,9 @@ $attrLabels = $api->attributeLabels();
                     <dt><?php echo \CHtml::encode($attrLabels['require_signature']); ?></dt>
                     <dd><?= \CHtml::encode($api->getRequiresSignatureText()); ?></dd>
 
+                    <dt><?php echo \CHtml::encode($attrLabels['signature_window']); ?></dt>
+                    <dd><?= $api->getSignatureWindowHtml(); ?></dd>
+
                     <?php if (count($api->apiVisibilityUsers) > 0): ?>
                         <dt>Invited Users</dt>
                         <dd>

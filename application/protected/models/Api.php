@@ -44,6 +44,8 @@ class Api extends \ApiBase
     CONST REQUIRE_SIGNATURES_YES = 'yes';
     CONST REQUIRE_SIGNATURES_NO = 'no';
     
+    CONST SIGNATURE_WINDOW_MAX = 10;
+    
     CONST VISIBILITY_INVITATION = 'invitation';
     CONST VISIBILITY_PUBLIC = 'public';
     
@@ -450,6 +452,11 @@ class Api extends \ApiBase
             $options[self::REQUIRE_SIGNATURES_NO];
     }
     
+    public function getSignatureWindowHtml()
+    {
+        return '+/- ' . (int)$this->signature_window . ' seconds';
+    }
+    
     /**
      * Get the public URL for this API as an HTML string that adds an HTML
      * element around the Api's code, with the given CSS class.
@@ -672,6 +679,19 @@ class Api extends \ApiBase
                 'message' => 'That does not look like a valid Google Doc embedding URL. '
                 . 'Please check the example and try again.'
             ),
+            array(
+                'signature_window',
+                'numerical',
+                'allowEmpty' => false,
+                'integerOnly' => true,
+                'min' => 0,
+                'max' => self::SIGNATURE_WINDOW_MAX,
+                'tooSmall' => 'The time window for valid signatures cannot be negative.',
+                'tooBig' => sprintf(
+                    'The time window for valid signatures cannot be more than +/-%s seconds.',
+                    self::SIGNATURE_WINDOW_MAX
+                ),
+            ),
         ), parent::rules());
     }
     
@@ -710,7 +730,11 @@ class Api extends \ApiBase
          * 
          * If the call to ApiAxle fails, the save will not go through.
          */
-        
+        return $this->updateInApiAxle();
+    }
+    
+    protected function updateInApiAxle()
+    {
         $apiData = array(
             'endPoint' => $this->endpoint,
             'defaultPath' => $this->default_path ?: '/',
@@ -719,6 +743,7 @@ class Api extends \ApiBase
             'endPointTimeout' => !is_null($this->endpoint_timeout) 
                     ? (int)$this->endpoint_timeout : 2,
             'additionalHeaders' => $this->additional_headers ?: '',
+            'tokenSkewProtectionCount' => (int)$this->signature_window,
         );
         
         $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);

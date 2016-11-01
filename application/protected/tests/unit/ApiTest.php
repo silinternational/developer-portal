@@ -1177,6 +1177,57 @@ class ApiTest extends DeveloperPortalTestCase
         $this->assertSame($expected, $actual);
     }
     
+    public function testSignatureWindowRules()
+    {
+        // Arrange:
+        $testCases = [
+            'null' => [
+                'value' => null,
+                'valid' => false,
+            ],
+            'an empty string' => [
+                'value' => '',
+                'valid' => false,
+            ],
+            'a negative value' => [
+                'value' => -1,
+                'valid' => false,
+            ],
+            'zero' => [
+                'value' => 0,
+                'valid' => true,
+            ],
+            'a normal value' => [
+                'value' => 3,
+                'valid' => true,
+            ],
+            'the max allowed value' => [
+                'value' => Api::SIGNATURE_WINDOW_MAX,
+                'valid' => true,
+            ],
+            'a value too big' => [
+                'value' => Api::SIGNATURE_WINDOW_MAX + 1,
+                'valid' => false,
+            ],
+        ];
+        $api = new Api();
+        foreach ($testCases as $description => $testCase) {
+            $api->signature_window = $testCase['value'];
+            $expectedResult = $testCase['valid'];
+            
+            // Act:
+            $actualResult = $api->validate(['signature_window']);
+            
+            // Assert:
+            $this->assertSame($expectedResult, $actualResult, sprintf(
+                'When using %s for the signature window, it incorrectly came '
+                . 'back as %s.',
+                $description,
+                ($actualResult ? 'valid' : 'not valid')
+            ));
+        }
+    }
+    
     public function testUniqueDisplayNameCaseInsensitive()
     {
         // Arrange:
