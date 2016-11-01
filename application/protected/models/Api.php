@@ -725,7 +725,11 @@ class Api extends \ApiBase
          * 
          * If the call to ApiAxle fails, the save will not go through.
          */
-        
+        return $this->updateInApiAxle();
+    }
+    
+    protected function updateInApiAxle()
+    {
         $apiData = array(
             'endPoint' => $this->endpoint,
             'defaultPath' => $this->default_path ?: '/',
