@@ -11,6 +11,7 @@ class DashboardController extends \Controller
     const CHART_TOTALS = 'total';
     
     public $layout = '//layouts/left-menu';
+    public $pageTitle = 'Home';
     
     public function actionUsageChart($rewindBy = 0)
     {

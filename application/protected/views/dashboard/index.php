@@ -16,8 +16,6 @@ $this->breadcrumbs = array(
     'Home',
 );
 
-$this->pageTitle = '';
-
 // If the user is an owner and has any pending keys, say so.
 if ($user->hasOwnerPrivileges()) {
     $numOwnerApis = 0;

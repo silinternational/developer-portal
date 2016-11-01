@@ -71,37 +71,10 @@
           ),
       ));
       
-      //// If there are any news items, show them.
-      //$news = \Yii::app()->user->user->getNews();
-      //if (isset($news) && (count($news) > 0)) {
-      //  ?><!-- <div> <h3>News</h3> --><?php
-      //
-      //    foreach ($news as $newsItem) {
-      //
-      //      // TODO: Show news items.
-      //
-      //    }
-      //
-      //    ?><!-- </div> --><?php
-      //}
-      
       ?>
     </div>
     <div class="span9">
-      <?php
-      if ($this->pageTitle) {
-          echo sprintf(
-              '<h2>%s%s</h2> ',
-              CHtml::encode($this->pageTitle),
-              $this->pageSubtitle ? sprintf(
-                  ' <small>%s</small>',
-                  CHtml::encode($this->pageSubtitle)
-              ) : ''
-          );
-      }
-      
-      echo $content;
-      ?>
+      <?= $content; ?>
     </div>
   </div>
 </div>
