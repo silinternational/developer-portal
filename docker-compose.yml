@@ -1,138 +1,128 @@
-data:
-    image: silintl/data-volume:latest
-    volumes:
-        - /data:/data
+version: '2'
+services:
+    data:
+        image: silintl/data-volume:latest
+        volumes:
+            - /data:/data
 
-db:
-    image: silintl/mariadb:latest
-    ports:
-        - "3306"
-    environment:
-        MYSQL_ROOT_PASSWORD: soemthing
-        MYSQL_DATABASE: developer_portal
-        MYSQL_USER: developer_portal
-        MYSQL_PASSWORD: developer_portal
+    db:
+        image: silintl/mariadb:latest
+        ports:
+            - "3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: soemthing
+            MYSQL_DATABASE: developer_portal
+            MYSQL_USER: developer_portal
+            MYSQL_PASSWORD: developer_portal
 
-testDb:
-    image: silintl/mariadb:latest
-    ports:
-        - "3306"
-    environment:
-        MYSQL_ROOT_PASSWORD: soemthing
-        MYSQL_DATABASE: test
-        MYSQL_USER: developer_portal
-        MYSQL_PASSWORD: developer_portal
+    testDb:
+        image: silintl/mariadb:latest
+        ports:
+            - "3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: soemthing
+            MYSQL_DATABASE: test
+            MYSQL_USER: developer_portal
+            MYSQL_PASSWORD: developer_portal
 
-web:
-    build: .
-    volumes_from:
-        - data
-    ports:
-        - "80:80"
-    links:
-        - db
-        - proxy:apiaxle.api.proxy
-        - proxy:test.api.proxy
-    env_file:
-        - ./common.env
-        - ./local.env
+    web:
+        build: .
+        volumes_from:
+            - data
+        ports:
+            - "80:80"
+        links:
+            - db
+            - proxy:apiaxle.api.proxy
+            - proxy:test.api.proxy
+        env_file:
+            - ./common.env
+            - ./local.env
 
-composer:
-    image: silintl/php-cli:latest
-    volumes_from:
-        - data
-    working_dir: /data
-    command: composer install --no-plugins --no-scripts --prefer-dist
+    composer:
+        image: silintl/php-cli:latest
+        volumes_from:
+            - data
+        working_dir: /data
+        command: composer install --no-plugins --no-scripts --prefer-dist
 
-composerupdate:
-    image: silintl/php-cli:latest
-    volumes_from:
-        - data
-    working_dir: /data
-    command: composer update --no-plugins --no-scripts --prefer-dist
+    composerupdate:
+        image: silintl/php-cli:latest
+        volumes_from:
+            - data
+        working_dir: /data
+        command: composer update --no-plugins --no-scripts --prefer-dist
 
-yiimigrate:
-    image: silintl/php-cli:latest
-    volumes_from:
-        - data
-    links:
-        - db
-    env_file:
-        - ./common.env
-        - ./local.env
-    working_dir: /data/protected
-    command: bash -c "whenavail db 3306 100 ./yiic migrate --interactive=0"
+    yiimigrate:
+        image: silintl/php-cli:latest
+        volumes_from:
+            - data
+        links:
+            - db
+        env_file:
+            - ./common.env
+            - ./local.env
+        working_dir: /data/protected
+        command: bash -c "whenavail db 3306 100 ./yiic migrate --interactive=0"
 
-yiimigratetestDb:
-    image: silintl/php-cli:latest
-    volumes_from:
-        - data
-    links:
-        - testDb
-    env_file:
-        - ./common.env
-        - ./local.env
-    working_dir: /data/protected
-    command: whenavail testDb 3306 100 ./yiic migrate --interactive=0
-    environment:
-      MYSQL_HOST: testDb
-      MYSQL_DATABASE: test
+    yiimigratetestDb:
+        image: silintl/php-cli:latest
+        volumes_from:
+            - data
+        links:
+            - testDb
+        env_file:
+            - ./common.env
+            - ./local.env
+        working_dir: /data/protected
+        command: whenavail testDb 3306 100 ./yiic migrate --interactive=0
+        environment:
+          MYSQL_HOST: testDb
+          MYSQL_DATABASE: test
 
-phpunit:
-    image: silintl/php-cli:latest
-    volumes_from:
-        - data
-    links:
-        - testDb
-        - proxy:apiaxle.api.proxy
-    env_file:
-        - ./common.env
-        - ./local.env
-    working_dir: /data/protected/tests
-    command: whenavail testDb 3306 100 ../../vendor/bin/phpunit unit/
-    environment:
-      MYSQL_HOST: testDb
-      MYSQL_DATABASE: test
-      SAML_ADMIN_PASSWORD: dummy-for-tests-q6.eYWtfLF-BTQXf-OktD5lVFCOFyC4B
-      SAML_SECRET_SALT: dummy-for-tests-Ac4MTgO9UJ6_wpXXKc6EGU_.gWNNkdMe
-      SAML_IDP: NONE
+    phpunit:
+        image: silintl/php-cli:latest
+        volumes_from:
+            - data
+        links:
+            - testDb
+            - proxy:apiaxle.api.proxy
+        env_file:
+            - ./common.env
+            - ./local.env
+        working_dir: /data/protected/tests
+        command: whenavail testDb 3306 100 ../../vendor/bin/phpunit unit/
+        environment:
+          MYSQL_HOST: testDb
+          MYSQL_DATABASE: test
+          SAML_ADMIN_PASSWORD: dummy-for-tests-q6.eYWtfLF-BTQXf-OktD5lVFCOFyC4B
+          SAML_SECRET_SALT: dummy-for-tests-Ac4MTgO9UJ6_wpXXKc6EGU_.gWNNkdMe
+          SAML_IDP: NONE
 
-redis:
-    image: redis:latest
+    redis:
+        image: redis:latest
 
-api:
-    image: apiaxle/apiaxle:develop
-    environment:
-        REDIS_HOST: redis
-        REDIS_PORT: 6379
-        DEBUG_MODE: 'false'
-        API_NAME_REGEX: "^(.+?)\\.api\\."
-        NODE_ENV: production
-    links:
-        - redis
-    ports:
-        - "80"
-    command: api 80
+    api:
+        image: apiaxle/apiaxle:develop
+        links:
+            - redis
+        ports:
+            - "80"
+        command: api 80
 
-proxy:
-    image: apiaxle/apiaxle:develop
-    environment:
-        REDIS_HOST: redis
-        REDIS_PORT: 6379
-        DEBUG_MODE: 'false'
-        API_NAME_REGEX: "^(.+?)\\.api\\."
-        NODE_ENV: production
-    links:
-        - api
-        - redis
-    ports:
-        - "80"
-    command: proxy 80
+    proxy:
+        image: apiaxle/apiaxle:develop
+        links:
+            - api
+            - redis
+        ports:
+            - "80"
+        command: proxy 80
 
-axlesetup:
-    image: silintl/php-cli:latest
-    links:
-        - api
-    volumes:
-        - ./build/setup-apiaxle.sh:/usr/local/bin/setup-apiaxle.sh
-    command: setup-apiaxle.sh
+    axlesetup:
+        image: silintl/php-cli:latest
+        links:
+            - api
+        volumes:
+            - ./build/setup-apiaxle.sh:/usr/local/bin/setup-apiaxle.sh
+        command: setup-apiaxle.sh
