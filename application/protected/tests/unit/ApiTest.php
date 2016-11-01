@@ -1181,6 +1181,14 @@ class ApiTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $testCases = [
+            'null' => [
+                'value' => null,
+                'valid' => false,
+            ],
+            'an empty string' => [
+                'value' => '',
+                'valid' => false,
+            ],
             'a negative value' => [
                 'value' => -1,
                 'valid' => false,

@@ -677,6 +677,7 @@ class Api extends \ApiBase
             array(
                 'signature_window',
                 'numerical',
+                'allowEmpty' => false,
                 'integerOnly' => true,
                 'min' => 0,
                 'max' => self::SIGNATURE_WINDOW_MAX,
