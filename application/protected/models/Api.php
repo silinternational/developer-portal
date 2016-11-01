@@ -44,6 +44,8 @@ class Api extends \ApiBase
     CONST REQUIRE_SIGNATURES_YES = 'yes';
     CONST REQUIRE_SIGNATURES_NO = 'no';
     
+    CONST SIGNATURE_WINDOW_MAX = 10;
+    
     CONST VISIBILITY_INVITATION = 'invitation';
     CONST VISIBILITY_PUBLIC = 'public';
     
@@ -671,6 +673,18 @@ class Api extends \ApiBase
                 'pattern' => '/^https:\/\/docs\.google\.com\/document\/d\/[A-Z0-9_]+\/pub\?embedded=true/i',
                 'message' => 'That does not look like a valid Google Doc embedding URL. '
                 . 'Please check the example and try again.'
+            ),
+            array(
+                'signature_window',
+                'numerical',
+                'integerOnly' => true,
+                'min' => 0,
+                'max' => self::SIGNATURE_WINDOW_MAX,
+                'tooSmall' => 'The time window for valid signatures cannot be negative.',
+                'tooBig' => sprintf(
+                    'The time window for valid signatures cannot be more than +/-%s seconds.',
+                    self::SIGNATURE_WINDOW_MAX
+                ),
             ),
         ), parent::rules());
     }

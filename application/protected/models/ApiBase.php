@@ -29,6 +29,7 @@
  * @property string $how_to_get
  * @property string $embedded_docs_url
  * @property string $additional_headers
+ * @property integer $signature_window
  *
  * The followings are the available model relations:
  * @property User $owner
@@ -56,7 +57,7 @@ class ApiBase extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('code, display_name, endpoint, queries_second, queries_day, created, updated, endpoint_timeout', 'required'),
-			array('queries_second, queries_day, strict_ssl, endpoint_timeout, owner_id', 'numerical', 'integerOnly'=>true),
+			array('queries_second, queries_day, strict_ssl, endpoint_timeout, owner_id, signature_window', 'numerical', 'integerOnly'=>true),
 			array('code', 'length', 'max'=>32),
 			array('display_name', 'length', 'max'=>64),
 			array('brief_description, endpoint, default_path, technical_support, customer_support, logo_url, embedded_docs_url, additional_headers', 'length', 'max'=>255),
@@ -66,7 +67,7 @@ class ApiBase extends CActiveRecord
 			array('documentation, terms, how_to_get', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('api_id, code, display_name, brief_description, endpoint, queries_second, queries_day, documentation, created, updated, approval_type, protocol, strict_ssl, endpoint_timeout, default_path, owner_id, technical_support, visibility, customer_support, terms, logo_url, require_signature, how_to_get, embedded_docs_url, additional_headers', 'safe', 'on'=>'search'),
+			array('api_id, code, display_name, brief_description, endpoint, queries_second, queries_day, documentation, created, updated, approval_type, protocol, strict_ssl, endpoint_timeout, default_path, owner_id, technical_support, visibility, customer_support, terms, logo_url, require_signature, how_to_get, embedded_docs_url, additional_headers, signature_window', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -117,6 +118,7 @@ class ApiBase extends CActiveRecord
 			'how_to_get' => 'How To Get',
 			'embedded_docs_url' => 'Embedded Docs Url',
 			'additional_headers' => 'Additional Headers',
+			'signature_window' => 'Signature Window',
 		);
 	}
 
@@ -163,6 +165,7 @@ class ApiBase extends CActiveRecord
 		$criteria->compare('how_to_get',$this->how_to_get,true);
 		$criteria->compare('embedded_docs_url',$this->embedded_docs_url,true);
 		$criteria->compare('additional_headers',$this->additional_headers,true);
+		$criteria->compare('signature_window',$this->signature_window);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
