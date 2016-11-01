@@ -452,6 +452,11 @@ class Api extends \ApiBase
             $options[self::REQUIRE_SIGNATURES_NO];
     }
     
+    public function getSignatureWindowHtml()
+    {
+        return '+/- ' . (int)$this->signature_window . ' seconds';
+    }
+    
     /**
      * Get the public URL for this API as an HTML string that adds an HTML
      * element around the Api's code, with the given CSS class.
