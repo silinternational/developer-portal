@@ -334,4 +334,17 @@ return array(
         'purpose' => 'Testing Multiple ApiVisibilityDomains',
         'domain' => 'developer-portal.local',
     ),
+    'keyToCallableTestApi' => array(
+        'user_id' => 40,
+        'api_id' => 22,
+        'queries_second' => 100,
+        'queries_day' => 1000,
+        'created' => '2016-11-01 15:56:37',
+        'updated' => '2016-11-01 15:56:37',
+        'requested_on' => '2016-11-01 15:56:37',
+        'processed_on' => '2016-11-01 15:56:37',
+        'status' => Key::STATUS_APPROVED,
+        'purpose' => 'Unit testing',
+        'domain' => 'developer-portal.local',
+    ),
 );

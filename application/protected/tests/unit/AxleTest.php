@@ -2,19 +2,25 @@
 
 use ApiAxle\Shared\ApiException;
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
+use Sil\DevPortal\components\Http\ClientG5 as HttpClient;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\Key;
+use Sil\DevPortal\models\User;
 
 /**
  * @group ApiAxle
+ * @method Api apis(string $fixtureName)
+ * @method User users(string $fixtureName)
+ * @method Key keys(string $fixtureName)
  */
 class AxleTest extends DeveloperPortalTestCase
 {
     protected $config;
     
     public $fixtures = array(
-        'users' => '\Sil\DevPortal\models\User',
-        'keys' => '\Sil\DevPortal\models\Key',
+        'apis' => Api::class,
+        'users' => User::class,
+        'keys' => Key::class,
     );  
     
     public function setUp()
@@ -183,6 +189,68 @@ class AxleTest extends DeveloperPortalTestCase
             $dataFromAxle['tokenSkewProtectionCount'],
             'Did not correctly save the signature_window value.'
         );
+    }
+    
+    public function testEffectsOfCustomSignatureWindow()
+    {
+        // Arrange:
+        $key = $this->keys('keyToCallableTestApi');
+        $this->assertTrue(
+            $key->api->save(), // Make sure the API exists in ApiAxle.
+            $key->api->getErrorsForConsole()
+        );
+        $key->generateNewValueAndSecret();
+        $this->assertTrue(
+            $key->save(), // Make sure the key exists in ApiAxle.
+            $key->getErrorsForConsole()
+        );
+        $this->assertTrue(
+            $key->api->requiresSignature(),
+            'This test requires a key to an API that requires a signature.'
+        );
+        $proxyProtocol = parse_url(\Yii::app()->params['apiaxle']['endpoint'], PHP_URL_SCHEME);
+        $apiAxleEndpointDomain = parse_url(\Yii::app()->params['apiaxle']['endpoint'], PHP_URL_HOST);
+        $proxyDomain = str_replace('apiaxle.', '', $apiAxleEndpointDomain);
+        $urlMinusSignature = sprintf(
+            '%s://%s.%s/?api_key=%s&api_sig=',
+            $proxyProtocol,
+            $key->api->code,
+            $proxyDomain,
+            $key->value
+        );
+        $client = new HttpClient();
+        foreach ([3, Api::SIGNATURE_WINDOW_MAX] as $signatureWindow) {
+            $key->api->signature_window = $signatureWindow;
+            $this->assertTrue(
+                $key->api->save(),
+                $key->api->getErrorsForConsole()
+            );
+            $lastValidSignatureOffset = 0;
+            $foundInvalidSignatureOffset = false;
+            for ($i = 0; $i <= Api::SIGNATURE_WINDOW_MAX + 1; $i++) {
+                $signature = \CalcApiSig\HmacSigner::CalcApiSig(
+                    $key->value,
+                    $key->secret,
+                    time() + $i
+                );
+
+                // Act:
+                $response = $client->request('GET', $urlMinusSignature . $signature);
+                $responseData = json_decode($response->getBody());
+                if ($responseData->meta->status_code == 403) {
+                    $foundInvalidSignatureOffset = true;
+                } else {
+                    $lastValidSignatureOffset = $i;
+                }
+            }
+
+            // Assert:
+            $this->assertEquals(
+                $key->api->signature_window,
+                $lastValidSignatureOffset
+            );
+            $this->assertTrue($foundInvalidSignatureOffset);
+        }
     }
     
     public function testAxleCreateResetAndRevokeKey()

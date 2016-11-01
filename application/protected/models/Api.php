@@ -743,7 +743,7 @@ class Api extends \ApiBase
             'endPointTimeout' => !is_null($this->endpoint_timeout) 
                     ? (int)$this->endpoint_timeout : 2,
             'additionalHeaders' => $this->additional_headers ?: '',
-            'tokenSkewProtectionCount' => $this->signature_window,
+            'tokenSkewProtectionCount' => (int)$this->signature_window,
         );
         
         $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
