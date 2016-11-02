@@ -101,6 +101,7 @@ class AxleTest extends DeveloperPortalTestCase
         
         // Assert:
         $this->assertTrue($result, $api->getErrorsForConsole());
+        $this->assertTrue($apiAxle->apiExists($apiCode));
     }
     
     public function testAxleCreateApi()
