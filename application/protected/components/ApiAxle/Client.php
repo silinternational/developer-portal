@@ -12,12 +12,17 @@ class Client extends BaseClient
      */
     public function createApi($apiName, $data)
     {
-        $data['id'] = $apiName;
-        $response = $this->api()->create($data);
-        return new ApiInfo(
-            $apiName,
-            $this->getDataFromResponse($response)
-        );
+        try {
+            $data['id'] = $apiName;
+            $response = $this->api()->create($data);
+            return new ApiInfo($apiName, $this->getDataFromResponse($response));
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            throw new \Exception(
+                $this->getErrorMessageFromGuzzleException($e),
+                1477426036,
+                $e
+            );
+        }
     }
     
     /**
@@ -50,7 +55,7 @@ class Client extends BaseClient
             );
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             throw new \Exception(
-                $e->getResponse()->getBody()->getContents(),
+                $this->getErrorMessageFromGuzzleException($e),
                 1477426036,
                 $e
             );
@@ -99,16 +104,26 @@ class Client extends BaseClient
     }
     
     /**
+     * Get the information about the specified API (or null if no such API was
+     * found).
+     * 
      * @param string $apiName The code name of the API in question.
-     * @return ApiInfo
+     * @return ApiInfo|null
      */
     public function getApiInfo($apiName)
     {
-        $response = $this->api()->get(['id' => $apiName]);
-        return new ApiInfo(
-            $apiName,
-            $this->getDataFromResponse($response)
-        );
+        try {
+            $response = $this->api()->get(['id' => $apiName]);
+            return new ApiInfo(
+                $apiName,
+                $this->getDataFromResponse($response)
+            );
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                return null;
+            }
+            throw $e;
+        }
     }
     
     /**
@@ -144,17 +159,35 @@ class Client extends BaseClient
         return $response['results'];
     }
     
+    protected function getErrorMessageFromGuzzleException(
+        \GuzzleHttp\Exception\RequestException $exception
+    ) {
+        if ($exception->hasResponse() && $exception->getResponse()->getBody()) {
+            return $exception->getResponse()->getBody()->getContents();
+        } else {
+            return $exception->getMessage();
+        }
+    }
+    
     /**
+     * Get the information about the specified key (or null if no such key was
+     * found).
+     * 
      * @param string $keyValue
-     * @return KeyInfo
+     * @return KeyInfo|null
+     * @throws \Exception
      */
     public function getKeyInfo($keyValue)
     {
-        $response = $this->key()->get(['id' => $keyValue]);
-        return new KeyInfo(
-            $keyValue,
-            $this->getDataFromResponse($response)
-        );
+        try {
+            $response = $this->key()->get(['id' => $keyValue]);
+            return new KeyInfo($keyValue, $this->getDataFromResponse($response));
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                return null;
+            }
+            throw $e;
+        }
     }
     
     /**
