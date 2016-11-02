@@ -431,7 +431,7 @@ class Key extends \KeyBase
     
     /**
      * Get an array (attribute name => new value) of differences between the
-     * given previous attribute values the current attribute values (for use
+     * given previous attribute values and the current attribute values (for use
      * in the log).
      * 
      * NOTE: Certain attribute will never be included in this, either for
