@@ -22,6 +22,7 @@ class Key extends \KeyBase
     use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
+    use \Sil\DevPortal\components\CreateOrUpdateInApiAxleTrait;
     
     const STATUS_APPROVED = 'approved';
     const STATUS_DENIED = 'denied';
@@ -94,7 +95,7 @@ class Key extends \KeyBase
         /* ***** ApiAxle-specific checks: ***** */
         
         if ($this->isApproved()) {
-            return $this->updateInApiAxle();
+            return $this->createOrUpdateInApiAxle();
         } elseif ($this->isDenied()) {
             
             /**
@@ -244,6 +245,11 @@ class Key extends \KeyBase
         return true;
     }
     
+    protected function calculateKeyringName()
+    {
+        return md5($this->user->email);
+    }
+    
     /**
      * Whether the given User is allowed to delete this Key. This takes into
      * account both the user's ownership (or lack thereof) of the Key and Api
@@ -279,6 +285,27 @@ class Key extends \KeyBase
         }
     }
     
+    protected function createInApiAxle(ApiAxleClient $apiAxle)
+    {
+        $this->ensureKeyringExistsInApiAxle($apiAxle);
+        $apiAxle->createKey($this->value, $this->getDataForApiAxle());
+        $apiAxle->linkKeyToKeyring($this->value, $this->calculateKeyringName());
+        $apiAxle->linkKeyToApi($this->value, $this->api->code);
+    }
+    
+    protected function ensureKeyringExistsInApiAxle(ApiAxleClient $apiAxle)
+    {
+        $keyringName = $this->calculateKeyringName();
+        if ( ! $apiAxle->keyringExists($keyringName)) {
+            $apiAxle->createKeyring($keyringName);
+        }
+    }
+    
+    protected function existsInApiAxle()
+    {
+        return $this->getApiAxleClient()->keyExists($this->value);
+    }
+    
     public function generateNewValueAndSecret()
     {
         $this->value = \Utils::getRandStr(32);
@@ -299,6 +326,15 @@ class Key extends \KeyBase
                 ),
             ),
         ));
+    }
+    
+    protected function getKeyValueFromDatabase()
+    {
+        $currentDbRecord = self::model()->findByPk($this->key_id);
+        if ($currentDbRecord === null) {
+            return null;
+        }
+        return $currentDbRecord->value;
     }
     
     public static function getPendingKeysDataProvider()
@@ -462,6 +498,15 @@ class Key extends \KeyBase
             }
         }
         return $changes;
+    }
+    
+    protected function getDataForApiAxle()
+    {
+        return [
+            'sharedSecret' => $this->secret,
+            'qpd' => (int)$this->queries_day,
+            'qps' => (int)$this->queries_second,
+        ];
     }
     
     /**
@@ -665,6 +710,11 @@ class Key extends \KeyBase
             . 'of ' . var_export($user->role, true) . '.',
             1420733488
         );
+    }
+    
+    protected function keyValueHasChanged()
+    {
+        return ($this->value !== $this->getKeyValueFromDatabase());
     }
     
     /**
@@ -1401,58 +1451,19 @@ class Key extends \KeyBase
         }
     }
     
-    /**
-     * Try to create (if it does not exist) or update (if it does exist) this
-     * key in ApiAxle, returning an indicator of whether we were successful.
-     * 
-     * @return boolean Whether it was successfully updated in ApiAxle. If not,
-     *     check the key's errors.
-     */
-    protected function updateInApiAxle()
+    protected function updateInApiAxle(ApiAxleClient $apiAxle)
     {
-        try {
-            $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
-            $keyData = array(
-                'sharedSecret' => $this->secret,
-                'qpd' => (int)$this->queries_day,
-                'qps' => (int)$this->queries_second,
-            );
-
-            $keyringName = md5($this->user->email);
-            if ( ! $apiAxle->keyringExists($keyringName)) {
-                $apiAxle->createKeyring($keyringName);
+        if ($this->keyValueHasChanged()) {
+            $oldKeyValue = $this->getKeyValueFromDatabase();
+            if (($oldKeyValue !== null) && $apiAxle->keyExists($oldKeyValue)) {
+                $apiAxle->deleteKey($oldKeyValue);
             }
-            
-            /* Get the current key's value (if/as it exists in the database) to see
-             * whether it already exists in ApiAxle.  */
-            if ($this->key_id !== null) {
-                $current = self::model()->findByPk($this->key_id);
-                $currentValue = (($current !== null) ? $current->value : null);
-            } else {
-                $currentValue = null; 
-            }
-            
-            // If the key already exists in our database (and thus, at least in
-            // theory, it exists in ApiAxle)...
-            if ($currentValue !== null) {
-                if ($currentValue != $this->value) {
-                    // If it has a different value, delete it. (We'll recreate
-                    // it in a moment.)
-                    $apiAxle->deleteKey($currentValue);
-                } else {
-                    // If it matches, simply update it and exit.
-                    $apiAxle->updateKey($this->value, $keyData);
-                    return true;
-                }
-            }
-            
-            $apiAxle->createKey($this->value, $keyData);
-            $apiAxle->linkKeyToKeyring($this->value, $keyringName);
-            $apiAxle->linkKeyToApi($this->value, $this->api->code);
-            return true;
-        } catch (\Exception $e) {
-            $this->addError('value', $e->getMessage());
-            return false;
+            $this->createInApiAxle($apiAxle);
         }
+        
+        $this->ensureKeyringExistsInApiAxle($apiAxle);
+        
+        $keyData = $this->getDataForApiAxle();
+        $apiAxle->updateKey($this->value, $keyData);
     }
 }

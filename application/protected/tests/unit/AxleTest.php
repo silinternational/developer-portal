@@ -104,6 +104,38 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertTrue($apiAxle->apiExists($apiCode));
     }
     
+    /**
+     * As a programmer, I want to be able to recreate a key in ApiAxle so that
+     * I can recover from a data loss in ApiAxle.
+     */
+    public function testKeyCreateOrUpdateInApiAxle()
+    {
+        // Arrange:
+        $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
+        $key = $this->keys('approvedKey');
+        $key->generateNewValueAndSecret();
+        $this->assertTrue(
+            $key->api->save(), // Make sure the API exists in ApiAxle.
+            $key->api->getErrorsForConsole()
+        );
+        $this->assertTrue(
+            $key->save(), // Make sure the key exists in ApiAxle.
+            $key->getErrorsForConsole()
+        );
+        
+        // Pre-assert:
+        $this->assertTrue($apiAxle->keyExists($key->value));
+        $apiAxle->deleteKey($key->value);
+        $this->assertFalse($apiAxle->keyExists($key->value));
+        
+        // Act:
+        $result = $key->createOrUpdateInApiAxle();
+        
+        // Assert:
+        $this->assertTrue($result, $key->getErrorsForConsole());
+        $this->assertTrue($apiAxle->keyExists($key->value));
+    }
+    
     public function testAxleCreateApi()
     {
         $apiData = array(
