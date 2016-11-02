@@ -83,14 +83,24 @@ class Client extends BaseClient
     }
     
     /**
+     * Delete the specified key from ApiAxle. If unable to do so for some
+     * reason, an exception will be thrown.
+     * 
      * @param string $keyValue
-     * @return boolean
+     * @throws NotFoundException
+     * @throws \Exception
      */
     public function deleteKey($keyValue)
     {
         try {
             $response = $this->key()->delete(['id' => $keyValue]);
-            return $this->getDataFromResponse($response);
+            $successfullyDeleted = $this->getDataFromResponse($response);
+            if ( ! $successfullyDeleted) {
+                throw new \Exception(
+                    'We could not delete that key from ApiAxle for some reason.',
+                    1478118797
+                );
+            }
         } catch (\Exception $e) {
             if ($e->getCode() === 404) {
                 throw new NotFoundException(sprintf(
