@@ -733,7 +733,13 @@ class Api extends \ApiBase
         return $this->updateInApiAxle();
     }
     
-    protected function updateInApiAxle()
+    /**
+     * Make sure this Api exists and is up-to-date in ApiAxle.
+     * 
+     * @return boolean True if successful, false otherwise (in which case you
+     *     should check the Api's errors).
+     */
+    public function updateInApiAxle()
     {
         $apiData = array(
             'endPoint' => $this->endpoint,
@@ -747,37 +753,18 @@ class Api extends \ApiBase
         );
         
         $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
-        if ($this->getIsNewRecord()) {
+        if ($this->isNewRecord || !$apiAxle->apiExists($this->code)) {
             try {
                 $apiAxle->createApi($this->code, $apiData);
                 return true;
-            } catch (\GuzzleHttp\Exception\RequestException $e) {
-                $response = $e->getResponse();
-                if ($response === null) {
-                    $errorMessage = $e->getMessage();
-                } else {
-                    $errorMessage = $response->getBody()->getContents();
-                }
-                $this->addError('code', sprintf(
-                    'Error creating API: %s',
-                    $errorMessage
-                ));
-                return false;
             } catch (\Exception $e) {
-                $this->addError(
-                    'code',
-                    'Failed to create new API on the proxy: ' . $e->getMessage()
-                );
-                return false;
-            }
-        } else {
-            try {
-                $apiAxle->updateApi($this->code, $apiData);
-                return true;
-            } catch (NotFoundException $e) {
-                try {
-                    $apiAxle->createApi($this->code, $apiData);
-                    $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+                $this->addError('code', sprintf(
+                    'Error %s API in ApiAxle: %s',
+                    ($this->isNewRecord ? 'creating' : 're-creating'),
+                    $e->getMessage()
+                ));
+                $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
+                if ( ! $this->isNewRecord) {
                     Event::log(sprintf(
                         'The "%s" API (%s, ID %s) was re-added to ApiAxle%s.',
                         $this->display_name,
@@ -785,18 +772,17 @@ class Api extends \ApiBase
                         $this->api_id,
                         (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
                     ), $this->api_id);
-                    return true;
-                } catch (\Exception $e) {
-                    $this->addError(
-                        'code',
-                        'Failed to recreate API on the proxy: ' . $e->getMessage()
-                    );
-                    return false;
                 }
+                return false;
+            }
+        } else {
+            try {
+                $apiAxle->updateApi($this->code, $apiData);
+                return true;
             } catch (\Exception $e) {
                 $this->addError(
                     'code',
-                    'Failed to update API on the proxy: ' . $e->getMessage()
+                    'Error updating API in ApiAxle: ' . $e->getMessage()
                 );
                 return false;
             }
