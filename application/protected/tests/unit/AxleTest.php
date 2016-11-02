@@ -72,6 +72,37 @@ class AxleTest extends DeveloperPortalTestCase
         }
     }
     
+    /**
+     * As a programmer, I want to be able to recreate an API in ApiAxle so that
+     * I can recover from a data loss in ApiAxle.
+     */
+    public function testApiUpdateInApiAxle()
+    {
+        // Arrange:
+        $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
+        $api = new Api();
+        $apiCode = 'test-' . uniqid();
+        $api->setAttributes([
+            'code' => $apiCode,
+            'endpoint' => 'local',
+            'default_path' => '/' . $apiCode,
+            'display_name' => __FUNCTION__,
+            'queries_second' => 100,
+            'queries_day' => 1000,
+            'endpoint_timeout' => 10,
+        ]);
+        $this->assertTrue($api->save(), $api->getErrorsForConsole());
+        $this->assertTrue($apiAxle->apiExists($apiCode));
+        $this->assertTrue($apiAxle->deleteApi($apiCode));
+        $this->assertFalse($apiAxle->apiExists($apiCode));
+        
+        // Act:
+        $result = $api->updateInApiAxle();
+        
+        // Assert:
+        $this->assertTrue($result, $api->getErrorsForConsole());
+    }
+    
     public function testAxleCreateApi()
     {
         $apiData = array(
