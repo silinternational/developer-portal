@@ -736,8 +736,8 @@ class Api extends \ApiBase
     /**
      * Make sure this Api exists and is up-to-date in ApiAxle.
      * 
-     * @return boolean True if successful, false otherwise (in which case you
-     *     should check the Api's errors).
+     * @return boolean Whether it was successfully updated in ApiAxle. If not,
+     *     check the Api's errors.
      */
     public function updateInApiAxle()
     {
