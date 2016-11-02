@@ -6,6 +6,16 @@ use Sil\DevPortal\components\Exception\NotFoundException;
 class Client extends BaseClient
 {
     /**
+     * @param string $apiName
+     * @return bool
+     * @throws \Exception
+     */
+    public function apiExists($apiName)
+    {
+        return ($this->getApiInfo($apiName) !== null);
+    }
+    
+    /**
      * @param string $apiName The code name of the API in question.
      * @param array $data
      * @return ApiInfo
@@ -208,6 +218,16 @@ class Client extends BaseClient
             'format_timeseries' => false,
         ]);
         return $this->getDataFromResponse($response);
+    }
+    
+    /**
+     * @param string $keyValue
+     * @return bool
+     * @throws \Exception
+     */
+    public function keyExists($keyValue)
+    {
+        return ($this->getKeyInfo($keyValue) !== null);
     }
     
     /**
