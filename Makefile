@@ -45,7 +45,7 @@ start: web
 
 test: testunit
 
-testunit: composer rmTestDb upTestDb yiimigratetestDb rmApiaxle apiaxle phpunit
+testunit: composer rmTestDb upTestDb yiimigratetestDb rmApiaxle apiaxle web phpunit
 
 upDb:
 	docker-compose up -d db
