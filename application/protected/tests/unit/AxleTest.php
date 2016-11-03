@@ -14,8 +14,6 @@ use Sil\DevPortal\models\User;
  */
 class AxleTest extends DeveloperPortalTestCase
 {
-    protected $config;
-    
     public $fixtures = array(
         'apis' => Api::class,
         'users' => User::class,
@@ -30,7 +28,6 @@ class AxleTest extends DeveloperPortalTestCase
         }
         Yii::app()->user->id = 1;
         parent::setUp();
-        $this->config = $this->getConfig();
     }
     
     protected static function deleteTestApisFromApiAxle(ApiAxleClient $apiAxle)
@@ -57,15 +54,15 @@ class AxleTest extends DeveloperPortalTestCase
         }
     }
     
-    public static function getConfig()
+    protected static function getApiAxleClient()
     {
-        return Yii::app()->params['apiaxle'];
+        return new ApiAxleClient(\Yii::app()->params['apiaxle']);
     }
     
     public static function tearDownAfterClass()
     {
         try {
-            $apiAxle = new ApiAxleClient(self::getConfig());
+            $apiAxle = self::getApiAxleClient();
             self::deleteTestApisFromApiAxle($apiAxle);
             self::deleteTestKeysFromApiAxle($apiAxle);
         } catch(\Exception $e){
@@ -80,7 +77,7 @@ class AxleTest extends DeveloperPortalTestCase
     public function testApiCreateOrUpdateInApiAxle()
     {
         // Arrange:
-        $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
+        $apiAxle = self::getApiAxleClient();
         $api = new Api();
         $apiCode = 'test-' . uniqid();
         $api->setAttributes([
@@ -112,7 +109,7 @@ class AxleTest extends DeveloperPortalTestCase
     public function testKeyCreateOrUpdateInApiAxle()
     {
         // Arrange:
-        $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
+        $apiAxle = self::getApiAxleClient();
         $key = $this->keys('approvedKey');
         $key->generateNewValueAndSecret();
         $this->assertTrue(
@@ -159,7 +156,7 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertTrue($result, 'Failed to create API: ' . PHP_EOL .
             self::getModelErrorsForConsole($api->getErrors()));
         
-        $apiAxle = new ApiAxleClient($this->config);
+        $apiAxle = self::getApiAxleClient();
         $apiCodeNames = $apiAxle->listApis(0, 1000);
         $inList = false;
         foreach ($apiCodeNames as $apiCodeName) {
@@ -174,7 +171,7 @@ class AxleTest extends DeveloperPortalTestCase
     public function testAxleCreateApiWithAdditionalHeaders()
     {
         // Arrange:
-        $apiAxle = new ApiAxleClient($this->config);
+        $apiAxle = self::getApiAxleClient();
         $apiData = array(
             'code' => 'test-' . uniqid(),
             'display_name' => __FUNCTION__,
@@ -216,7 +213,7 @@ class AxleTest extends DeveloperPortalTestCase
     public function testAxleCreateApiWithCustomSignatureWindow()
     {
         // Arrange:
-        $apiAxle = new ApiAxleClient($this->config);
+        $apiAxle = self::getApiAxleClient();
         $apiData = array(
             'code' => 'test-' . uniqid(),
             'display_name' => __FUNCTION__,
@@ -363,7 +360,7 @@ class AxleTest extends DeveloperPortalTestCase
             $approveKeyResult,
             'Failed to create/approve Key: ' . print_r($key->getErrors(), true)
         );
-        $apiAxle = new ApiAxleClient($this->config);
+        $apiAxle = self::getApiAxleClient();
         $keyValuesAfterCreate = $apiAxle->listKeysForApi($api->code);
         $hasKeyAfterCreate = false;
         foreach ($keyValuesAfterCreate as $keyValue) {
@@ -458,7 +455,7 @@ class AxleTest extends DeveloperPortalTestCase
         $result = $api->save();
         $this->assertTrue($result,'Failed to create API: '.print_r($api->getErrors(),true));
         
-        $apiAxle = new ApiAxleClient($this->config);
+        $apiAxle = self::getApiAxleClient();
         $apiCodeNames = $apiAxle->listApis(0, 1000);
         $hasApi = false;
         foreach ($apiCodeNames as $apiCodeName) {
@@ -514,7 +511,7 @@ class AxleTest extends DeveloperPortalTestCase
         }
         
         $inList = 0;
-        $apiAxle = new ApiAxleClient($this->config);
+        $apiAxle = self::getApiAxleClient();
         $apiCodeNames = $apiAxle->listApis(0, 1000);
         foreach ($apiCodeNames as $apiCodeName) {
             if (preg_match('/test\-' . $uniqId . '-[0-9]{1,3}/', $apiCodeName)) {
