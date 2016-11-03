@@ -1,6 +1,5 @@
 <?php
 
-use ApiAxle\Shared\ApiException;
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
 use Sil\DevPortal\components\Http\ClientG5 as HttpClient;
 use Sil\DevPortal\models\Api;
@@ -34,6 +33,30 @@ class AxleTest extends DeveloperPortalTestCase
         $this->config = $this->getConfig();
     }
     
+    protected static function deleteTestApisFromApiAxle(ApiAxleClient $apiAxle)
+    {
+        // Delete all the APIs that start with the string we use to identify
+        // test APIs.
+        $apiCodeNames = $apiAxle->listApis(0, 1000);
+        foreach ($apiCodeNames as $apiCodeName) {
+            if (strpos($apiCodeName, 'test-') !== false) {
+                $apiAxle->deleteApi($apiCodeName);
+            }
+        }
+    }
+    
+    protected static function deleteTestKeysFromApiAxle(ApiAxleClient $apiAxle)
+    {
+        // Delete all the keys that start with the string we use to identify
+        // test keys.
+        $keyValues = $apiAxle->listKeys(0, 1000);
+        foreach ($keyValues as $keyValue) {
+            if (strpos($keyValue, 'test-') !== false) {
+                $apiAxle->deleteKey($keyValue);
+            }
+        }
+    }
+    
     public static function getConfig()
     {
         return Yii::app()->params['apiaxle'];
@@ -43,32 +66,10 @@ class AxleTest extends DeveloperPortalTestCase
     {
         try {
             $apiAxle = new ApiAxleClient(self::getConfig());
-            
-            // Delete all the APIs that start with the string we use to identify
-            // test APIs.
-            $apiCodeNames = $apiAxle->listApis(0, 1000);
-            foreach ($apiCodeNames as $apiCodeName) {
-                if (strpos($apiCodeName, 'test-') !== false) {
-                    $apiAxle->deleteApi($apiCodeName);
-                }
-            }
-            
-            // Get the list of keys from ApiAxle.
-            $keyValues = $apiAxle->listKeys(0, 1000);
-            
-            // For each key that ApiAxle returned...
-            foreach ($keyValues as $keyValue) {
-                
-                // If it starts with the string we use to identify test keys,
-                // delete it.
-                if (strpos($keyValue, 'test-') !== false) {
-                    $apiAxle->deleteKey($keyValue);
-                }
-            }
-        } catch(ApiException $ae){
-            echo $ae;
+            self::deleteTestApisFromApiAxle($apiAxle);
+            self::deleteTestKeysFromApiAxle($apiAxle);
         } catch(\Exception $e){
-            echo $e;
+            echo PHP_EOL, $e, PHP_EOL;
         }
     }
     
