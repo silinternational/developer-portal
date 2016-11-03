@@ -231,6 +231,7 @@ return array(
         'domain' => 'developer-portal.local',
     ),
     'approvedKeyForUserWithOneApprovedKeyAndTwoPendingKeys' => array(
+        'value' => \Utils::getRandStr(32),
         'user_id' => 31,
         'api_id' => 20,
         'queries_second' => 10,
@@ -270,6 +271,7 @@ return array(
         'domain' => 'developer-portal.local',
     ),
     'firstUserKeyDependentOnAvd3' => array(
+        'value' => \Utils::getRandStr(32),
         'user_id' => 34,
         'api_id' => 17,
         'queries_second' => 10,
@@ -296,6 +298,7 @@ return array(
         'domain' => 'developer-portal.local',
     ),
     'keyNotDependentOnAvd3' => array(
+        'value' => \Utils::getRandStr(32),
         'user_id' => 36,
         'api_id' => 17,
         'queries_second' => 10,
@@ -322,6 +325,7 @@ return array(
         'domain' => 'developer-portal.local',
     ),
     'allowedByTwoApiVisibilityDomains' => array(
+        'value' => \Utils::getRandStr(32),
         'user_id' => 38,
         'api_id' => 17,
         'queries_second' => 10,
@@ -335,6 +339,7 @@ return array(
         'domain' => 'developer-portal.local',
     ),
     'keyToCallableTestApi' => array(
+        'value' => \Utils::getRandStr(32),
         'user_id' => 40,
         'api_id' => 22,
         'queries_second' => 100,

@@ -71,6 +71,7 @@ class Key extends \KeyBase
             array('processed_on', 'recordDateWhenProcessed'),
             array('api_id', 'onlyAllowOneKeyPerApi', 'on' => 'insert'),
             array('terms', 'requireAcceptingTermsIfApplicable', 'on' => 'insert'),
+            array('value', 'hasValueIfApproved'),
         ), parent::rules());
     }
     
@@ -1105,6 +1106,21 @@ class Key extends \KeyBase
     public function requiresSignature()
     {
         return $this->api->requiresSignature();
+    }
+    
+    /**
+     * Require the Key to have a value if it has been approved.
+     * 
+     * @param string $attribute The name of the attribute to be validated.
+     */
+    public function hasValueIfApproved($attribute)
+    {
+        if ($this->isApproved() && empty($this->$attribute)) {
+            $this->addError(
+                $attribute,
+                'This approved key was not given a value.'
+            );
+        }
     }
     
     /**
