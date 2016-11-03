@@ -303,6 +303,12 @@ class Key extends \KeyBase
     
     protected function existsInApiAxle()
     {
+        if (empty($this->value)) {
+            throw new \Exception(sprintf(
+                'This Key (ID %s) has no value, and thus cannot exist in ApiAxle.',
+                $this->key_id
+            ), 1478185810);
+        }
         return $this->getApiAxleClient()->keyExists($this->value);
     }
     
@@ -1429,6 +1435,11 @@ class Key extends \KeyBase
                 $appParams
             );
         }
+    }
+    
+    protected function shouldExistInApiAxle()
+    {
+        return $this->isApproved();
     }
     
     /**

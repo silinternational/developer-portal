@@ -9,15 +9,19 @@ trait CreateOrUpdateInApiAxleTrait
     abstract public function addError($attribute, $error);
     
     /**
-     * Make sure ApiAxle has an up-to-date record for this.
+     * Make sure ApiAxle has an up-to-date record for this (if applicable).
      * 
      * @param ApiAxleClient|null $apiAxle (Optional:) The ApiAxleClient to use.
      *     If not provided, one will be created.
-     * @return boolean Whether it was successfully updated in ApiAxle. If not,
-     *     check this object's errors.
+     * @return boolean Whether we were successful. If not, check this object's
+     *     errors.
      */
     public function createOrUpdateInApiAxle($apiAxle = null)
     {
+        if ( ! $this->shouldExistInApiAxle($apiAxle)) {
+            return true;
+        }
+        
         if ($apiAxle === null) {
             $apiAxle = $this->getApiAxleClient();
         }
@@ -107,6 +111,17 @@ trait CreateOrUpdateInApiAxleTrait
     {
         return trim(substr(__CLASS__, (int)strrpos(__CLASS__, '\\')), '\\');
     }
+    
+    /**
+     * Whether a record for this should exist in ApiAxle, but doesn't. For
+     * example, all Apis should exist in ApiAxle, but only approved Keys
+     * should exist in ApiAxle.
+     * 
+     * @param ApiAxleClient $apiAxle The client to use for interacting with
+     *     ApiAxle.
+     * @return boolean
+     */
+    abstract protected function shouldExistInApiAxle(ApiAxleClient $apiAxle);
     
     /**
      * Update the record for this in ApiAxle. Throws an exception if

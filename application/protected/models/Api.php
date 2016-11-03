@@ -987,6 +987,11 @@ class Api extends \ApiBase
         return ($this->approval_type !== self::APPROVAL_TYPE_AUTO);
     }
     
+    protected function shouldExistInApiAxle()
+    {
+        return true;
+    }
+    
     protected function updateInApiAxle(ApiAxleClient $apiAxle)
     {
         $apiAxle->updateApi($this->code, $this->getDataForApiAxle());
