@@ -232,6 +232,7 @@ return array(
     ),
     'approvedKeyForUserWithOneApprovedKeyAndTwoPendingKeys' => array(
         'value' => \Utils::getRandStr(32),
+        'secret' => \Utils::getRandStr(128),
         'user_id' => 31,
         'api_id' => 20,
         'queries_second' => 10,
@@ -272,6 +273,7 @@ return array(
     ),
     'firstUserKeyDependentOnAvd3' => array(
         'value' => \Utils::getRandStr(32),
+        'secret' => \Utils::getRandStr(128),
         'user_id' => 34,
         'api_id' => 17,
         'queries_second' => 10,
@@ -299,6 +301,7 @@ return array(
     ),
     'keyNotDependentOnAvd3' => array(
         'value' => \Utils::getRandStr(32),
+        'secret' => \Utils::getRandStr(128),
         'user_id' => 36,
         'api_id' => 17,
         'queries_second' => 10,
@@ -326,6 +329,7 @@ return array(
     ),
     'allowedByTwoApiVisibilityDomains' => array(
         'value' => \Utils::getRandStr(32),
+        'secret' => \Utils::getRandStr(128),
         'user_id' => 38,
         'api_id' => 17,
         'queries_second' => 10,
@@ -340,6 +344,7 @@ return array(
     ),
     'keyToCallableTestApi' => array(
         'value' => \Utils::getRandStr(32),
+        'secret' => \Utils::getRandStr(128),
         'user_id' => 40,
         'api_id' => 22,
         'queries_second' => 100,

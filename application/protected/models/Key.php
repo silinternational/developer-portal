@@ -72,6 +72,7 @@ class Key extends \KeyBase
             array('api_id', 'onlyAllowOneKeyPerApi', 'on' => 'insert'),
             array('terms', 'requireAcceptingTermsIfApplicable', 'on' => 'insert'),
             array('value', 'hasValueIfApproved'),
+            array('secret', 'hasSecretIfRequiredAndApproved', 'on' => 'insert'),
         ), parent::rules());
     }
     
@@ -1106,6 +1107,27 @@ class Key extends \KeyBase
     public function requiresSignature()
     {
         return $this->api->requiresSignature();
+    }
+    
+    /**
+     * Require the Key to have a secret if it has been approved (and is to an
+     * API that requires signatures).
+     * 
+     * NOTE: This should only be enforced when creating a key. Existing Keys
+     *       should not be automatically modified to start requiring a
+     *       signature since this would break existing secret-less Keys.
+     * 
+     * @param string $attribute The name of the attribute to be validated.
+     */
+    public function hasSecretIfRequiredAndApproved($attribute)
+    {
+        if ($this->isApproved() && $this->requiresSignature() && empty($this->$attribute)) {
+            $this->addError(
+                $attribute,
+                'This new approved key (to an API that requires signatures) '
+                . 'was not given a secret.'
+            );
+        }
     }
     
     /**
