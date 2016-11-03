@@ -76,7 +76,7 @@ class AxleTest extends DeveloperPortalTestCase
      * As a programmer, I want to be able to recreate an API in ApiAxle so that
      * I can recover from a data loss in ApiAxle.
      */
-    public function testApiUpdateInApiAxle()
+    public function testApiCreateOrUpdateInApiAxle()
     {
         // Arrange:
         $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
@@ -97,7 +97,7 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertFalse($apiAxle->apiExists($apiCode));
         
         // Act:
-        $result = $api->updateInApiAxle();
+        $result = $api->createOrUpdateInApiAxle();
         
         // Assert:
         $this->assertTrue($result, $api->getErrorsForConsole());

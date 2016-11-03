@@ -2,7 +2,6 @@
 namespace Sil\DevPortal\models;
 
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
-use Sil\DevPortal\components\Exception\NotFoundException;
 use Sil\DevPortal\models\ApiVisibilityDomain;
 use Sil\DevPortal\models\ApiVisibilityUser;
 use Sil\DevPortal\models\Event;
@@ -28,6 +27,7 @@ class Api extends \ApiBase
     use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
+    use \Sil\DevPortal\components\CreateOrUpdateInApiAxleTrait;
     
     CONST APPROVAL_TYPE_AUTO = 'auto';
     CONST APPROVAL_TYPE_OWNER = 'owner';
@@ -318,6 +318,20 @@ class Api extends \ApiBase
         } else {
             return 'https';
         }
+    }
+    
+    protected function getDataForApiAxle()
+    {
+        return [
+            'endPoint' => $this->endpoint,
+            'defaultPath' => $this->default_path ?: '/',
+            'protocol' => $this->protocol,
+            'strictSSL' => $this->strict_ssl ? true : false,
+            'endPointTimeout' => !is_null($this->endpoint_timeout) 
+                    ? (int)$this->endpoint_timeout : 2,
+            'additionalHeaders' => $this->additional_headers ?: '',
+            'tokenSkewProtectionCount' => (int)$this->signature_window,
+        ];
     }
     
     /**
@@ -730,63 +744,7 @@ class Api extends \ApiBase
          * 
          * If the call to ApiAxle fails, the save will not go through.
          */
-        return $this->updateInApiAxle();
-    }
-    
-    /**
-     * Make sure this Api exists and is up-to-date in ApiAxle.
-     * 
-     * @return boolean Whether it was successfully updated in ApiAxle. If not,
-     *     check the Api's errors.
-     */
-    public function updateInApiAxle()
-    {
-        $apiData = array(
-            'endPoint' => $this->endpoint,
-            'defaultPath' => $this->default_path ?: '/',
-            'protocol' => $this->protocol,
-            'strictSSL' => $this->strict_ssl ? true : false,
-            'endPointTimeout' => !is_null($this->endpoint_timeout) 
-                    ? (int)$this->endpoint_timeout : 2,
-            'additionalHeaders' => $this->additional_headers ?: '',
-            'tokenSkewProtectionCount' => (int)$this->signature_window,
-        );
-        
-        $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
-        if ($this->isNewRecord || !$apiAxle->apiExists($this->code)) {
-            try {
-                $apiAxle->createApi($this->code, $apiData);
-                return true;
-            } catch (\Exception $e) {
-                $this->addError('code', sprintf(
-                    'Error %s API in ApiAxle: %s',
-                    ($this->isNewRecord ? 'creating' : 're-creating'),
-                    $e->getMessage()
-                ));
-                $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-                if ( ! $this->isNewRecord) {
-                    Event::log(sprintf(
-                        'The "%s" API (%s, ID %s) was re-added to ApiAxle%s.',
-                        $this->display_name,
-                        $this->code,
-                        $this->api_id,
-                        (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-                    ), $this->api_id);
-                }
-                return false;
-            }
-        } else {
-            try {
-                $apiAxle->updateApi($this->code, $apiData);
-                return true;
-            } catch (\Exception $e) {
-                $this->addError(
-                    'code',
-                    'Error updating API in ApiAxle: ' . $e->getMessage()
-                );
-                return false;
-            }
-        }
+        return $this->createOrUpdateInApiAxle();
     }
     
     protected function beforeDelete()
@@ -873,6 +831,16 @@ class Api extends \ApiBase
             $this->addError('code',$e->getMessage());
             return false;
         }
+    }
+    
+    protected function createInApiAxle(ApiAxleClient $apiAxle)
+    {
+        $apiAxle->createApi($this->code, $this->getDataForApiAxle());
+    }
+    
+    protected function existsInApiAxle()
+    {
+        return $this->getApiAxleClient()->apiExists($this->code);
     }
     
     /**
@@ -1017,6 +985,11 @@ class Api extends \ApiBase
     public function requiresApproval()
     {
         return ($this->approval_type !== self::APPROVAL_TYPE_AUTO);
+    }
+    
+    protected function updateInApiAxle(ApiAxleClient $apiAxle)
+    {
+        $apiAxle->updateApi($this->code, $this->getDataForApiAxle());
     }
     
     /**
