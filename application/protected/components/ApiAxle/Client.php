@@ -329,17 +329,54 @@ class Client extends BaseClient
     }
     
     /**
+     * Get a list of existing keyrings.
+     * 
+     * @param int $fromIndex Integer for the index of the first keyring you want
+     *     to see. Starts at zero.
+     * @param int $toIndex Integer for the index of the last keyring you want to
+     *     see. Starts at zero.
+     * @return string[] The list of keyring identifiers.
+     */
+    public function listKeyrings($fromIndex, $toIndex)
+    {
+        $response = $this->keyring()->list([
+            'from' => $fromIndex,
+            'to' => $toIndex,
+        ]);
+        return $this->getDataFromResponse($response);
+    }
+    
+    /**
      * Get a list of existing keys.
      * 
-     * @param int $fromIndex Integer for the index of the first API you want to
+     * @param int $fromIndex Integer for the index of the first key you want to
      *     see. Starts at zero.
-     * @param int $toIndex Integer for the index of the last API you want to
+     * @param int $toIndex Integer for the index of the last key you want to
      *     see. Starts at zero.
      * @return string[] The list of key values (aka. key identifiers).
      */
     public function listKeys($fromIndex, $toIndex)
     {
         $response = $this->key()->list([
+            'from' => $fromIndex,
+            'to' => $toIndex,
+        ]);
+        return $this->getDataFromResponse($response);
+    }
+    
+    /**
+     * Get a list of existing keys linked to the specified keyring.
+     * 
+     * @param int $fromIndex Integer for the index of the first key you want to
+     *     see. Starts at zero.
+     * @param int $toIndex Integer for the index of the last key you want to
+     *     see. Starts at zero.
+     * @return string[] The list of key values (aka. key identifiers).
+     */
+    public function listKeysOnKeyring($keyringId, $fromIndex = 0, $toIndex = 100)
+    {
+        $response = $this->keyring()->list([
+            'id' => $keyringId,
             'from' => $fromIndex,
             'to' => $toIndex,
         ]);
