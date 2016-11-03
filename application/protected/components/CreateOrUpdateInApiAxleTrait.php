@@ -11,12 +11,16 @@ trait CreateOrUpdateInApiAxleTrait
     /**
      * Make sure ApiAxle has an up-to-date record for this.
      * 
+     * @param ApiAxleClient|null $apiAxle (Optional:) The ApiAxleClient to use.
+     *     If not provided, one will be created.
      * @return boolean Whether it was successfully updated in ApiAxle. If not,
      *     check this object's errors.
      */
-    public function createOrUpdateInApiAxle()
+    public function createOrUpdateInApiAxle($apiAxle = null)
     {
-        $apiAxle = $this->getApiAxleClient();
+        if ($apiAxle === null) {
+            $apiAxle = $this->getApiAxleClient();
+        }
         
         if ($this->getIsNewRecord()) {
             try {
