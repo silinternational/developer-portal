@@ -336,6 +336,11 @@ class Key extends \KeyBase
         ));
     }
     
+    public function getFriendlyId()
+    {
+        return $this->key_id;
+    }
+    
     protected function getKeyValueFromDatabase()
     {
         $currentDbRecord = self::model()->findByPk($this->key_id);

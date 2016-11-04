@@ -45,16 +45,16 @@ trait CreateOrUpdateInApiAxleTrait
             try {
                 $this->createInApiAxle($apiAxle);
                 Event::log(sprintf(
-                    'Re-added %s (ID %s) to ApiAxle.',
+                    'Re-added %s %s to ApiAxle.',
                     $this->getShortClassName(),
-                    $this->getPrimaryKey()
+                    var_export($this->getFriendlyId(), true)
                 ));
                 return true;
             } catch (\Exception $e) {
                 $this->addError('code', sprintf(
-                    'Error re-adding %s (ID %s) to ApiAxle: %s',
+                    'Error re-adding %s %s to ApiAxle: %s',
                     $this->getShortClassName(),
-                    $this->getPrimaryKey(),
+                    var_export($this->getFriendlyId(), true),
                     $e->getMessage()
                 ));
                 return false;
@@ -103,9 +103,15 @@ trait CreateOrUpdateInApiAxleTrait
         return new ApiAxleClient(\Yii::app()->params['apiaxle']);
     }
     
-    abstract public function getIsNewRecord();
+    /**
+     * Get a simple value that can be used to identify this model, such as an
+     * integer ID or a string that has a unique constraint.
+     * 
+     * @return int|string
+     */
+    abstract public function getFriendlyId();
     
-    abstract public function getPrimaryKey();
+    abstract public function getIsNewRecord();
     
     protected function getShortClassName()
     {

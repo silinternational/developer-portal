@@ -392,6 +392,11 @@ class Api extends \ApiBase
         return $emailAddresses;
     }
     
+    public function getFriendlyId()
+    {
+        return $this->code;
+    }
+    
     /**
      * Get the internal endpoint for this Api.
      * 
