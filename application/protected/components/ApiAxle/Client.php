@@ -404,6 +404,59 @@ class Client extends BaseClient
     }
     
     /**
+     * Unlink the specified key from the specified API (in ApiAxle).
+     * 
+     * @param string $keyValue The value of the key to unlink.
+     * @param string $apiName The code name of the API to unlink it from.
+     */
+    public function unlinkKeyFromApi($keyValue, $apiName)
+    {
+        try {
+            $this->api()->unlinkKey([
+                'id' => $apiName,
+                'key' => $keyValue,
+            ]);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                throw new NotFoundException(sprintf(
+                    'Either the key (%s) or the API (%s) was not found.',
+                    $keyValue,
+                    $apiName
+                ), 1478204852, $e);
+            }
+            throw $e;
+        }
+    }
+    
+    /**
+     * Unlink the specified key from the specified keyring (in ApiAxle).
+     * 
+     * @param string $keyValue
+     * @param string $keyringName
+     * @throws NotFoundException
+     * @throws \Exception
+     */
+    public function unlinkKeyFromKeyring($keyValue, $keyringName)
+    {
+        try {
+            $response = $this->keyring()->unlinkKey([
+                'id' => $keyringName,
+                'key' => $keyValue,
+            ]);
+            return $this->getDataFromResponse($response);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                throw new NotFoundException(sprintf(
+                    'Either the key (%s) or the keyring (%s) was not found.',
+                    $keyValue,
+                    $keyringName
+                ), 1478205187, $e);
+            }
+            throw $e;
+        }
+    }
+    
+    /**
      * @param string $apiName
      * @param array $data
      * @return ApiInfo
