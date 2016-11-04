@@ -20,6 +20,9 @@ composer:
 composerupdate:
 	docker-compose run --rm composerupdate
 
+db:
+	docker-compose up -d db
+
 phpunit:
 	docker-compose run --rm phpunit
 
@@ -48,13 +51,10 @@ start: web
 
 test: testunit
 
-testunit: composer rmtestdb uptestdb yiimigratetestdb rmapiaxle apiaxle web phpunit
-
-db:
-	docker-compose up -d db
-
 testdb:
 	docker-compose up -d testdb
+
+testunit: composer rmtestdb uptestdb yiimigratetestdb rmapiaxle apiaxle web phpunit
 
 web: apiaxle updb composer yiimigrate
 	docker-compose up -d web
