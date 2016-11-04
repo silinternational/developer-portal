@@ -48,8 +48,8 @@ class AxleTest extends DeveloperPortalTestCase
         // test keys.
         $keyValues = $apiAxle->listKeys(0, 1000);
         foreach ($keyValues as $keyValue) {
-            if (strpos($keyValue, 'test-') !== false) {
-                $apiAxle->deleteKey($keyValue);
+            if ( ! self::isValueOfTestKey($keyValue)) {
+                continue;
             }
         }
     }
@@ -57,6 +57,11 @@ class AxleTest extends DeveloperPortalTestCase
     protected static function getApiAxleClient()
     {
         return new ApiAxleClient(\Yii::app()->params['apiaxle']);
+    }
+    
+    protected static function isValueOfTestKey($keyValue)
+    {
+        return (strpos($keyValue, 'test-') === 0);
     }
     
     public static function tearDownAfterClass()
