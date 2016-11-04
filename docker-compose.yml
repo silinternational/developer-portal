@@ -15,7 +15,7 @@ services:
             MYSQL_USER: developer_portal
             MYSQL_PASSWORD: developer_portal
 
-    testDb:
+    testdb:
         image: silintl/mariadb:latest
         ports:
             - "3306"
@@ -65,7 +65,7 @@ services:
         working_dir: /data/protected
         command: bash -c "whenavail db 3306 100 ./yiic migrate --interactive=0"
 
-    yiimigratetestDb:
+    yiimigratetestdb:
         image: silintl/php-cli:latest
         volumes_from:
             - data

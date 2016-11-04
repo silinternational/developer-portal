@@ -32,35 +32,35 @@ ps:
 redis:
 	docker-compose up -d redis
 
-rmApiaxle:
+rmapiaxle:
 	docker-compose kill redis api proxy axlesetup
 	docker-compose rm -f redis api proxy axlesetup
 
-rmDb:
+rmdb:
 	docker-compose kill db
 	docker-compose rm -f db
 
-rmTestDb:
-	docker-compose kill testDb
-	docker-compose rm -f testDb
+rmtestdb:
+	docker-compose kill testdb
+	docker-compose rm -f testdb
 
 start: web
 
 test: testunit
 
-testunit: composer rmTestDb upTestDb yiimigratetestDb rmApiaxle apiaxle web phpunit
+testunit: composer rmtestdb uptestdb yiimigratetestdb rmapiaxle apiaxle web phpunit
 
-upDb:
+db:
 	docker-compose up -d db
 
-upTestDb:
-	docker-compose up -d testDb
+testdb:
+	docker-compose up -d testdb
 
-web: apiaxle upDb composer yiimigrate
+web: apiaxle updb composer yiimigrate
 	docker-compose up -d web
 
 yiimigrate:
 	docker-compose run --rm yiimigrate
 
-yiimigratetestDb:
-	docker-compose run --rm yiimigratetestDb
+yiimigratetestdb:
+	docker-compose run --rm yiimigratetestdb
