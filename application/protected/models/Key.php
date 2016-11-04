@@ -247,7 +247,7 @@ class Key extends \KeyBase
         return true;
     }
     
-    protected function calculateKeyringName()
+    public function calculateKeyringName()
     {
         return md5($this->user->email);
     }

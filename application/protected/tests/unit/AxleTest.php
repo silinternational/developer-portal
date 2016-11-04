@@ -30,6 +30,17 @@ class AxleTest extends DeveloperPortalTestCase
         parent::setUp();
     }
     
+    protected static function calculateKeyringNameForKey($keyValue)
+    {
+        if ( ! empty($keyValue)) {
+            $key = Key::model()->findByAttributes(['value' => $keyValue]);
+            if ($key !== null) {
+                return $key->calculateKeyringName();
+            }
+        }
+        return null;
+    }
+    
     protected static function deleteTestApisFromApiAxle(ApiAxleClient $apiAxle)
     {
         // Delete all the APIs that start with the string we use to identify
