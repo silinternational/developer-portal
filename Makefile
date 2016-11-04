@@ -26,6 +26,9 @@ phpunit:
 proxy:
 	docker-compose up -d proxy
 
+ps:
+	docker-compose ps
+
 redis:
 	docker-compose up -d redis
 
