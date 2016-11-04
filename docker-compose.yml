@@ -70,14 +70,14 @@ services:
         volumes_from:
             - data
         links:
-            - testDb
+            - testdb
         env_file:
             - ./common.env
             - ./local.env
         working_dir: /data/protected
-        command: whenavail testDb 3306 100 ./yiic migrate --interactive=0
+        command: whenavail testdb 3306 100 ./yiic migrate --interactive=0
         environment:
-          MYSQL_HOST: testDb
+          MYSQL_HOST: testdb
           MYSQL_DATABASE: test
 
     phpunit:
@@ -85,16 +85,16 @@ services:
         volumes_from:
             - data
         links:
-            - testDb
+            - testdb
             - proxy:apiaxle.api.proxy
             - proxy:test.api.proxy
         env_file:
             - ./common.env
             - ./local.env
         working_dir: /data/protected/tests
-        command: whenavail testDb 3306 100 ../../vendor/bin/phpunit unit/
+        command: whenavail testdb 3306 100 ../../vendor/bin/phpunit unit/
         environment:
-          MYSQL_HOST: testDb
+          MYSQL_HOST: testdb
           MYSQL_DATABASE: test
           SAML_ADMIN_PASSWORD: dummy-for-tests-q6.eYWtfLF-BTQXf-OktD5lVFCOFyC4B
           SAML_SECRET_SALT: dummy-for-tests-Ac4MTgO9UJ6_wpXXKc6EGU_.gWNNkdMe
