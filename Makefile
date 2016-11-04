@@ -54,9 +54,9 @@ test: testunit
 testdb:
 	docker-compose up -d testdb
 
-testunit: composer rmtestdb uptestdb yiimigratetestdb rmapiaxle apiaxle web phpunit
+testunit: composer rmtestdb testdb yiimigratetestdb rmapiaxle apiaxle web phpunit
 
-web: apiaxle updb composer yiimigrate
+web: apiaxle db composer yiimigrate
 	docker-compose up -d web
 
 yiimigrate:
