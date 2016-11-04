@@ -5,7 +5,7 @@ use Sil\DevPortal\models\Api;
 return array(
     'api1'  => array(
         'api_id'          => 1,
-        'code'            => 'auto',
+        'code'            => 'test-auto',
         'display_name'    => 'Api that has auto approval',
         'endpoint'        => 'www.auto.com',
         'queries_second'  => 1,
@@ -20,7 +20,7 @@ return array(
     ),
     'api2' => array(
         'api_id'          => 2,
-        'code'            => 'owner',
+        'code'            => 'test-owner',
         'display_name'    => 'Api that has to be approved by the owner',
         'endpoint'        => 'www.owner.com',
         'queries_second'  => 2,
@@ -36,7 +36,7 @@ return array(
     ),
     'api3'  => array(
         'api_id'          => 3,
-        'code'            => 'admin',
+        'code'            => 'test-admin',
         'display_name'    => 'Api that has to be approved by an admin',
         'endpoint'        => 'localhost',
         'default_path'    => '/admin',
@@ -52,7 +52,7 @@ return array(
     ),
     'api4'  => array(
         'api_id'          => 4,
-        'code'            => 'api4',
+        'code'            => 'test-api4',
         'display_name'    => 'Api Number 4',
         'endpoint'        => 'localhost',
         'default_path'    => '/api4',
@@ -68,7 +68,7 @@ return array(
     ),
     'apiWithOwner'  => array(
         'api_id'          => 5,
-        'code'            => 'with-owner',
+        'code'            => 'test-with-owner',
         'display_name'    => 'API With An Owner',
         'endpoint'        => 'localhost',
         'default_path'    => '/5',
@@ -85,7 +85,7 @@ return array(
     ),
     'publicApi'  => array(
         'api_id'          => 6,
-        'code'            => 'public-api',
+        'code'            => 'test-public-api',
         'display_name'    => 'A Public API',
         'endpoint'        => 'localhost',
         'default_path'    => '/public',
@@ -101,7 +101,7 @@ return array(
     ),
     'allInsiteApi'  => array(
         'api_id'          => 7,
-        'code'            => 'all-insite',
+        'code'            => 'test-all-insite',
         'display_name'    => 'An API Visible to All Insite Users',
         'endpoint'        => 'localhost',
         'default_path'    => '/all-insite',
@@ -117,7 +117,7 @@ return array(
     ),
     'specificInsiteGroupApi'  => array(
         'api_id'          => 8,
-        'code'            => 'specific-access-group',
+        'code'            => 'test-specific-access-group',
         'display_name'    => 'An API Visible to a Specific Access Group',
         'endpoint'        => 'localhost',
         'default_path'    => '/specific-group',
@@ -133,7 +133,7 @@ return array(
     ),
     'apiWithTwoKeys'  => array(
         'api_id'          => 9,
-        'code'            => 'two-keys',
+        'code'            => 'test-two-keys',
         'display_name'    => 'API With Two Keys',
         'endpoint'        => 'localhost',
         'default_path'    => '/two-keys',
@@ -149,7 +149,7 @@ return array(
     ),
     'apiWithTwoPendingKeys'  => array(
         'api_id'          => 10,
-        'code'            => 'two-pending',
+        'code'            => 'test-two-pending',
         'display_name'    => 'API With Two Pending Keys',
         'endpoint'        => 'localhost',
         'default_path'    => '/two-pending',
@@ -165,7 +165,7 @@ return array(
     ),
     'apiWithoutOwner'  => array(
         'api_id'          => 11,
-        'code'            => 'without-owner',
+        'code'            => 'test-without-owner',
         'display_name'    => 'API Without An Owner',
         'endpoint'        => 'localhost',
         'default_path'    => '/11',
@@ -181,7 +181,7 @@ return array(
     ),
     'apiOwnedByUser18'  => array(
         'api_id'          => 12,
-        'code'            => 'owned-by-user18',
+        'code'            => 'test-owned-by-user18',
         'display_name'    => 'API Owned By User 18',
         'endpoint'        => 'localhost',
         'default_path'    => '/12',
@@ -198,7 +198,7 @@ return array(
     ),
     'apiWithZeroKeys'  => array(
         'api_id'          => 13,
-        'code'            => 'zero-keys',
+        'code'            => 'test-zero-keys',
         'display_name'    => 'API With Zero Keys',
         'endpoint'        => 'localhost',
         'default_path'    => '/zero-keys',
@@ -214,7 +214,7 @@ return array(
     ),
     'apiWithZeroPendingKeys'  => array(
         'api_id'          => 14,
-        'code'            => 'zero-pending-keys',
+        'code'            => 'test-zero-pending-keys',
         'display_name'    => 'API With Zero Pending Keys',
         'endpoint'        => 'localhost',
         'default_path'    => '/zero-pending-keys',
@@ -230,7 +230,7 @@ return array(
     ),
     'apiWithDefaultPath' => array(
         'api_id'          => 15,
-        'code'            => 'with-default-path',
+        'code'            => 'test-with-default-path',
         'display_name'    => 'API with a default_path',
         'endpoint'        => 'local',
         'default_path'    => '/withDefaultPath',
@@ -246,7 +246,7 @@ return array(
     ),
     'apiWithoutDefaultPath' => array(
         'api_id'          => 16,
-        'code'            => 'without-default-path',
+        'code'            => 'test-without-default-path',
         'display_name'    => 'API without a default_path',
         'endpoint'        => 'local',
         'queries_second'  => 10,
@@ -261,7 +261,7 @@ return array(
     ),
     'apiVisibleByInvitationOnly' => array(
         'api_id'           => 17,
-        'code'             => 'visible-by-invitation-only',
+        'code'             => 'test-visible-by-invitation-only',
         'display_name'     => 'API visible by invitation only',
         'endpoint'         => 'local',
         'default_path'     => '/visibleByInvitationOnly',
@@ -278,7 +278,7 @@ return array(
     ),
     'apiVisibleByInvitationOnlyWithNoInvitations' => array(
         'api_id'           => 18,
-        'code'             => 'visible-by-inv-only-with-no-invs',
+        'code'             => 'test-vis-by-inv-only-no-invs',
         'display_name'     => 'API visible by invitation only with no invitations',
         'endpoint'         => 'local',
         'default_path'     => '/visibleByInvitationOnlyWithNoInvitations',
@@ -295,7 +295,7 @@ return array(
     ),
     'publicApiThatRequiresApproval' => array(
         'api_id'           => 19,
-        'code'             => 'public-that-requires-approval',
+        'code'             => 'test-pub-that-requires-approval',
         'display_name'     => 'Public API that requires approval',
         'endpoint'         => 'local',
         'default_path'     => '/publicApiThatRequiresApproval',
@@ -312,7 +312,7 @@ return array(
     ),
     'publicApiThatAutoApprovesKeys' => array(
         'api_id'           => 20,
-        'code'             => 'public-that-auto-approves-keys',
+        'code'             => 'test-pub-that-auto-approves-keys',
         'display_name'     => 'Public API that auto-approves keys',
         'endpoint'         => 'local',
         'default_path'     => '/publicApiThatAutoApprovesKeys',
@@ -329,7 +329,7 @@ return array(
     ),
     'apiVisibleByInvitationOnlyWith2UserAnd1DomainInvitation' => array(
         'api_id'           => 21,
-        'code'             => 'by-inv-only-with-2u-1d-invs',
+        'code'             => 'test-by-inv-only-with-2u-1d-invs',
         'display_name'     => 'API visible by invitation only with some invitations',
         'endpoint'         => 'local',
         'default_path'     => '/by-inv-only-with-2u-1d-invs',
