@@ -62,6 +62,18 @@ class AxleTest extends DeveloperPortalTestCase
             if ( ! self::isValueOfTestKey($keyValue)) {
                 continue;
             }
+            
+            if ( ! $apiAxle->keyExists($keyValue)) {
+                continue;
+            }
+            
+            $keyringId = self::calculateKeyringNameForKey($keyValue);
+            if ($keyringId === null) {
+                continue;
+            }
+            
+            $apiAxle->unlinkKeyFromKeyring($keyValue, $keyringId);
+            $apiAxle->deleteKey($keyValue);
         }
     }
     

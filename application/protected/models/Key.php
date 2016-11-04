@@ -411,7 +411,14 @@ class Key extends \KeyBase
     {
         try{
             $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
-            $apiAxle->deleteKey($this->value);
+            if (( ! empty($this->value)) && $this->existsInApiAxle()) {
+                $apiAxle->unlinkKeyFromApi($this->value, $this->api->code);
+                $apiAxle->unlinkKeyFromKeyring(
+                    $this->value,
+                    $this->calculateKeyringName()
+                );
+                $apiAxle->deleteKey($this->value);
+            }
             return true;
         } catch (NotFoundException $e) {
             // If the key was not found, consider the deletion successful.
