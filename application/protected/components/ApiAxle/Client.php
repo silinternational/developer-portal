@@ -375,7 +375,7 @@ class Client extends BaseClient
      */
     public function listKeysOnKeyring($keyringId, $fromIndex = 0, $toIndex = 100)
     {
-        $response = $this->keyring()->list([
+        $response = $this->keyring()->listKeys([
             'id' => $keyringId,
             'from' => $fromIndex,
             'to' => $toIndex,
