@@ -1,5 +1,7 @@
 <?php
 
+use Sil\DevPortal\components\ApiAxle\ApiInfo;
+use Sil\DevPortal\components\ApiAxle\KeyInfo;
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
 use Sil\DevPortal\components\Http\ClientG5 as HttpClient;
 use Sil\DevPortal\models\Api;
@@ -11,6 +13,8 @@ use Sil\DevPortal\models\User;
  * @method Api apis(string $fixtureName)
  * @method User users(string $fixtureName)
  * @method Key keys(string $fixtureName)
+ * @property array[] $apis
+ * @property array[] $keys
  */
 class AxleTest extends DeveloperPortalTestCase
 {
@@ -82,9 +86,44 @@ class AxleTest extends DeveloperPortalTestCase
         return new ApiAxleClient(\Yii::app()->params['apiaxle']);
     }
     
+    protected function getApiInfoListFromApiAxle(ApiAxleClient $apiAxle)
+    {
+        $list = [];
+        foreach ($apiAxle->listApis(0, 1000) as $apiCodeName) {
+            $apiInfo = $apiAxle->getApiInfo($apiCodeName);
+            $apiData = $apiInfo->getData();
+            unset($apiData['createdAt']);
+            unset($apiData['updatedAt']);
+            $list[] = new ApiInfo($apiInfo->getName(), $apiData);
+        }
+        return $list;
+    }
+    
+    protected function getKeyInfoListFromApiAxle(ApiAxleClient $apiAxle)
+    {
+        $list = [];
+        foreach ($apiAxle->listKeys(0, 1000) as $keyValue) {
+            $keyInfo = $apiAxle->getKeyInfo($keyValue);
+            $keyData = $keyInfo->getData();
+            unset($keyData['createdAt']);
+            unset($keyData['updatedAt']);
+            $list[] = new KeyInfo($keyInfo->getKeyValue(), $keyData);
+        }
+        return $list;
+    }
+    
     protected static function isValueOfTestKey($keyValue)
     {
         return (strpos($keyValue, 'test-') === 0);
+    }
+    
+    protected function listApiAxleKeysByKeyring(ApiAxleClient $apiAxle)
+    {
+        $list = [];
+        foreach ($apiAxle->listKeyrings(0, 1000) as $keyringId) {
+            $list[$keyringId] = $apiAxle->listKeysOnKeyring($keyringId, 0, 1000);
+        }
+        return $list;
     }
     
     public static function tearDownAfterClass()
@@ -548,5 +587,73 @@ class AxleTest extends DeveloperPortalTestCase
         }
         
         $this->assertEquals($howMany, $inList);
+    }
+    
+    public function testRedisDisasterRecovery()
+    {
+        // Arrange:
+        $apiAxle = self::getApiAxleClient();
+        self::deleteTestApisFromApiAxle($apiAxle);
+        self::deleteTestKeysFromApiAxle($apiAxle);
+        foreach ($this->apis as $fixtureName => $fixtureData) {
+            $api = $this->apis($fixtureName);
+            $setupResult = $api->createOrUpdateInApiAxle($apiAxle);
+            $this->assertTrue($setupResult, $api->getErrorsForConsole());
+        }
+        foreach ($this->keys as $fixtureName => $fixtureData) {
+            $key = $this->keys($fixtureName);
+            try {
+                $setupResult = $key->createOrUpdateInApiAxle($apiAxle);
+                $this->assertTrue($setupResult, $key->getErrorsForConsole());
+            } catch (\Exception $e) {
+                $this->fail(sprintf(
+                    "Failed to create/update '%s' in ApiAxle:\n(%s) %s",
+                    $fixtureName,
+                    $e->getCode(),
+                    $e->getMessage()
+                ));
+            }
+        }
+        $preDisasterApiInfoList = $this->getApiInfoListFromApiAxle($apiAxle);
+        $preDisasterKeyInfoList = $this->getKeyInfoListFromApiAxle($apiAxle);
+        $preDisasterKeysByKeyring = $this->listApiAxleKeysByKeyring($apiAxle);
+        
+        // Pre-assert:
+        $this->assertNotEmpty($preDisasterApiInfoList);
+        $this->assertNotEmpty($preDisasterKeyInfoList);
+        $this->assertNotEmpty($preDisasterKeysByKeyring);
+        self::deleteTestApisFromApiAxle($apiAxle);
+        self::deleteTestKeysFromApiAxle($apiAxle);
+        // NOTE: Keyrings are not deleted.
+        $postDisasterApiInfoList = $this->getApiInfoListFromApiAxle($apiAxle);
+        $postDisasterKeyInfoList = $this->getKeyInfoListFromApiAxle($apiAxle);
+        $postDisasterKeysByKeyring = $this->listApiAxleKeysByKeyring($apiAxle);
+        $this->assertNotEquals($preDisasterApiInfoList, $postDisasterApiInfoList);
+        $this->assertNotEquals($preDisasterKeyInfoList, $postDisasterKeyInfoList);
+        $this->assertNotEquals($preDisasterKeysByKeyring, $postDisasterKeysByKeyring);
+        
+        // Act:
+        $apiDisasterRecoveryErrors = Api::repopulateApiAxle($apiAxle);
+        $keyDisasterRecoveryErrors = Key::repopulateApiAxle($apiAxle);
+        
+        // Assert:
+        $this->assertEmpty($apiDisasterRecoveryErrors, sprintf(
+            "There were errors while repopulating ApiAxle's list of APIs:\n%s",
+            var_export($apiDisasterRecoveryErrors, true)
+        ));
+        $this->assertEmpty($keyDisasterRecoveryErrors, sprintf(
+            "There were errors while repopulating ApiAxle's list of keys:\n%s",
+            var_export($keyDisasterRecoveryErrors, true)
+        ));
+        $postRecoveryApiInfoList = $this->getApiInfoListFromApiAxle($apiAxle);
+        $postRecoveryKeyInfoList = $this->getKeyInfoListFromApiAxle($apiAxle);
+        $postRecoveryKeysByKeyring = $this->listApiAxleKeysByKeyring($apiAxle);
+        $this->assertEquals($preDisasterApiInfoList, $postRecoveryApiInfoList);
+        $this->assertEquals(
+            $preDisasterKeyInfoList,
+            $postRecoveryKeyInfoList,
+            var_export($postRecoveryKeyInfoList, true)
+        );
+        $this->assertEquals($preDisasterKeysByKeyring, $postRecoveryKeysByKeyring);
     }
 }

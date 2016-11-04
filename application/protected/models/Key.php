@@ -23,6 +23,7 @@ class Key extends \KeyBase
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     use \Sil\DevPortal\components\CreateOrUpdateInApiAxleTrait;
+    use \Sil\DevPortal\components\RepopulateApiAxleTrait;
     
     const STATUS_APPROVED = 'approved';
     const STATUS_DENIED = 'denied';

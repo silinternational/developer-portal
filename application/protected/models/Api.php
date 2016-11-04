@@ -28,6 +28,7 @@ class Api extends \ApiBase
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     use \Sil\DevPortal\components\CreateOrUpdateInApiAxleTrait;
+    use \Sil\DevPortal\components\RepopulateApiAxleTrait;
     
     CONST APPROVAL_TYPE_AUTO = 'auto';
     CONST APPROVAL_TYPE_OWNER = 'owner';
