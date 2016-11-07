@@ -1526,11 +1526,11 @@ class Key extends \KeyBase
                 $apiAxle->deleteKey($oldKeyValue);
             }
             $this->createInApiAxle($apiAxle);
+        } else {
+            $this->ensureKeyringExistsInApiAxle($apiAxle);
+            $apiAxle->updateKey($this->value, $this->getDataForApiAxle());
+            $apiAxle->linkKeyToKeyring($this->value, $this->calculateKeyringName());
+            $apiAxle->linkKeyToApi($this->value, $this->api->code);
         }
-        
-        $this->ensureKeyringExistsInApiAxle($apiAxle);
-        
-        $keyData = $this->getDataForApiAxle();
-        $apiAxle->updateKey($this->value, $keyData);
     }
 }
