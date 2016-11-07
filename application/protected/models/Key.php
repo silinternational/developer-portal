@@ -1518,6 +1518,11 @@ class Key extends \KeyBase
         if ($this->keyValueHasChanged()) {
             $oldKeyValue = $this->getKeyValueFromDatabase();
             if (($oldKeyValue !== null) && $apiAxle->keyExists($oldKeyValue)) {
+                $apiAxle->unlinkKeyFromApi($oldKeyValue, $this->api->code);
+                $apiAxle->unlinkKeyFromKeyring(
+                    $oldKeyValue,
+                    $this->calculateKeyringName()
+                );
                 $apiAxle->deleteKey($oldKeyValue);
             }
             $this->createInApiAxle($apiAxle);
