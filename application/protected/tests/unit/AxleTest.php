@@ -652,7 +652,10 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertEquals(
             $preDisasterKeyInfoList,
             $postRecoveryKeyInfoList,
-            var_export($postRecoveryKeyInfoList, true)
+            var_export(
+                array_diff($preDisasterKeyInfoList, $postRecoveryKeyInfoList),
+                true
+            )
         );
         $this->assertEquals($preDisasterKeysByKeyring, $postRecoveryKeysByKeyring);
     }
