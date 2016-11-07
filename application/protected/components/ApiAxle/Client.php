@@ -263,6 +263,8 @@ class Client extends BaseClient
      * 
      * @param string $keyValue The value of the key to link.
      * @param string $apiName The code name of the API to link it to.
+     * @throws NotFoundException
+     * @throws \Exception
      */
     public function linkKeyToApi($keyValue, $apiName)
     {
