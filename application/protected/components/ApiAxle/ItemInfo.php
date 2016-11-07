@@ -12,6 +12,14 @@ class ItemInfo
         $this->data = $data;
     }
     
+    public function __toString()
+    {
+        return var_export([
+            'name' => $this->getName(),
+            'data' => $this->getData()
+        ], true);
+    }
+    
     public function getData()
     {
         return $this->data;
