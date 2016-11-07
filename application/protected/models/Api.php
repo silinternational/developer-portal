@@ -2,7 +2,6 @@
 namespace Sil\DevPortal\models;
 
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
-use Sil\DevPortal\components\Exception\NotFoundException;
 use Sil\DevPortal\models\ApiVisibilityDomain;
 use Sil\DevPortal\models\ApiVisibilityUser;
 use Sil\DevPortal\models\Event;
@@ -28,6 +27,8 @@ class Api extends \ApiBase
     use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
+    use \Sil\DevPortal\components\CreateOrUpdateInApiAxleTrait;
+    use \Sil\DevPortal\components\RepopulateApiAxleTrait;
     
     CONST APPROVAL_TYPE_AUTO = 'auto';
     CONST APPROVAL_TYPE_OWNER = 'owner';
@@ -320,6 +321,20 @@ class Api extends \ApiBase
         }
     }
     
+    protected function getDataForApiAxle()
+    {
+        return [
+            'endPoint' => $this->endpoint,
+            'defaultPath' => $this->default_path ?: '/',
+            'protocol' => $this->protocol,
+            'strictSSL' => $this->strict_ssl ? true : false,
+            'endPointTimeout' => !is_null($this->endpoint_timeout) 
+                    ? (int)$this->endpoint_timeout : 2,
+            'additionalHeaders' => $this->additional_headers ?: '',
+            'tokenSkewProtectionCount' => (int)$this->signature_window,
+        ];
+    }
+    
     /**
      * Generate the HTML for the pending key count badge.
      * 
@@ -376,6 +391,11 @@ class Api extends \ApiBase
             }
         }
         return $emailAddresses;
+    }
+    
+    public function getFriendlyId()
+    {
+        return $this->code;
     }
     
     /**
@@ -730,77 +750,7 @@ class Api extends \ApiBase
          * 
          * If the call to ApiAxle fails, the save will not go through.
          */
-        return $this->updateInApiAxle();
-    }
-    
-    protected function updateInApiAxle()
-    {
-        $apiData = array(
-            'endPoint' => $this->endpoint,
-            'defaultPath' => $this->default_path ?: '/',
-            'protocol' => $this->protocol,
-            'strictSSL' => $this->strict_ssl ? true : false,
-            'endPointTimeout' => !is_null($this->endpoint_timeout) 
-                    ? (int)$this->endpoint_timeout : 2,
-            'additionalHeaders' => $this->additional_headers ?: '',
-            'tokenSkewProtectionCount' => (int)$this->signature_window,
-        );
-        
-        $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
-        if ($this->getIsNewRecord()) {
-            try {
-                $apiAxle->createApi($this->code, $apiData);
-                return true;
-            } catch (\GuzzleHttp\Exception\RequestException $e) {
-                $response = $e->getResponse();
-                if ($response === null) {
-                    $errorMessage = $e->getMessage();
-                } else {
-                    $errorMessage = $response->getBody()->getContents();
-                }
-                $this->addError('code', sprintf(
-                    'Error creating API: %s',
-                    $errorMessage
-                ));
-                return false;
-            } catch (\Exception $e) {
-                $this->addError(
-                    'code',
-                    'Failed to create new API on the proxy: ' . $e->getMessage()
-                );
-                return false;
-            }
-        } else {
-            try {
-                $apiAxle->updateApi($this->code, $apiData);
-                return true;
-            } catch (NotFoundException $e) {
-                try {
-                    $apiAxle->createApi($this->code, $apiData);
-                    $nameOfCurrentUser = \Yii::app()->user->getDisplayName();
-                    Event::log(sprintf(
-                        'The "%s" API (%s, ID %s) was re-added to ApiAxle%s.',
-                        $this->display_name,
-                        $this->code,
-                        $this->api_id,
-                        (is_null($nameOfCurrentUser) ? '' : ' by ' . $nameOfCurrentUser)
-                    ), $this->api_id);
-                    return true;
-                } catch (\Exception $e) {
-                    $this->addError(
-                        'code',
-                        'Failed to recreate API on the proxy: ' . $e->getMessage()
-                    );
-                    return false;
-                }
-            } catch (\Exception $e) {
-                $this->addError(
-                    'code',
-                    'Failed to update API on the proxy: ' . $e->getMessage()
-                );
-                return false;
-            }
-        }
+        return $this->createOrUpdateInApiAxle();
     }
     
     protected function beforeDelete()
@@ -887,6 +837,16 @@ class Api extends \ApiBase
             $this->addError('code',$e->getMessage());
             return false;
         }
+    }
+    
+    protected function createInApiAxle(ApiAxleClient $apiAxle)
+    {
+        $apiAxle->createApi($this->code, $this->getDataForApiAxle());
+    }
+    
+    protected function existsInApiAxle()
+    {
+        return $this->getApiAxleClient()->apiExists($this->code);
     }
     
     /**
@@ -1031,6 +991,16 @@ class Api extends \ApiBase
     public function requiresApproval()
     {
         return ($this->approval_type !== self::APPROVAL_TYPE_AUTO);
+    }
+    
+    protected function shouldExistInApiAxle()
+    {
+        return true;
+    }
+    
+    protected function updateInApiAxle(ApiAxleClient $apiAxle)
+    {
+        $apiAxle->updateApi($this->code, $this->getDataForApiAxle());
     }
     
     /**

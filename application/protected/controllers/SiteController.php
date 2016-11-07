@@ -82,27 +82,19 @@ class SiteController extends \Controller
              * Get an apixle object and try to fetch details about 'apiaxle' api
              */
             $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
-            $axleApi = $apiAxle->getApi('apiaxle');
-            $data = $axleApi->getData();
-
-            if (!is_null($data['protocol'])) {
-                /**
-                 * Check that expected parameter is set
-                 */
+            $apiInfo = $apiAxle->getApiInfo('apiaxle');
+            $data = $apiInfo->getData();
+            
+            // Check that an expected parameter is set.
+            if ($data['protocol'] !== null) {
                 header('Content-type: text/plain', true, 200);
                 echo 'OK';
-            }
-            else {
-                /**
-                 * If not, output an error
-                 */
+            } else {
                 header('Content-type: text/plain', true, 500);
                 echo 'Error with api proxy, expected attribute not set';
             }
         } catch (\Exception $e) {
-            /**
-             * Catch any exceptions from ApiAxle class and output error
-             */
+            /* Catch any exceptions from ApiAxle class and output error: */
             header('Content-type: text/plain', true, 500);
             echo 'Error with api proxy, code: ' . $e->getCode();
             

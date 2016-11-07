@@ -6,18 +6,33 @@ use Sil\DevPortal\components\Exception\NotFoundException;
 class Client extends BaseClient
 {
     /**
+     * @param string $apiName
+     * @return bool
+     * @throws \Exception
+     */
+    public function apiExists($apiName)
+    {
+        return ($this->getApiInfo($apiName) !== null);
+    }
+    
+    /**
      * @param string $apiName The code name of the API in question.
      * @param array $data
      * @return ApiInfo
      */
     public function createApi($apiName, $data)
     {
-        $data['id'] = $apiName;
-        $response = $this->api()->create($data);
-        return new ApiInfo(
-            $apiName,
-            $this->getDataFromResponse($response)
-        );
+        try {
+            $data['id'] = $apiName;
+            $response = $this->api()->create($data);
+            return new ApiInfo($apiName, $this->getDataFromResponse($response));
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            throw new \Exception(
+                $this->getErrorMessageFromGuzzleException($e),
+                1477426036,
+                $e
+            );
+        }
     }
     
     /**
@@ -50,7 +65,7 @@ class Client extends BaseClient
             );
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             throw new \Exception(
-                $e->getResponse()->getBody()->getContents(),
+                $this->getErrorMessageFromGuzzleException($e),
                 1477426036,
                 $e
             );
@@ -68,14 +83,24 @@ class Client extends BaseClient
     }
     
     /**
+     * Delete the specified key from ApiAxle. If unable to do so for some
+     * reason, an exception will be thrown.
+     * 
      * @param string $keyValue
-     * @return boolean
+     * @throws NotFoundException
+     * @throws \Exception
      */
     public function deleteKey($keyValue)
     {
         try {
             $response = $this->key()->delete(['id' => $keyValue]);
-            return $this->getDataFromResponse($response);
+            $successfullyDeleted = $this->getDataFromResponse($response);
+            if ( ! $successfullyDeleted) {
+                throw new \Exception(
+                    'We could not delete that key from ApiAxle for some reason.',
+                    1478118797
+                );
+            }
         } catch (\Exception $e) {
             if ($e->getCode() === 404) {
                 throw new NotFoundException(sprintf(
@@ -99,16 +124,26 @@ class Client extends BaseClient
     }
     
     /**
+     * Get the information about the specified API (or null if no such API was
+     * found).
+     * 
      * @param string $apiName The code name of the API in question.
-     * @return ApiInfo
+     * @return ApiInfo|null
      */
     public function getApiInfo($apiName)
     {
-        $response = $this->api()->get(['id' => $apiName]);
-        return new ApiInfo(
-            $apiName,
-            $this->getDataFromResponse($response)
-        );
+        try {
+            $response = $this->api()->get(['id' => $apiName]);
+            return new ApiInfo(
+                $apiName,
+                $this->getDataFromResponse($response)
+            );
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                return null;
+            }
+            throw $e;
+        }
     }
     
     /**
@@ -144,17 +179,35 @@ class Client extends BaseClient
         return $response['results'];
     }
     
+    protected function getErrorMessageFromGuzzleException(
+        \GuzzleHttp\Exception\RequestException $exception
+    ) {
+        if ($exception->hasResponse() && $exception->getResponse()->getBody()) {
+            return $exception->getResponse()->getBody()->getContents();
+        } else {
+            return $exception->getMessage();
+        }
+    }
+    
     /**
+     * Get the information about the specified key (or null if no such key was
+     * found).
+     * 
      * @param string $keyValue
-     * @return KeyInfo
+     * @return KeyInfo|null
+     * @throws \Exception
      */
     public function getKeyInfo($keyValue)
     {
-        $response = $this->key()->get(['id' => $keyValue]);
-        return new KeyInfo(
-            $keyValue,
-            $this->getDataFromResponse($response)
-        );
+        try {
+            $response = $this->key()->get(['id' => $keyValue]);
+            return new KeyInfo($keyValue, $this->getDataFromResponse($response));
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                return null;
+            }
+            throw $e;
+        }
     }
     
     /**
@@ -175,6 +228,16 @@ class Client extends BaseClient
             'format_timeseries' => false,
         ]);
         return $this->getDataFromResponse($response);
+    }
+    
+    /**
+     * @param string $keyValue
+     * @return bool
+     * @throws \Exception
+     */
+    public function keyExists($keyValue)
+    {
+        return ($this->getKeyInfo($keyValue) !== null);
     }
     
     /**
@@ -200,6 +263,8 @@ class Client extends BaseClient
      * 
      * @param string $keyValue The value of the key to link.
      * @param string $apiName The code name of the API to link it to.
+     * @throws NotFoundException
+     * @throws \Exception
      */
     public function linkKeyToApi($keyValue, $apiName)
     {
@@ -266,17 +331,54 @@ class Client extends BaseClient
     }
     
     /**
+     * Get a list of existing keyrings.
+     * 
+     * @param int $fromIndex Integer for the index of the first keyring you want
+     *     to see. Starts at zero.
+     * @param int $toIndex Integer for the index of the last keyring you want to
+     *     see. Starts at zero.
+     * @return string[] The list of keyring identifiers.
+     */
+    public function listKeyrings($fromIndex, $toIndex)
+    {
+        $response = $this->keyring()->list([
+            'from' => $fromIndex,
+            'to' => $toIndex,
+        ]);
+        return $this->getDataFromResponse($response);
+    }
+    
+    /**
      * Get a list of existing keys.
      * 
-     * @param int $fromIndex Integer for the index of the first API you want to
+     * @param int $fromIndex Integer for the index of the first key you want to
      *     see. Starts at zero.
-     * @param int $toIndex Integer for the index of the last API you want to
+     * @param int $toIndex Integer for the index of the last key you want to
      *     see. Starts at zero.
      * @return string[] The list of key values (aka. key identifiers).
      */
     public function listKeys($fromIndex, $toIndex)
     {
         $response = $this->key()->list([
+            'from' => $fromIndex,
+            'to' => $toIndex,
+        ]);
+        return $this->getDataFromResponse($response);
+    }
+    
+    /**
+     * Get a list of existing keys linked to the specified keyring.
+     * 
+     * @param int $fromIndex Integer for the index of the first key you want to
+     *     see. Starts at zero.
+     * @param int $toIndex Integer for the index of the last key you want to
+     *     see. Starts at zero.
+     * @return string[] The list of key values (aka. key identifiers).
+     */
+    public function listKeysOnKeyring($keyringId, $fromIndex = 0, $toIndex = 100)
+    {
+        $response = $this->keyring()->listKeys([
+            'id' => $keyringId,
             'from' => $fromIndex,
             'to' => $toIndex,
         ]);
@@ -301,6 +403,59 @@ class Client extends BaseClient
             'to' => $toIndex,
         ]);
         return $this->getDataFromResponse($response);
+    }
+    
+    /**
+     * Unlink the specified key from the specified API (in ApiAxle).
+     * 
+     * @param string $keyValue The value of the key to unlink.
+     * @param string $apiName The code name of the API to unlink it from.
+     */
+    public function unlinkKeyFromApi($keyValue, $apiName)
+    {
+        try {
+            $this->api()->unlinkKey([
+                'id' => $apiName,
+                'key' => $keyValue,
+            ]);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                throw new NotFoundException(sprintf(
+                    'Either the key (%s) or the API (%s) was not found.',
+                    $keyValue,
+                    $apiName
+                ), 1478204852, $e);
+            }
+            throw $e;
+        }
+    }
+    
+    /**
+     * Unlink the specified key from the specified keyring (in ApiAxle).
+     * 
+     * @param string $keyValue
+     * @param string $keyringName
+     * @throws NotFoundException
+     * @throws \Exception
+     */
+    public function unlinkKeyFromKeyring($keyValue, $keyringName)
+    {
+        try {
+            $response = $this->keyring()->unlinkKey([
+                'id' => $keyringName,
+                'key' => $keyValue,
+            ]);
+            return $this->getDataFromResponse($response);
+        } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                throw new NotFoundException(sprintf(
+                    'Either the key (%s) or the keyring (%s) was not found.',
+                    $keyValue,
+                    $keyringName
+                ), 1478205187, $e);
+            }
+            throw $e;
+        }
     }
     
     /**

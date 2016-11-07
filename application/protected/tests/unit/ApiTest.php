@@ -937,7 +937,7 @@ class ApiTest extends DeveloperPortalTestCase
         $existingApi = $this->apis('apiWithoutDefaultPath');
         $newApi = new Api;
         $newApi->attributes = $existingApi->attributes;
-        $newApi->code = $existingApi->code . '-duplicate';
+        $newApi->code = $existingApi->code . '-dup';
         $newApi->display_name = $existingApi->display_name . '-duplicate';
         $newApi->endpoint = $existingApi->endpoint . '-duplicate';
         
@@ -945,7 +945,7 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $newApi->validate();
         
         // Assert:
-        $this->assertEmpty($newApi->errors);
+        $this->assertEmpty($newApi->errors, $newApi->getErrorsForConsole());
         $this->assertTrue(
             $result,
             'Failed to recognize that a different endpoint results in a '
