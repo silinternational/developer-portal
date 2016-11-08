@@ -8,7 +8,6 @@ $this->breadcrumbs += array(
 );
 
 ?>
-</div>
 <div class="row">
     <div class="span12 text-center">
         <?php $form = $this->beginWidget('CActiveForm'); ?>
