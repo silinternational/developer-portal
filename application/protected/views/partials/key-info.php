@@ -81,7 +81,7 @@ if ($currentUser->canSeeKey($key)) {
                     }
                     ?>
                 </dd>
-            <?php elseif ( ! $key->api->requiresSignature()): ?>
+            <?php elseif ( ! $key->requiresSignature()): ?>
                 <dd><i class="muted">not applicable - no signature necessary</i></dd>
             <?php endif;?>
         <?php endif;?>

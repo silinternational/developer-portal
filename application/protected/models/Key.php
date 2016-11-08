@@ -318,6 +318,10 @@ class Key extends \KeyBase
     public function generateNewValueAndSecret()
     {
         $this->value = \Utils::getRandStr(32);
+        
+        /* NOTE: Make sure this checks whether the Api requires a signature, not
+         * whether the Key currently requires a signature, since we might be
+         * about to change whether this Key requires a signature.  */
         if ($this->api->requiresSignature()) {
             $this->secret = \Utils::getRandStr(128);
         } else {
@@ -1119,7 +1123,7 @@ class Key extends \KeyBase
      */
     public function requiresSignature()
     {
-        return $this->api->requiresSignature();
+        return ($this->secret !== null);
     }
     
     /**

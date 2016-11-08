@@ -334,7 +334,7 @@ class AxleTest extends DeveloperPortalTestCase
             $key->getErrorsForConsole()
         );
         $this->assertTrue(
-            $key->api->requiresSignature(),
+            $key->requiresSignature(),
             'This test requires a key to an API that requires a signature.'
         );
         $proxyProtocol = parse_url(\Yii::app()->params['apiaxle']['endpoint'], PHP_URL_SCHEME);

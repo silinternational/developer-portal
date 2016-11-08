@@ -870,7 +870,7 @@ class ApiController extends \Controller
                     'api_key',
                     $key->value
                 );
-                if ($key->api->requiresSignature()) {
+                if ($key->requiresSignature()) {
                     $paramsCollection->addParam(
                         ParamsCollection::TYPE_QUERY,
                         'api_sig',
