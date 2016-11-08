@@ -532,9 +532,10 @@ class KeyTest extends DeveloperPortalTestCase
     public function testGetPendingKeysDataProvider_onlyIncludesPendingKeys()
     {
         // Arrange: (n/a)
+        $customConfig = ['pagination' => false];
         
         // Act:
-        $pendingKeysDataProvider = Key::getPendingKeysDataProvider();
+        $pendingKeysDataProvider = Key::getPendingKeysDataProvider($customConfig);
         
         // Assert:
         foreach ($pendingKeysDataProvider->getData() as $key) {
@@ -546,10 +547,11 @@ class KeyTest extends DeveloperPortalTestCase
     public function testGetPendingKeysDataProvider_includesAllPendingKeys()
     {
         // Arrange:
+        $customConfig = ['pagination' => false];
         $keysFixtureData = $this->keys;
         
         // Act:
-        $pendingKeysDataProvider = Key::getPendingKeysDataProvider();
+        $pendingKeysDataProvider = Key::getPendingKeysDataProvider($customConfig);
         
         // Assert:
         $pendingKeysFromDP = $pendingKeysDataProvider->getData();

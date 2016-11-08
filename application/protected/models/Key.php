@@ -355,16 +355,16 @@ class Key extends \KeyBase
         return $currentDbRecord->value;
     }
     
-    public static function getPendingKeysDataProvider()
+    public static function getPendingKeysDataProvider($customConfig = [])
     {
-        return new \CActiveDataProvider(self::class, array(
+        return new \CActiveDataProvider(self::class, \CMap::mergeArray([
             'criteria' => array(
                 'condition' => 'status = :status',
                 'params' => array(
                     ':status' => self::STATUS_PENDING,
                 ),
             ),
-        ));
+        ], $customConfig));
     }
     
     public function getStyledStatusHtml()
