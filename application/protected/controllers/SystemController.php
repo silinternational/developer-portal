@@ -52,10 +52,12 @@ class SystemController extends \Controller
                     __CLASS__ . '.' . __FUNCTION__
                 );
                 
-                \Yii::app()->user->setFlash(
-                    'success',
-                    '<strong>Success!</strong> APIs and keys resynced to ApiAxle.'
-                );
+                \Yii::app()->user->setFlash('success', sprintf(
+                    '<strong>Success!</strong> APIs and keys resynced to '
+                    . 'ApiAxle. Check the <a href="%s">Event Log</a> to see if '
+                    . 'anything had to be re-added to ApiAxle.',
+                    \CHtml::encode($this->createUrl('event/'))
+                ));
             } else {
                 \Yii::app()->user->setFlash('error', sprintf(
                     "<strong>Error!</strong> There were problems while "
