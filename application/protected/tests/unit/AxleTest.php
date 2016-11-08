@@ -589,6 +589,29 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertEquals($howMany, $inList);
     }
     
+    public function testCreateKeyToApiNotRequiringSignatures()
+    {
+        // Arrange:
+        $key = $this->keys('pendingKeyToApiNotRequiringSignatures');
+        $this->assertTrue(
+            $key->api->save(), // Make sure the API exists in ApiAxle.
+            $key->api->getErrorsForConsole()
+        );
+        $this->assertTrue(
+            $key->save(), // Make sure the key exists in ApiAxle.
+            $key->getErrorsForConsole()
+        );
+        
+        // Act:
+        $result = $key->approve($key->api->owner);
+        
+        // Assert
+        $this->assertTrue($result, sprintf(
+            "Failed to approve a pending Key to an Api not requiring signatures: \n%s",
+            $key->getErrorsForConsole()
+        ));
+    }
+    
     public function testRedisDisasterRecovery()
     {
         // Arrange:

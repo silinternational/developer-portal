@@ -528,7 +528,7 @@ class Key extends \KeyBase
     protected function getDataForApiAxle()
     {
         return [
-            'sharedSecret' => $this->secret,
+            'sharedSecret' => ($this->secret === null ? '' : $this->secret),
             'qpd' => (int)$this->queries_day,
             'qps' => (int)$this->queries_second,
         ];

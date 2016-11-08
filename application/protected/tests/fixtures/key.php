@@ -357,4 +357,17 @@ return array(
         'purpose' => 'Unit testing',
         'domain' => 'developer-portal.local',
     ),
+    'pendingKeyToApiNotRequiringSignatures' => array(
+        'user_id' => 9,
+        'api_id' => 23,
+        'queries_second' => 10,
+        'queries_day' => 1000,
+        'created' => '2016-11-08 16:16:52',
+        'updated' => '2016-11-08 16:16:52',
+        'requested_on' => '2016-11-08 16:16:52',
+        'processed_on' => null,
+        'status' => Key::STATUS_PENDING,
+        'purpose' => 'Unit testing',
+        'domain' => 'developer-portal.local',
+    ),
 );
