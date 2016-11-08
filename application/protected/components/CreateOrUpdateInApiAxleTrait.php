@@ -18,12 +18,12 @@ trait CreateOrUpdateInApiAxleTrait
      */
     public function createOrUpdateInApiAxle($apiAxle = null)
     {
-        if ( ! $this->shouldExistInApiAxle($apiAxle)) {
-            return true;
-        }
-        
         if ($apiAxle === null) {
             $apiAxle = $this->getApiAxleClient();
+        }
+        
+        if ( ! $this->shouldExistInApiAxle($apiAxle)) {
+            return true;
         }
         
         if ($this->getIsNewRecord()) {
