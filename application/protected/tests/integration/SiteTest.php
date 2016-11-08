@@ -1,9 +1,9 @@
 <?php
-namespace Sil\DevPortal\tests\unit;
+namespace Sil\DevPortal\tests\integration;
 
 use Sil\DevPortal\components\Http\ClientG5 as HttpClient;
 
-class IntegrationTest extends \CTestCase
+class SiteTest extends \CTestCase
 {
     public function testSystemCheck()
     {

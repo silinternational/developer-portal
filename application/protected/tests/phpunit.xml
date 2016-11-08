@@ -12,7 +12,7 @@
     <testsuites>
         <testsuite name="DeveloperPortal">
             <directory>./unit</directory>
-            <directory>./functional</directory>
+            <directory>./integration</directory>
         </testsuite>
     </testsuites>
   

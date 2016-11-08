@@ -92,7 +92,7 @@ services:
             - ./common.env
             - ./local.env
         working_dir: /data/protected/tests
-        command: whenavail testdb 3306 100 ../../vendor/bin/phpunit unit/
+        command: whenavail testdb 3306 100 ../../vendor/bin/phpunit --testsuite DeveloperPortal
         environment:
           MYSQL_HOST: testdb
           MYSQL_DATABASE: test
