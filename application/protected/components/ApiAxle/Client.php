@@ -26,12 +26,8 @@ class Client extends BaseClient
             $data['id'] = $apiName;
             $response = $this->api()->create($data);
             return new ApiInfo($apiName, $this->getDataFromResponse($response));
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
-            throw new \Exception(
-                $this->getErrorMessageFromGuzzleException($e),
-                1477426036,
-                $e
-            );
+        } catch (\Exception $e) {
+            $this->throwWithBetterMessage($e);
         }
     }
     
@@ -42,12 +38,16 @@ class Client extends BaseClient
      */
     public function createKey($keyValue, $data)
     {
-        $data['id'] = $keyValue;
-        $response = $this->key()->create($data);
-        return new KeyInfo(
-            $keyValue,
-            $this->getDataFromResponse($response)
-        );
+        try {
+            $data['id'] = $keyValue;
+            $response = $this->key()->create($data);
+            return new KeyInfo(
+                $keyValue,
+                $this->getDataFromResponse($response)
+            );
+        } catch (\Exception $e) {
+            $this->throwWithBetterMessage($e);
+        }
     }
     
     /**
@@ -63,12 +63,8 @@ class Client extends BaseClient
                 $keyringName,
                 $this->getDataFromResponse($response)
             );
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
-            throw new \Exception(
-                $this->getErrorMessageFromGuzzleException($e),
-                1477426036,
-                $e
-            );
+        } catch (\Exception $e) {
+            $this->throwWithBetterMessage($e);
         }
     }
     
@@ -109,7 +105,7 @@ class Client extends BaseClient
                     ((strlen($keyValue) > 12) ? '...' : '')
                 ), 1477584689, $e);
             }
-            throw $e;
+            $this->throwWithBetterMessage($e);
         }
     }
     
@@ -142,7 +138,7 @@ class Client extends BaseClient
             if ($e->getCode() === 404) {
                 return null;
             }
-            throw $e;
+            $this->throwWithBetterMessage($e);
         }
     }
     
@@ -206,7 +202,7 @@ class Client extends BaseClient
             if ($e->getCode() === 404) {
                 return null;
             }
-            throw $e;
+            $this->throwWithBetterMessage($e);
         }
     }
     
@@ -254,7 +250,7 @@ class Client extends BaseClient
             if ($e->getCode() === 404) {
                 return false;
             }
-            throw $e;
+            $this->throwWithBetterMessage($e);
         }
     }
     
@@ -281,7 +277,7 @@ class Client extends BaseClient
                     $apiName
                 ), 1477428053, $e);
             }
-            throw $e;
+            $this->throwWithBetterMessage($e);
         }
     }
     
@@ -308,7 +304,7 @@ class Client extends BaseClient
                     $keyringName
                 ), 1477419154, $e);
             }
-            throw $e;
+            $this->throwWithBetterMessage($e);
         }
     }
     
@@ -405,6 +401,18 @@ class Client extends BaseClient
         return $this->getDataFromResponse($response);
     }
     
+    protected function throwWithBetterMessage($exception)
+    {
+        if ($exception instanceof \GuzzleHttp\Exception\RequestException) {
+            throw new \Exception(
+                $this->getErrorMessageFromGuzzleException($exception),
+                $exception->getCode(),
+                $exception
+            );
+        }
+        throw $exception;
+    }
+    
     /**
      * Unlink the specified key from the specified API (in ApiAxle).
      * 
@@ -426,7 +434,7 @@ class Client extends BaseClient
                     $apiName
                 ), 1478204852, $e);
             }
-            throw $e;
+            $this->throwWithBetterMessage($e);
         }
     }
     
@@ -454,7 +462,7 @@ class Client extends BaseClient
                     $keyringName
                 ), 1478205187, $e);
             }
-            throw $e;
+            $this->throwWithBetterMessage($e);
         }
     }
     
@@ -482,7 +490,7 @@ class Client extends BaseClient
                     $apiName
                 ), 1477414149, $e);
             }
-            throw $e;
+            $this->throwWithBetterMessage($e);
         }
     }
     
@@ -510,7 +518,7 @@ class Client extends BaseClient
                     $keyValue
                 ), 1477419988, $e);
             }
-            throw $e;
+            $this->throwWithBetterMessage($e);
         }
     }
 }
