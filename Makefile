@@ -8,7 +8,7 @@ axlesetup:
 	docker-compose up -d axlesetup
 
 bounce:
-	docker-compose up -d web
+	docker-compose up -d portal
 
 clean:
 	docker-compose kill
@@ -25,6 +25,9 @@ db:
 
 phpunit:
 	docker-compose run --rm phpunit
+
+portal: apiaxle db composer yiimigrate
+	docker-compose up -d portal
 
 proxy:
 	docker-compose up -d proxy
@@ -47,17 +50,14 @@ rmtestdb:
 	docker-compose kill testdb
 	docker-compose rm -f testdb
 
-start: web
+start: portal
 
 test: testunit
 
 testdb:
 	docker-compose up -d testdb
 
-testunit: composer rmtestdb testdb yiimigratetestdb rmapiaxle apiaxle web phpunit
-
-web: apiaxle db composer yiimigrate
-	docker-compose up -d web
+testunit: composer rmtestdb testdb yiimigratetestdb rmapiaxle apiaxle portal phpunit
 
 yiimigrate:
 	docker-compose run --rm yiimigrate

@@ -25,7 +25,7 @@ services:
             MYSQL_USER: developer_portal
             MYSQL_PASSWORD: developer_portal
 
-    web:
+    portal:
         build: .
         volumes_from:
             - data

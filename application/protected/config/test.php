@@ -24,7 +24,7 @@ return CMap::mergeArray(
                 ),
             ),
             'request' => array(
-                'hostInfo' => 'http://developer-portal.local',
+                'hostInfo' => 'http://portal',
                 'baseUrl' => '',
                 'scriptUrl' => '',
             ),
