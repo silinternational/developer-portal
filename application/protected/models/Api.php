@@ -695,7 +695,7 @@ class Api extends \ApiBase
             array(
                 'embedded_docs_url',
                 'url',
-                'pattern' => '/^https:\/\/docs\.google\.com\/document\/d\/[A-Z0-9_]+\/pub\?embedded=true/i',
+                'pattern' => '/^https:\/\/docs\.google\.com\/document\/d\/[-A-Z0-9_]+\/pub\?embedded=true/i',
                 'message' => 'That does not look like a valid Google Doc embedding URL. '
                 . 'Please check the example and try again.'
             ),
