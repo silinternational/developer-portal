@@ -161,13 +161,20 @@ $attrLabels = $api->attributeLabels();
 
                     <dt>Additional Headers</dt>
                     <dd class="fixed">
-                        <?php foreach ($api->getAdditionalHeadersArray() as $header => $value): ?>
-                            <?= sprintf(
-                                '<div><b>%s:</b> %s</div>',
-                                CHtml::encode($header),
-                                CHtml::encode($value)
-                            ); ?>
-                        <?php endforeach; ?>
+                        <?php
+                        $additionalHeaders = $api->getAdditionalHeadersArray();
+                        if (empty($additionalHeaders)) {
+                            ?><i class="muted">(none)</i><?php
+                        } else {
+                            foreach ($additionalHeaders as $header => $value) {
+                                echo sprintf(
+                                    '<div><b>%s:</b> %s</div>',
+                                    CHtml::encode($header),
+                                    CHtml::encode($value)
+                                );
+                            }
+                        }
+                        ?>
                     </dd>
 
                     <dt><?php echo CHtml::encode($attrLabels['endpoint_timeout']); ?></dt>

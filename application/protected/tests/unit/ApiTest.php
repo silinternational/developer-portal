@@ -380,6 +380,18 @@ class ApiTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testGetAdditionalHeadersArray()
+    {
+        // Arrange:
+        $apiWithNoAdditionalHeaders = new Api();
+        
+        // Act:
+        $result = $apiWithNoAdditionalHeaders->getAdditionalHeadersArray();
+        
+        // Assert:
+        $this->assertEmpty($result);
+    }
+    
     public function testGetEmailAddressesOfUsersWithActiveKeys_apiWithNoKeys()
     {
         // Arrange:

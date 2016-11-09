@@ -268,6 +268,9 @@ class Api extends \ApiBase
         $array = [];
         $rawPairs = explode('&', $this->additional_headers);
         foreach ($rawPairs as $rawPair) {
+            if (empty($rawPair)) {
+                continue;
+            }
             $keyValue = explode('=', $rawPair, 2);
             if (count($keyValue) > 0) {
                 $key = $keyValue[0];
