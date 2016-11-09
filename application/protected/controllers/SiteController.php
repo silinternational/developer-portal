@@ -142,7 +142,7 @@ class SiteController extends \Controller
     public function actionPrivacyPolicy()
     {
         $this->render('privacy-policy',array(
-            'contactEmail' => \Yii::app()->params['adminEmail'],
+            'contactLink' => \Utils::getContactLinkValue(),
         ));
     }
 }

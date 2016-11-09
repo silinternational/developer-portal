@@ -15,8 +15,19 @@ class Utils {
             throw new CHttpException(404,'invalid request'); 
         }      
         return $object;
-    }          
-
+    }
+    
+    public static function getContactLinkValue()
+    {
+        $params = \Yii::app()->params;
+        
+        if ( ! empty($params['contactUsUrl'])) {
+            return $params['contactUsUrl'];
+        }
+        
+        return 'mailto:' . $params['adminEmail'];
+    }
+    
     /**
      * Retrieve the value at the place specified in the given data array by the
      * given list of keys.

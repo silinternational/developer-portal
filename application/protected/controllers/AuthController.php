@@ -81,9 +81,9 @@ class AuthController extends \Controller
                         '<div><p><b>Error!</b></p></div>'
                         . '<div>%s</div> '
                         . '<div><p>If you believe this is a mistake, please '
-                        . '<a href="mailto:%s">contact us</a>.</p></div>',
+                        . '<a href="%s">contact us</a>.</p></div>',
                         \CHtml::encode($identity->errorMessage),
-                        \CHtml::encode(\Yii::app()->params['adminEmail'])
+                        \CHtml::encode(\Utils::getContactLinkValue())
                     )
                 );
             }
