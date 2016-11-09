@@ -12,7 +12,6 @@ TIME=$(($END-$START))
 echo -e "Migrations should be done. Ran for $TIME seconds.\n\n"
 
 # Setup ApiAxle with dev key/secret
-whenavail api 80 100 echo 'api ready'
 echo -e "Creating api...\n\n"
 curl -X POST -H 'Content-type: application/json' 'http://api/v1/api/apiaxle' -d '{"endPoint":"api"}'
 echo -e "Creating key...\n\n"
