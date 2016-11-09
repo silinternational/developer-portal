@@ -190,7 +190,6 @@ class Controller extends CController
                 'allow',
                 'controllers' => array('api'),
                 'actions' => array(
-                    'addContactUs',
                     'details',
                     'index',
                     'playground',

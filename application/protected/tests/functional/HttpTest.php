@@ -67,22 +67,6 @@ class HttpTest extends CDbTestCase
         $this->assertEquals($expected, $redirect, '>>> Got wrong redirect.');
     }
 
-    public function testApiAddContactUsRedirect()
-    {
-        Yii::import('ext.httpclient.*');
-        $uri = Yii::app()->createAbsoluteUrl('/api/add-contact-us/');
-        $client = $this->get_client($uri);
-
-        $expected = 302;
-        $response = $client->request();
-        $code = $response->getStatus();
-        $this->assertEquals($expected, $code, '>>> Got wrong response.');
-
-        $expected = Yii::app()->createAbsoluteUrl('/auth/login/');
-        $redirect = $response->getHeader('Location');
-        $this->assertEquals($expected, $redirect, '>>> Got wrong redirect.');
-    }
-
     public function testApiPendingKeysRedirect()
     {
         Yii::import('ext.httpclient.*');

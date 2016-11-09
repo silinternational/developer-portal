@@ -61,14 +61,6 @@ class ApiController extends \Controller
         ));
     }
     
-    public function actionAddContactUs()
-    {
-        // Render the page.
-        $this->render('addContactUs', array(
-            'contactEmail' => \Yii::app()->params['adminEmail'],
-        ));
-    }
-    
     public function actionAdd()
     {
         // Get the current user's model.

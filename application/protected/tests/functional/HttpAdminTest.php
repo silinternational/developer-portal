@@ -319,14 +319,6 @@ class HttpAdminTest extends CDbTestCase
         );
     }
 
-    public function testApiAddContactUs()
-    {
-        $this->assertContentPiecesFoundOnPage(
-            array('please contact us'),
-            '/api/add-contact-us/'
-        );
-    }
-
     public function testApiDelete()
     {
         $api = $this->apis('api4');
