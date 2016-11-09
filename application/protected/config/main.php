@@ -71,6 +71,10 @@ return array(
             'loginUrl' => array('auth/login'),
             'class' => 'WebUser',
             'autoUpdateFlash' => false,
+            
+            // Seconds of inactivity before session timeout. For details, see:
+            // http://www.yiiframework.com/doc/api/1.1/CWebUser#authTimeout-detail
+            'authTimeout' => 14400, // 14400 seconds = 4 hours
         ),
         'urlManager' => array(
             'class' => 'UrlManager',
