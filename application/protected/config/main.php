@@ -19,6 +19,7 @@ $apiaxleEndpoint = Env::get('APIAXLE_ENDPOINT');
 $apiaxleKey = Env::get('APIAXLE_KEY');
 $apiaxleSecret = Env::get('APIAXLE_SECRET');
 $apiaxleSslVerifyPeer = Env::get('APIAXLE_SSL_VERIFYPEER', true);
+$contactUsUrl = Env::get('CONTACT_US_URL');
 $gaEnabled = Env::get('GA_ENABLED', false);
 $gaTrackingId = Env::get('GA_TRACKING_ID');
 $googleOAuthClientId = Env::get('GOOGLE_OAUTH_CLIENT_ID');
@@ -134,6 +135,7 @@ return array(
     'params' => array(
         'adminEmail' => $adminEmail,
         'alertsEmail' => $alertsEmail,
+        'contactUsUrl' => $contactUsUrl,
         'showPopularApis' => $showPopularApis,
         'saml' => array(
             'default-sp' => 'default-sp',

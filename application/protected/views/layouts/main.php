@@ -143,8 +143,8 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
             Built <?= \CHtml::encode(Utils::getApplicationBuildDate()); ?><br />
         <?php endif; ?>
         <a href="<?php echo Yii::app()->createUrl('/site/privacy-policy'); ?>">Privacy Policy</a>
-        <?php if (( ! \Yii::app()->user->isGuest) && isset(\Yii::app()->params['adminEmail'])): ?>
-        | <a href="mailto:<?php echo CHtml::encode(Yii::app()->params['adminEmail']); ?>">Contact Us</a>
+        <?php if (( ! \Yii::app()->user->isGuest) && ( ! empty(\Yii::app()->params['contactUsUrl']))): ?>
+            | <a href="<?= \CHtml::encode(\Yii::app()->params['contactUsUrl']); ?>">Contact Us</a>
         <?php endif; ?>
     </div><!-- footer -->
 </div><!-- page -->
