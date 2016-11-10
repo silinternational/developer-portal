@@ -682,4 +682,39 @@ class AxleTest extends DeveloperPortalTestCase
         );
         $this->assertEquals($preDisasterKeysByKeyring, $postRecoveryKeysByKeyring);
     }
+    
+    public function testUsageStatistics()
+    {
+        // Arrange:
+        $key = $this->keys('keyToCallableTestApi');
+        $key->api->require_signature = Api::REQUIRE_SIGNATURES_NO;
+        $this->assertTrue($key->api->save());
+        $key->generateNewValueAndSecret();
+        $this->assertTrue($key->save());
+        
+        $apiAxleEndpoint = \Yii::app()->params['apiaxle']['endpoint'];
+        $apiAxleEndpointDomain = parse_url($apiAxleEndpoint, PHP_URL_HOST);
+        $proxyDomain = str_replace('apiaxle.', '', $apiAxleEndpointDomain);
+        $url = sprintf(
+            '%s://%s.%s/?api_key=%s',
+            parse_url($apiAxleEndpoint, PHP_URL_SCHEME), // Proxy protocol
+            $key->api->code,
+            $proxyDomain,
+            $key->value
+        );
+        
+        $httpClient = new HttpClient();
+        $preStats = $key->getUsage(UsageStats::INTERVAL_SECOND);
+        
+        // Act:
+        $response = $httpClient->request('GET', $url);
+        $postStats = $key->getUsage(UsageStats::INTERVAL_SECOND);
+        
+        // Assert:
+        $this->assertNotEquals(
+            $preStats,
+            $postStats,
+            "Call to test API had no effect on a key's usage statistics."
+        );
+    }
 }

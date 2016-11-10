@@ -568,7 +568,6 @@ class Key extends \KeyBase
         $granularity = 'minute',
         $includeCurrentInterval = true,
         $rewindBy = 0
-
     ) {
         // Get the starting timestamp for the data we care about.
         $timeStart = \UsageStats::getTimeStart(

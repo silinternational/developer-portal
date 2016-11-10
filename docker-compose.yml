@@ -118,7 +118,7 @@ services:
             - redis
         ports:
             - "80"
-        command: proxy 80
+        command: proxy 80 -q
 
     axlesetup:
         image: silintl/php-cli:latest
