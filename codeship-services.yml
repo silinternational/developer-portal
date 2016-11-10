@@ -36,7 +36,7 @@ proxy:
         - redis
     ports:
         - "80"
-    command: proxy 80
+    command: proxy 80 -q
 
 portal:
     build:
