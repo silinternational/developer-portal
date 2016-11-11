@@ -337,14 +337,11 @@ class AxleTest extends DeveloperPortalTestCase
             $key->requiresSignature(),
             'This test requires a key to an API that requires a signature.'
         );
-        $proxyProtocol = parse_url(\Yii::app()->params['apiaxle']['endpoint'], PHP_URL_SCHEME);
-        $apiAxleEndpointDomain = parse_url(\Yii::app()->params['apiaxle']['endpoint'], PHP_URL_HOST);
-        $proxyDomain = str_replace('apiaxle.', '', $apiAxleEndpointDomain);
         $urlMinusSignature = sprintf(
             '%s://%s.%s/?api_key=%s&api_sig=',
-            $proxyProtocol,
+            $key->api->getApiProxyProtocol(),
             $key->api->code,
-            $proxyDomain,
+            $key->api->getApiProxyDomain(),
             $key->value
         );
         $client = new HttpClient();
@@ -692,14 +689,11 @@ class AxleTest extends DeveloperPortalTestCase
         $key->generateNewValueAndSecret();
         $this->assertTrue($key->save());
         
-        $apiAxleEndpoint = \Yii::app()->params['apiaxle']['endpoint'];
-        $apiAxleEndpointDomain = parse_url($apiAxleEndpoint, PHP_URL_HOST);
-        $proxyDomain = str_replace('apiaxle.', '', $apiAxleEndpointDomain);
         $url = sprintf(
             '%s://%s.%s/?api_key=%s',
-            parse_url($apiAxleEndpoint, PHP_URL_SCHEME), // Proxy protocol
+            $key->api->getApiProxyProtocol(),
             $key->api->code,
-            $proxyDomain,
+            $key->api->getApiProxyDomain(),
             $key->value
         );
         
@@ -707,7 +701,7 @@ class AxleTest extends DeveloperPortalTestCase
         $preStats = $key->getUsage(UsageStats::INTERVAL_SECOND);
         
         // Act:
-        $response = $httpClient->request('GET', $url);
+        $httpClient->request('GET', $url);
         $postStats = $key->getUsage(UsageStats::INTERVAL_SECOND);
         
         // Assert:

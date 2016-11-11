@@ -282,8 +282,8 @@ class Api extends \ApiBase
     }
     
     /**
-     * Get the apiProxyDomain config data. Throws an exception if it has not
-     * been set.
+     * Get the domain name for the API proxy. Throws an exception if unable to
+     * do so.
      * 
      * NOTE: This is primarily defined in order to make mocking it in unit tests
      *       easier, which is also why it is NOT a static function (which would
@@ -294,19 +294,21 @@ class Api extends \ApiBase
      */
     public function getApiProxyDomain()
     {
-        if (isset(\Yii::app()->params['apiProxyDomain'])) {
-            return \Yii::app()->params['apiProxyDomain'];
-        } else {
-            throw new \Exception(
-                'The API proxy domain has not been defined in the config data.',
-                1420751158
-            );
+        $apiAxleEndpointDomain = parse_url(
+            \Yii::app()->params['apiaxle']['endpoint'],
+            PHP_URL_HOST
+        );
+        if ( ! empty($apiAxleEndpointDomain)) {
+            return str_replace('apiaxle.', '', $apiAxleEndpointDomain);
         }
+        throw new \Exception(
+            'We could not figure out the API proxy domain name.',
+            1420751158
+        );
     }
     
     /**
-     * Get the apiProxyProtocol config data, returning a default value if that
-     * has not been set.
+     * Get the protocol (e.g. 'https') for the API proxy.
      * 
      * NOTE: This is primarily defined in order to make mocking it in unit tests
      *       easier, which is also why it is NOT a static function (which would
@@ -317,11 +319,11 @@ class Api extends \ApiBase
      */
     public function getApiProxyProtocol()
     {
-        if (isset(\Yii::app()->params['apiProxyProtocol'])) {
-            return \Yii::app()->params['apiProxyProtocol'];
-        } else {
-            return 'https';
-        }
+        $proxyProtocol = parse_url(
+            \Yii::app()->params['apiaxle']['endpoint'],
+            PHP_URL_SCHEME
+        );
+        return (empty($proxyProtocol) ? 'https' : $proxyProtocol);
     }
     
     protected function getDataForApiAxle()
@@ -370,7 +372,7 @@ class Api extends \ApiBase
     public function getPublicUrl()
     {
         return sprintf(
-            '%s://%s%s/',
+            '%s://%s.%s/',
             $this->getApiProxyProtocol(),
             $this->code,
             $this->getApiProxyDomain()
@@ -491,7 +493,7 @@ class Api extends \ApiBase
     public function getStyledPublicUrlHtml($cssClass = 'bold')
     {
         return sprintf(
-            '%s://<span class="%s">%s</span>%s/',
+            '%s://<span class="%s">%s</span>.%s/',
             \CHtml::encode($this->getApiProxyProtocol()),
             \CHtml::encode($cssClass),
             \CHtml::encode($this->code),

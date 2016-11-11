@@ -840,17 +840,12 @@ class ApiController extends \Controller
             $key = Key::model()->findByPk($keyId);
             if ($key && $key->isOwnedBy($currentUser)) {
                 
-                // Figure out proxy domain (to create the URL to call).
-                $proxyProtocol = parse_url(\Yii::app()->params['apiaxle']['endpoint'], PHP_URL_SCHEME);
-                $apiAxleEndpointDomain = parse_url(\Yii::app()->params['apiaxle']['endpoint'], PHP_URL_HOST);
-                $proxyDomain = str_replace('apiaxle.', '', $apiAxleEndpointDomain);
-                
                 // Build url from components.
                 $url = sprintf(
                     '%s://%s.%s%s',
-                    $proxyProtocol,
+                    $key->api->getApiProxyProtocol(),
                     $key->api->code,
-                    $proxyDomain,
+                    $key->api->getApiProxyDomain(),
                     $path
                 );
                 
