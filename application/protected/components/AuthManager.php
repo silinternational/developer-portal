@@ -1,6 +1,8 @@
 <?php
 namespace Sil\DevPortal\components;
 
+use Stringy\StaticStringy as SS;
+
 class AuthManager
 {
     /**
@@ -249,5 +251,10 @@ class AuthManager
         if ( ! empty($logoutUrl)) {
             \Yii::app()->controller->redirect($logoutUrl);
         }
+    }
+    
+    public static function slugify($string)
+    {
+        return (string)SS::slugify($string);
     }
 }

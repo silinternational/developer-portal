@@ -15,7 +15,7 @@ class AuthController extends \Controller
         \Hybrid_Endpoint::process();
     }
     
-    public function actionLogin($authType = null)
+    public function actionLogin($authType = null, $providerSlug = null)
     {
         $authManager = new AuthManager();
         

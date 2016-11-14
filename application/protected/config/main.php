@@ -91,6 +91,7 @@ return array(
                 'dashboard/<interval:[a-z]+>' => 'dashboard/index',
                 '<controller:[\w\-]+>/api<apiAction:[\w\-]+>/<code:([a-z0-9]{1}[a-z0-9\-]{1,}[a-z0-9]{1})>' => '<controller>/api<apiAction>',
                 'api/<action:[\w\-]+>/<code:([a-z0-9]{1}[a-z0-9\-]{1,}[a-z0-9]{1})>' => 'api/<action>',
+                'auth/login/<authType:[\w-]+>/<providerSlug:[\w-]+>' => 'auth/login',
                 'auth/login/<authType:[\w-]+>' => 'auth/login',
                 '<controller:[\w\-]+>/<id:\d+>' => '<controller>/view',
                 '<controller:[\w\-]+>/<action:[\w\-]+>/<id:\d+>' => '<controller>/<action>',
