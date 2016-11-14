@@ -22,6 +22,9 @@ $apiaxleSslVerifyPeer = Env::get('APIAXLE_SSL_VERIFYPEER', true);
 $contactUsUrl = Env::get('CONTACT_US_URL');
 $gaEnabled = Env::get('GA_ENABLED', false);
 $gaTrackingId = Env::get('GA_TRACKING_ID');
+$githubOAuthClientId = Env::get('GITHUB_OAUTH_CLIENT_ID');
+$githubOAuthClientSecret = Env::get('GITHUB_OAUTH_CLIENT_SECRET');
+$githubOAuthEnabled = Env::get('GITHUB_OAUTH_ENABLED', false);
 $googleOAuthClientId = Env::get('GOOGLE_OAUTH_CLIENT_ID');
 $googleOAuthClientSecret = Env::get('GOOGLE_OAUTH_CLIENT_SECRET');
 $googleOAuthEnabled = Env::get('GOOGLE_OAUTH_ENABLED', false);
@@ -176,8 +179,14 @@ return array(
                     ),
                     'scope' => 'email profile',
                 ),
-                
-                /** @TODO: Also add GitHub (if reasonably simple). */
+                'GitHub' => array(
+                    'enabled' => (bool)$githubOAuthEnabled,
+                    'keys' => array(
+                        'id' => $githubOAuthClientId,
+                        'secret' => $githubOAuthClientSecret,
+                    ),
+                    'scope' => 'email profile',
+                ),
             )
         ),
 
