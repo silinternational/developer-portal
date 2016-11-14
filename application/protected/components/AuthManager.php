@@ -164,9 +164,13 @@ class AuthManager
             ));
         }
         if ($this->isAuthTypeEnabled('hybrid')) {
-            $loginOptions['Google'] = \Yii::app()->createUrl('auth/login', array(
-                'authType' => 'hybrid',
-            ));
+            $hybridAuthManager = new HybridAuthManager();
+            foreach ($hybridAuthManager->getEnabledProvidersList() as $provider) {
+                $loginOptions[$provider] = \Yii::app()->createUrl('auth/login', [
+                    'authType' => 'hybrid',
+                    'providerSlug' => self::slugify($provider),
+                ]);
+            }
         }
         if ($this->isAuthTypeEnabled('test-user')) {
             $loginOptions['Test (User)'] = \Yii::app()->createUrl('auth/login', array(

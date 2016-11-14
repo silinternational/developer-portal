@@ -52,17 +52,17 @@ class HybridAuthManagerTest extends \CTestCase
         );
     }
     
-    public function testGetProvidersList_returnsArray()
+    public function testGetEnabledProvidersList_returnsArray()
     {
         // Arrange:
         $hybridAuthManager = new HybridAuthManager();
         
         // Act:
-        $providersList = $hybridAuthManager->getProvidersList();
+        $enabledProviders = $hybridAuthManager->getEnabledProvidersList();
         
         // Assert:
         $this->assertTrue(
-            is_array($providersList),
+            is_array($enabledProviders),
             'Failed to return an array.'
         );
     }
@@ -75,6 +75,7 @@ class HybridAuthManagerTest extends \CTestCase
             'Sil\DevPortal\components\HybridAuthManager'
         );
         \Phake::when($hybridAuthManager)->isHybridAuthEnabled->thenCallParent();
+        \Phake::when($hybridAuthManager)->getEnabledProvidersList->thenCallParent();
         \Phake::when($hybridAuthManager)->getProvidersConfig->thenReturn(array(
             'SampleProvider' => array(
                 'enabled' => false,
@@ -100,6 +101,7 @@ class HybridAuthManagerTest extends \CTestCase
             'Sil\DevPortal\components\HybridAuthManager'
         );
         \Phake::when($hybridAuthManager)->isHybridAuthEnabled->thenCallParent();
+        \Phake::when($hybridAuthManager)->getEnabledProvidersList->thenCallParent();
         \Phake::when($hybridAuthManager)->getProvidersConfig->thenReturn(array());
         
         // Act:
@@ -121,6 +123,7 @@ class HybridAuthManagerTest extends \CTestCase
             'Sil\DevPortal\components\HybridAuthManager'
         );
         \Phake::when($hybridAuthManager)->isHybridAuthEnabled->thenCallParent();
+        \Phake::when($hybridAuthManager)->getEnabledProvidersList->thenCallParent();
         \Phake::when($hybridAuthManager)->getProvidersConfig->thenReturn(array(
             'SampleDisabledProvider' => array(
                 'enabled' => true,

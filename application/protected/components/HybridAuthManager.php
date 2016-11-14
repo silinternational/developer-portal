@@ -34,6 +34,27 @@ class HybridAuthManager
         }
     }
     
+    /**
+     * Get the names of the enabled HybridAuth providers. Note that this can
+     * be mixed case, so slugify them before using them in a URL.
+     * 
+     * @return string[]
+     */
+    public function getEnabledProvidersList()
+    {
+        $enabledProviders = [];
+        foreach ($this->getProvidersConfig() as $providerName => $providerConfig) {
+            if ( ! array_key_exists('enabled', $providerConfig)) {
+                continue;
+            }
+            
+            if ($providerConfig['enabled'] === true) {
+                $enabledProviders[] = $providerName;
+            }
+        }
+        return $enabledProviders;
+    }
+    
     protected function getHybridAuthConfig()
     {
         $config = array(
@@ -79,11 +100,6 @@ class HybridAuthManager
         return $providers;
     }
     
-    public function getProvidersList()
-    {
-        return \array_keys($this->getProvidersConfig());
-    }
-    
     /**
      * Determine whether we have at least one enabled HybridAuth provider,
      * in which case we will consider HybridAuth authentication enabled.
@@ -92,16 +108,6 @@ class HybridAuthManager
      */
     public function isHybridAuthEnabled()
     {
-        // If we have at least one enabled HybridAuth provider, consider
-        // HybridAuth authentication enabled.
-        $providersConfig = $this->getProvidersConfig();
-        foreach ($providersConfig as $providerConfig) {
-            if (array_key_exists('enabled', $providerConfig)) {
-                if ($providerConfig['enabled'] === true) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return !empty($this->getEnabledProvidersList());
     }
 }
