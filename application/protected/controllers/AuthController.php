@@ -35,23 +35,18 @@ class AuthController extends \Controller
 
         if ($authType === null) {
             if ($authManager->canUseMultipleAuthTypes()) {
-                
-                // If multiple auth. types are available, ask the user which to
-                // use.
                 $this->redirect(['auth/login-options']);
-                
-            } else {
-                
-                // Otherwise, if there is an obvious default auth. type
-                // available, redirect the user as though they had specified
-                // that one.
-                $defaultAuthType = $authManager->getDefaultAuthType();
-                if ($defaultAuthType !== null) {
-                    $this->redirect([
-                        'auth/login',
-                        'authType' => $defaultAuthType,
-                    ]);
-                }
+            }
+
+            // Otherwise, if there is an obvious default auth. type
+            // available, redirect the user as though they had specified
+            // that one.
+            $defaultAuthType = $authManager->getDefaultAuthType();
+            if ($defaultAuthType !== null) {
+                $this->redirect([
+                    'auth/login',
+                    'authType' => $defaultAuthType,
+                ]);
             }
         }
         
@@ -101,21 +96,10 @@ class AuthController extends \Controller
             'loginOptions' => $loginOptions,
         ));
     }
-
-    //public function actionTestLogin()
-    //{           
-    //
-    //    yii::log('actionTestLogin: role1 = ' .Yii::app()->user->getRole() . '<<', 'debug');      
-    //    $identity = new TestUserIdentity('guest', '');//, Yii::app()->user);
-    //    $identity->authenticate();      
-    //    Yii::app()->user->login($identity);
-    //    //yii::log('actionTestLogin: role2 = ' .Yii::app()->user->getRole() . '<<', 'debug');
-    //
-    //    Yii::app()->request->redirect(Yii::app()->user->returnUrl);
-    //}
     
     public function actionLogout()
     {
+        /* @var $webUser \WebUser */
         $webUser = \Yii::app()->user;
         $authType = $webUser->getAuthType();
         $authProvider = $webUser->getAuthProvider();
