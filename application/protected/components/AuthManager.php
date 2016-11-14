@@ -28,8 +28,8 @@ class AuthManager
      * auth types, we could presumably safely assume that the user does NOT need
      * to select a login option since there is (at most) only one option.
      * 
-     * @return bool Whether there are multiple authenciation types available for
-     *     user's to log in through.
+     * @return bool Whether there are multiple authentication types available
+     *     for users to log in through.
      */
     public function canUseMultipleAuthTypes()
     {
