@@ -34,22 +34,12 @@ class AuthController extends \Controller
         }
 
         if ($authType === null) {
-            if ($authManager->canUseMultipleAuthTypes()) {
+            $authType = $authManager->getDefaultAuthType();
+            if ($authType === null) {
                 $this->redirect(['auth/login-options']);
             }
-
-            // Otherwise, if there is an obvious default auth. type
-            // available, redirect the user as though they had specified
-            // that one.
-            $defaultAuthType = $authManager->getDefaultAuthType();
-            if ($defaultAuthType !== null) {
-                $this->redirect([
-                    'auth/login',
-                    'authType' => $defaultAuthType,
-                ]);
-            }
         }
-        
+
         try {
             $identity = $authManager->getIdentityForAuthType($authType);
         } catch (\InvalidArgumentException $e) {
