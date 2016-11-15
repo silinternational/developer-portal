@@ -219,7 +219,7 @@ abstract class UserIdentity extends \CBaseUserIdentity
      *     type (such as which HybridAuth provider to use).
      * @return \Sil\DevPortal\components\UserAuthenticationData
      */
-    abstract public function getUserAuthData($providerSlug);
+    abstract public function getUserAuthData($providerSlug = null);
     
     /**
      * Load the necessary information from the given parameters in order to

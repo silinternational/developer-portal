@@ -13,7 +13,7 @@ class UserTestUserIdentity extends UserIdentity
      *     type (such as which HybridAuth provider to use).
      * @return \Sil\DevPortal\components\UserAuthenticationData
      */
-    public function getUserAuthData($providerSlug)
+    public function getUserAuthData($providerSlug = null)
     {
         return new UserAuthenticationData(
             'TEST',
