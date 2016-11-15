@@ -1,6 +1,8 @@
 <?php
 namespace Sil\DevPortal\tests\unit;
 
+use Sil\DevPortal\components\UserAuthenticationData;
+
 class HybridAuthUserIdentityTest extends \CTestCase
 {
     public function testGetUserAuthData_hasEmailVerified()
@@ -32,7 +34,7 @@ class HybridAuthUserIdentityTest extends \CTestCase
         
         // Assert:
         $this->assertInstanceOf(
-            'Sil\DevPortal\components\UserAuthenticationData',
+            UserAuthenticationData::class,
             $result
         );
     }
