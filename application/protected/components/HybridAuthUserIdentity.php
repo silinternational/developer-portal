@@ -43,7 +43,14 @@ class HybridAuthUserIdentity extends UserIdentity
             $userProfile = $authProviderAdapter->getUserProfile();
         }
         
-        // Ensure that we got a verified email address.
+        /* Ensure that we got a verified email address.
+         * 
+         * NOTE: This is important both to protect against social engineering
+         *       (a user seeming to be who they are not, and asking us for help)
+         *       and because certain APIs may only be visible to people with an
+         *       email address on a certain domain, and that protection could be
+         *       bypassed if a user's email address is not verified.
+         */
         if ( ! $userProfile->emailVerified) {
             throw new \Exception(
                 sprintf(
