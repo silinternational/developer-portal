@@ -187,7 +187,7 @@ return array(
                         'id' => $githubOAuthClientId,
                         'secret' => $githubOAuthClientSecret,
                     ),
-                    'scope' => 'email profile',
+                    'scope' => 'user:email',
                     'wrapper' => array(
                         'class' => 'Hybrid_Providers_GitHub',
                         'path' => HybridAuthManager::getPathToAdditionalProviderFile('GitHub'),
