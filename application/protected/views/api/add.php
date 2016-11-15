@@ -16,6 +16,7 @@ $this->breadcrumbs += array(
     <?php
     
     // Show the form.
+    $form->showErrorSummary = false;
     echo $form;
     
     ?>
