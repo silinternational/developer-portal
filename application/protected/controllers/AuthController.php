@@ -64,7 +64,7 @@ class AuthController extends \Controller
         
         /* Attempt to authenticate the user (which may itself involve
         /* redirecting the user to log in somewhere).  */
-        if ($identity->authenticate()) {
+        if ($identity->authenticate($providerSlug)) {
             \Yii::app()->user->login($identity);
             $this->redirect(\Yii::app()->user->getReturnUrl());
         } else {

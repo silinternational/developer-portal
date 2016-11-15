@@ -82,6 +82,31 @@ class HybridAuthManager
     }
     
     /**
+     * Get the wrapper path for one of HybridAuth's additional providers. If
+     * the given $providerName is not one we have manually configured within
+     * this function, null will be provided.
+     * 
+     * @param string $providerName The name of the provider (e.g. 'GitHub').
+     * @return string|null
+     */
+    public static function getPathToAdditionalProviderFile($providerName)
+    {
+        switch ($providerName) {
+            case 'GitHub':
+                return sprintf(
+                    '%s/../../vendor/hybridauth/hybridauth/additional-providers/'
+                    . 'hybridauth-%s/Providers/%s.php',
+                    __DIR__,
+                    AuthManager::slugify($providerName),
+                    $providerName
+                );
+
+            default:
+                return null;
+        }
+    }
+    
+    /**
      * Get the array of configuration data for the various HybridAuth providers
      * that we have config data for.
      * 

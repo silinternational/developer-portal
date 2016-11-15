@@ -14,9 +14,12 @@ class HybridAuthUserIdentity extends UserIdentity
     /**
      * Get the data about this user as returned by the authentication provider.
      * 
+     * @param string|null $providerSlug The URL-safe (aka. "slug") version of
+     *     the name of what provider to use within the current authentication
+     *     type (such as which HybridAuth provider to use).
      * @return \Sil\DevPortal\components\UserAuthenticationData
      */
-    public function getUserAuthData()
+    public function getUserAuthData($providerSlug)
     {
         $hybridAuth = $this->getHybridAuthInstance();
         
@@ -24,7 +27,7 @@ class HybridAuthUserIdentity extends UserIdentity
         // user will be redirected to that auth. provider for authentication, or
         // if that has already happened then HybridAuth will ignore this step
         // and return an instance of the adapter.
-        $authProvider = $this->getAuthProvider();
+        $authProvider = $this->getFullAuthProviderName($providerSlug);
         $authProviderAdapter = $hybridAuth->authenticate($authProvider);
         
         try {
@@ -64,9 +67,16 @@ class HybridAuthUserIdentity extends UserIdentity
         );
     }
     
-    protected function getAuthProvider()
+    protected function getFullAuthProviderName($providerSlug = null)
     {
-        return 'Google';
+        $hybridAuthManager = new HybridAuthManager();
+        $enabledProviders = $hybridAuthManager->getEnabledProvidersList();
+        foreach ($enabledProviders as $enabledProvider) {
+            if ($providerSlug === AuthManager::slugify($enabledProvider)) {
+                return $enabledProvider;
+            }
+        }
+        return null;
     }
     
     public function getAuthType()

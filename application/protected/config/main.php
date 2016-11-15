@@ -1,5 +1,6 @@
 <?php
 
+use Sil\DevPortal\components\HybridAuthManager;
 use Sil\PhpEnv\Env;
 
 /**
@@ -187,6 +188,10 @@ return array(
                         'secret' => $githubOAuthClientSecret,
                     ),
                     'scope' => 'email profile',
+                    'wrapper' => array(
+                        'class' => 'Hybrid_Providers_GitHub',
+                        'path' => HybridAuthManager::getPathToAdditionalProviderFile('GitHub'),
+                    )
                 ),
             )
         ),

@@ -35,11 +35,14 @@ abstract class UserIdentity extends \CBaseUserIdentity
      * NOTE: This method should NOT be overridden. Subclasses should instead
      *       implement/override the applicable functions called by this one.
      * 
+     * @param string|null $providerSlug The URL-safe (aka. "slug") version of
+     *     the name of what provider to use within the current authentication
+     *     type (such as which HybridAuth provider to use).
      * @return boolean Whether the authentication was successful.
      */
-    final public function authenticate()
+    final public function authenticate($providerSlug = null)
     {
-        $userAuthData = $this->getUserAuthData();
+        $userAuthData = $this->getUserAuthData($providerSlug);
 
         try {
             /* @var $user User */
@@ -211,9 +214,12 @@ abstract class UserIdentity extends \CBaseUserIdentity
     /**
      * Get the data about this user as returned by the authentication provider.
      * 
+     * @param string|null $providerSlug The URL-safe (aka. "slug") version of
+     *     the name of what provider to use within the current authentication
+     *     type (such as which HybridAuth provider to use).
      * @return \Sil\DevPortal\components\UserAuthenticationData
      */
-    abstract public function getUserAuthData();
+    abstract public function getUserAuthData($providerSlug);
     
     /**
      * Load the necessary information from the given parameters in order to
