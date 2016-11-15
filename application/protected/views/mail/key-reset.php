@@ -1,5 +1,5 @@
 <p>
-    Hello <?php echo CHtml::encode($key->user->first_name); ?>,
+    <?= \CHtml::encode($key->user->display_name); ?>,
 </p>
 <p>
     Your API key for the <?php echo CHtml::encode($api->display_name); ?> API has been reset.

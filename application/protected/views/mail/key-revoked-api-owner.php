@@ -5,7 +5,7 @@
 /* @var $keyOwner \Sil\DevPortal\models\User */
 ?>
 <p>
-    Hello <?php echo ($apiOwner ? $apiOwner->first_name : 'API Developer Portal administrator'); ?>,
+    <?php echo ($apiOwner ? $apiOwner->display_name : 'API Developer Portal administrator'); ?>,
 </p>
 <p>
     A key to the <?php echo \CHtml::encode($api->display_name); ?> API has been

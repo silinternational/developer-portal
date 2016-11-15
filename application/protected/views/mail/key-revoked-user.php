@@ -4,7 +4,7 @@
 /* @var $keyOwner \Sil\DevPortal\models\User */
 ?>
 <p>
-    Hello <?= \CHtml::encode($keyOwner->first_name) ?>,
+    <?= \CHtml::encode($keyOwner->display_name) ?>,
 </p>
 <p>
     Your key to the <?php echo \CHtml::encode($api->display_name); ?> API has been

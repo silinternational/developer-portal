@@ -182,9 +182,12 @@ class SamlUserIdentity extends UserIdentity
     /**
      * Get the data about this user as returned by the authentication provider.
      * 
+     * @param string|null $providerSlug The URL-safe (aka. "slug") version of
+     *     the name of what provider to use within the current authentication
+     *     type (such as which HybridAuth provider to use).
      * @return \Sil\DevPortal\components\UserAuthenticationData
      */
-    public function getUserAuthData()
+    public function getUserAuthData($providerSlug = null)
     {
         // If the user is NOT yet authenticated...
         if ( ! $this->auth->isAuthenticated()) {

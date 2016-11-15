@@ -1,6 +1,8 @@
 <?php
 namespace Sil\DevPortal\components;
 
+use Stringy\StaticStringy as SS;
+
 class AuthManager
 {
     /**
@@ -26,8 +28,8 @@ class AuthManager
      * auth types, we could presumably safely assume that the user does NOT need
      * to select a login option since there is (at most) only one option.
      * 
-     * @return bool Whether there are multiple authenciation types available for
-     *     user's to log in through.
+     * @return bool Whether there are multiple authentication types available
+     *     for users to log in through.
      */
     public function canUseMultipleAuthTypes()
     {
@@ -162,9 +164,13 @@ class AuthManager
             ));
         }
         if ($this->isAuthTypeEnabled('hybrid')) {
-            $loginOptions['Google'] = \Yii::app()->createUrl('auth/login', array(
-                'authType' => 'hybrid',
-            ));
+            $hybridAuthManager = new HybridAuthManager();
+            foreach ($hybridAuthManager->getEnabledProvidersList() as $provider) {
+                $loginOptions[$provider] = \Yii::app()->createUrl('auth/login', [
+                    'authType' => 'hybrid',
+                    'providerSlug' => self::slugify($provider),
+                ]);
+            }
         }
         if ($this->isAuthTypeEnabled('test-user')) {
             $loginOptions['Test (User)'] = \Yii::app()->createUrl('auth/login', array(
@@ -249,5 +255,10 @@ class AuthManager
         if ( ! empty($logoutUrl)) {
             \Yii::app()->controller->redirect($logoutUrl);
         }
+    }
+    
+    public static function slugify($string)
+    {
+        return (string)SS::slugify($string);
     }
 }

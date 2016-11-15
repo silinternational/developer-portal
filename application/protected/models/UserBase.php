@@ -46,7 +46,7 @@ class UserBase extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('email, first_name, last_name, created, updated', 'required'),
+			array('email, display_name, created, updated', 'required'),
 			array('status, verified_nonprofit', 'numerical', 'integerOnly'=>true),
 			array('email, auth_provider_user_identifier, customer_id', 'length', 'max'=>255),
 			array('first_name, last_name', 'length', 'max'=>32),

@@ -258,4 +258,17 @@ class AuthManagerTest extends \CTestCase
         \Phake::verify($webUser)->logout;
         \Phake::verify($webUser)->clearStates;
     }
+    
+    public function testSlugify()
+    {
+        // Arrange:
+        $testString = 'MixedCaseString';
+        $expected = 'mixedcasestring';
+        
+        // Act:
+        $actual = AuthManager::slugify($testString);
+        
+        // Assert:
+        $this->assertSame($expected, $actual);
+    }
 }

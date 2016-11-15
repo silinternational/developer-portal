@@ -15,7 +15,7 @@ class AuthController extends \Controller
         \Hybrid_Endpoint::process();
     }
     
-    public function actionLogin($authType = null)
+    public function actionLogin($authType = null, $providerSlug = null)
     {
         $authManager = new AuthManager();
         
@@ -34,27 +34,12 @@ class AuthController extends \Controller
         }
 
         if ($authType === null) {
-            if ($authManager->canUseMultipleAuthTypes()) {
-                
-                // If multiple auth. types are available, ask the user which to
-                // use.
+            $authType = $authManager->getDefaultAuthType();
+            if ($authType === null) {
                 $this->redirect(['auth/login-options']);
-                
-            } else {
-                
-                // Otherwise, if there is an obvious default auth. type
-                // available, redirect the user as though they had specified
-                // that one.
-                $defaultAuthType = $authManager->getDefaultAuthType();
-                if ($defaultAuthType !== null) {
-                    $this->redirect([
-                        'auth/login',
-                        'authType' => $defaultAuthType,
-                    ]);
-                }
             }
         }
-        
+
         try {
             $identity = $authManager->getIdentityForAuthType($authType);
         } catch (\InvalidArgumentException $e) {
@@ -69,7 +54,7 @@ class AuthController extends \Controller
         
         /* Attempt to authenticate the user (which may itself involve
         /* redirecting the user to log in somewhere).  */
-        if ($identity->authenticate()) {
+        if ($identity->authenticate($providerSlug)) {
             \Yii::app()->user->login($identity);
             $this->redirect(\Yii::app()->user->getReturnUrl());
         } else {
@@ -101,21 +86,10 @@ class AuthController extends \Controller
             'loginOptions' => $loginOptions,
         ));
     }
-
-    //public function actionTestLogin()
-    //{           
-    //
-    //    yii::log('actionTestLogin: role1 = ' .Yii::app()->user->getRole() . '<<', 'debug');      
-    //    $identity = new TestUserIdentity('guest', '');//, Yii::app()->user);
-    //    $identity->authenticate();      
-    //    Yii::app()->user->login($identity);
-    //    //yii::log('actionTestLogin: role2 = ' .Yii::app()->user->getRole() . '<<', 'debug');
-    //
-    //    Yii::app()->request->redirect(Yii::app()->user->returnUrl);
-    //}
     
     public function actionLogout()
     {
+        /* @var $webUser \WebUser */
         $webUser = \Yii::app()->user;
         $authType = $webUser->getAuthType();
         $authProvider = $webUser->getAuthProvider();

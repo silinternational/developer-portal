@@ -14,9 +14,12 @@ class HybridAuthUserIdentity extends UserIdentity
     /**
      * Get the data about this user as returned by the authentication provider.
      * 
+     * @param string|null $providerSlug The URL-safe (aka. "slug") version of
+     *     the name of what provider to use within the current authentication
+     *     type (such as which HybridAuth provider to use).
      * @return \Sil\DevPortal\components\UserAuthenticationData
      */
-    public function getUserAuthData()
+    public function getUserAuthData($providerSlug = null)
     {
         $hybridAuth = $this->getHybridAuthInstance();
         
@@ -24,7 +27,7 @@ class HybridAuthUserIdentity extends UserIdentity
         // user will be redirected to that auth. provider for authentication, or
         // if that has already happened then HybridAuth will ignore this step
         // and return an instance of the adapter.
-        $authProvider = $this->getAuthProvider();
+        $authProvider = $this->getFullAuthProviderName($providerSlug);
         $authProviderAdapter = $hybridAuth->authenticate($authProvider);
         
         try {
@@ -40,7 +43,14 @@ class HybridAuthUserIdentity extends UserIdentity
             $userProfile = $authProviderAdapter->getUserProfile();
         }
         
-        // Ensure that we got a verified email address.
+        /* Ensure that we got a verified email address.
+         * 
+         * NOTE: This is important both to protect against social engineering
+         *       (a user seeming to be who they are not, and asking us for help)
+         *       and because certain APIs may only be visible to people with an
+         *       email address on a certain domain, and that protection could be
+         *       bypassed if a user's email address is not verified.
+         */
         if ( ! $userProfile->emailVerified) {
             throw new \Exception(
                 sprintf(
@@ -64,9 +74,16 @@ class HybridAuthUserIdentity extends UserIdentity
         );
     }
     
-    protected function getAuthProvider()
+    protected function getFullAuthProviderName($providerSlug = null)
     {
-        return 'Google';
+        $hybridAuthManager = new HybridAuthManager();
+        $enabledProviders = $hybridAuthManager->getEnabledProvidersList();
+        foreach ($enabledProviders as $enabledProvider) {
+            if ($providerSlug === AuthManager::slugify($enabledProvider)) {
+                return $enabledProvider;
+            }
+        }
+        return null;
     }
     
     public function getAuthType()

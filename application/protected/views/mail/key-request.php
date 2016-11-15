@@ -5,7 +5,7 @@
 /* @var $requestingUser \Sil\DevPortal\models\User */
 ?>
 <p>
-    Hello <?php echo ($owner ? CHtml::encode($owner->first_name) : 'API Developer Portal administrator'); ?>,
+    <?php echo ($owner ? CHtml::encode($owner->display_name) : 'API Developer Portal administrator'); ?>,
 </p>
 <p>
     <?php echo CHtml::encode($requestingUser->display_name); ?> has requested access to the 

@@ -1,5 +1,6 @@
 <?php
 
+use Sil\DevPortal\components\HybridAuthManager;
 use Sil\PhpEnv\Env;
 
 /**
@@ -22,6 +23,9 @@ $apiaxleSslVerifyPeer = Env::get('APIAXLE_SSL_VERIFYPEER', true);
 $contactUsUrl = Env::get('CONTACT_US_URL');
 $gaEnabled = Env::get('GA_ENABLED', false);
 $gaTrackingId = Env::get('GA_TRACKING_ID');
+$githubOAuthClientId = Env::get('GITHUB_OAUTH_CLIENT_ID');
+$githubOAuthClientSecret = Env::get('GITHUB_OAUTH_CLIENT_SECRET');
+$githubOAuthEnabled = Env::get('GITHUB_OAUTH_ENABLED', false);
 $googleOAuthClientId = Env::get('GOOGLE_OAUTH_CLIENT_ID');
 $googleOAuthClientSecret = Env::get('GOOGLE_OAUTH_CLIENT_SECRET');
 $googleOAuthEnabled = Env::get('GOOGLE_OAUTH_ENABLED', false);
@@ -88,6 +92,7 @@ return array(
                 'dashboard/<interval:[a-z]+>' => 'dashboard/index',
                 '<controller:[\w\-]+>/api<apiAction:[\w\-]+>/<code:([a-z0-9]{1}[a-z0-9\-]{1,}[a-z0-9]{1})>' => '<controller>/api<apiAction>',
                 'api/<action:[\w\-]+>/<code:([a-z0-9]{1}[a-z0-9\-]{1,}[a-z0-9]{1})>' => 'api/<action>',
+                'auth/login/<authType:[\w-]+>/<providerSlug:[\w-]+>' => 'auth/login',
                 'auth/login/<authType:[\w-]+>' => 'auth/login',
                 '<controller:[\w\-]+>/<id:\d+>' => '<controller>/view',
                 '<controller:[\w\-]+>/<action:[\w\-]+>/<id:\d+>' => '<controller>/<action>',
@@ -176,8 +181,18 @@ return array(
                     ),
                     'scope' => 'email profile',
                 ),
-                
-                /** @TODO: Also add GitHub (if reasonably simple). */
+                'GitHub' => array(
+                    'enabled' => (bool)$githubOAuthEnabled,
+                    'keys' => array(
+                        'id' => $githubOAuthClientId,
+                        'secret' => $githubOAuthClientSecret,
+                    ),
+                    'scope' => 'user:email',
+                    'wrapper' => array(
+                        'class' => 'Hybrid_Providers_GitHub',
+                        'path' => HybridAuthManager::getPathToAdditionalProviderFile('GitHub'),
+                    )
+                ),
             )
         ),
 

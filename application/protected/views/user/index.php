@@ -21,8 +21,7 @@ $this->pageTitle = 'Users';
             . ')',
             'template' => '{items}{pager}',
             'columns' => array(
-                array('name' => 'first_name', 'header' => 'First name'),
-                array('name' => 'last_name', 'header' => 'Last name'),
+                array('name' => 'display_name', 'header' => 'Display Name'),
                 array('name' => 'email', 'header' => 'Email'),
                 array('name' => 'approvedKeyCount', 'header' => 'Keys'),
                 array(
