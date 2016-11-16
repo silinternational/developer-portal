@@ -22,3 +22,14 @@ application/runtime/
 application/simplesamlphp/cert/
 build/saml.crt
 build/saml.pem
+
+# favicon files (to be put in place via s3-expand)
+application/public/android-chrome-192x192.png
+application/public/android-chrome-256x256.png
+application/public/apple-touch-icon.png
+application/public/browserconfig.xml
+application/public/favicon-16x16.png
+application/public/favicon-32x32.png
+application/public/favicon.ico
+application/public/manifest.json
+application/public/mstile-150x150.png
