@@ -1,5 +1,6 @@
 <?php
 
+use Sil\DevPortal\components\HybridAuthManager;
 use Sil\PhpEnv\Env;
 
 /**
@@ -11,22 +12,28 @@ $mysqlUser = Env::get('MYSQL_USER');
 $mysqlPassword = Env::get('MYSQL_PASSWORD');
 $mailerUsername = Env::get('MAILER_USERNAME', false); // Defaults to false to mimic previous getenv() behavior.
 $mailerPassword = Env::get('MAILER_PASSWORD', false); // Defaults to false to mimic previous getenv() behavior.
-$appEnv = Env::get('APP_ENV', 'not set');
+$appEnv = Env::get('APPLICATION_ENV', 'not set');
+$appName = Env::get('APP_NAME', 'Developer Portal');
 $adminEmail = Env::get('ADMIN_EMAIL');
 $alertsEmail = Env::get('ALERTS_EMAIL');
 $apiaxleEndpoint = Env::get('APIAXLE_ENDPOINT');
 $apiaxleKey = Env::get('APIAXLE_KEY');
 $apiaxleSecret = Env::get('APIAXLE_SECRET');
 $apiaxleSslVerifyPeer = Env::get('APIAXLE_SSL_VERIFYPEER', true);
-$apiaxleProxyEnable = Env::get('APIAXLE_PROXY_ENABLE');
+$contactUsUrl = Env::get('CONTACT_US_URL');
 $gaEnabled = Env::get('GA_ENABLED', false);
 $gaTrackingId = Env::get('GA_TRACKING_ID');
+$githubOAuthClientId = Env::get('GITHUB_OAUTH_CLIENT_ID');
+$githubOAuthClientSecret = Env::get('GITHUB_OAUTH_CLIENT_SECRET');
+$githubOAuthEnabled = Env::get('GITHUB_OAUTH_ENABLED', false);
 $googleOAuthClientId = Env::get('GOOGLE_OAUTH_CLIENT_ID');
 $googleOAuthClientSecret = Env::get('GOOGLE_OAUTH_CLIENT_SECRET');
 $googleOAuthEnabled = Env::get('GOOGLE_OAUTH_ENABLED', false);
+$samlEnabled = Env::get('SAML_ENABLED', false);
 $samlIdpEntityId = Env::get('SAML_IDP');
 $samlIdpName = Env::get('SAML_IDP_NAME');
 $samlTrustEmailFor = Env::get('SAML_TRUST_EMAIL_FOR');
+$showPopularApis = (bool)Env::get('SHOW_POPULAR_APIS', false);
 
 // Define a path alias for the Bootstrap extension as it's used internally.
 Yii::setPathOfAlias('bootstrap', dirname(__FILE__) . '/../extensions/bootstrap');
@@ -36,8 +43,9 @@ Yii::setPathOfAlias('bootstrap', dirname(__FILE__) . '/../extensions/bootstrap')
 return array(
     
     'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
-    'name' => 'API Developer Portal',
+    'name' => $appName,
     'theme' => 'bootstrap',
+    'controllerNamespace' => '\\Sil\\DevPortal\\controllers',
     
     // preloading 'log' component
     'preload' => array('log'),
@@ -67,18 +75,25 @@ return array(
             'loginUrl' => array('auth/login'),
             'class' => 'WebUser',
             'autoUpdateFlash' => false,
+            
+            // Seconds of inactivity before session timeout. For details, see:
+            // http://www.yiiframework.com/doc/api/1.1/CWebUser#authTimeout-detail
+            'authTimeout' => 14400, // 14400 seconds = 4 hours
         ),
         'urlManager' => array(
             'class' => 'UrlManager',
             'urlFormat' => 'path',
             'showScriptName' => false,
             'rules' => array(
+                'dashboard/<interval:[a-z]+>/<chart:[a-z-]+>/usage-chart/<rewindBy:[0-9]+>' => 'dashboard/usage-chart',
                 'dashboard/<interval:[a-z]+>/<chart:[a-z-]+>/usage-chart' => 'dashboard/usage-chart',
+                'dashboard/<interval:[a-z]+>/<chart:[a-z-]+>/<rewindBy:[0-9]+>' => 'dashboard/index',
                 'dashboard/<interval:[a-z]+>/<chart:[a-z-]+>' => 'dashboard/index',
                 'dashboard/<interval:[a-z]+>' => 'dashboard/index',
                 '<controller:[\w\-]+>/api<apiAction:[\w\-]+>/<code:([a-z0-9]{1}[a-z0-9\-]{1,}[a-z0-9]{1})>' => '<controller>/api<apiAction>',
                 'api/<action:[\w\-]+>/<code:([a-z0-9]{1}[a-z0-9\-]{1,}[a-z0-9]{1})>' => 'api/<action>',
-                'auth/login/<authType:[\w]+>' => 'auth/login',
+                'auth/login/<authType:[\w-]+>/<providerSlug:[\w-]+>' => 'auth/login',
+                'auth/login/<authType:[\w-]+>' => 'auth/login',
                 '<controller:[\w\-]+>/<id:\d+>' => '<controller>/view',
                 '<controller:[\w\-]+>/<action:[\w\-]+>/<id:\d+>' => '<controller>/<action>',
                 '<controller:[\w\-]+>/<action:[\w\-]+>' => '<controller>/<action>',
@@ -101,15 +116,17 @@ return array(
             'class' => 'CLogRouter',
             'routes' => array(
                 array(
-                    'class' => 'CFileLogRoute',
+                    'class' => 'CSysLogRoute',
                     'levels' => 'error, warning',
+                    'filter' => array(
+                        'class' => 'CLogFilter',
+                        'logVars' => array(),
+                    ),
                 ),
-            // Uncomment the following to show log messages on web pages:
-            /*
-              array(
-              'class'=>'CWebLogRoute',
-              ),
-            */
+                //// Uncomment the following to show log messages on web pages:
+                //array(
+                //    'class' => 'CWebLogRoute',
+                //),
             ),
         ),            
         'request' => array(
@@ -127,8 +144,11 @@ return array(
     'params' => array(
         'adminEmail' => $adminEmail,
         'alertsEmail' => $alertsEmail,
+        'contactUsUrl' => $contactUsUrl,
+        'showPopularApis' => $showPopularApis,
         'saml' => array(
             'default-sp' => 'default-sp',
+            'enabled' => (bool)$samlEnabled,
             'map' => array(
                 'firstNameField' => 'givenName',
                 'firstNameFieldElement' => 0,
@@ -161,16 +181,25 @@ return array(
                     ),
                     'scope' => 'email profile',
                 ),
-                
-                /** @TODO: Also add GitHub (if reasonably simple). */
+                'GitHub' => array(
+                    'enabled' => (bool)$githubOAuthEnabled,
+                    'keys' => array(
+                        'id' => $githubOAuthClientId,
+                        'secret' => $githubOAuthClientSecret,
+                    ),
+                    'scope' => 'user:email',
+                    'wrapper' => array(
+                        'class' => 'Hybrid_Providers_GitHub',
+                        'path' => HybridAuthManager::getPathToAdditionalProviderFile('GitHub'),
+                    )
+                ),
             )
         ),
 
         'friendlyDateFormat' => 'F j, Y, g:ia (T)',
         'shortDateFormat'    => 'm/d/y',
+        'shortDateTimeFormat' => 'n/j/y g:ia',
         'allInsiteUsersGroup' => 'grp_custgrp_po-sil_cg-641',
-        'apiProxyProtocol' => 'https',
-        'apiProxyDomain' => '.api.sil.org',
         'mail' => array(
             'from' => $mailerUsername,
         ),
@@ -185,11 +214,11 @@ return array(
             'pass' => $mailerPassword,
         ),
         "apiaxle" => array(
+            'baseUrl' => $apiaxleEndpoint,
             "endpoint" => $apiaxleEndpoint,
             "key" => $apiaxleKey,
             "secret" => $apiaxleSecret,
             "ssl_verifypeer" => $apiaxleSslVerifyPeer,
-            "proxy_enable" => $apiaxleProxyEnable,
         ),
         "google_analytics" => array(
             "enabled" => $gaEnabled,

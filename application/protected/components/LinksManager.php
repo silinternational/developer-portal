@@ -1,5 +1,9 @@
 <?php
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\Key;
+use Sil\DevPortal\models\User;
+
 class LinksManager extends CComponent
 {
     const BUTTON_SIZE_LARGE = 'large';
@@ -23,7 +27,7 @@ class LinksManager extends CComponent
         $buttonSize = self::BUTTON_SIZE_MEDIUM
     ) {
         // If no ActionLinks were given, then no HTML needs to be generated.
-        if (( ! is_array($actionLinks)) || (count($actionLinks) < 1)) {
+        if ( ! Utils::isArrayWithContent($actionLinks)) {
             return '';
         }
         
@@ -60,7 +64,6 @@ class LinksManager extends CComponent
                     'Unknown button size passed to LinksManager.',
                     1423241139
                 );
-                break;
         }
         
         // Return the resulting HTML.
@@ -98,116 +101,99 @@ class LinksManager extends CComponent
         $actionLinks = array();
         
         if ($user->hasActiveKeyToApi($api)) {
-            
             foreach ($user->keys as $key) {
                 if ($key->api_id === $api->api_id) {
-                    $actionLinks[] = new ActionLink(
-                        array(
-                            '/key/details/',
-                            'id' => $key->key_id,
-                        ),
-                        'View Key Details',
-                        'list'
-                    );
+                    $actionLinks[] = new ActionLink(array(
+                        '/key/details/',
+                        'id' => $key->key_id,
+                    ), 'View Key Details', 'list');
                 }
             }
-            
         } else {
-            
-            $actionLinks[] = new ActionLink(
-                array(
-                    '/api/request-key/',
-                    'code' => $api->code,
-                ),
-                'Request Key',
-                'off'
-            );
+            $actionLinks[] = new ActionLink(array(
+                '/api/request-key/',
+                'code' => $api->code,
+            ), $api->getRequestKeyText(), 'off');
         }
         
         if ($user->canSeeKeysForApi($api)) {
+            $actionLinks[] = new ActionLink(array(
+                '/api/active-keys/',
+                'code' => $api->code,
+            ), 'Show Active Keys', 'ok-sign');
             
-            $actionLinks[] = new ActionLink(
-                array(
-                    '/api/active-keys/',
+            $actionLinks[] = new ActionLink(array(
+                '/api/pending-keys/',
+                'code' => $api->code,
+            ), 'Show Pending Keys', 'question-sign');
+        }
+        
+        if ( ! $api->isPubliclyVisible()) {
+            if ($user->canInviteUserToSeeApi($api)) {
+                $actionLinks[] = new ActionLink(array(
+                    '/api/invite-user/',
                     'code' => $api->code,
-                ),
-                'Show Active Keys',
-                'ok-sign'
-            );
+                ), 'Invite User', 'user');
+            }
             
-            $actionLinks[] = new ActionLink(
-                array(
-                    '/api/pending-keys/',
+            if ($user->canInviteDomainToSeeApi($api)) {
+                $actionLinks[] = new ActionLink(array(
+                    '/api/invite-domain/',
                     'code' => $api->code,
-                ),
-                'Show Pending Keys',
-                'question-sign'
-            );
+                ), 'Invite Users in Domain', 'globe');
+            }
         }
         
         if ($user->hasAdminPrivilegesForApi($api)) {
-            
-            if ($api->keyCount > 0) {
-                $actionLinks[] = new ActionLink(
-                    sprintf(
-                        'mailto:%s?subject=%s&bcc=%s',
-                        CHtml::encode($user->email),
-                        CHtml::encode($api->display_name . ' API'),
-                        CHtml::encode(implode(
-                            ',',
-                            $api->getEmailAddressesOfUsersWithActiveKeys()
-                        ))
-                    ),
-                    'Email Users With Keys',
-                    'envelope'
-                );
+            if ($api->approvedKeyCount > 0) {
+                $actionLinks[] = new ActionLink(sprintf(
+                    'mailto:%s?subject=%s&bcc=%s',
+                    CHtml::encode($user->email),
+                    CHtml::encode($api->display_name . ' API'),
+                    CHtml::encode(implode(
+                        ',',
+                        $api->getEmailAddressesOfUsersWithActiveKeys()
+                    ))
+                ), 'Email Users With Keys', 'envelope');
             }
             
-            $actionLinks[] = new ActionLink(
-                array(
-                    '/api/edit/',
-                    'code' => $api->code,
-                ),
-                'Edit API',
-                'pencil'
-            );
+            $actionLinks[] = new ActionLink(array(
+                '/api/edit/',
+                'code' => $api->code,
+            ), 'Edit API', 'pencil');
         
-            $actionLinks[] = new ActionLink(
-                array(
-                    '/api/delete/',
-                    'code' => $api->code,
-                ),
-                'Delete API',
-                'remove'
-            );
+            $actionLinks[] = new ActionLink(array(
+                '/api/delete/',
+                'code' => $api->code,
+            ), 'Delete API', 'remove');
         }
         
         return $actionLinks;
     }
     
     /**
-     * Get the list of 'Actions' links that should for shown on the Dashboard
-     * for a card representing a KeyRequest.
+     * Get the list of 'Actions' links that should be shown on the Dashboard
+     * for a card representing a Key.
      * 
-     * @param KeyRequest $keyRequest The KeyRequest.
+     * @param Key $key The Key.
      * @return ActionLink[] The list of ActionLinks representing the links to
      *     include.
      */
-    public static function getDashboardKeyRequestActionLinks($keyRequest)
+    public static function getDashboardKeyActionLinks($key)
     {
-        // If lacking the KeyRequest, return an empty array.
-        if ( ! ($keyRequest instanceof KeyRequest)) {
+        // If lacking the Key, return an empty array.
+        if ( ! ($key instanceof Key)) {
             return array();
         }
         
         // Set up an array to hold the list of links.
         $actionLinks = array();
         
-        // All a KeyRequest needs is a details link.
+        // All a Key needs is a details link.
         $actionLinks[] = new ActionLink(
             array(
-                '/key-request/details/',
-                'id' => $keyRequest->key_request_id,
+                '/key/details/',
+                'id' => $key->key_id,
             ),
             'View Details',
             'list'
@@ -217,21 +203,18 @@ class LinksManager extends CComponent
     }
     
     /**
-     * Get the list of 'Actions' links that should for shown on the Key Request
-     * details page for the given KeyRequest and User.
+     * Get the list of 'Actions' links that should for shown on the Key details
+     * page for the given Key and User.
      * 
-     * @param KeyRequest $keyRequest The KeyRequest whose details are being
-     *     viewed.
+     * @param Key $key The Key whose details are being viewed.
      * @param User $user The User viewing the page.
      * @return ActionLink[] The list of ActionLinks representing the links to
      *     include.
      */
-    public static function getKeyRequestDetailsActionLinksForUser(
-        $keyRequest,
-        $user
-    ) {
-        // If lacking either the KeyRequest or the User, return an empty array.
-        if ( ! ($keyRequest instanceof KeyRequest)) {
+    public static function getKeyDetailsActionLinksForUser($key, $user)
+    {
+        // If lacking either the Key or the User, return an empty array.
+        if ( ! ($key instanceof Key)) {
             return array();
         } elseif ( ! ($user instanceof User)) {
             return array();
@@ -240,19 +223,50 @@ class LinksManager extends CComponent
         // Set up an array to hold the list of links.
         $actionLinks = array();
         
-        // If the User can delete the given KeyRequest, include that link.
-        if ($user->canDeleteKeyRequest($keyRequest)) {
-            
-            $actionLinks[] = new ActionLink(
-                array(
-                    '/key-request/delete/',
-                    'id' => $keyRequest->key_request_id,
-                ),
-                'Delete Key Request',
-                'remove'
-            );
+        if ($user->canResetKey($key)) {
+            $actionLinks[] = new ActionLink(array(
+                '/key/reset/',
+                'id' => $key->key_id,
+            ), 'Reset Key', 'refresh');
+        }
+        
+        if ($user->canDeleteKey($key)) {
+            $actionLinks[] = new ActionLink(array(
+                '/key/delete/',
+                'id' => $key->key_id,
+            ), 'Delete ' . $key->getTypeText(), 'remove');
+        }
+        
+        if ($user->canRevokeKey($key)) {
+            $actionLinks[] = new ActionLink(array(
+                '/key/revoke/',
+                'id' => $key->key_id,
+            ), 'Revoke Key', 'remove');
         }
         
         return $actionLinks;
+    }
+    
+    /**
+     * Generate the HTML for the given ActionLinks. If only one is given, it
+     * will be shown as a single button. If multiple are given, they will be
+     * shown as a drop-down list.
+     * 
+     * @param ActionLink[] $actionLinks The list of ActionLinks representing the
+     *     buttons to include.
+     * @param string $buttonSize (Optional:) A constant representing the desired
+     *     size of the 'Actions' button. Defaults to
+     *     LinksManager::BUTTON_SIZE_MEDIUM.
+     * @return string The resulting HTML (if any).
+     */
+    public static function showActionLinks(
+        $actionLinks,
+        $buttonSize = self::BUTTON_SIZE_MEDIUM
+    ) {
+        if (count($actionLinks) === 1) {
+            return $actionLinks[0]->getAsHtml('btn');
+        } else {
+            return self::generateActionsDropdownHtml($actionLinks, $buttonSize);
+        }
     }
 }

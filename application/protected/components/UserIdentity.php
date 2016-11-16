@@ -3,6 +3,7 @@ namespace Sil\DevPortal\components;
 
 use Sil\DevPortal\components\UserAuthenticationData;
 use Sil\DevPortal\components\WrongAuthProviderException;
+use Sil\DevPortal\models\User;
 
 abstract class UserIdentity extends \CBaseUserIdentity
 {
@@ -34,14 +35,17 @@ abstract class UserIdentity extends \CBaseUserIdentity
      * NOTE: This method should NOT be overridden. Subclasses should instead
      *       implement/override the applicable functions called by this one.
      * 
+     * @param string|null $providerSlug The URL-safe (aka. "slug") version of
+     *     the name of what provider to use within the current authentication
+     *     type (such as which HybridAuth provider to use).
      * @return boolean Whether the authentication was successful.
      */
-    final public function authenticate()
+    final public function authenticate($providerSlug = null)
     {
-        $userAuthData = $this->getUserAuthData();
+        $userAuthData = $this->getUserAuthData($providerSlug);
 
         try {
-            /* @var $user \User */
+            /* @var $user User */
             $user = $this->findUserRecord($userAuthData);
 
             if ($user === null) {
@@ -92,11 +96,11 @@ abstract class UserIdentity extends \CBaseUserIdentity
      * given user auth. data.
      * 
      * @param UserAuthenticationData $userAuthData
-     * @return \User The new User.
+     * @return User The new User.
      */
     protected function createUserRecord($userAuthData)
     {
-        if (\User::isEmailAddressInUse($userAuthData->getEmailAddress())) {
+        if (User::isEmailAddressInUse($userAuthData->getEmailAddress())) {
             throw new \Exception(
                 'A user with that email address already exists in our '
                 . 'database.',
@@ -105,7 +109,7 @@ abstract class UserIdentity extends \CBaseUserIdentity
         }
         
         // Create the new User instance.
-        $user = new \User();
+        $user = new User();
         $user->auth_provider = $userAuthData->getAuthProvider();
         $user->auth_provider_user_identifier = $userAuthData->getAuthProviderUserIdentifier();
         $user->email = $userAuthData->getEmailAddress();
@@ -114,14 +118,14 @@ abstract class UserIdentity extends \CBaseUserIdentity
         $user->display_name = $userAuthData->getDisplayName();
 
         // Assign them a default role and mark them as active.
-        $user->role = \User::ROLE_USER;
-        $user->status = \User::STATUS_ACTIVE;
+        $user->role = User::ROLE_USER;
+        $user->status = User::STATUS_ACTIVE;
 
         // Try to save the new User record.
         if ( ! $user->save()) {
             throw new \Exception(
-                'Failed to save new User to database: '
-                . print_r($user->errors, true),
+                'Failed to save new User to database: ' . PHP_EOL
+                . $user->getErrorsAsFlatTextList(),
                 1444679705
             );
         }
@@ -135,7 +139,7 @@ abstract class UserIdentity extends \CBaseUserIdentity
      * returned.
      * 
      * @param UserAuthenticationData $userAuthData
-     * @return \User|null
+     * @return User|null
      */
     protected function findUserRecord($userAuthData)
     {
@@ -160,7 +164,7 @@ abstract class UserIdentity extends \CBaseUserIdentity
             );
         }
         
-        $user = \User::model()->findByAttributes(array(
+        $user = User::model()->findByAttributes(array(
             'auth_provider' => $authProvider,
             'auth_provider_user_identifier' => $authProviderUserIdentifier,
         ));
@@ -210,15 +214,18 @@ abstract class UserIdentity extends \CBaseUserIdentity
     /**
      * Get the data about this user as returned by the authentication provider.
      * 
+     * @param string|null $providerSlug The URL-safe (aka. "slug") version of
+     *     the name of what provider to use within the current authentication
+     *     type (such as which HybridAuth provider to use).
      * @return \Sil\DevPortal\components\UserAuthenticationData
      */
-    abstract public function getUserAuthData();
+    abstract public function getUserAuthData($providerSlug = null);
     
     /**
      * Load the necessary information from the given parameters in order to
      * populate the required fields for this UserIdentity.
      * 
-     * @param \User $user
+     * @param User $user
      * @param array $accessGroups
      * @param mixed $uuid
      */
@@ -283,13 +290,14 @@ abstract class UserIdentity extends \CBaseUserIdentity
         $user->first_name = $userAuthData->getFirstName();
         $user->last_name = $userAuthData->getLastName();
         $user->display_name = $userAuthData->getDisplayName();
+        $user->email = $userAuthData->getEmailAddress();
 
         // Try to save the changes.
         if ( ! $user->save()) {
             throw new \Exception(
                 'Failed to update our database with the data from the '
-                . 'authentication provider: '
-                . print_r($user->errors, true),
+                . 'authentication provider: ' . PHP_EOL
+                . $user->getErrorsAsFlatTextList(),
                 1444936203
             );
         }
@@ -304,8 +312,8 @@ abstract class UserIdentity extends \CBaseUserIdentity
      */
     protected function warnIfEmailIsInUseByDiffAuthProvider($userAuthData)
     {
-        /* @var $possibleUser \User */
-        $possibleUser = \User::model()->findByAttributes(array(
+        /* @var $possibleUser User */
+        $possibleUser = User::model()->findByAttributes(array(
             'email' => $userAuthData->getEmailAddress(),
         ));
         

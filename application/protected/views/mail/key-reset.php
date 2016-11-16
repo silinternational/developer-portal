@@ -1,8 +1,8 @@
 <p>
-    Hello <?php echo $key->user->first_name; ?>,
+    <?= \CHtml::encode($key->user->display_name); ?>,
 </p>
 <p>
-    Your API key for the <?php echo $api->display_name ?> API has been reset.
+    Your API key for the <?php echo CHtml::encode($api->display_name); ?> API has been reset.
     If you did not request this or believe this to be an error we recommend that 
     you login and reset the key again to be sure your key has not been compromised.
 </p>
@@ -16,5 +16,5 @@
 </p>
 <p>
     Key reset at <?php echo date(Yii::app()->params['friendlyDateFormat']); ?><br />
-    Key reset by user <?php echo Yii::app()->user->user->display_name; ?>
+    Key reset by user <?php echo CHtml::encode(Yii::app()->user->user->display_name); ?>
 </p>

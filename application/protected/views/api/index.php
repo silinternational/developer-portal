@@ -1,11 +1,10 @@
 <?php
-/* @var $this ApiController */
+/* @var $this \Sil\DevPortal\controllers\ApiController */
 /* @var $apiList CDataProvider */
-/* @var $user User */
+/* @var $webUser WebUser */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'APIs',
 );
 
@@ -22,14 +21,12 @@ $this->pageTitle = "Browse APIs";
             'type' => 'striped hover',
             'dataProvider' => $apiList,
             'template' => '{items}{pager}',
-            'hideHeader' => ( ! $user->hasOwnerPrivileges()),
             'columns' => array(
                 array(
                     'name' => 'display_name',
                     'header' => 'Name',
-                    'type' => 'raw',
-                    'value' => '"<b>" . CHtml::encode($data["display_name"]) . "</b>"',
-                    'visible' => ($user->role !== User::ROLE_ADMIN),
+                    'value' => '$data["display_name"]',
+                    'visible' => ( ! $webUser->isAdmin()),
                 ),
                 array(
                     'name' => 'display_name',
@@ -37,7 +34,7 @@ $this->pageTitle = "Browse APIs";
                     'type' => 'raw',
                     'value' => '"<b>" . CHtml::encode($data["display_name"]) . "</b><br />" . ' .
                                '"<span style=\"color: #999\">" . $data->getStyledPublicUrlHtml("text-dark") . "</span>"',
-                    'visible' => ($user->role === User::ROLE_ADMIN),
+                    'visible' => $webUser->isAdmin(),
                 ),
                 array(
                     'name' => 'brief_description',
@@ -47,16 +44,16 @@ $this->pageTitle = "Browse APIs";
                     'name' => 'owner_id',
                     'header' => 'Owner',
                     'value' => '($data->owner ? $data->owner->display_name : "")',
-                    'visible' => ($user->role === User::ROLE_ADMIN),
+                    'visible' => $webUser->isAdmin(),
                 ),
                 array(
                     'class' => 'CLinkColumn',
                     'labelExpression' => ''
                     . '\Yii::app()->user->user->canSeeKeysForApi($data) ? sprintf('
                         . '"<span class=\"badge%s\" title=\"%s\">%s</span>",'
-                        . '($data->keyCount ? " badge-info" : "" ),'
+                        . '($data->approvedKeyCount ? " badge-info" : "" ),'
                         . '"Click for more information",'
-                        . '$data->keyCount'
+                        . '$data->approvedKeyCount'
                     . ') : ""',
                     'urlExpression' => ''
                     . '\Yii::app()->user->user->canSeeKeysForApi($data) ? \Yii::app()->createUrl('
@@ -70,7 +67,7 @@ $this->pageTitle = "Browse APIs";
                     'htmlOptions' => array(
                       'style' => 'text-align: center',
                     ),
-                    'visible' => $user->hasOwnerPrivileges(),
+                    'visible' => $webUser->hasOwnerPrivileges(),
                 ),
                 array(
                     'class' => 'CLinkColumn',
@@ -93,7 +90,7 @@ $this->pageTitle = "Browse APIs";
                     'htmlOptions' => array(
                       'style' => 'text-align: center',
                     ),
-                    'visible' => $user->hasOwnerPrivileges(),
+                    'visible' => $webUser->hasOwnerPrivileges(),
                 ),
                 array(
                     'class' => 'ActionLinksColumn',
@@ -107,21 +104,16 @@ $this->pageTitle = "Browse APIs";
                     ),
                 ),
             ),
-        )); 
-
-        // Determine which page to link to based on whether the user is allowed to
-        // add APIs.
-        if ($user->hasOwnerPrivileges()) {
-            $addApiLinkRoute = '/api/add/';
-        } else {
-            $addApiLinkRoute = '/api/add-contact-us/';
+        ));
+        
+        if ($webUser->hasOwnerPrivileges()) {
+            ?>
+            <a href="<?php echo $this->createUrl('/api/add/'); ?>" 
+               class="btn space-after-icon" >
+                <i class="icon-plus"></i>Publish a new API
+            </a>
+            <?php
         }
-
-        // Show the link for adding an API.
         ?>
-        <a href="<?php echo $this->createUrl($addApiLinkRoute); ?>" 
-           class="btn space-after-icon" >
-            <i class="icon-plus"></i>Publish a new API
-        </a>
     </div>
 </div>

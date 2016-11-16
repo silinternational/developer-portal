@@ -1,10 +1,9 @@
 <?php
-/* @var $this ApiController */
-/* @var $api Api */
+/* @var $this \Sil\DevPortal\controllers\ApiController */
+/* @var $api \Sil\DevPortal\models\Api */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'APIs' => array('/api/'),
     $api->display_name => array('/api/details/', 'code' => $api->code),
     'API Usage',

@@ -1,6 +1,9 @@
 <?php
+namespace Sil\DevPortal\controllers;
 
-class DashboardController extends Controller
+use Sil\DevPortal\models\User;
+
+class DashboardController extends \Controller
 {
     const CHART_ALL_APIS = 'all-api';
     const CHART_MY_APIS = 'api';
@@ -8,8 +11,9 @@ class DashboardController extends Controller
     const CHART_TOTALS = 'total';
     
     public $layout = '//layouts/left-menu';
+    public $pageTitle = 'Home';
     
-    public function actionUsageChart()
+    public function actionUsageChart($rewindBy = 0)
     {
         $defaultChart = $this->getDefaultChart();
         
@@ -17,11 +21,11 @@ class DashboardController extends Controller
         $interval = $this->getIntervalToShow();
         
         // Get the user model.
-        /* @var $user \User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
         // If we should include API Owner content on the dashboard...
-        if ($user->hasOwnerPrivileges()) {
+        if ($currentUser->hasOwnerPrivileges()) {
             
             // Get the identifier for which chart to show (the user's keys'
             // usage, or usage of the user's APIs).
@@ -35,13 +39,13 @@ class DashboardController extends Controller
 
         // Get the appropriate set of usage data for the chart.
         if ($chart === self::CHART_MY_KEYS) {
-            $usageStats = $user->getUsageStatsForKeys($interval);
+            $usageStats = $currentUser->getUsageStatsForKeys($interval, $rewindBy);
         } elseif ($chart === self::CHART_ALL_APIS) {
-            $usageStats = $user->getUsageStatsForAllApis($interval);
+            $usageStats = $currentUser->getUsageStatsForAllApis($interval, $rewindBy);
         } elseif ($chart === self::CHART_TOTALS) {
-            $usageStats = $user->getUsageStatsTotals($interval);
+            $usageStats = $currentUser->getUsageStatsTotals($interval, $rewindBy);
         } else {
-            $usageStats = $user->getUsageStatsForApis($interval);
+            $usageStats = $currentUser->getUsageStatsForApis($interval, $rewindBy);
         }
         
         $this->renderPartial('usage-chart', [
@@ -49,7 +53,7 @@ class DashboardController extends Controller
         ]);
     }
     
-    public function actionIndex()
+    public function actionIndex($rewindBy = 0)
     {
         $defaultChart = $this->getDefaultChart();
         
@@ -57,23 +61,23 @@ class DashboardController extends Controller
         $interval = $this->getIntervalToShow();
         
         // Get the user model.
-        /* @var $user \User */
-        $user = \Yii::app()->user->user;
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
         
-        // Get the list of the APIs that the user either has a Key for or has
-        // a KeyRequest for. To do this, get the list of their KeyRequests, but
-        // include the names of the APIs.
-        $keyRequests = $user->getKeyRequestsWithApiNames();
+        // Get the list of the APIs that the user either has a Key for (of any
+        // status). To do this, get the list of their Keys, but include the
+        // names of the APIs.
+        $keys = $currentUser->getKeysWithApiNames();
         
         // If we should include API Owner content on the dashboard...
-        if ($user->hasOwnerPrivileges()) {
+        if ($currentUser->hasOwnerPrivileges()) {
             
             // Get the identifier for which chart to show (the user's keys'
             // usage, or usage of the user's APIs).
             $chart = \Yii::app()->request->getParam('chart', $defaultChart);
 
             // Get the list of APIs that this user owns.
-            $apisOwnedByUser = $user->apis;
+            $apisOwnedByUser = $currentUser->apis;
             
         } else {
             
@@ -84,11 +88,12 @@ class DashboardController extends Controller
         
         // Show the page.
         $this->render('index', array(
-            'user' => $user,
-            'keyRequests' => $keyRequests,
+            'user' => $currentUser,
+            'keys' => $keys,
             'apisOwnedByUser' => $apisOwnedByUser,
             'currentInterval' => $interval,
             'chart' => $chart,
+            'rewindBy' => (int)$rewindBy,
         ));
     }
     

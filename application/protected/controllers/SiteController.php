@@ -1,6 +1,12 @@
 <?php
+namespace Sil\DevPortal\controllers;
 
-class SiteController extends Controller
+use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
+use Sil\DevPortal\components\AuthManager;
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\SiteText;
+
+class SiteController extends \Controller
 {
     ///**
     // * Declares class-based actions.
@@ -27,19 +33,26 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        // If the user is logged in...
-        if ( ! Yii::app()->user->isGuest) {
-            
-            // Redirect them to the dashboard controller.
+        if ( ! \Yii::app()->user->isGuest) {
             $this->redirect(array('dashboard/'));
         }
         
-        // Set the page title.
-        $this->pageTitle = Yii::app()->name;
+        if (\Yii::app()->params['showPopularApis']) {
+            $popularApis = Api::getPopularApis();
+        } else {
+            $popularApis = null;
+        }
         
-        // renders the view file 'protected/views/site/index.php'
-        // using the default layout 'protected/views/layouts/main.php'
-        $this->render('index');
+        $authManager = new AuthManager();
+        $loginOptions = $authManager->getLoginOptions();
+        
+        $this->render('index', array(
+            'loginOptions' => $loginOptions,
+            'logoUrls' => \Utils::getLogoUrls(),
+            'popularApis' => $popularApis,
+            'homeLowerLeftHtml' => SiteText::getHtml('home-lower-left'),
+            'homeLowerRightHtml' => SiteText::getHtml('home-lower-right'),
+        ));
     }
 
     /**
@@ -47,9 +60,9 @@ class SiteController extends Controller
      */
     public function actionError()
     {
-        $error = Yii::app()->errorHandler->error;
+        $error = \Yii::app()->errorHandler->error;
         if ($error) {
-            if (Yii::app()->request->isAjaxRequest) {
+            if (\Yii::app()->request->isAjaxRequest) {
                 echo $error['message'];
             } else {
                 $this->render('error', $error);
@@ -68,34 +81,26 @@ class SiteController extends Controller
             /**
              * Get an apixle object and try to fetch details about 'apiaxle' api
              */
-            $axle = new \ApiAxle\Api\Api(Yii::app()->params['apiaxle']);
-            $check = $axle->get('apiaxle');
-            $data = $check->getData();
-
-            if (!is_null($data['protocol'])) {
-                /**
-                 * Check that expected parameter is set
-                 */
+            $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
+            $apiInfo = $apiAxle->getApiInfo('apiaxle');
+            $data = $apiInfo->getData();
+            
+            // Check that an expected parameter is set.
+            if ($data['protocol'] !== null) {
                 header('Content-type: text/plain', true, 200);
                 echo 'OK';
-            }
-            else {
-                /**
-                 * If not, output an error
-                 */
+            } else {
                 header('Content-type: text/plain', true, 500);
                 echo 'Error with api proxy, expected attribute not set';
             }
         } catch (\Exception $e) {
-            /**
-             * Catch any exceptions from ApiAxle class and output error
-             */
+            /* Catch any exceptions from ApiAxle class and output error: */
             header('Content-type: text/plain', true, 500);
             echo 'Error with api proxy, code: ' . $e->getCode();
             
             // If we are in an environment where we should send email
             // notifications...
-            if (Yii::app()->params['mail'] !== false) {
+            if (\Yii::app()->params['mail'] !== false) {
                 
                 // Get some identifier for which server this is.
                 if (isset($_SERVER['HTTP_HOST'])) {
@@ -105,7 +110,7 @@ class SiteController extends Controller
                 }
                 
                 // Email us the full error info.
-                $mail = Utils::getMailer();
+                $mail = \Utils::getMailer();
                 $alertsEmail = \Yii::app()->params['alertsEmail'];
                 if ( ! empty($alertsEmail)) {
                     $mail->setTo($alertsEmail);
@@ -137,7 +142,7 @@ class SiteController extends Controller
     public function actionPrivacyPolicy()
     {
         $this->render('privacy-policy',array(
-            'contactEmail' => Yii::app()->params['adminEmail'],
+            'contactLink' => \Utils::getContactLinkValue(),
         ));
     }
 }

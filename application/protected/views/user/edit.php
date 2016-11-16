@@ -1,10 +1,9 @@
 <?php
-/* @var $this UserController */
+/* @var $this \Sil\DevPortal\controllers\UserController */
 /* @var $form CForm */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'Users' => array('/user/'),
     $form->model->display_name => array(
         '/user/details/',

@@ -25,5 +25,14 @@ WORKDIR /data
 # Install/cleanup composer dependencies
 RUN composer install --prefer-dist --no-interaction --no-dev --optimize-autoloader
 
+# Get s3-expand for ENTRYPOINT
+RUN curl -o /usr/local/bin/s3-expand https://raw.githubusercontent.com/silinternational/s3-expand/master/s3-expand \
+    && chmod a+x /usr/local/bin/s3-expand
+
 EXPOSE 80
+ENTRYPOINT ["/usr/local/bin/s3-expand"]
+
+# Record now as the build date/time (in a friendly format).
+RUN date -u +"%B %-d, %Y, %-I:%M%P (%Z)" > /data/protected/data/version.txt
+
 CMD ["/data/run.sh"]

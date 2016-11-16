@@ -1,18 +1,17 @@
 <?php
-/* @var $this ApiController */
-/* @var $pendingKeyRequests KeyRequest[] */
-/* @var $api Api */
+/* @var $this \Sil\DevPortal\controllers\ApiController */
+/* @var $pendingKeysDataProvider CDataProvider */
+/* @var $api \Sil\DevPortal\models\Api */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Dashboard' => array('dashboard/'),
+$this->breadcrumbs += array(
     'APIs' => array('api/'),
     $api->display_name => array('/api/details/', 'code' => $api->code),
     'Pending Keys',
 );
 
 $this->pageTitle = 'Pending Keys';
-$this->pageSubtitle = 'Pending Key Requests for this API';
+$this->pageSubtitle = 'Pending Keys for this API';
 
 ?>
 <div class="row">
@@ -21,9 +20,8 @@ $this->pageSubtitle = 'Pending Key Requests for this API';
 
         $this->widget('bootstrap.widgets.TbGridView', array(
             'type' => 'striped hover',
-            'dataProvider' => $pendingKeyRequests,
+            'dataProvider' => $pendingKeysDataProvider,
             'template' => '{items}{pager}',
-            //'filter' => new Key(),
             'columns' => array(
                 array(
                     'name' => 'user.display_name',
@@ -52,7 +50,7 @@ $this->pageSubtitle = 'Pending Key Requests for this API';
                         array(
                             'icon' => 'list',
                             'text' => 'Details',
-                            'urlPattern' => '/key-request/details/:key_request_id',
+                            'urlPattern' => '/key/details/:key_id',
                         ),
                     ),
                     //'visible' => (\Yii::app()->user->getRole() === 'admin'),

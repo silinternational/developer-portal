@@ -1,15 +1,16 @@
 <?php
-/* @var $this ApiController */
+/* @var $this \Sil\DevPortal\controllers\ApiController */
+/* @var $api \Sil\DevPortal\models\Api */
+/* @var $key \Sil\DevPortal\models\Key */
+/* @var $acceptedTerms bool */
 
-// Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+$this->pageTitle = $api->getRequestKeyText();
+$this->breadcrumbs += array(
     'APIs' => array('/api/'),
     $api->display_name => array('/api/details/', 'code' => $api->code),
-    'Request Key',
+    $this->pageTitle,
 );
 
-$this->pageTitle = 'Request Key';
 
 ?>
 <dl class="dl-horizontal">
@@ -28,23 +29,41 @@ $this->pageTitle = 'Request Key';
     <div class="span11 offset1">
         <?php
         
-        /** @var BootActiveForm $form */
+        /* @var $form TbActiveForm */
         $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
             'inlineErrors' => true,
         ));
         
-        echo $form->errorSummary($model);
+        echo $form->errorSummary($key);
         
         // Show the necessary input fields.
         ?>
         <label>
             <p>What do you intend to use this API for? </p>
-            <?php echo $form->textArea($model,'purpose'); ?>
+            <?php echo $form->textArea($key, 'purpose'); ?>
         </label>
         <label>
             <p>What url/domain do you plan to use this API on? </p>
-            <?php echo $form->textField($model,'domain'); ?>
+            <?php echo $form->textField($key, 'domain'); ?>
         </label>
+        <?php if ($api->hasTerms()): ?>
+            <div class="well">
+                <?php
+                $this->beginWidget('CMarkdown', array('purifyOutput' => true));
+                echo $api->terms;
+                $this->endWidget();
+                ?>
+            </div>
+            <label class="checkbox">
+                <?= \CHtml::checkBox('accept_terms', $acceptedTerms); ?>
+                I accept the terms
+            </label>
+        <?php endif; ?>
+        <hr />
+        <p class="muted">
+            <b>Note:</b> The owner of this API will be able to see your name and
+            email address if you request a key.
+        </p>
         <?php
         
         // Show the submit button.
@@ -52,7 +71,7 @@ $this->pageTitle = 'Request Key';
         $this->widget('bootstrap.widgets.TbButton', array(
             'buttonType' => 'submit',
             'icon' => 'off white',
-            'label' => 'Request',
+            'label' => $api->getRequestKeyText(),
             'type' => 'primary'
         ));
         ?></div><?php

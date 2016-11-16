@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/styles.css?2015-02-09" />
+    <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/styles.css?2016-09" />
     <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/prism.css" />
     <meta charset="utf-8">
     <title><?php echo CHtml::encode($this->pageTitle . ' - ' . \Yii::app()->name); ?></title>
@@ -26,21 +26,20 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
             'class' => 'bootstrap.widgets.TbMenu',
             'items' => array(
                 array(
-                    'label' => 'Dashboard',
-                    'url' => array('dashboard/'),
+                    'label' => 'Home',
+                    'url' => array('/dashboard/'),
                     'active' => ($this->id == 'dashboard'),
                     'visible' => ( ! Yii::app()->user->isGuest),
                 ),
                 array(
-                    'label' => 'APIs',
+                    'label' => 'Browse APIs',
                     'url' => array('api/'),
                     'active' => (($this->id == 'api') && ($this->route != 'api/playground')),
-                    'visible' => ( ! Yii::app()->user->isGuest),
                 ),
                 array(
                     'label' => 'Keys',
                     'url' => array('key/'),
-                    'active' => (($this->id == 'key') || ($this->id == 'keyRequest')),
+                    'active' => ($this->id == 'key'),
                     'visible' => ( ! (Yii::app()->user->isGuest || Yii::app()->user->checkAccess('admin'))),
                 ),
                 array(
@@ -48,13 +47,13 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'items' => array(
                         array(
                             'label' => 'Active Keys',
-                            'url' => array('/key/all/'),
-                            'active' => ($this->route == 'key/all'),
+                            'url' => array('/key/active/'),
+                            'active' => ($this->route == 'key/active'),
                         ),
                         array(
                             'label' => 'Pending Keys',
-                            'url' => array('/key-request/'),
-                            'active' => ($this->route == 'keyRequest/index'),
+                            'url' => array('/key/pending/'),
+                            'active' => ($this->route == 'key/pending'),
                         ),
                         array(
                             'label' => 'My Keys',
@@ -63,7 +62,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                         ),
                     ),
                     'visible' => Yii::app()->user->role == 'admin',
-                    'active' => (($this->id == 'key') || ($this->id == 'keyRequest')),
+                    'active' => ($this->id == 'key'),
                 ),
                 array(
                     'label' => 'Users',
@@ -81,7 +80,18 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'label' => 'FAQs',
                     'url' => array('/faq/'),
                     'active' => ($this->id == 'faq'),
-                    'visible' => ( ! Yii::app()->user->isGuest),
+                ),
+                array(
+                    'label' => 'Site Text',
+                    'url' => array('/site-text/'),
+                    'active' => ($this->id == 'siteText'),
+                    'visible' => Yii::app()->user->checkAccess('admin'),
+                ),
+                array(
+                    'label' => 'Event Log',
+                    'url' => array('/event/'),
+                    'active' => ($this->id == 'event'),
+                    'visible' => Yii::app()->user->checkAccess('admin'),
                 ),
             ),
         ),
@@ -126,22 +136,15 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
     <div class="clear"></div>
     <hr>
     <div id="footer">
+        <img src="/img/logos/site-logo.png" class="pull-left footer-logo" />
         &copy; <?php echo date('Y'); ?> by SIL International Inc. | All Rights Reserved.<br/>
         Delivered by GTIS, USA Studio<br />
-        <?php
-        if ( ! Yii::app()->user->isGuest) {
-            $versionInfo = Utils::getApplicationVersion();
-            echo sprintf(
-                '%s version <em>%s</em> built on <em>%s</em><br />',
-                CHtml::encode(Yii::app()->name),
-                CHtml::encode($versionInfo['version']),
-                CHtml::encode($versionInfo['build'])
-            );
-        }
-        ?>
+        <?php if ( ! Yii::app()->user->isGuest): ?>
+            Built <?= \CHtml::encode(Utils::getApplicationBuildDate()); ?><br />
+        <?php endif; ?>
         <a href="<?php echo Yii::app()->createUrl('/site/privacy-policy'); ?>">Privacy Policy</a>
-        <?php if (( ! \Yii::app()->user->isGuest) && isset(\Yii::app()->params['adminEmail'])): ?>
-        | <a href="mailto:<?php echo CHtml::encode(Yii::app()->params['adminEmail']); ?>">Contact Us</a>
+        <?php if (( ! \Yii::app()->user->isGuest) && ( ! empty(\Yii::app()->params['contactUsUrl']))): ?>
+            | <a href="<?= \CHtml::encode(\Yii::app()->params['contactUsUrl']); ?>">Contact Us</a>
         <?php endif; ?>
     </div><!-- footer -->
 </div><!-- page -->

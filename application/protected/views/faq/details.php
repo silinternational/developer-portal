@@ -1,10 +1,9 @@
 <?php
-/* @var $this FaqController */
-/* @var $faq Faq */
+/* @var $this \Sil\DevPortal\controllers\FaqController */
+/* @var $faq Sil\DevPortal\models\Faq */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'FAQs' => array('/faq/'),
     $faq->question,
 );
@@ -26,7 +25,7 @@ if (\Yii::app()->user->checkAccess('admin')) {
 <div class="well">
     <?php
     
-    $this->beginWidget('CMarkdown', array('purifyOutput' => false));
+    $this->beginWidget('CMarkdown', array('purifyOutput' => true));
     echo $faq->answer;
     $this->endWidget();
     

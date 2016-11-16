@@ -18,6 +18,7 @@ class UsageStats extends CComponent
     
     protected $intervalSize = null;
     protected $data = null;
+    protected $rewindBy = 0;
     
     /**
      * Class for managing usage statistics.
@@ -26,13 +27,15 @@ class UsageStats extends CComponent
      *     point should represent (e.g. - 'day', 'hour', etc.). See the
      *     INTERVAL_* constants for the list of valid options.
      */
-    public function __construct($intervalName)
+    public function __construct($intervalName, $rewindBy = 0)
     {
         // Initialize our array of data.
         $this->data = array();
         
         // Convert the given interval name to an interval size (and record it).
         $this->intervalSize = self::getSecondsPerInterval($intervalName);
+        
+        $this->rewindBy = $rewindBy;
     }
     
     /**
@@ -52,7 +55,7 @@ class UsageStats extends CComponent
      * Add a set of usage data to this collection of usage statistics.
      * 
      * @param string $displayName The name to show for this usage data.
-     * @param array $usageData The usage data as returned by \Key->getUsage().
+     * @param array $usageData The usage data as returned by Key->getUsage().
      *     Note that the Key referred to here is the Key model, NOT the ApiAxle
      *     Key class.
      * @throws \Exception
@@ -216,7 +219,9 @@ class UsageStats extends CComponent
         // Get the actual list of timestamps we'll show data points for.
         $timestamps = self::getTimestampsToShow(
             $this->intervalSize,
-            $numIntervals
+            $numIntervals,
+            true,
+            $this->rewindBy
         );
         
         // Get the data that we'll use for the chart.
@@ -299,12 +304,15 @@ class UsageStats extends CComponent
      * @param boolean $includeCurrentInterval (Optional:) Whether to include the
      *     current time interval, even though we only have incomplete data for
      *     it. Defaults to true.
+     * @param int $rewindBy (Optional:) How many intervals to "back up"
+     *     the starting point by. Used for getting older data.
      * @return array The list of timestamps.
      */
     public static function getTimestampsToShow(
         $intervalSize,
         $numIntervals,
-        $includeCurrentInterval = true
+        $includeCurrentInterval = true,
+        $rewindBy = 0
     ) {
         // Find a timestamp in the past that we know would be included in the
         // data from ApiAxle if anything happened in that timeframe (aka. 
@@ -320,6 +328,9 @@ class UsageStats extends CComponent
         for ($i = $tempTime; $i < $stopBefore; $i += $intervalSize) {
             $finalTimestamp = $i;
         }
+        
+        // If told to get older data, adjust accordingly.
+        $finalTimestamp -= ($rewindBy * $intervalSize);
         
         // Populate an array (ending with that final timestamp) which has the
         // given number of timestamps in it.
@@ -342,11 +353,14 @@ class UsageStats extends CComponent
      * @param boolean $includeCurrentInterval (Optional:) Whether to include the
      *     current time interval, even though we only have incomplete data for
      *     it. Defaults to true.
+     * @param int $rewindBy (Optional:) How many intervals to "back up"
+     *     the starting point by. Used for getting older data.
      * @return int The timestamp.
      */
     public static function getTimeStart(
         $intervalName,
-        $includeCurrentInterval = true
+        $includeCurrentInterval = true,
+        $rewindBy = 0
     ) {
         // Get the list of timestamps to be shown.
         $intervalSize = self::getSecondsPerInterval($intervalName);
@@ -354,7 +368,8 @@ class UsageStats extends CComponent
         $timestamps = self::getTimestampsToShow(
             $intervalSize,
             $numInterals,
-            $includeCurrentInterval
+            $includeCurrentInterval,
+            $rewindBy
         );
         
         // Return the first one.

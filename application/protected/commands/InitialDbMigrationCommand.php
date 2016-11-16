@@ -37,7 +37,7 @@ class InitialDbMigrationCommand extends CConsoleCommand
             }
 
             // Add composite primary key for join tables
-            if ($compositePrimaryKeyCols) {
+            if ( ! empty($compositePrimaryKeyCols)) {
                 $result .= '    $this->addPrimaryKey(\'pk_' . $table->name . "', '$table->name', '" . implode(',', $compositePrimaryKeyCols) . "');\n\n";
 
             }

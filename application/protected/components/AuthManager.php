@@ -1,6 +1,8 @@
 <?php
 namespace Sil\DevPortal\components;
 
+use Stringy\StaticStringy as SS;
+
 class AuthManager
 {
     /**
@@ -16,6 +18,8 @@ class AuthManager
     private $knownAuthTypes = array(
         'hybrid' => '\Sil\DevPortal\components\HybridAuthUserIdentity',
         'saml' => '\Sil\DevPortal\components\SamlUserIdentity',
+        'test-owner' => '\Sil\DevPortal\components\OwnerTestUserIdentity',
+        'test-user' => '\Sil\DevPortal\components\UserTestUserIdentity',
     );
     
     /**
@@ -24,8 +28,8 @@ class AuthManager
      * auth types, we could presumably safely assume that the user does NOT need
      * to select a login option since there is (at most) only one option.
      * 
-     * @return bool Whether there are multiple authenciation types available for
-     *     user's to log in through.
+     * @return bool Whether there are multiple authentication types available
+     *     for users to log in through.
      */
     public function canUseMultipleAuthTypes()
     {
@@ -36,6 +40,11 @@ class AuthManager
             }
         }
         return ($numUsableAuthTypes > 1);
+    }
+    
+    public function getApplicationEnv()
+    {
+        return (defined('APPLICATION_ENV') ? APPLICATION_ENV : null);
     }
     
     /**
@@ -139,6 +148,43 @@ class AuthManager
         return $messageHtml;
     }
     
+    /**
+     * Get the list of login options.
+     * 
+     * @return array<string,string> The list of login options, where keys are
+     *     the display name for that authentication types (e.g. Google) and
+     *     values are URL for logging in using that auth. type.
+     */
+    public function getLoginOptions()
+    {
+        $loginOptions = array();
+        if ($this->isAuthTypeEnabled('saml')) {
+            $loginOptions['Insite'] = \Yii::app()->createUrl('auth/login', array(
+                'authType' => 'saml',
+            ));
+        }
+        if ($this->isAuthTypeEnabled('hybrid')) {
+            $hybridAuthManager = new HybridAuthManager();
+            foreach ($hybridAuthManager->getEnabledProvidersList() as $provider) {
+                $loginOptions[$provider] = \Yii::app()->createUrl('auth/login', [
+                    'authType' => 'hybrid',
+                    'providerSlug' => self::slugify($provider),
+                ]);
+            }
+        }
+        if ($this->isAuthTypeEnabled('test-user')) {
+            $loginOptions['Test (User)'] = \Yii::app()->createUrl('auth/login', array(
+                'authType' => 'test-user',
+            ));
+        }
+        if ($this->isAuthTypeEnabled('test-owner')) {
+            $loginOptions['Test (Owner)'] = \Yii::app()->createUrl('auth/login', array(
+                'authType' => 'test-owner',
+            ));
+        }
+        return $loginOptions;
+    }
+    
     protected function getKnownAuthTypeNames()
     {
         return \array_keys($this->knownAuthTypes);
@@ -156,6 +202,9 @@ class AuthManager
                 return $this->isSamlAuthEnabled();
             case 'hybrid':
                 return $this->isHybridAuthEnabled();
+            case 'test-user':
+            case 'test-owner':
+                return $this->isTestAuthEnabled();
             default:
                 return false;
         }
@@ -171,9 +220,13 @@ class AuthManager
     
     protected function isSamlAuthEnabled()
     {
-        // If we have SAML config data, consider SAML authentication enabled.
-        $rawSamlConfigData = \Yii::app()->params['saml'];
-        return is_array($rawSamlConfigData) && (count($rawSamlConfigData) > 0);
+        return \Yii::app()->params['saml']['enabled'];
+    }
+    
+    protected function isTestAuthEnabled()
+    {
+        $applicationEnv = $this->getApplicationEnv();
+        return ($applicationEnv === 'development') || ($applicationEnv === 'testing');
     }
     
     /**
@@ -202,5 +255,10 @@ class AuthManager
         if ( ! empty($logoutUrl)) {
             \Yii::app()->controller->redirect($logoutUrl);
         }
+    }
+    
+    public static function slugify($string)
+    {
+        return (string)SS::slugify($string);
     }
 }

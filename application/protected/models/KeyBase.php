@@ -13,11 +13,19 @@
  * @property integer $queries_day
  * @property string $created
  * @property string $updated
- * @property integer $key_request_id
+ * @property string $status
+ * @property string $requested_on
+ * @property string $processed_on
+ * @property integer $processed_by
+ * @property string $purpose
+ * @property string $domain
+ * @property string $accepted_terms_on
+ * @property string $subscription_id
  *
  * The followings are the available model relations:
- * @property KeyRequest $keyRequest
+ * @property Event[] $events
  * @property Api $api
+ * @property User $processedBy
  * @property User $user
  */
 class KeyBase extends CActiveRecord
@@ -38,14 +46,16 @@ class KeyBase extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('value, secret, user_id, api_id, queries_second, queries_day', 'required'),
-			array('user_id, api_id, queries_second, queries_day, key_request_id', 'numerical', 'integerOnly'=>true),
+			array('user_id, api_id, queries_second, queries_day, created, updated, requested_on, purpose, domain', 'required'),
+			array('user_id, api_id, queries_second, queries_day, processed_by', 'numerical', 'integerOnly'=>true),
 			array('value', 'length', 'max'=>32),
 			array('secret', 'length', 'max'=>128),
-			array('created, updated', 'safe'),
+			array('status', 'length', 'max'=>8),
+			array('purpose, domain, subscription_id', 'length', 'max'=>255),
+			array('processed_on, accepted_terms_on', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('key_id, value, secret, user_id, api_id, queries_second, queries_day, created, updated, key_request_id', 'safe', 'on'=>'search'),
+			array('key_id, value, secret, user_id, api_id, queries_second, queries_day, created, updated, status, requested_on, processed_on, processed_by, purpose, domain, accepted_terms_on, subscription_id', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -57,8 +67,9 @@ class KeyBase extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'keyRequest' => array(self::BELONGS_TO, 'KeyRequest', 'key_request_id'),
+			'events' => array(self::HAS_MANY, 'Event', 'key_id'),
 			'api' => array(self::BELONGS_TO, 'Api', 'api_id'),
+			'processedBy' => array(self::BELONGS_TO, 'User', 'processed_by'),
 			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
 		);
 	}
@@ -78,7 +89,14 @@ class KeyBase extends CActiveRecord
 			'queries_day' => 'Queries Day',
 			'created' => 'Created',
 			'updated' => 'Updated',
-			'key_request_id' => 'Key Request',
+			'status' => 'Status',
+			'requested_on' => 'Requested On',
+			'processed_on' => 'Processed On',
+			'processed_by' => 'Processed By',
+			'purpose' => 'Purpose',
+			'domain' => 'Domain',
+			'accepted_terms_on' => 'Accepted Terms On',
+			'subscription_id' => 'Subscription',
 		);
 	}
 
@@ -109,7 +127,14 @@ class KeyBase extends CActiveRecord
 		$criteria->compare('queries_day',$this->queries_day);
 		$criteria->compare('created',$this->created,true);
 		$criteria->compare('updated',$this->updated,true);
-		$criteria->compare('key_request_id',$this->key_request_id);
+		$criteria->compare('status',$this->status,true);
+		$criteria->compare('requested_on',$this->requested_on,true);
+		$criteria->compare('processed_on',$this->processed_on,true);
+		$criteria->compare('processed_by',$this->processed_by);
+		$criteria->compare('purpose',$this->purpose,true);
+		$criteria->compare('domain',$this->domain,true);
+		$criteria->compare('accepted_terms_on',$this->accepted_terms_on,true);
+		$criteria->compare('subscription_id',$this->subscription_id,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

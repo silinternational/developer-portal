@@ -1,35 +1,68 @@
 <?php
-/* @var $this SiteController */
+/* @var $this \Sil\DevPortal\controllers\SiteController */
+/* @var $loginOptions array<string,string> */
+/* @var $logoUrls string[] */
+/* @var $homeLowerLeftHtml string|null */
+/* @var $homeLowerRightHtml string|null */
+/* @var $popularApis \Sil\DevPortal\models\Api[]|null */
 
+$this->breadcrumbs = array();
 $this->pageTitle = 'Welcome';
 ?>
-
-<div class="hero-unit">
-    <h1>Welcome to the <br /><span class="sil-blue"><?php echo CHtml::encode(Yii::app()->name); ?></span></h1>
-    <p></p>
-</div>
-
-<div class="row">
-
-    <div class="span4">
-        <h2>API Owners</h2>
-        <p>
-            Publish your APIs and manage access to who can use them.
-        </p>
+<div class="home-page">
+    <div class="hero-unit">
+        <div class="row-fluid">
+            <div class="span8">
+                <h2>
+                    <span class="text-sm">Welcome to the </span><br />
+                    <span class="sil-blue site-name"><?= \CHtml::encode(Yii::app()->name); ?></span>
+                </h2>
+            </div>
+            
+            <div class="span4">
+                <div id="get-started">
+                    <h2>Get Started</h2>
+                    <?php
+                    foreach ($loginOptions as $displayName => $loginUrl) {
+                        echo sprintf(
+                            '<div><a href="%s" class="btn btn-success">Login with %s</a></div> ',
+                            $loginUrl,
+                            \CHtml::encode($displayName)
+                        );
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <div class="pad-horiz-extra">
+        <div class="row-fluid">
+            <div class="span8">
+                <?= $homeLowerLeftHtml; ?>
+            </div>
 
-    <div class="span4">
-        <h2>API Consumers</h2>
-        <p>
-            Discover new APIs, read integration documentation, and request access
-            to APIs.
-        </p>
-    </div>
-
-    <div class="span4">
-        <h2>Getting Started</h2>
-        <p>
-            To begin, click the Login button above.
-        </p>
+            <div class="span4">
+                <?php if ($popularApis === null): ?>
+                    <?php $homeLowerRightHtml; ?>
+                <?php else: ?>
+                    <?php
+                    $this->renderPartial('//partials/popular-apis', array(
+                        'popularApis' => $popularApis,
+                    ));
+                    ?>
+                <?php endif; ?>
+            </div>
+        </div>
+        
+        <?php if ( ! empty($logoUrls)): ?>
+            <div id="logo-strip">
+                <div>
+                    <?php foreach ($logoUrls as $logoUrl): ?>
+                        <img src="<?= \CHtml::encode($logoUrl); ?>" />
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </div>

@@ -29,17 +29,17 @@
                   'url' => $this->createUrl('/api/'),
               ),
               array(
-                  'label' => 'All Active Keys',
-                  'url' => $this->createUrl('/key/all/'),
+                  'label' => 'Active Keys',
+                  'url' => $this->createUrl('/key/active/'),
                   'visible' => \Yii::app()->user->checkAccess('admin'),
               ),
               array(
-                  'label' => 'Pending Key Requests',
-                  'url' => $this->createUrl('/key-request/'),
+                  'label' => 'Pending Keys',
+                  'url' => $this->createUrl('/key/pending/'),
                   'visible' => \Yii::app()->user->checkAccess('admin'),
               ),
               array(
-                  'label' => 'My API Keys',
+                  'label' => 'My Keys',
                   'url' => $this->createUrl('/key/mine/'),
               ),
               array(
@@ -58,40 +58,23 @@
                   'label' => 'FAQs',
                   'url' => $this->createUrl('/faq/'),
               ),
+              array(
+                  'label' => 'Site Text',
+                  'url' => $this->createUrl('/site-text/'),
+                  'visible' => \Yii::app()->user->checkAccess('admin'),
+              ),
+              array(
+                  'label' => 'Event Log',
+                  'url' => $this->createUrl('/event/'),
+                  'visible' => \Yii::app()->user->checkAccess('admin'),
+              ),
           ),
       ));
-      
-      //// If there are any news items, show them.
-      //$news = \Yii::app()->user->user->getNews();
-      //if (isset($news) && (count($news) > 0)) {
-      //  ?><!-- <div> <h3>News</h3> --><?php
-      //
-      //    foreach ($news as $newsItem) {
-      //
-      //      // TODO: Show news items.
-      //
-      //    }
-      //
-      //    ?><!-- </div> --><?php
-      //}
       
       ?>
     </div>
     <div class="span9">
-      <?php
-      if ($this->pageTitle) {
-          echo sprintf(
-              '<h2>%s%s</h2> ',
-              CHtml::encode($this->pageTitle),
-              $this->pageSubtitle ? sprintf(
-                  ' <small>%s</small>',
-                  CHtml::encode($this->pageSubtitle)
-              ) : ''
-          );
-      }
-      
-      echo $content;
-      ?>
+      <?= $content; ?>
     </div>
   </div>
 </div>

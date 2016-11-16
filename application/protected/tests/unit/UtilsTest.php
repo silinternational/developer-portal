@@ -123,7 +123,7 @@ class UtilsTest extends CDbTestCase
 
     public function testfindPkOr404() 
     {
-        $model = 'Api';
+        $model = '\Sil\DevPortal\models\Api';
         $pk = 2;
         $expected = 'www.owner.com';
         
@@ -136,17 +136,46 @@ class UtilsTest extends CDbTestCase
 
     public function testfindPkOr404_Fail() 
     {
-        $model = 'Api';
+        $model = '\Sil\DevPortal\models\Api';
         $pk = 999;
         $expected = 'invalid request';
         
         try {
             $results = Utils::findPkOr404($model, $pk);
         }
-        catch (Exception $ex) {
+        catch (\Exception $ex) {
             $results = $ex->getMessage();
         }
         
         $this->assertEquals($expected, $results);
+    }
+    
+    public function testIsArrayWithContent()
+    {
+        // Arrange:
+        $testCases = [
+            [null, false],
+            ['', false],
+            ['abc', false],
+            [0, false],
+            [1, false],
+            [[], false],
+            [['a'], true],
+            [['a', 'b'], true],
+            [[null], true],
+        ];
+        foreach ($testCases as $testCase) {
+            $value = $testCase[0];
+            $expected = $testCase[1];
+            
+            // Act:
+            $actual = Utils::isArrayWithContent($value);
+
+            // Assert:
+            $this->assertSame($expected, $actual, sprintf(
+                'Returned the wrong response for %s.',
+                var_export($value, true)
+            ));
+        }
     }
 }

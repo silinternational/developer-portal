@@ -2,6 +2,7 @@
 namespace Sil\DevPortal\components;
 
 use Sil\DevPortal\components\UserAuthenticationData;
+use Sil\DevPortal\models\User;
 
 class SamlUserIdentity extends UserIdentity
 {
@@ -73,7 +74,7 @@ class SamlUserIdentity extends UserIdentity
      * the database.
      * 
      * @param \Sil\DevPortal\components\UserAuthenticationData $userAuthData
-     * @return \User|null
+     * @return User|null
      */
     protected function findUserRecord($userAuthData)
     {
@@ -83,8 +84,8 @@ class SamlUserIdentity extends UserIdentity
             $authProvider = $userAuthData->getAuthProvider();
             if ($this->canTrustEmailAsFallbackIdFor($authProvider)) {
             
-                /* @var $user \User */
-                $user = \User::model()->findByAttributes(array(
+                /* @var $user User */
+                $user = User::model()->findByAttributes(array(
                     'auth_provider' => $authProvider,
                     'auth_provider_user_identifier' => null,
                     'email' => $userAuthData->getEmailAddress(),
@@ -181,9 +182,12 @@ class SamlUserIdentity extends UserIdentity
     /**
      * Get the data about this user as returned by the authentication provider.
      * 
+     * @param string|null $providerSlug The URL-safe (aka. "slug") version of
+     *     the name of what provider to use within the current authentication
+     *     type (such as which HybridAuth provider to use).
      * @return \Sil\DevPortal\components\UserAuthenticationData
      */
-    public function getUserAuthData()
+    public function getUserAuthData($providerSlug = null)
     {
         // If the user is NOT yet authenticated...
         if ( ! $this->auth->isAuthenticated()) {
@@ -307,8 +311,8 @@ class SamlUserIdentity extends UserIdentity
                 if ( ! $user->save()) {
                     throw new \Exception(
                         'Failed to save this user\'s auth. provider user '
-                        . 'identifier: '
-                        . print_r($user->errors, true),
+                        . 'identifier: ' . PHP_EOL
+                        . $user->getErrorsAsFlatTextList(),
                         1444936447
                     );
                 }

@@ -22,7 +22,7 @@ class Controller extends CController
      * be assigned to {@link CBreadcrumbs::links}. Please refer to {@link CBreadcrumbs::links}
      * for more details on how to specify this property.
      */
-    public $breadcrumbs = array();
+    public $breadcrumbs = array('Home' => '/');
     
     /**
      * @var string|null The (optional) subtitle for the page.
@@ -178,31 +178,39 @@ class Controller extends CController
                     'delete',
                     'docsEdit',
                     'edit',
+                    'invitedDomains',
+                    'inviteDomain',
+                    'invitedUsers',
+                    'inviteUser',
                     'pendingKeys',
                 ),
                 'roles' => array('owner'),
-            ),
-            array( // Developers and Owners can see some KeyRequest information.
-                'allow',
-                'controllers' => array('keyRequest'),
-                'actions' => array(
-                    'delete',
-                    'details',
-                    'index',
-                ),
-                'roles' => array('owner', 'user'),
             ),
             array( // Developers and Owners can view basic info about APIs.
                 'allow',
                 'controllers' => array('api'),
                 'actions' => array(
-                    'addContactUs',
                     'details',
                     'index',
                     'playground',
                     'requestKey',
                 ),
                 'roles' => array('owner', 'user'),
+            ),
+            array( // Anyone can see basic info about (some) APIs (policed in the controller).
+                'allow',
+                'controllers' => array('api'),
+                'actions' => array(
+                    'details',
+                    'index',
+                ),
+                'roles' => array('*'),
+            ),
+            array( // Owners can do certain things with keys.
+                'allow',
+                'controllers' => array('key'),
+                'actions' => array('revoke'),
+                'roles' => array('owner'),
             ),
             array( // Developers and Owners can see some key information.
                 'allow',
@@ -227,11 +235,11 @@ class Controller extends CController
                 'actions'       => array('index', 'usageChart'),
                 'roles'         => array('owner', 'user'),
             ),
-            array( // Authenticated users can read the FAQs.
+            array( // Anyone can read the FAQs.
                 'allow',
                 'controllers' => array('faq'),
                 'actions' => array('details', 'index'),
-                'roles' => array('@'),
+                'roles' => array('*'),
             ),
             array( // Authenticated users can view very limited info about APIs.
                 'allow',

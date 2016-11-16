@@ -1,10 +1,9 @@
 <?php
-/* @var $this UserController */
+/* @var $this \Sil\DevPortal\controllers\UserController */
 /* @var $usersDataProvider CDataProvider*/
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'Users',
 );
 
@@ -18,23 +17,22 @@ $this->pageTitle = 'Users';
             'type' => 'striped hover',
             'dataProvider' => $usersDataProvider,
             'rowCssClassExpression' => '('
-            . '    ($data->status == \User::STATUS_ACTIVE) ? "" : "muted"'
+            . '    ($data->status == \Sil\DevPortal\models\User::STATUS_ACTIVE) ? "" : "muted"'
             . ')',
             'template' => '{items}{pager}',
             'columns' => array(
-                array('name' => 'first_name', 'header' => 'First name'),
-                array('name' => 'last_name', 'header' => 'Last name'),
+                array('name' => 'display_name', 'header' => 'Display Name'),
                 array('name' => 'email', 'header' => 'Email'),
-                array('name' => 'keyCount', 'header' => 'Keys'),
+                array('name' => 'approvedKeyCount', 'header' => 'Keys'),
                 array(
                     'name' => 'role',
                     'header' => 'Role',
-                    'value' => 'User::getRoleString($data->role)',
+                    'value' => '\Sil\DevPortal\models\User::getRoleString($data->role)',
                 ),
                 array(
                     'name' => 'status',
                     'header' => 'Status',
-                    'value' => 'User::getStatusString($data->status)',
+                    'value' => '\Sil\DevPortal\models\User::getStatusString($data->status)',
                 ),
                 array(
                     'class' => 'ActionLinksColumn',

@@ -1,58 +1,60 @@
 <?php
-/* @var $this DashboardController */
-/* @var $user User */
-/* @var $keyRequests KeyRequest[] */
+
+use Sil\DevPortal\controllers\DashboardController;
+use Sil\DevPortal\models\Key;
+
+/* @var $this \Sil\DevPortal\controllers\DashboardController */
+/* @var $user \Sil\DevPortal\models\User */
+/* @var $keys Key[] */
 /* @var $usageStats UsageStats */
-/* @var $apisOwnedByUser Api[]|null */
+/* @var $apisOwnedByUser \Sil\DevPortal\models\Api[]|null */
 /* @var $currentInterval string */
 /* @var $chart string */
 
 // Set up the breadcrumbs.
 $this->breadcrumbs = array(
-    'Dashboard',
+    'Home',
 );
 
-$this->pageTitle = 'Dashboard';
-
-// If the user is an owner and has any pending key requests, say so.
+// If the user is an owner and has any pending keys, say so.
 if ($user->hasOwnerPrivileges()) {
     $numOwnerApis = 0;
-    $numPendingKeyRequestsForOwnerApis = 0;
+    $numPendingKeysForOwnerApis = 0;
     foreach ($apisOwnedByUser as $api) {
         $numOwnerApis += 1;
-        $numPendingKeyRequestsForOwnerApis += $api->pendingKeyCount;
+        $numPendingKeysForOwnerApis += $api->pendingKeyCount;
     }
 
-    if ($numPendingKeyRequestsForOwnerApis > 0) {
+    if ($numPendingKeysForOwnerApis > 0) {
         echo sprintf(
             '<div class="row-fluid"><div class="span12 alert alert-error">'
             . '<button type="button" class="close" data-dismiss="alert">&times;'
-            . '</button> <b>Important:</b> Your %s %s pending key request%s. '
+            . '</button> <b>Important:</b> Your %s %s pending key%s. '
             . '<a href="javascript: scrollToAnchor(\'apis\', \'.pending-keys.badge-important\');">See below</a> '
             . '(under "My APIs") for details.</div></div>',
             ($numOwnerApis === 1 ? 'API has' : 'APIs have'),
-            $numPendingKeyRequestsForOwnerApis,
-            ($numPendingKeyRequestsForOwnerApis === 1 ? '' : 's')
+            $numPendingKeysForOwnerApis,
+            ($numPendingKeysForOwnerApis === 1 ? '' : 's')
         );
     }
 }
 
 ?>
 <ul class="nav nav-tabs">
-  <li<?php echo ($chart === \DashboardController::CHART_MY_KEYS ? ' class="active"' : ''); ?>>
+  <li<?php echo ($chart === DashboardController::CHART_MY_KEYS ? ' class="active"' : ''); ?>>
     <a href="<?php echo $this->createUrl('', array(
         'interval' => $currentInterval,
-        //'chart' => \DashboardController::CHART_MY_KEYS, // Automatic default.
+        //'chart' => DashboardController::CHART_MY_KEYS, // Automatic default.
     )); ?>">My Usage</a>
   </li>
   <?php
 
   if ($user->hasOwnerPrivileges()) {
       ?>
-      <li<?php echo ($chart === \DashboardController::CHART_MY_APIS ? ' class="active"' : ''); ?>>
+      <li<?php echo ($chart === DashboardController::CHART_MY_APIS ? ' class="active"' : ''); ?>>
         <a href="<?php echo $this->createUrl('', array(
             'interval' => $currentInterval,
-            'chart' => \DashboardController::CHART_MY_APIS,
+            'chart' => DashboardController::CHART_MY_APIS,
         )); ?>">My APIs</a>
       </li>
       <?php
@@ -60,16 +62,16 @@ if ($user->hasOwnerPrivileges()) {
 
   if ($user->isAdmin()) {
       ?>
-      <li<?php echo ($chart === \DashboardController::CHART_ALL_APIS ? ' class="active"' : ''); ?>>
+      <li<?php echo ($chart === DashboardController::CHART_ALL_APIS ? ' class="active"' : ''); ?>>
         <a href="<?php echo $this->createUrl('', array(
             'interval' => $currentInterval,
-            'chart' => \DashboardController::CHART_ALL_APIS,
+            'chart' => DashboardController::CHART_ALL_APIS,
         )); ?>">All APIs</a>
       </li>
-      <li<?php echo ($chart === \DashboardController::CHART_TOTALS ? ' class="active"' : ''); ?>>
+      <li<?php echo ($chart === DashboardController::CHART_TOTALS ? ' class="active"' : ''); ?>>
         <a href="<?php echo $this->createUrl('', array(
             'interval' => $currentInterval,
-            'chart' => \DashboardController::CHART_TOTALS,
+            'chart' => DashboardController::CHART_TOTALS,
         )); ?>">Totals</a>
       </li>
       <?php
@@ -96,6 +98,29 @@ if ($user->hasOwnerPrivileges()) {
       }
       ?>
     </div>
+    <div class="btn-group shrink-below-480" style="margin: 5px auto;">
+      <?php
+      $intervalSize = \UsageStats::getSecondsPerInterval($currentInterval);
+      $numIntervalsShown = \UsageStats::getNumIntervalsToShow($intervalSize);
+      echo sprintf(
+          '<a class="btn" href="%s" title="Previous">&lt;&lt;</a>',
+          $this->createUrl('', array(
+              'interval' => $currentInterval,
+              'chart' => $chart,
+              'rewindBy' => $rewindBy + $numIntervalsShown,
+          ))
+      );
+      echo sprintf(
+          '<a class="btn" href="%s" title="Next"%s>&gt;&gt;</a>',
+          $this->createUrl('', array(
+              'interval' => $currentInterval,
+              'chart' => $chart,
+              'rewindBy' => max(0, $rewindBy - $numIntervalsShown),
+          )),
+          ($rewindBy === 0 ? ' disabled=disabled' : '')
+      );
+      ?>
+    </div>
   </div>
   <div id="ajax-usage-chart-destination" style="height: 368px; overflow: hidden;">
     <div style="height: 100%; text-align: center;">
@@ -106,7 +131,8 @@ if ($user->hasOwnerPrivileges()) {
   $('#ajax-usage-chart-destination').load(
     '<?= $this->createUrl('dashboard/usage-chart', array(
            'interval' => $currentInterval,
-           'chart' => $chart
+           'chart' => $chart,
+           'rewindBy' => $rewindBy
          )); ?>',
     null,
     function(responseText, textStatus, jqXHR) {
@@ -134,18 +160,18 @@ if ($user->hasOwnerPrivileges()) {
     <div class="row-fluid">
       <?php
 
-      if (count($keyRequests) <= 0) {
+      if (count($keys) <= 0) {
           echo '<i>None</i>';
       }
 
       // Track when we should start a new row.
       $startNewRow = false;
 
-      // For each Key/KeyRequest to show...
-      foreach ($keyRequests as $keyRequest) {
+      // For each Key to show...
+      foreach ($keys as $key) {
 
-        // Get this Key's/KeyRequet's API's display name.
-        $displayName = $keyRequest->api->display_name;
+        // Get this Keys API's display name.
+        $displayName = $key->api->display_name;
 
         // Start the card, giving it a left border color specific to this
         // key's API.
@@ -159,84 +185,73 @@ if ($user->hasOwnerPrivileges()) {
         // links, if applicable).
         $cardActionLinksHtml = null;
         $cardDetailsHtml = null;
-        switch($keyRequest->status) {
-          case KeyRequest::STATUS_APPROVED:
-            if ($keyRequest->key !== null) {
+        switch($key->status) {
+          case Key::STATUS_APPROVED:
 
-              // If the key still exists, assemble the info/links to show
-              // for this key/request/api.
-              $cardActionLinksHtml = sprintf(
-                '<div class="btn-group pull-right">'
-                . '<button class="btn btn-small dropdown-toggle" data-toggle="dropdown">'
-                  . 'Actions <span class="caret"></span>'
-                . '</button>'
-                . '<ul class="dropdown-menu">'
-                  . '<li>'
-                    . '<a href="%s" class="nowrap space-after-icon">'
-                      . '<i class="icon-list"></i>Key Details'
-                    . '</a>'
-                  . '</li> '
-                  . '<li>'
-                    . '<a href="%s" class="nowrap space-after-icon">'
-                      . '<i class="icon-book"></i>API Documentation'
-                    . '</a>'
-                  . '</li>'
-                  . '<li>'
-                    . '<a href="%s" class="nowrap space-after-icon">'
-                      . '<i class="icon-play-circle"></i>API Playground'
-                    . '</a>'
-                  . '</li> '
-                . '</ul>'
-                . '</div>',
-                $this->createUrl('/key/details/', array(
-                    'id' => $keyRequest->key->key_id,
-                )),
-                $this->createUrl('/api/details/', array(
-                    'code' => $keyRequest->api->code,
-                )),
-                $this->createUrl('/api/playground/', array(
-                  'key_id' => (int)$keyRequest->key->key_id
-                ))
-              );
-              $cardDetailsHtml = sprintf(
-                '<div class="card-url">'
-                . '<span class="card-hover-content"><b>Domain: </b></span><u>%s</u>'
-                . '</div> '
-                . '<div class="card-summary">'
-                . '<span class="card-hover-content"><b>Purpose: </b></span>%s'
-                . '</div>',
-                str_replace(
-                  '.',
-                  '.<wbr>',
-                  CHtml::encode($keyRequest->domain)
-                ),
-                CHtml::encode($keyRequest->purpose)
-              );
-
-            } else {
-
-              // Otherwise, say so.
-              $cardDetailsHtml = '<div class="text-error">'
-                  . '<span class="card-hover-content"><b>Status: </b></span>'
-                  . '<i>Key was not found. It may have been revoked.</i>'
-                  . '</div>';
-            }
+            // Assemble the info/links to show for this key/api.
+            $cardActionLinksHtml = sprintf(
+              '<div class="btn-group pull-right">'
+              . '<button class="btn btn-small dropdown-toggle" data-toggle="dropdown">'
+                . 'Actions <span class="caret"></span>'
+              . '</button>'
+              . '<ul class="dropdown-menu">'
+                . '<li>'
+                  . '<a href="%s" class="nowrap space-after-icon">'
+                    . '<i class="icon-list"></i>Key Details'
+                  . '</a>'
+                . '</li> '
+                . '<li>'
+                  . '<a href="%s" class="nowrap space-after-icon">'
+                    . '<i class="icon-book"></i>API Documentation'
+                  . '</a>'
+                . '</li>'
+                . '<li>'
+                  . '<a href="%s" class="nowrap space-after-icon">'
+                    . '<i class="icon-play-circle"></i>API Playground'
+                  . '</a>'
+                . '</li> '
+              . '</ul>'
+              . '</div>',
+              $this->createUrl('/key/details/', array(
+                  'id' => $key->key_id,
+              )),
+              $this->createUrl('/api/details/', array(
+                  'code' => $key->api->code,
+              )),
+              $this->createUrl('/api/playground/', array(
+                'key_id' => (int)$key->key_id
+              ))
+            );
+            $cardDetailsHtml = sprintf(
+              '<div class="card-url">'
+              . '<span class="card-hover-content"><b>Domain: </b></span><u>%s</u>'
+              . '</div> '
+              . '<div class="card-summary">'
+              . '<span class="card-hover-content"><b>Purpose: </b></span>%s'
+              . '</div>',
+              str_replace(
+                '.',
+                '.<wbr>',
+                CHtml::encode($key->domain)
+              ),
+              CHtml::encode($key->purpose)
+            );
             break;
 
-          case KeyRequest::STATUS_DENIED:
+          case Key::STATUS_DENIED:
             $cardActionLinksHtml = LinksManager::generateActionsDropdownHtml(
-                LinksManager::getDashboardKeyRequestActionLinks($keyRequest),
+                LinksManager::getDashboardKeyActionLinks($key),
                 LinksManager::BUTTON_SIZE_SMALL
             );
             $cardDetailsHtml = '<div class="text-error">'
               . '<span class="card-hover-content"><b>Status: </b></span>'
-              . '<i>Key request denied. </i>'
+              . '<i>Key denied. </i>'
               . '</div>';
             break;
 
-          case KeyRequest::STATUS_PENDING:
+          case Key::STATUS_PENDING:
             $cardActionLinksHtml = LinksManager::generateActionsDropdownHtml(
-                LinksManager::getDashboardKeyRequestActionLinks($keyRequest),
+                LinksManager::getDashboardKeyActionLinks($key),
                 LinksManager::BUTTON_SIZE_SMALL
             );
             $cardDetailsHtml = '<div>'
@@ -245,9 +260,9 @@ if ($user->hasOwnerPrivileges()) {
               . '</div>';
             break;
 
-          case KeyRequest::STATUS_REVOKED:
+          case Key::STATUS_REVOKED:
             $cardActionLinksHtml = LinksManager::generateActionsDropdownHtml(
-                LinksManager::getDashboardKeyRequestActionLinks($keyRequest),
+                LinksManager::getDashboardKeyActionLinks($key),
                 LinksManager::BUTTON_SIZE_SMALL
             );
             $cardDetailsHtml = '<div class="text-error">'
@@ -259,7 +274,7 @@ if ($user->hasOwnerPrivileges()) {
           default:
             $cardDetailsHtml = '<div class="text-error">'
               . '<i><b>Error:</b> Unknown status ('
-              . CHtml::encode($keyRequest->status) . ')</i>'
+              . CHtml::encode($key->status) . ')</i>'
               . '</div>';
             break;
         }
@@ -323,9 +338,9 @@ if ($user->hasOwnerPrivileges()) {
                 'class' => 'CLinkColumn',
                 'labelExpression' => 'sprintf('
                     . '"<span class=\"badge%s\" title=\"%s\">%s</span>",'
-                    . '($data->keyCount ? " badge-info" : "" ),'
+                    . '($data->approvedKeyCount ? " badge-info" : "" ),'
                     . '"Click for more information",'
-                    . '$data->keyCount'
+                    . '$data->approvedKeyCount'
                 . ')',
                 'urlExpression' => '\Yii::app()->createUrl('
                     . '"api/active-keys", '

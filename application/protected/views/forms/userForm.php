@@ -1,5 +1,7 @@
 <?php
 
+use Sil\DevPortal\models\User;
+
 return array(
     
     'elements' => array(

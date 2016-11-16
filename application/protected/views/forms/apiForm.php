@@ -1,5 +1,8 @@
 <?php
 
+use Sil\DevPortal\models\Api;
+use Sil\DevPortal\models\User;
+
 return array(
     
     'elements' => array(
@@ -35,11 +38,13 @@ return array(
             'data' => CMap::mergeArray(
                 array('' => '-- none --'),
                 CHtml::encodeArray(CHtml::listData(
-                    \User::model()->findAllByAttributes(array(
-                        'role' => array(\User::ROLE_OWNER, \User::ROLE_ADMIN),
+                    User::model()->findAllByAttributes(array(
+                        'role' => array(User::ROLE_OWNER, User::ROLE_ADMIN),
                     )),
                     'user_id',
-                    'display_name'
+                    function($user) {
+                        return $user->display_name . ' (' . $user->email . ')';
+                    }
                 ))
             ),
             'visible' => \Yii::app()->user->checkAccess('admin'),
@@ -58,6 +63,13 @@ return array(
             ),
             'type' => 'text',
         ),
+        'additional_headers' => [
+            'htmlOptions' => [
+                'placeholder' => 'SampleHeader=Value&Header2=OtherValue',
+                'class' => 'input-xxlarge',
+            ],
+            'type' => 'text',
+        ],
         'endpoint_timeout' => array(
             'htmlOptions' => array(
                 'placeholder' => '10',
@@ -73,6 +85,25 @@ return array(
             'type' => 'radiobuttonlist_inline',
             'data' => Api::getStrictSsls()
         ),
+        'require_signature' => array(
+            'type' => 'radiobuttonlist_inline',
+            'data' => Api::getRequireSignatureOptions(),
+            'htmlOptions' => array(
+                'hint' => '<i class="icon-info-sign"></i> This controls '
+                . 'whether calls to this API require a signature (and thus '
+                . 'whether keys to this API will have a secret value).',
+            ),
+        ),
+        'signature_window' => array(
+            'type' => 'text',
+            'htmlOptions' => array(
+                'placeholder' => '3',
+                'class' => 'input-mini',
+                'hint' => '<i class="icon-info-sign"></i> This how many '
+                . 'seconds off the signature can be and still be considered '
+                . 'valid.',
+            ),
+        ),
         'queries_second' => array(
             'htmlOptions' => array(
                 'placeholder' => '3',
@@ -87,36 +118,54 @@ return array(
             ),
             'type' => 'text',
         ),
-        'access_type' => array(
+        'visibility' => array(
             'type' => 'dropdownlist',
-            'data' => array_merge(
-                array('' => '-- Select one: --'),
-                Api::getAccessTypes()
-            ),
-        ),
-        'access_options' => array(
-            'htmlOptions' => array(
-                'hint' => '<i class="icon-info-sign"></i> Enter one or more ' .
-                          'Insite access groups separated by commas.',
-                'class' => 'input-xxlarge',
-            ),
-            'type' => 'text',
+            'data' => Api::getVisibilityDescriptions(),
         ),
         'approval_type' => array(
             'type' => 'dropdownlist',
-            'data' => array_merge(
-                array('' => '-- Select one: --'),
-                Api::getApprovalTypes()
-            ),
+            'data' => Api::getApprovalTypes(),
         ),
-        'support' => array(
+        'technical_support' => array(
             'htmlOptions' => array(
                 'hint' => '<i class="icon-info-sign"></i> Enter a website, ' .
                           'email address, phone number, or some other way ' .
-                          'for developers using this API to seek support.',
+                          'for people to get technical support for this API.',
                 'class' => 'input-xxlarge',
             ),
             'type' => 'text',
+        ),
+        'customer_support' => array(
+            'htmlOptions' => array(
+                'hint' => '<i class="icon-info-sign"></i> Enter a website, ' .
+                          'email address, phone number, or some other way ' .
+                          'for people to get customer support for this API.',
+                'class' => 'input-xxlarge',
+            ),
+            'type' => 'text',
+        ),
+        'how_to_get' => array(
+            'htmlOptions' => array(
+                'hint' => '<i class="icon-info-sign"></i> Use <a href="' .
+                          'http://en.wikipedia.org/wiki/Markdown" target="' .
+                          '_blank">Markdown</a> syntax to format your ' .
+                          'instructions to users about how to get access to ' .
+                          'this API.',
+                'style' => 'height: 25ex; width: 90%;'
+            ),
+            'type' => 'textarea',
+        ),
+        'embedded_docs_url' => array(
+            'type' => 'text',
+            'maxlength' => 255,
+            'htmlOptions' => array(
+                'class' => 'input-xxlarge',
+                'hint' => '<i class="icon-info-sign"></i> If you would like ' .
+                          'to embed a Google Doc as the documentation for this ' .
+                          'API, enter that URL here. <br />Example: <code>' .
+                          'https://docs.google.com/document/d/.../pub?embedded=true' .
+                          '</code>',
+            ),
         ),
         'documentation' => array(
             'htmlOptions' => array(
@@ -127,7 +176,20 @@ return array(
                 'style' => 'height: 25ex; width: 90%;'
             ),
             'type' => 'textarea',
-        )
+        ),
+        'terms' => array(
+            'htmlOptions' => array(
+                'hint' => '<i class="icon-lock"></i> If you provide '
+                . 'terms, anyone requesting a new key will be required to '
+                . 'accept these Terms. <br />'
+                . '<i class="icon-info-sign"></i> Use <a href="'
+                . 'http://en.wikipedia.org/wiki/Markdown" target="_blank">'
+                . 'Markdown</a> syntax to format your API\'s Terms of Use (if '
+                . 'applicable).',
+                'style' => 'height: 25ex; width: 90%;',
+            ),
+            'type' => 'textarea',
+        ),
     ),
     
     'buttons' => array(

@@ -1,3 +1,4 @@
+<?php /* @var $contactLink string */ ?>
 <div class="row">
     <div class="span12">
         <h1>Privacy Policy</h1>
@@ -22,11 +23,10 @@
         <p>
             This Privacy Policy may change, in which case an updated version will be
             posted here. If you feel that we are not abiding by this privacy policy,
-            please contact us at
-            <a href="mailto:<?php echo $contactEmail; ?>"><?php echo $contactEmail; ?></a>.
+            please <a href="<?= \CHtml::encode($contactLink); ?>">contact us</a>.
         </p>
         <p>
-            Last updated November 5, 2014.
+            Last updated November 9, 2016.
         </p>
     </div>
 </div>

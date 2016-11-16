@@ -1,10 +1,9 @@
 <?php
-/* @var $this AdminController */
+/* @var $this \Sil\DevPortal\controllers\AdminController */
 /* @var $form CForm */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'FAQs' => array('/faq/'),
     'Add FAQ'
 );

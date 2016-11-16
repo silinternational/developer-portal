@@ -1,9 +1,14 @@
 <?php
 
+use Sil\DevPortal\models\User;
+
 class WebUser extends CWebUser
 {
     private $_model = null;
     
+    /**
+     * @todo Remove references to access groups, since we no longer use those.
+     */
     public function getAccessGroups()
     {
         // Get the User model.
@@ -18,12 +23,17 @@ class WebUser extends CWebUser
     public function getAuthProvider()
     {
         $user = $this->getModel();
-        return ($user instanceof \User ? $user->auth_provider : null);
+        return ($user instanceof User ? $user->auth_provider : null);
     }
     
     public function getAuthType()
     {
         return $this->getState('authType', null);
+    }
+
+    public function getHomeUrl()
+    {
+        return $this->isGuest ? '/' : array('/dashboard/');
     }
 
     /**
@@ -54,7 +64,7 @@ class WebUser extends CWebUser
         if (!$this->isGuest && $this->_model === null) {
             
             // Try to get the User model from the session.
-            $user = \Yii::app()->user->user;
+            $user = $this->getState('user');
             
             // If NOT successful, try to get it from the database.
             if ( ! ($user instanceof User)) {
@@ -114,6 +124,27 @@ class WebUser extends CWebUser
         return false;
     }
     
+    public function getDisplayName()
+    {
+        $user = $this->getModel();
+        return (is_null($user) ? null : $user->getDisplayName());
+    }
+    
+    public function getUser()
+    {
+        return $this->getModel();
+    }
+    
+    public function getUserId()
+    {
+        $user = $this->getModel();
+        if ($user !== null) {
+            return $user->user_id;
+        } else {
+            return null;
+        }
+    }
+    
     public function hasFlashes()
     {
         $flashes = $this->getFlashes(false);
@@ -127,10 +158,37 @@ class WebUser extends CWebUser
     public function hasOwnerPrivileges()
     {
         $userModel = $this->getModel();
-        if ($userModel instanceof \User) {
+        if ($userModel instanceof User) {
             return $userModel->hasOwnerPrivileges();
         } else {
             return false;
         }
+    }
+    
+    public function hasActiveKeyToApi($api)
+    {
+        $userModel = $this->getModel();
+        if ($userModel instanceof User) {
+            return $userModel->hasActiveKeyToApi($api);
+        }
+        return false;
+    }
+    
+    public function hasAdminPrivilegesForApi($api)
+    {
+        $userModel = $this->getModel();
+        if ($userModel instanceof User) {
+            return $userModel->hasAdminPrivilegesForApi($api);
+        }
+        return false;
+    }
+    
+    public function isAdmin()
+    {
+        $userModel = $this->getModel();
+        if ($userModel instanceof User) {
+            return $userModel->isAdmin();
+        }
+        return false;
     }
 }

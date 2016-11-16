@@ -6,10 +6,9 @@
 class HttpTest extends CDbTestCase
 {
     public $fixtures = array(
-        'apis' => 'Api',
-        'users' => 'User',
-        'keys' => 'Key',
-        'keyRequests' => 'KeyRequest',
+        'apis' => '\Sil\DevPortal\models\Api',
+        'users' => '\Sil\DevPortal\models\User',
+        'keys' => '\Sil\DevPortal\models\Key',
     );
 
     private function get_client($uri, $redirects = 1, $timeout = 10)
@@ -36,7 +35,7 @@ class HttpTest extends CDbTestCase
     public function testApiActiveKeysRedirect()
     {
         Yii::import('ext.httpclient.*');
-        $api = $this->apis('apiWithTwoPendingKeyRequests');
+        $api = $this->apis('apiWithTwoPendingKeys');
         $uri = Yii::app()->createAbsoluteUrl(
             '/api/active-keys/', array('code' => $api->code)
         );
@@ -68,26 +67,10 @@ class HttpTest extends CDbTestCase
         $this->assertEquals($expected, $redirect, '>>> Got wrong redirect.');
     }
 
-    public function testApiAddContactUsRedirect()
-    {
-        Yii::import('ext.httpclient.*');
-        $uri = Yii::app()->createAbsoluteUrl('/api/add-contact-us/');
-        $client = $this->get_client($uri);
-
-        $expected = 302;
-        $response = $client->request();
-        $code = $response->getStatus();
-        $this->assertEquals($expected, $code, '>>> Got wrong response.');
-
-        $expected = Yii::app()->createAbsoluteUrl('/auth/login/');
-        $redirect = $response->getHeader('Location');
-        $this->assertEquals($expected, $redirect, '>>> Got wrong redirect.');
-    }
-
     public function testApiPendingKeysRedirect()
     {
         Yii::import('ext.httpclient.*');
-        $api = $this->apis('apiWithTwoPendingKeyRequests');
+        $api = $this->apis('apiWithTwoPendingKeys');
         $uri = Yii::app()->createAbsoluteUrl(
             '/api/pending-keys/', array('code' => $api->code)
         );
@@ -328,42 +311,6 @@ class HttpTest extends CDbTestCase
         $this->assertEquals($expected, $redirect, '>>> Got wrong redirect.');
     }
 
-    public function testKeyRequestDeleteRedirect()
-    {
-        Yii::import('ext.httpclient.*');
-        $uri = Yii::app()->createAbsoluteUrl('/key-request/delete/', array(
-            'id' => 1,
-        ));
-        $client = $this->get_client($uri);
-
-        $expected = 302;
-        $response = $client->request();
-        $code = $response->getStatus();
-        $this->assertEquals($expected, $code, '>>> Got wrong response.');
-
-        $expected = Yii::app()->createAbsoluteUrl('/auth/login/');
-        $redirect = $response->getHeader('Location');
-        $this->assertEquals($expected, $redirect, '>>> Got wrong redirect.');
-    }
-
-    public function testKeyRequestDetailsRedirect()
-    {
-        Yii::import('ext.httpclient.*');
-        $uri = Yii::app()->createAbsoluteUrl('/key-request/details/', array(
-            'id' => 1,
-        ));
-        $client = $this->get_client($uri);
-
-        $expected = 302;
-        $response = $client->request();
-        $code = $response->getStatus();
-        $this->assertEquals($expected, $code, '>>> Got wrong response.');
-
-        $expected = Yii::app()->createAbsoluteUrl('/auth/login/');
-        $redirect = $response->getHeader('Location');
-        $this->assertEquals($expected, $redirect, '>>> Got wrong redirect.');
-    }
-
     public function testFaqAddRedirect()
     {
         Yii::import('ext.httpclient.*');
@@ -420,22 +367,6 @@ class HttpTest extends CDbTestCase
     {
         Yii::import('ext.httpclient.*');
         $uri = Yii::app()->createAbsoluteUrl('/faq/');
-        $client = $this->get_client($uri);
-
-        $expected = 302;
-        $response = $client->request();
-        $code = $response->getStatus();
-        $this->assertEquals($expected, $code, '>>> Got wrong response.');
-
-        $expected = Yii::app()->createAbsoluteUrl('/auth/login/');
-        $redirect = $response->getHeader('Location');
-        $this->assertEquals($expected, $redirect, '>>> Got wrong redirect.');
-    }
-
-    public function testKeyRequestRedirect()
-    {
-        Yii::import('ext.httpclient.*');
-        $uri = Yii::app()->createAbsoluteUrl('/key-request/');
         $client = $this->get_client($uri);
 
         $expected = 302;

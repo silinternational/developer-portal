@@ -11,6 +11,11 @@ $SECRET_SALT = getenv('SAML_SECRET_SALT');
 $CONTACT_NAME = getenv('SAML_CONTACT_NAME');
 $CONTACT_EMAIL = getenv('SAML_CONTACT_EMAIL');
 
+if (empty($ADMIN_PASSWORD)) {
+    throw new \Exception('SAML_ADMIN_PASSWORD environment variable missing.');
+} elseif (empty($SECRET_SALT)) {
+    throw new \Exception('SAML_SECRET_SALT environment variable missing.');
+}
 
 $config = array (
 

@@ -1,21 +1,21 @@
 <?php
-/* @var $owner User */
-/* @var $api Api */
-/* @var $keyRequest KeyRequest */
-/* @var $requestingUser User */
+/* @var $owner \Sil\DevPortal\models\User */
+/* @var $api \Sil\DevPortal\models\Api */
+/* @var $key \Sil\DevPortal\models\Key */
+/* @var $requestingUser \Sil\DevPortal\models\User */
 ?>
 <p>
-    Hello <?php echo ($owner ? $owner->first_name : 'API Developer Portal administrator'); ?>,
+    <?php echo ($owner ? CHtml::encode($owner->display_name) : 'API Developer Portal administrator'); ?>,
 </p>
 <p>
-    <?php echo $requestingUser->display_name; ?> has requested access to the 
-    <?php echo $api->display_name ?> API. 
+    <?php echo CHtml::encode($requestingUser->display_name); ?> has requested access to the 
+    <?php echo CHtml::encode($api->display_name); ?> API. 
     <?php
     echo sprintf(
         '<a href="%s" title="%s">Click here</a> to view and approve or reject '
         . 'this request.',
-        \Yii::app()->createAbsoluteUrl('/key-request/details/', array(
-            'id' => $keyRequest->key_request_id,
+        \Yii::app()->createAbsoluteUrl('/key/details/', array(
+            'id' => $key->key_id,
         )),
         'View key request'
     );

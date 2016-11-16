@@ -15,8 +15,19 @@ class Utils {
             throw new CHttpException(404,'invalid request'); 
         }      
         return $object;
-    }          
-
+    }
+    
+    public static function getContactLinkValue()
+    {
+        $params = \Yii::app()->params;
+        
+        if ( ! empty($params['contactUsUrl'])) {
+            return $params['contactUsUrl'];
+        }
+        
+        return 'mailto:' . $params['adminEmail'];
+    }
+    
     /**
      * Retrieve the value at the place specified in the given data array by the
      * given list of keys.
@@ -178,37 +189,75 @@ Rand_Gen_Loop:
     }
     
     /**
-     * Function loads the protected/data/version.txt file and parses out
-     * application version number and build date and returns as an indexed
-     * array
+     * Convert the given time string to a date in the short date-with-time
+     * format (as defined in our config settings). Unless it specifies a
+     * timezone (or is a timestamp), it is assumed to be in UTC time. For more
+     * information, see http://php.net/manual/en/datetime.construct.php
      * 
-     * $results = array(
-     *    'version' => 'vx.x.x',
-     *    'build'   => 'Thurs, 09 Jan 2014  08:59:23 -0600',
-     * );
-     * 
-     * @return array
+     * @param string $timeStr A string representing some point in time.
+     * @return string A short display of that date-time.
      */
-    public static function getApplicationVersion()
+    public static function getShortDateTime($timeStr)
     {
-        $results = array(
-            'version' => 'Error',
-            'build' => 'Error',
-        );
-        if(file_exists(__DIR__.'/../data/version.txt')){
-            $line = file_get_contents(__DIR__.'/../data/version.txt');
-            if($line && $line != ''){
-                $info = explode('|', $line);
-                if(is_array($info)){
-                    $results['version'] = $info[0];
-                    $results['build'] = $info[1];
-                }
-            }
+        // Create a DateTime object from the given string.
+        $utcTimezone = new DateTimeZone('UTC');
+        $dateTime = new DateTime($timeStr, $utcTimezone);
+        
+        // Convert it to the desired timezone.
+        $targetTimezone = new DateTimeZone(date_default_timezone_get());
+        $dateTime->setTimezone($targetTimezone);
+        
+        // Get the date format string to use.
+        $shortDateFormat = 'n/j/y';
+        if (isset(Yii::app()->params['shortDateTimeFormat'])) {
+            $shortDateFormat = Yii::app()->params['shortDateTimeFormat'];
         }
         
-        return $results;
+        // Format the given date/time and return the resulting string.
+        return $dateTime->format($shortDateFormat);
     }
     
+    /**
+     * Get the build date (from the protected/data/version.txt file) of this
+     * version of this application.
+     * 
+     * @return string|null
+     */
+    public static function getApplicationBuildDate()
+    {
+        /* Use false (rather than null) to simplify check for a valid value
+         * used at the end of this function.  */
+        $buildDate = false;
+        
+        if (file_exists(__DIR__ . '/../data/version.txt')) {
+            $buildDate = file_get_contents(__DIR__ . '/../data/version.txt');
+        }
+        return ($buildDate !== false) ? $buildDate : null;
+    }
+    
+    public static function getLogoUrls()
+    {
+        try {
+            $logoStripDir = __DIR__ . '/../../public/img/logos';
+            $logoFiles = CFileHelper::findFiles($logoStripDir, [
+                'fileTypes' => ['png', 'jpg', 'jpeg'],
+                'exclude' => ['site-logo.png'],
+                'level' => 0,
+                'absolutePaths' => false,
+            ]);
+            sort($logoFiles);
+            return array_map(
+                function($logoFilename) { return '/img/logos/' . $logoFilename; },
+                $logoFiles
+            );
+        } catch (\Exception $e) {
+            Yii::log(
+                'Failed to get logo files: ' . $e->getMessage(),
+                \CLogger::LEVEL_WARNING
+            );
+            return [];
+        }
+    }
     
     public static function getMailer()
     {
@@ -231,53 +280,11 @@ Rand_Gen_Loop:
     }
 
     public static function pretty_json($json) {
-
-        $result      = '';
-        $pos         = 0;
-        $strLen      = strlen($json);
-        $indentStr   = '  ';
-        $newLine     = "\n";
-        $prevChar    = '';
-        $outOfQuotes = true;
-
-        for ($i=0; $i<=$strLen; $i++) {
-
-            // Grab the next character in the string.
-            $char = substr($json, $i, 1);
-
-            // Are we inside a quoted string?
-            if ($char == '"' && $prevChar != '\\') {
-                $outOfQuotes = !$outOfQuotes;
-
-                // If this character is the end of an element,
-                // output a new line and indent the next line.
-            } else if(($char == '}' || $char == ']') && $outOfQuotes) {
-                $result .= $newLine;
-                $pos --;
-                for ($j=0; $j<$pos; $j++) {
-                    $result .= $indentStr;
-                }
-            }
-
-            // Add the character to the result string.
-            $result .= $char;
-
-            // If the last character was the beginning of an element,
-            // output a new line and indent the next line.
-            if (($char == ',' || $char == '{' || $char == '[') && $outOfQuotes) {
-                $result .= $newLine;
-                if ($char == '{' || $char == '[') {
-                    $pos ++;
-                }
-
-                for ($j = 0; $j < $pos; $j++) {
-                    $result .= $indentStr;
-                }
-            }
-
-            $prevChar = $char;
-        }
-
-        return $result;
+        return json_encode(json_decode($json), JSON_PRETTY_PRINT);
+    }
+    
+    public static function isArrayWithContent($value)
+    {
+        return (is_array($value) && (count($value) > 0));
     }
 }

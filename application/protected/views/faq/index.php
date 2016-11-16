@@ -1,10 +1,9 @@
 <?php
-/* @var $this FaqController */
+/* @var $this \Sil\DevPortal\controllers\FaqController */
 /* @var $faqDataProvider CDataProvider */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'FAQs',
 );
 

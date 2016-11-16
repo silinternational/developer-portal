@@ -1,12 +1,14 @@
 <?php
-/* @var $this UserController */
+
+use Sil\DevPortal\models\User;
+
+/* @var $this \Sil\DevPortal\controllers\UserController */
 /* @var $apisDataProvider CDataProvider */
 /* @var $keysDataProvider CDataProvider */
 /* @var $user User */
 
 // Set up the breadcrumbs.
-$this->breadcrumbs = array(
-    'Dashboard' => array('/dashboard/'),
+$this->breadcrumbs += array(
     'Users' => array('/user/'),
     $user->display_name,
 );

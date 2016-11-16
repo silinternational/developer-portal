@@ -28,16 +28,18 @@ class ActionLink extends CComponent
     /**
      * Get the HTML for this ActionLink.
      * 
+     * @param string $extraCssClassesString Any additional CSS class(es) to use.
      * @return string The HTML.
      */
-    public function getAsHtml()
+    public function getAsHtml($extraCssClassesString = '')
     {
         return CHtml::link(
             self::getLinkContentHtml($this->text, $this->icon),
             $this->url,
             array(
                 'class' => sprintf(
-                    'nowrap%s',
+                    'nowrap %s%s',
+                    \CHtml::encode($extraCssClassesString),
                     (($this->text !== null) ? ' space-after-icon' : '')
                 ),
             )
