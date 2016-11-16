@@ -2,9 +2,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/styles.css?2016-09" />
     <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/prism.css" />
-    <meta charset="utf-8">
     <title><?php echo CHtml::encode($this->pageTitle . ' - ' . \Yii::app()->name); ?></title>
     <?php
     // Load the Yii-Bootstrap CSS/JS.
