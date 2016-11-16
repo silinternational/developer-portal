@@ -290,6 +290,7 @@ abstract class UserIdentity extends \CBaseUserIdentity
         $user->first_name = $userAuthData->getFirstName();
         $user->last_name = $userAuthData->getLastName();
         $user->display_name = $userAuthData->getDisplayName();
+        $user->email = $userAuthData->getEmailAddress();
 
         // Try to save the changes.
         if ( ! $user->save()) {
