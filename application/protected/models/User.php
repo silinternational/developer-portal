@@ -904,6 +904,13 @@ class User extends \UserBase
     {
         return \CMap::mergeArray(array(
             array('email', 'email'),
+            array(
+                'email',
+                'unique',
+                'caseSensitive' => false,
+                'message' => 'That email address ({value}) already belongs to '
+                . 'a different account.',
+            ),
             array('auth_provider', 'validateAuthProvider'),
             array(
                 'updated',
