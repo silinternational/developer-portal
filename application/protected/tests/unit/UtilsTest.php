@@ -15,6 +15,17 @@ class UtilsTest extends CDbTestCase
               ' not found in ' . $returnValue . ' ... This could' .
               ' be because of Windows not accepting certain format markers.');
     }
+    
+    public function testGetFaviconsHtml()
+    {
+        // Arrange: (n/a)
+        
+        // Act:
+        $result = \Utils::getFaviconsHtml();
+        
+        // Assert:
+        $this->assertTrue(is_string($result));
+    }
 
     public function testGetNestedArrayValue_deeplyNestedKeyExists()
     {
