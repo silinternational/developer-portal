@@ -127,6 +127,11 @@ if ($user->hasOwnerPrivileges()) {
       <p class="muted" style="margin-top: 160px;"><i>Loading usage chart...</i></p>
     </div>
   </div>
+  <div class="alert alert-block">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    Usage information is only provided on an as-available basis and is not
+    guaranteed to persist.
+  </div>
   <script type="text/javascript">
   $('#ajax-usage-chart-destination').load(
     '<?= $this->createUrl('dashboard/usage-chart', array(
