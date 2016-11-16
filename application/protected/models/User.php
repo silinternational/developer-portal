@@ -919,6 +919,7 @@ class User extends \UserBase
                 'setOnEmpty' => true,
                 'on' => 'insert',
             ),
+            array('display_name', 'assembleDisplayNameIfEmpty'),
             array('auth_provider', 'required'),
         ), parent::rules());
     }
@@ -986,6 +987,19 @@ class User extends \UserBase
      */
     public static function model($className = __CLASS__) {
         return parent::model($className);
+    }
+    
+    /**
+     * Assemble the user's display name if it does not yet exist.
+     * 
+     * @param string $attribute The name of the attribute to be validated.
+     * @param array $params The options specified in the validation rule.
+     */
+    public function assembleDisplayNameIfEmpty($attribute)
+    {
+        if (empty($this->$attribute)) {
+            $this->display_name = $this->getDisplayName();
+        }
     }
     
     /**
