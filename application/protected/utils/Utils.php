@@ -28,6 +28,33 @@ class Utils {
         return 'mailto:' . $params['adminEmail'];
     }
     
+    public static function getFaviconsHtml()
+    {
+        $faviconsHtml = '';
+        $pathToPublicFolder = __DIR__ . '/../../public';
+        $possibleFaviconFiles = [
+            '/apple-touch-icon.png' => '<link rel="apple-touch-icon" sizes="180x180" href="%s">',
+            '/favicon-32x32.png' => '<link rel="icon" type="image/png" href="%s" sizes="32x32">',
+            '/favicon-16x16.png' => '<link rel="icon" type="image/png" href="%s" sizes="16x16">',
+            '/manifest.json' => '<link rel="manifest" href="%s">',
+        ];
+        
+        foreach ($possibleFaviconFiles as $fileHref => $tagTemplate) {
+            if (file_exists($pathToPublicFolder . $fileHref)) {
+                $faviconsHtml .= sprintf($tagTemplate, $fileHref) . "\n";
+            }
+        }
+        
+        if (\Yii::app()->params['themeColor']) {
+            $faviconsHtml .= sprintf(
+                '<meta name="theme-color" content="#%s">' . "\n",
+                \CHtml::encode(\Yii::app()->params['themeColor'])
+            );
+        }
+        
+        return $faviconsHtml;
+    }
+    
     /**
      * Retrieve the value at the place specified in the given data array by the
      * given list of keys.

@@ -34,6 +34,7 @@ $samlIdpEntityId = Env::get('SAML_IDP');
 $samlIdpName = Env::get('SAML_IDP_NAME');
 $samlTrustEmailFor = Env::get('SAML_TRUST_EMAIL_FOR');
 $showPopularApis = (bool)Env::get('SHOW_POPULAR_APIS', false);
+$themeColor = Env::get('THEME_COLOR');
 
 // Define a path alias for the Bootstrap extension as it's used internally.
 Yii::setPathOfAlias('bootstrap', dirname(__FILE__) . '/../extensions/bootstrap');
@@ -146,6 +147,7 @@ return array(
         'alertsEmail' => $alertsEmail,
         'contactUsUrl' => $contactUsUrl,
         'showPopularApis' => $showPopularApis,
+        'themeColor' => $themeColor,
         'saml' => array(
             'default-sp' => 'default-sp',
             'enabled' => (bool)$samlEnabled,

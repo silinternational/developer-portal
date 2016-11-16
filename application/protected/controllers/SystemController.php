@@ -12,9 +12,6 @@ class SystemController extends \Controller
     
     public function actionResyncApiaxle()
     {
-        /* @var $webUser WebUser */
-        $webUser = \Yii::app()->user;
-        
         // If the form has been submitted (POSTed)...
         if (\Yii::app()->request->isPostRequest) {
             
