@@ -70,6 +70,11 @@ dd { margin-bottom: 10px; }
 
 .home-page .site-name { font-size: 50px; }
 
+.login-logo {
+  height: 1em;
+  width: auto;
+}
+
 #logo-strip {
     border-radius: 12px;
     margin: 40px 0;

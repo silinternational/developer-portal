@@ -1,6 +1,6 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\SiteController */
-/* @var $loginOptions array<string,string> */
+/* @var $loginOptions Sil\DevPortal\components\LoginOption[] */
 /* @var $logoUrls string[] */
 /* @var $homeLowerLeftHtml string|null */
 /* @var $homeLowerRightHtml string|null */
@@ -22,15 +22,9 @@ $this->pageTitle = 'Welcome';
             <div class="span4">
                 <div id="get-started">
                     <h2>Get Started</h2>
-                    <?php
-                    foreach ($loginOptions as $displayName => $loginUrl) {
-                        echo sprintf(
-                            '<div><a href="%s" class="btn btn-success">Login with %s</a></div> ',
-                            $loginUrl,
-                            \CHtml::encode($displayName)
-                        );
-                    }
-                    ?>
+                    <?php foreach ($loginOptions as $loginOption): ?>
+                        <div style="margin: 4px;"><?= $loginOption->getLinkHtml('btn btn-success', true); ?></div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
