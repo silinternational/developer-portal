@@ -157,6 +157,25 @@ class AuthManagerTest extends \CTestCase
         );
     }
     
+    public function testGetDefaultProviderSlugFor()
+    {
+        // Arrange:
+        $testCases = [
+            ['authType' => null, 'expected' => null],
+            ['authType' => 'saml', 'expected' => 'insite'],
+            ['authType' => 'someunknownvalue', 'expected' => null],
+        ];
+        $authManager = new AuthManager();
+        foreach ($testCases as $testCase) {
+            
+            // Act:
+            $actual = $authManager->getDefaultProviderSlugFor($testCase['authType']);
+
+            // Assert:
+            $this->assertSame($testCase['expected'], $actual);
+        }
+    }
+    
     public function testGetIdentityForAuthType_disabledAuthType()
     {
         // Arrange:

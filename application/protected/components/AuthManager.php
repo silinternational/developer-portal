@@ -72,6 +72,38 @@ class AuthManager
     }
     
     /**
+     * If there is a default provider for the given auth. type, return (the
+     * slugified version of) it, regardless of whether that auth. type is
+     * currently enabled.
+     * 
+     * @param string|null $authType The auth. type (if known).
+     * @return string|null
+     */
+    public function getDefaultProviderSlugFor($authType)
+    {
+        $defaultProvider = null;
+        switch ($authType) {
+            case 'saml':
+                $defaultProvider = 'Insite';
+                break;
+                
+            case 'hybrid':
+                $hybridAuthManager = new HybridAuthManager();
+                $enabledProviders = $hybridAuthManager->getEnabledProvidersList();
+                if (count($enabledProviders) === 1) {
+                    $defaultProviderSlug = $enabledProviders[0];
+                }
+                break;
+        }
+        
+        if ($defaultProvider === null) {
+            return null;
+        }
+        
+        return self::slugify($defaultProvider);
+    }
+    
+    /**
      * Get an identify class instance appropriate for the specified type of
      * authentication. Throws an InvalidArgumentException if an unknown auth
      * type is provided.
