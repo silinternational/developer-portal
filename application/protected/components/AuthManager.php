@@ -181,6 +181,26 @@ class AuthManager
     }
     
     /**
+     * Get the login options formatted as an array usable in a menu.
+     * 
+     * @return array[]
+     */
+    public static function getLoginMenuItems()
+    {
+        $authManager = new AuthManager();
+        $loginOptions = $authManager->getLoginOptions();
+        $loginMenuItems = [];
+        foreach ($loginOptions as $displayName => $loginUrl) {
+            $loginMenuItems[] = [
+                'label' => 'Login with ' . $displayName,
+                'itemOptions' => ['class' => 'muted'],
+                'url' => $loginUrl,
+            ];
+        }
+        return $loginMenuItems;
+    }
+    
+    /**
      * Get the list of login options.
      * 
      * @return array<string,string> The list of login options, where keys are

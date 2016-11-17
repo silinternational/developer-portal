@@ -1,4 +1,9 @@
-<?php /* @var $this Controller */ ?>
+<?php
+/* @var $this Controller */
+
+use Sil\DevPortal\components\AuthManager;
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,21 +101,23 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                 ),
             ),
         ),
-        (
-            Yii::app()->user->isGuest ?
-            '<a class="btn btn-primary pull-right" href="' . $this->createUrl('/auth/login') . '">Login</a>' : 
-            array(
-                'class' => 'bootstrap.widgets.TbMenu',
-                'htmlOptions' => array('class' => 'pull-right'),
-                'items' => array(
-                    array('label' => CHtml::encode(Yii::app()->user->name),
-                        'visible' => !Yii::app()->user->isGuest,
-                        'items' => array(
-                            array('label' => 'Logout', 'url' => $this->createUrl('/auth/logout')),
-                        ),
+        array(
+            'class' => 'bootstrap.widgets.TbMenu',
+            'htmlOptions' => array('class' => 'pull-right'),
+            'items' => array(
+                array(
+                    'label' => 'Login',
+                    'visible' => Yii::app()->user->isGuest,
+                    'items' => AuthManager::getLoginMenuItems(),
+                ),
+                array(
+                    'label' => CHtml::encode(Yii::app()->user->name),
+                    'visible' => !Yii::app()->user->isGuest,
+                    'items' => array(
+                        array('label' => 'Logout', 'url' => $this->createUrl('/auth/logout')),
                     ),
                 ),
-            )
+            ),
         ),
     ),
 ));

@@ -192,6 +192,22 @@ class AuthManagerTest extends \CTestCase
         $authManager->getIdentityForAuthType($disabledAuthType);
     }
     
+    public function testGetLoginMenuItems()
+    {
+        // Arrange:
+        $authManager = new AuthManager();
+        $loginOptions = $authManager->getLoginOptions();
+        
+        // Pre-assert:
+        $this->assertNotEmpty($loginOptions);
+        
+        // Act:
+        $loginMenuItems = AuthManager::getLoginMenuItems();
+        
+        // Assert:
+        $this->assertCount(count($loginOptions), $loginMenuItems);
+    }
+    
     public function testIsAuthTypeEnabled_hybrid()
     {
         // Arrange:
