@@ -4,9 +4,14 @@
 
 // Set the page title.
 $this->pageTitle = 'Login Options';
-
-echo '<h2>' . \CHtml::encode($this->pageTitle) . '</h2> ';
-
-foreach ($loginOptions as $loginOption) {
-    echo $loginOption->getLinkHtml('btn');
-}
+?>
+<div class="text-center">
+    <div style="display: inline-block; margin: auto;">
+        <h2><?= \CHtml::encode($this->pageTitle); ?></h2>
+        <?php foreach ($loginOptions as $loginOption): ?>
+            <div style="display: inline-block; margin: 4px;">
+                <?= $loginOption->getLinkHtml('btn btn-success', true); ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
