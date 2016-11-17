@@ -73,7 +73,7 @@ class LoginOption
         }
         
         return sprintf(
-            '<img src="%s" class="login-logo" /> ',
+            '<img src="%s" class="login-logo" aria-hidden="true" /> ',
             \CHtml::encode($this->getUrlPathToLogo($useLightLogo))
         );
     }
