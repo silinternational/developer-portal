@@ -1,6 +1,5 @@
 <?php
 
-use Sil\DevPortal\components\AuthManager;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\User;
 
@@ -29,17 +28,8 @@ $attrLabels = $api->attributeLabels();
     <div class="span12">
         <div class="pull-right pad-horiz">
             <?php if ($webUser->isGuest): ?>
-                <?php
-                $this->widget('bootstrap.widgets.TbMenu', [
-                    'type' => 'list',
-                    'items' => [
-                        [
-                            'label' => 'Login to continue',
-                            'items' => AuthManager::getLoginMenuItems(),
-                        ],
-                    ],
-                ]);
-                ?>
+                <a href="<?= \CHtml::encode($this->createUrl('/auth/login/')); ?>"
+                   class="btn btn-success">Login to continue</a>
             <?php else: ?>
                 <?= LinksManager::showActionLinks($actionLinks); ?>
             <?php endif; ?>
