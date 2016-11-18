@@ -40,6 +40,13 @@ class AuthController extends \Controller
             }
         }
 
+        if ($providerSlug === null) {
+            $providerSlug = $authManager->getDefaultProviderSlugFor($authType);
+            if ($providerSlug === null) {
+                $this->redirect(['auth/login-options']);
+            }
+        }
+
         try {
             $identity = $authManager->getIdentityForAuthType($authType);
         } catch (\InvalidArgumentException $e) {

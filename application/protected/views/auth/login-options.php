@@ -1,16 +1,17 @@
 <?php
 /* @var $this \Sil\DevPortal\controllers\AuthController */
-/* @var $loginOptions array */
+/* @var $loginOptions Sil\DevPortal\components\LoginOption[] */
 
 // Set the page title.
 $this->pageTitle = 'Login Options';
-
-echo '<h2>' . \CHtml::encode($this->pageTitle) . '</h2> ';
-
-foreach ($loginOptions as $displayName => $loginUrl) {
-    echo sprintf(
-        '<a href="%s" class="btn">Login with %s</a> ',
-        $loginUrl,
-        \CHtml::encode($displayName)
-    );
-}
+?>
+<div class="text-center">
+    <div style="display: inline-block; margin: auto;">
+        <h2><?= \CHtml::encode($this->pageTitle); ?></h2>
+        <?php foreach ($loginOptions as $loginOption): ?>
+            <div style="display: inline-block; margin: 4px;">
+                <?= $loginOption->getLinkHtml('btn btn-success', true); ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>

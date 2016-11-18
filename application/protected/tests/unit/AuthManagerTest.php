@@ -157,6 +157,25 @@ class AuthManagerTest extends \CTestCase
         );
     }
     
+    public function testGetDefaultProviderSlugFor()
+    {
+        // Arrange:
+        $testCases = [
+            ['authType' => null, 'expected' => null],
+            ['authType' => 'saml', 'expected' => 'insite'],
+            ['authType' => 'someunknownvalue', 'expected' => null],
+        ];
+        $authManager = new AuthManager();
+        foreach ($testCases as $testCase) {
+            
+            // Act:
+            $actual = $authManager->getDefaultProviderSlugFor($testCase['authType']);
+
+            // Assert:
+            $this->assertSame($testCase['expected'], $actual);
+        }
+    }
+    
     public function testGetIdentityForAuthType_disabledAuthType()
     {
         // Arrange:
@@ -171,6 +190,22 @@ class AuthManagerTest extends \CTestCase
         
         // Act:
         $authManager->getIdentityForAuthType($disabledAuthType);
+    }
+    
+    public function testGetLoginMenuItems()
+    {
+        // Arrange:
+        $authManager = new AuthManager();
+        $loginOptions = $authManager->getLoginOptions();
+        
+        // Pre-assert:
+        $this->assertNotEmpty($loginOptions);
+        
+        // Act:
+        $loginMenuItems = AuthManager::getLoginMenuItems();
+        
+        // Assert:
+        $this->assertCount(count($loginOptions), $loginMenuItems);
     }
     
     public function testIsAuthTypeEnabled_hybrid()

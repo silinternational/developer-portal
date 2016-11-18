@@ -72,6 +72,38 @@ class AuthManager
     }
     
     /**
+     * If there is a default provider for the given auth. type, return (the
+     * slugified version of) it, regardless of whether that auth. type is
+     * currently enabled.
+     * 
+     * @param string|null $authType The auth. type (if known).
+     * @return string|null
+     */
+    public function getDefaultProviderSlugFor($authType)
+    {
+        $defaultProvider = null;
+        switch ($authType) {
+            case 'saml':
+                $defaultProvider = 'Insite';
+                break;
+                
+            case 'hybrid':
+                $hybridAuthManager = new HybridAuthManager();
+                $enabledProviders = $hybridAuthManager->getEnabledProvidersList();
+                if (count($enabledProviders) === 1) {
+                    $defaultProviderSlug = $enabledProviders[0];
+                }
+                break;
+        }
+        
+        if ($defaultProvider === null) {
+            return null;
+        }
+        
+        return self::slugify($defaultProvider);
+    }
+    
+    /**
      * Get an identify class instance appropriate for the specified type of
      * authentication. Throws an InvalidArgumentException if an unknown auth
      * type is provided.
@@ -149,38 +181,49 @@ class AuthManager
     }
     
     /**
+     * Get the login options formatted as an array usable in a menu.
+     * 
+     * @return array[]
+     */
+    public static function getLoginMenuItems()
+    {
+        $authManager = new AuthManager();
+        $loginOptions = $authManager->getLoginOptions();
+        $loginMenuItems = [];
+        foreach ($loginOptions as $loginOption) {
+            $loginMenuItems[] = [
+                'encodeLabel' => false,
+                'label' => $loginOption->getLabelHtml(),
+                'url' => $loginOption->getUrl(),
+            ];
+        }
+        return $loginMenuItems;
+    }
+    
+    /**
      * Get the list of login options.
      * 
-     * @return array<string,string> The list of login options, where keys are
+     * @return array<string,LoginOption> The list of login options, where keys are
      *     the display name for that authentication types (e.g. Google) and
-     *     values are URL for logging in using that auth. type.
+     *     values are a LoginOption value object.
      */
     public function getLoginOptions()
     {
         $loginOptions = array();
         if ($this->isAuthTypeEnabled('saml')) {
-            $loginOptions['Insite'] = \Yii::app()->createUrl('auth/login', array(
-                'authType' => 'saml',
-            ));
+            $loginOptions[] = new LoginOption('saml', null, 'Insite');
         }
         if ($this->isAuthTypeEnabled('hybrid')) {
             $hybridAuthManager = new HybridAuthManager();
             foreach ($hybridAuthManager->getEnabledProvidersList() as $provider) {
-                $loginOptions[$provider] = \Yii::app()->createUrl('auth/login', [
-                    'authType' => 'hybrid',
-                    'providerSlug' => self::slugify($provider),
-                ]);
+                $loginOptions[] = new LoginOption('hybrid', $provider);
             }
         }
         if ($this->isAuthTypeEnabled('test-user')) {
-            $loginOptions['Test (User)'] = \Yii::app()->createUrl('auth/login', array(
-                'authType' => 'test-user',
-            ));
+            $loginOptions[] = new LoginOption('test-user', null, 'Test (User)');
         }
         if ($this->isAuthTypeEnabled('test-owner')) {
-            $loginOptions['Test (Owner)'] = \Yii::app()->createUrl('auth/login', array(
-                'authType' => 'test-owner',
-            ));
+            $loginOptions[] = new LoginOption('test-owner', null, 'Test (Owner)');
         }
         return $loginOptions;
     }
