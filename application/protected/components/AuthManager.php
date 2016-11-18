@@ -91,7 +91,7 @@ class AuthManager
                 $hybridAuthManager = new HybridAuthManager();
                 $enabledProviders = $hybridAuthManager->getEnabledProvidersList();
                 if (count($enabledProviders) === 1) {
-                    $defaultProviderSlug = $enabledProviders[0];
+                    $defaultProvider = $enabledProviders[0];
                 }
                 break;
         }
