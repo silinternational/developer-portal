@@ -94,6 +94,11 @@ class AuthManager
                     $defaultProvider = $enabledProviders[0];
                 }
                 break;
+            
+            case 'test-owner':
+            case 'test-user':
+                $defaultProvider = 'test';
+                break;
         }
         
         if ($defaultProvider === null) {
