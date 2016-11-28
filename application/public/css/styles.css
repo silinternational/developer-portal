@@ -71,8 +71,24 @@ dd { margin-bottom: 10px; }
 .home-page .site-name { font-size: 50px; }
 
 .login-logo {
-  height: 1em;
+  border-radius: 3px 0 0 3px;
+  height: 34px;
+  margin-bottom: -4px;
+  margin-left: -12px;
+  margin-right: 16px;
+  margin-top: -4px;
   width: auto;
+}
+
+.login-logo-button {
+  font-weight: bold;
+  height: 26px;
+  white-space: nowrap;
+}
+#content .login-logo-button {
+  display: block;
+  line-height: 23px;
+  text-align: left;
 }
 
 #logo-strip {

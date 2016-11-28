@@ -22,9 +22,11 @@ $this->pageTitle = 'Welcome';
             <div class="span4">
                 <div id="get-started">
                     <h2>Get Started</h2>
-                    <?php foreach ($loginOptions as $loginOption): ?>
-                        <div style="margin: 4px;"><?= $loginOption->getLinkHtml('btn btn-success', true); ?></div>
-                    <?php endforeach; ?>
+                    <div style="display: inline-block;">
+                        <?php foreach ($loginOptions as $loginOption): ?>
+                            <div style="margin: 4px;"><?= $loginOption->getLinkHtml('btn btn-success login-logo-button'); ?></div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
         </div>
