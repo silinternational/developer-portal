@@ -51,7 +51,7 @@ class LoginOption
     public function getLinkHtml($extraCssClassString = '')
     {
         return sprintf(
-            '<a href="%s" class="%s">%s</a>',
+            '<a href="%s" class="btn btn-success login-logo-button %s">%s</a>',
             \CHtml::encode($this->getUrl()),
             \CHtml::encode($extraCssClassString),
             $this->getLabelHtml()

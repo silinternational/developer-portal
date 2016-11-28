@@ -24,7 +24,7 @@ $this->pageTitle = 'Welcome';
                     <h2>Get Started</h2>
                     <div style="display: inline-block;">
                         <?php foreach ($loginOptions as $loginOption): ?>
-                            <div style="margin: 4px;"><?= $loginOption->getLinkHtml('btn btn-success login-logo-button'); ?></div>
+                            <div style="margin: 4px;"><?= $loginOption->getLinkHtml(); ?></div>
                         <?php endforeach; ?>
                     </div>
                 </div>
