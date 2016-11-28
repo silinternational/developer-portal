@@ -197,8 +197,7 @@ class AuthManager
         $loginMenuItems = [];
         foreach ($loginOptions as $loginOption) {
             $loginMenuItems[] = [
-                'encodeLabel' => false,
-                'label' => $loginOption->getLabelHtml(),
+                'label' => 'Login with ' . $loginOption->getDisplayName(),
                 'url' => $loginOption->getUrl(),
             ];
         }
