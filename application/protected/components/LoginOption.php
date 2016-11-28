@@ -30,14 +30,13 @@ class LoginOption
     /**
      * Get the label HTML (with logo, if available).
      * 
-     * @param bool $useLightLogo Whether to use the light version of the logo.
      * @return string
      */
-    public function getLabelHtml($useLightLogo = false)
+    public function getLabelHtml()
     {
         return sprintf(
             '%sLogin with %s',
-            $this->getLogoHtml($useLightLogo),
+            $this->getLogoHtml(),
             \CHtml::encode($this->getDisplayName())
         );
     }
@@ -47,34 +46,32 @@ class LoginOption
      * 
      * @param string $extraCssClassString (Optional:) Any additional CSS class
      *     string content that you want.
-     * @param bool $useLightLogo Whether to use the light version of the logo.
      * @return string
      */
-    public function getLinkHtml($extraCssClassString = '', $useLightLogo = false)
+    public function getLinkHtml($extraCssClassString = '')
     {
         return sprintf(
             '<a href="%s" class="%s">%s</a>',
             \CHtml::encode($this->getUrl()),
             \CHtml::encode($extraCssClassString),
-            $this->getLabelHtml($useLightLogo)
+            $this->getLabelHtml()
         );
     }
     
     /**
      * Get the HTML for showing this login option's logo (if any).
      * 
-     * @param bool $useLightLogo Whether to use the light version of the logo.
      * @return string The HTML, or an empty string if unavailable.
      */
-    public function getLogoHtml($useLightLogo = false)
+    public function getLogoHtml()
     {
-        if ( ! $this->hasLogoFile($useLightLogo)) {
+        if ( ! $this->hasLogoFile()) {
             return '';
         }
         
         return sprintf(
             '<img src="%s" class="login-logo" aria-hidden="true" />',
-            \CHtml::encode($this->getUrlPathToLogo($useLightLogo))
+            \CHtml::encode($this->getUrlPathToLogo())
         );
     }
     
@@ -101,18 +98,16 @@ class LoginOption
      * Get the relative URL path to the logo for this login option (if
      * available), starting with a slash.
      * 
-     * @param bool $useLightLogo Whether to use the light version of the logo.
      * @return string|null The URL path, or null if not available.
      */
-    protected function getUrlPathToLogo($useLightLogo = false)
+    protected function getUrlPathToLogo()
     {
         if ($this->hasAuthProvider()) {
             $providerSlug = AuthManager::slugify($this->authProvider);
 
             return sprintf(
-                '/img/login-marks/%s%s.png',
-                $providerSlug,
-                ($useLightLogo ? '-light' : '')
+                '/img/login-marks/%s.png',
+                $providerSlug
             );
         }
         return null;
@@ -126,12 +121,11 @@ class LoginOption
     /**
      * Whether there is a logo file available for this login option.
      * 
-     * @param bool $useLightLogo Whether to use the light version of the logo.
      * @return boolean
      */
-    public function hasLogoFile($useLightLogo = false)
+    public function hasLogoFile()
     {
-        $urlPathToLogo = $this->getUrlPathToLogo($useLightLogo);
+        $urlPathToLogo = $this->getUrlPathToLogo();
         if (empty($urlPathToLogo)) {
             return false;
         }
