@@ -175,6 +175,8 @@ class Controller extends CController
                 'actions' => array(
                     'activeKeys',
                     'add',
+                    'cancelDomainInvitation',
+                    'cancelUserInvitation',
                     'delete',
                     'docsEdit',
                     'edit',
