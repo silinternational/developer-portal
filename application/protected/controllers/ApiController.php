@@ -396,6 +396,15 @@ class ApiController extends \Controller
         //    OR
         // if the Api isn't visible to the current user... say so.
         if (($api === null) || ( ! $api->isVisibleToUser($currentUser))) {
+            if ($webUser->isGuest) {
+                // Prompt guests to login (in case they have been invited to
+                // see this API).
+                \Yii::app()->user->setReturnUrl($this->createUrl(
+                    'api/details',
+                    ['code' => $code]
+                ));
+                $this->redirect(['auth/login']);
+            }
             throw new \CHttpException(
                 404,
                 'Either there is no "' . $code . '" API or you do not have '
