@@ -3,7 +3,7 @@ services:
     data:
         image: silintl/data-volume:latest
         volumes:
-            - /data:/data
+            - ./application:/data
 
     db:
         image: silintl/mariadb:latest
