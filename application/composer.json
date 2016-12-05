@@ -16,7 +16,7 @@
         "hybridauth/hybridauth": "dev-patch-1",
         "silinternational/php-env": "0.*",
         "silinternational/apiaxle-sdk-php": "^1.0",
-        "guzzlehttp/guzzle-services": "dev-master",
+        "guzzlehttp/guzzle-services": "^0.6",
         "roave/security-advisories": "dev-master"
     },
     "require-dev": {
