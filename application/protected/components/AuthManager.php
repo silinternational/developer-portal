@@ -91,8 +91,13 @@ class AuthManager
                 $hybridAuthManager = new HybridAuthManager();
                 $enabledProviders = $hybridAuthManager->getEnabledProvidersList();
                 if (count($enabledProviders) === 1) {
-                    $defaultProviderSlug = $enabledProviders[0];
+                    $defaultProvider = $enabledProviders[0];
                 }
+                break;
+            
+            case 'test-owner':
+            case 'test-user':
+                $defaultProvider = 'test';
                 break;
         }
         
@@ -192,8 +197,7 @@ class AuthManager
         $loginMenuItems = [];
         foreach ($loginOptions as $loginOption) {
             $loginMenuItems[] = [
-                'encodeLabel' => false,
-                'label' => $loginOption->getLabelHtml(),
+                'label' => 'Login with ' . $loginOption->getDisplayName(),
                 'url' => $loginOption->getUrl(),
             ];
         }

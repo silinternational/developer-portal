@@ -9,9 +9,9 @@ use Sil\DevPortal\components\AuthManager;
 <head>
     <meta charset="utf-8">
     <?= \Utils::getFaviconsHtml(); ?>
-    <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/styles.css?2016-11" />
-    <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/prism.css" />
-    <title><?php echo CHtml::encode($this->pageTitle . ' - ' . \Yii::app()->name); ?></title>
+    <link rel="stylesheet" type="text/css" href="<?= Yii::app()->request->baseUrl; ?>/css/styles.css?2016-11-28" />
+    <link rel="stylesheet" type="text/css" href="<?= Yii::app()->request->baseUrl; ?>/css/prism.css" />
+    <title><?= CHtml::encode($this->pageTitle . ' - ' . \Yii::app()->name); ?></title>
     <?php
     // Load the Yii-Bootstrap CSS/JS.
     Yii::app()->bootstrap->init();
@@ -145,18 +145,18 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
     <hr>
     <div id="footer">
         <img src="/img/logos/site-logo.png" class="pull-left footer-logo" />
-        &copy; <?php echo date('Y'); ?> by SIL International Inc. | All Rights Reserved.<br/>
+        &copy; <?= date('Y'); ?> by SIL International Inc. | All Rights Reserved.<br/>
         Delivered by GTIS, USA Studio<br />
         <?php if ( ! Yii::app()->user->isGuest): ?>
             Built <?= \CHtml::encode(Utils::getApplicationBuildDate()); ?><br />
         <?php endif; ?>
-        <a href="<?php echo Yii::app()->createUrl('/site/privacy-policy'); ?>">Privacy Policy</a>
+        <a href="<?= Yii::app()->createUrl('/site/privacy-policy'); ?>">Privacy Policy</a>
         <?php if (( ! \Yii::app()->user->isGuest) && ( ! empty(\Yii::app()->params['contactUsUrl']))): ?>
             | <a href="<?= \CHtml::encode(\Yii::app()->params['contactUsUrl']); ?>">Contact Us</a>
         <?php endif; ?>
     </div><!-- footer -->
 </div><!-- page -->
-<script type="text/javascript" src="<?php echo Yii::app()->baseUrl.'/js/prism.js'; ?>"></script>
+<script type="text/javascript" src="<?= Yii::app()->baseUrl.'/js/prism.js'; ?>"></script>
 <?php
 $this->renderPartial('//partials/google-analytics', array(
     'user' => Yii::app()->user

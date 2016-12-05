@@ -10,7 +10,7 @@ $this->pageTitle = 'Login Options';
         <h2><?= \CHtml::encode($this->pageTitle); ?></h2>
         <?php foreach ($loginOptions as $loginOption): ?>
             <div style="display: inline-block; margin: 4px;">
-                <?= $loginOption->getLinkHtml('btn btn-success', true); ?>
+                <?= $loginOption->getLinkHtml(); ?>
             </div>
         <?php endforeach; ?>
     </div>
