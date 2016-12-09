@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a3045cb16be843f20e5caa5111e4c183",
-    "content-hash": "165fc7ee20368f0b25e218fd31a51561",
+    "hash": "617d68e8f94a96ae6562058ee59e1068",
+    "content-hash": "b2e57adb5092232d801a1b7c5116f774",
     "packages": [
         {
             "name": "danielstjules/stringy",
@@ -454,16 +454,16 @@
         },
         {
             "name": "hybridauth/hybridauth",
-            "version": "dev-patch-1",
+            "version": "v2.8.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/forevermatt/hybridauth.git",
-                "reference": "79a192f7014b8876ecb9bf0b317f662981b4cf8c"
+                "url": "https://github.com/hybridauth/hybridauth.git",
+                "reference": "5f2df6660789d7eefe0189baa0d05fcf53c81ce5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/forevermatt/hybridauth/zipball/79a192f7014b8876ecb9bf0b317f662981b4cf8c",
-                "reference": "79a192f7014b8876ecb9bf0b317f662981b4cf8c",
+                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/5f2df6660789d7eefe0189baa0d05fcf53c81ce5",
+                "reference": "5f2df6660789d7eefe0189baa0d05fcf53c81ce5",
                 "shasum": ""
             },
             "require": {
@@ -480,6 +480,7 @@
                     "hybridauth/Hybrid"
                 ]
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "(MIT or GPL-3.0+)"
             ],
@@ -492,24 +493,17 @@
             "description": "Open source social sign on PHP library.",
             "homepage": "http://hybridauth.sourceforge.net",
             "keywords": [
+                "OpenId",
                 "facebook",
                 "google",
                 "hybridauth",
                 "login",
                 "oauth",
-                "openid",
                 "social",
                 "twitter",
                 "yahoo"
             ],
-            "support": {
-                "email": "hybridauth@gmail.com",
-                "forum": "https://groups.google.com/d/forum/hybridauth",
-                "issues": "https://github.com/hybridauth/hybridauth/issues",
-                "gitter": "https://gitter.im/hybridauth/hybridauth",
-                "source": "https://github.com/forevermatt/hybridauth/tree/patch-1"
-            },
-            "time": "2016-11-28 14:31:58"
+            "time": "2016-12-05 18:24:36"
         },
         {
             "name": "react/promise",
@@ -1933,7 +1927,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "hybridauth/hybridauth": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": false,
