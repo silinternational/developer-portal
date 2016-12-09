@@ -2,12 +2,18 @@
     "autoload": {
         "psr-4": {"Sil\\DevPortal\\": "protected/"}
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/forevermatt/hybridauth"
+        }
+    ],
     "require": {
         "danielstjules/stringy": "^2.3",
         "yiisoft/yii": "1.1.17",
         "guzzlehttp/guzzle": "^5",
         "forevermatt/calc-api-sig": "0.1.1",
-        "hybridauth/hybridauth": "^2.8.1",
+        "hybridauth/hybridauth": "dev-master#acf29f93e3ed7f793d571acccbaa1ca01e5fc49d",
         "silinternational/php-env": "0.*",
         "silinternational/apiaxle-sdk-php": "^1.0",
         "guzzlehttp/guzzle-services": "^0.6",

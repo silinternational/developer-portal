@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "617d68e8f94a96ae6562058ee59e1068",
-    "content-hash": "b2e57adb5092232d801a1b7c5116f774",
+    "hash": "a452af3fc118d2703f29b3df6436c2d8",
+    "content-hash": "920271f66534c825321f80002b974417",
     "packages": [
         {
             "name": "danielstjules/stringy",
@@ -454,16 +454,16 @@
         },
         {
             "name": "hybridauth/hybridauth",
-            "version": "v2.8.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/hybridauth/hybridauth.git",
-                "reference": "5f2df6660789d7eefe0189baa0d05fcf53c81ce5"
+                "url": "https://github.com/forevermatt/hybridauth.git",
+                "reference": "acf29f93e3ed7f793d571acccbaa1ca01e5fc49d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/5f2df6660789d7eefe0189baa0d05fcf53c81ce5",
-                "reference": "5f2df6660789d7eefe0189baa0d05fcf53c81ce5",
+                "url": "https://api.github.com/repos/forevermatt/hybridauth/zipball/acf29f93e3ed7f793d571acccbaa1ca01e5fc49d",
+                "reference": "acf29f93e3ed7f793d571acccbaa1ca01e5fc49d",
                 "shasum": ""
             },
             "require": {
@@ -480,7 +480,6 @@
                     "hybridauth/Hybrid"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "(MIT or GPL-3.0+)"
             ],
@@ -493,17 +492,24 @@
             "description": "Open source social sign on PHP library.",
             "homepage": "http://hybridauth.sourceforge.net",
             "keywords": [
-                "OpenId",
                 "facebook",
                 "google",
                 "hybridauth",
                 "login",
                 "oauth",
+                "openid",
                 "social",
                 "twitter",
                 "yahoo"
             ],
-            "time": "2016-12-05 18:24:36"
+            "support": {
+                "email": "hybridauth@gmail.com",
+                "forum": "https://groups.google.com/d/forum/hybridauth",
+                "issues": "https://github.com/hybridauth/hybridauth/issues",
+                "gitter": "https://gitter.im/hybridauth/hybridauth",
+                "source": "https://github.com/forevermatt/hybridauth/tree/master"
+            },
+            "time": "2016-12-07 09:50:00"
         },
         {
             "name": "react/promise",
@@ -555,12 +561,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "3c25700b65ba5e34a5ec8fd05b5cdc7a68d9385a"
+                "reference": "5560bd95c22a4ccf9404d8f176fceb4812a7398e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/3c25700b65ba5e34a5ec8fd05b5cdc7a68d9385a",
-                "reference": "3c25700b65ba5e34a5ec8fd05b5cdc7a68d9385a",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/5560bd95c22a4ccf9404d8f176fceb4812a7398e",
+                "reference": "5560bd95c22a4ccf9404d8f176fceb4812a7398e",
                 "shasum": ""
             },
             "conflict": {
@@ -610,7 +616,7 @@
                 "silverstripe/framework": ">=3,<3.3",
                 "silverstripe/userforms": "<3",
                 "simplesamlphp/saml2": ">=1.9,<1.9.1|>=1.10,<1.10.3|>=2.3,<2.3.3",
-                "simplesamlphp/simplesamlphp": "<1.14.4",
+                "simplesamlphp/simplesamlphp": "<1.14.10",
                 "socalnick/scn-social-auth": "<1.15.2",
                 "swiftmailer/swiftmailer": ">=4,<4.99.99|>=5,<5.2.1",
                 "symfony/dependency-injection": ">=2,<2.0.17",
@@ -677,7 +683,7 @@
                 }
             ],
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it",
-            "time": "2016-12-04 13:54:33"
+            "time": "2016-12-06 13:29:26"
         },
         {
             "name": "silinternational/apiaxle-sdk-php",
@@ -1927,6 +1933,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "hybridauth/hybridauth": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": false,
