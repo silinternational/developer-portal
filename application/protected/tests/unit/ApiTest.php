@@ -179,6 +179,19 @@ class ApiTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testRulesForEmbeddedDocsUrl()
+    {
+        // Arrange:
+        $testCases = [
+            
+        ];
+        
+        // Act:
+        
+        // Assert:
+        
+    }
+    
     public function testFindByPk_nullPkAfterInsert()
     {
         // Arrange:
