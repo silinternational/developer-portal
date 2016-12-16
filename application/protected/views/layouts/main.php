@@ -111,7 +111,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'items' => AuthManager::getLoginMenuItems(),
                 ),
                 array(
-                    'label' => CHtml::encode(Yii::app()->user->name),
+                    'label' => Yii::app()->user->name,
                     'visible' => !Yii::app()->user->isGuest,
                     'items' => array(
                         array('label' => 'Logout', 'url' => $this->createUrl('/auth/logout')),
