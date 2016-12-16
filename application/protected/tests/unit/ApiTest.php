@@ -183,13 +183,22 @@ class ApiTest extends DeveloperPortalTestCase
     {
         // Arrange:
         $testCases = [
-            
+            'https://docs.google.com/document/d/e/2PA------------DUMMY-VALUE-------------------------------------p6LS_eBxoVB-JYnIubacvp-/pub?embedded=true',
+            'https://docs.google.com/document/d/1dR--------------DUMMY-VALUE---------7dpXvWU/pub?embedded=true',
         ];
-        
-        // Act:
-        
-        // Assert:
-        
+        foreach ($testCases as $url) {
+            $api = new Api();
+            $api->embedded_docs_url = $url;
+            
+            // Act:
+            $result = $api->validate(['embedded_docs_url']);
+            
+            // Assert:
+            $this->assertTrue($result, sprintf(
+                'Expected "%s" to be allowed, but it was not.',
+                $url
+            ));
+        }
     }
     
     public function testFindByPk_nullPkAfterInsert()
