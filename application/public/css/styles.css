@@ -110,6 +110,23 @@ dd { margin-bottom: 10px; }
     text-align: center;
 }
 
+#body .navbar-inverse .brand,
+#body .navbar-inverse .nav > li > a {
+  color: #f0f0f0;
+}
+#body .navbar-inverse .nav .active > a,
+#body .navbar-inverse .nav .active > a:hover,
+#body .navbar-inverse .nav .active > a:focus,
+#body .navbar-inverse .nav li.dropdown.open > .dropdown-toggle,
+#body .navbar-inverse .nav li.dropdown.active > .dropdown-toggle,
+#body .navbar-inverse .nav li.dropdown.open.active > .dropdown-toggle {
+  background-color: #005485;
+}
+#body .navbar-inverse .navbar-inner {
+  background-color: #0068a6;
+  background-image: none;
+}
+
 .nowrap { white-space: nowrap; }
 
 .pad-horiz {
