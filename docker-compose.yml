@@ -126,4 +126,4 @@ services:
             - api
         volumes:
             - ./build/setup-apiaxle.sh:/usr/local/bin/setup-apiaxle.sh
-        command: whenavail api 80 10 setup-apiaxle.sh
+        command: setup-apiaxle.sh
