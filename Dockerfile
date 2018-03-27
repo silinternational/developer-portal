@@ -1,7 +1,7 @@
-FROM silintl/php-web:latest
+FROM silintl/php7:latest
 MAINTAINER Phillip Shipley <phillip_shipley@sil.org>
 
-ENV REFRESHED_AT 2015-07-24
+ENV REFRESHED_AT 2016-12-16
 
 # Make sure /data is available
 RUN mkdir -p /data
