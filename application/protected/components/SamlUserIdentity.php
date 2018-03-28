@@ -207,9 +207,9 @@ class SamlUserIdentity extends UserIdentity
 
             // Get the attributes returned by the authentication process.
             $attrs = $this->auth->getAttributes();
-            $eduPersonTargetedID = $this->getValueFromSamlAttributes(
+            $authProviderUserIdentifier = $this->getValueFromSamlAttributes(
                 $attrs,
-                'eduPersonTargetedID'
+                $map['authProviderUserIdentifierField']
             );
             $authProvider = $this->getNameOfAuthProvider();
             $emailAddress = $this->getValueFromSamlAttributes(
@@ -241,7 +241,7 @@ class SamlUserIdentity extends UserIdentity
 
             return new UserAuthenticationData(
                 $authProvider,
-                $eduPersonTargetedID,
+                $authProviderUserIdentifier,
                 $emailAddress,
                 $firstName,
                 $lastName,
