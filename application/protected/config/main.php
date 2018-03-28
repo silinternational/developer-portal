@@ -155,18 +155,12 @@ return array(
             'map' => array(
                 'authProviderUserIdentifierField' => 'entryUUID',
                 'firstNameField' => 'givenName',
-                'firstNameFieldElement' => 0,
                 'lastNameField' => 'sn',
-                'lastNameFieldElement' => 0,
                 'displayNameField' => 'displayName',
-                'displayNameFieldElement' => 0,
                 'emailField' => 'mail',
-                'emailFieldElement' => 0,
                 'usernameField' => 'uid',
-                'usernameFieldElement' => 0,
                 'groupsField' => 'groups',
                 'uuidField' => 'entryUUID',
-                'uuidFieldElement' => 0,
             ),
             'trustEmailAsFallbackIdFor' => $samlTrustEmailFor,
             'authSources' => array(
