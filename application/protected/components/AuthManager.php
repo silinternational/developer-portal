@@ -215,7 +215,11 @@ class AuthManager
     {
         $loginOptions = array();
         if ($this->isAuthTypeEnabled('saml')) {
-            $loginOptions[] = new LoginOption('saml', null, 'Insite');
+            $loginOptions[] = new LoginOption(
+                'saml',
+                null,
+                \Yii::app()->params['saml']['idpName']
+            );
         }
         if ($this->isAuthTypeEnabled('hybrid')) {
             $hybridAuthManager = new HybridAuthManager();

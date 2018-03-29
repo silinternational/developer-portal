@@ -151,6 +151,7 @@ return array(
         'saml' => array(
             'default-sp' => 'default-sp',
             'enabled' => (bool)$samlEnabled,
+            'idpName' => $samlIdpName ?? 'SAML',
             'map' => array(
                 'authProviderUserIdentifierField' => 'entryUUID',
                 'firstNameField' => 'givenName',
