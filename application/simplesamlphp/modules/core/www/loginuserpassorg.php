@@ -6,21 +6,14 @@
  * username/password/organization authentication.
  *
  * @author Olav Morken, UNINETT AS.
- * @package simpleSAMLphp
+ * @package SimpleSAMLphp
  */
 
+// Retrieve the authentication state
 if (!array_key_exists('AuthState', $_REQUEST)) {
 	throw new SimpleSAML_Error_BadRequest('Missing AuthState parameter.');
 }
 $authStateId = $_REQUEST['AuthState'];
-
-// sanitize the input
-$sid = SimpleSAML_Utilities::parseStateID($authStateId);
-if (!is_null($sid['url'])) {
-	SimpleSAML_Utilities::checkURLAllowed($sid['url']);
-}
-
-/* Retrieve the authentication state. */
 $state = SimpleSAML_Auth_State::loadState($authStateId, sspmod_core_Auth_UserPassOrgBase::STAGEID);
 
 $source = SimpleSAML_Auth_Source::getById($state[sspmod_core_Auth_UserPassOrgBase::AUTHID]);
@@ -60,17 +53,17 @@ if ($organizations === NULL || !empty($organization)) {
 	if (!empty($username) && !empty($password)) {
 
 		if ($source->getRememberUsernameEnabled()) {
-			$sessionHandler = SimpleSAML_SessionHandler::getSessionHandler();
+			$sessionHandler = \SimpleSAML\SessionHandler::getSessionHandler();
 			$params = $sessionHandler->getCookieParams();
 			$params['expire'] = time();
 			$params['expire'] += (isset($_REQUEST['remember_username']) && $_REQUEST['remember_username'] == 'Yes' ? 31536000 : -300);
-			SimpleSAML_Utilities::setCookie($source->getAuthId() . '-username', $username, $params, FALSE);
+            \SimpleSAML\Utils\HTTP::setCookie($source->getAuthId() . '-username', $username, $params, FALSE);
 		}
 
 		try {
 			sspmod_core_Auth_UserPassOrgBase::handleLogin($authStateId, $username, $password, $organization);
 		} catch (SimpleSAML_Error_Error $e) {
-			/* Login failed. Extract error code and parameters, to display the error. */
+			// Login failed. Extract error code and parameters, to display the error
 			$errorCode = $e->getErrorCode();
 			$errorParams = $e->getParameters();
 		}
@@ -84,8 +77,11 @@ $t->data['username'] = $username;
 $t->data['forceUsername'] = FALSE;
 $t->data['rememberUsernameEnabled'] = $source->getRememberUsernameEnabled();
 $t->data['rememberUsernameChecked'] = $source->getRememberUsernameChecked();
+$t->data['rememberMeEnabled'] = false;
+$t->data['rememberMeChecked'] = false;
 if (isset($_COOKIE[$source->getAuthId() . '-username'])) $t->data['rememberUsernameChecked'] = TRUE;
 $t->data['errorcode'] = $errorCode;
+$t->data['errorcodes'] = SimpleSAML\Error\ErrorCodes::getAllErrorCodeMessages();
 $t->data['errorparams'] = $errorParams;
 
 if ($organizations !== NULL) {

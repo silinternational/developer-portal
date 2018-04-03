@@ -9,7 +9,7 @@
  * - getOrganizations()
  *
  * @author Olav Morken, UNINETT AS.
- * @package simpleSAMLphp
+ * @package SimpleSAMLphp
  */
 abstract class sspmod_core_Auth_UserPassOrgBase extends SimpleSAML_Auth_Source {
 
@@ -71,7 +71,7 @@ abstract class sspmod_core_Auth_UserPassOrgBase extends SimpleSAML_Auth_Source {
 		assert('is_array($info)');
 		assert('is_array($config)');
 
-		/* Call the parent constructor first, as required by the interface. */
+		// Call the parent constructor first, as required by the interface
 		parent::__construct($info, $config);
 
 		// Get the remember username config options
@@ -149,14 +149,14 @@ abstract class sspmod_core_Auth_UserPassOrgBase extends SimpleSAML_Auth_Source {
 	public function authenticate(&$state) {
 		assert('is_array($state)');
 
-		/* We are going to need the authId in order to retrieve this authentication source later. */
+		// We are going to need the authId in order to retrieve this authentication source later
 		$state[self::AUTHID] = $this->authId;
 
 		$id = SimpleSAML_Auth_State::saveState($state, self::STAGEID);
 
-		$url = SimpleSAML_Module::getModuleURL('core/loginuserpassorg.php');
+		$url = SimpleSAML\Module::getModuleURL('core/loginuserpassorg.php');
 		$params = array('AuthState' => $id);
-		SimpleSAML_Utilities::redirectTrustedURL($url, $params);
+		\SimpleSAML\Utils\HTTP::redirectTrustedURL($url, $params);
 	}
 
 
@@ -208,12 +208,6 @@ abstract class sspmod_core_Auth_UserPassOrgBase extends SimpleSAML_Auth_Source {
 		assert('is_string($password)');
 		assert('is_string($organization)');
 
-		// sanitize the input
-		$sid = SimpleSAML_Utilities::parseStateID($authStateId);
-		if (!is_null($sid['url'])) {
-			SimpleSAML_Utilities::checkURLAllowed($sid['url']);
-		}
-
 		/* Retrieve the authentication state. */
 		$state = SimpleSAML_Auth_State::loadState($authStateId, self::STAGEID);
 
@@ -262,12 +256,6 @@ abstract class sspmod_core_Auth_UserPassOrgBase extends SimpleSAML_Auth_Source {
 	public static function listOrganizations($authStateId) {
 		assert('is_string($authStateId)');
 
-		// sanitize the input
-		$sid = SimpleSAML_Utilities::parseStateID($authStateId);
-		if (!is_null($sid['url'])) {
-			SimpleSAML_Utilities::checkURLAllowed($sid['url']);
-		}
-
 		/* Retrieve the authentication state. */
 		$state = SimpleSAML_Auth_State::loadState($authStateId, self::STAGEID);
 
@@ -286,5 +274,3 @@ abstract class sspmod_core_Auth_UserPassOrgBase extends SimpleSAML_Auth_Source {
 		return $source->getOrganizations();
 	}
 }
-
-?>

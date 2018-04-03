@@ -5,18 +5,10 @@
  *
  * @author Mathias Meisfjordskar, University of Oslo.
  *         <mathias.meisfjordskar@usit.uio.no>
- * @package simpleSAMLphp
+ * @package SimpleSAMLphp
  */
 
-$authStateId = $_REQUEST['AuthState'];
-
-// sanitize the input
-$sid = SimpleSAML_Utilities::parseStateID($authStateId);
-if (!is_null($sid['url'])) {
-	SimpleSAML_Utilities::checkURLAllowed($sid['url']);
-}
-
-$state = SimpleSAML_Auth_State::loadState($authStateId, sspmod_negotiate_Auth_Source_Negotiate::STAGEID);
+$state = SimpleSAML_Auth_State::loadState($_REQUEST['AuthState'], sspmod_negotiate_Auth_Source_Negotiate::STAGEID);
 
 $metadata = SimpleSAML_Metadata_MetaDataStorageHandler::getMetadataHandler();
 $idpid = $metadata->getMetaDataCurrentEntityID('saml20-idp-hosted', 'metaindex');
@@ -29,10 +21,10 @@ if (isset($idpmeta['auth'])) {
 
 	$session = SimpleSAML_Session::getSessionFromRequest();
 	$session->setData('negotiate:disable', 'session', FALSE, 24*60*60);
-	SimpleSAML_Logger::debug('Negotiate(retry) - session enabled, retrying.');
+	SimpleSAML\Logger::debug('Negotiate(retry) - session enabled, retrying.');
 	$source->authenticate($state);
 	assert('FALSE');
 } else {
-	SimpleSAML_Logger::error('Negotiate - retry - no "auth" parameter found in IdP metadata.');
+	SimpleSAML\Logger::error('Negotiate - retry - no "auth" parameter found in IdP metadata.');
 	assert('FALSE');
 }

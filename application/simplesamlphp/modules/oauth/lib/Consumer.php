@@ -6,7 +6,7 @@ require_once(dirname(dirname(__FILE__)) . '/libextinc/OAuth.php');
  * OAuth Consumer
  *
  * @author Andreas Åkre Solberg, <andreas.solberg@uninett.no>, UNINETT AS.
- * @package simpleSAMLphp
+ * @package SimpleSAMLphp
  */
 class sspmod_oauth_Consumer {
 	
@@ -18,7 +18,7 @@ class sspmod_oauth_Consumer {
 		$this->signer = new OAuthSignatureMethod_HMAC_SHA1();
 	}
 	
-	// Used only to load the libextinc library early.
+	// Used only to load the libextinc library early
 	public static function dummy() {}
 	
 	
@@ -91,9 +91,9 @@ class sspmod_oauth_Consumer {
 		if ($callback) {
 			$params['oauth_callback'] = $callback;
 		}
-		$authorizeURL = SimpleSAML_Utilities::addURLparameter($url, $params);
+		$authorizeURL = \SimpleSAML\Utils\HTTP::addURLParameters($url, $params);
 		if ($redirect) {
-			SimpleSAML_Utilities::redirectTrustedURL($authorizeURL);
+			\SimpleSAML\Utils\HTTP::redirectTrustedURL($authorizeURL);
 			exit;
 		}	
 		return $authorizeURL;
@@ -109,7 +109,7 @@ class sspmod_oauth_Consumer {
 			throw new Exception('Error contacting request_token endpoint on the OAuth Provider');
 		}
 
-		SimpleSAML_Logger::debug('oauth: Reponse to get access token: '. $response_acc);
+		SimpleSAML\Logger::debug('oauth: Reponse to get access token: '. $response_acc);
 		
 		parse_str($response_acc, $accessResponseParsed);
 		
@@ -130,8 +130,6 @@ class sspmod_oauth_Consumer {
 		$opts = array(
 			'ssl' => array(
 				'verify_peer' => FALSE,
-				// 'cafile' => $file,
-				// 'local_cert' => $spKeyCertFile,
 				'capture_peer_cert' => TRUE,
 				'capture_peer_chain' => TRUE,
 			),
@@ -158,7 +156,6 @@ class sspmod_oauth_Consumer {
 			$opts = stream_context_create($opts);
 		}
 		$data = file_get_contents($data_req->to_url(), FALSE, $opts);
-		#print_r($data);
 
 		$dataDecoded = json_decode($data, TRUE);
 		return $dataDecoded;

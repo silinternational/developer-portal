@@ -2,7 +2,7 @@
 /**
  * Baseclass for auth source exceptions.
  * 
- * @package simpleSAMLphp_base
+ * @package SimpleSAMLphp_base
  *
  */
 class SimpleSAML_Error_AuthSource extends SimpleSAML_Error_Error {
@@ -40,6 +40,8 @@ class SimpleSAML_Error_AuthSource extends SimpleSAML_Error_Error {
 			),
 			$cause
 		);
+
+		$this->message = "Error with authentication source '$authsource': $reason";
 	}
 
 
@@ -64,5 +66,3 @@ class SimpleSAML_Error_AuthSource extends SimpleSAML_Error_Error {
 
 	
 }
-
-?>

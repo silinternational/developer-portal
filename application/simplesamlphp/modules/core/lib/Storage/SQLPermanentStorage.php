@@ -7,7 +7,7 @@
  * to store data permanently.
  *
  * @author Andreas Åkre Solberg <andreas@uninett.no>, UNINETT AS.
- * @package simpleSAMLphp
+ * @package SimpleSAMLphp
  */
 class sspmod_core_Storage_SQLPermanentStorage {
 	
@@ -99,8 +99,6 @@ class sspmod_core_Storage_SQLPermanentStorage {
 			"key2 = '" . sqlite_escape_string($key2) . "' AND " . 
 			"type = '" . sqlite_escape_string($type) . "'";
 		$results = $this->db->queryExec($query);
-		# echo $query;
-		# echo $this->db>changes;
 		return $results;
 	}
 
@@ -109,9 +107,7 @@ class sspmod_core_Storage_SQLPermanentStorage {
 		$condition = self::getCondition($type, $key1, $key2);
 		$query = "SELECT * FROM data WHERE " . $condition;
 		$results = $this->db->arrayQuery($query, SQLITE_ASSOC);
-		
-#		echo '<pre>type: ' . $type . ' key1:' . $key1 . '   ' . $query; print_r($results); exit;
-		
+
 		if (count($results) !== 1) return NULL;
 		
 		$res = $results[0];
@@ -152,7 +148,7 @@ class sspmod_core_Storage_SQLPermanentStorage {
 	
 	public function getKeys($type = NULL, $key1 = NULL, $key2 = NULL, $whichKey = 'type') {
 
-		if (!in_array($whichKey, array('key1', 'key2', 'type')))
+		if (!in_array($whichKey, array('key1', 'key2', 'type'), true))
 			throw new Exception('Invalid key type');
 			
 		$condition = self::getCondition($type, $key1, $key2);

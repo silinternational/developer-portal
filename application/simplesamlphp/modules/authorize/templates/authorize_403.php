@@ -6,7 +6,7 @@
  * - 'target': Target URL.
  * - 'params': Parameters which should be included in the request.
  *
- * @package simpleSAMLphp
+ * @package SimpleSAMLphp
  */
 
 
@@ -26,4 +26,3 @@ if (isset($this->data['LogoutURL'])) {
 ?>
 <?php
 $this->includeAtTemplateBase('includes/footer.php');
-?>

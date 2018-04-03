@@ -16,7 +16,7 @@
  * collisions.
  *
  * @author Olav Morken, UNINETT AS.
- * @package simpleSAMLphp
+ * @package SimpleSAMLphp
  */
 abstract class SimpleSAML_Auth_ProcessingFilter {
 
@@ -64,5 +64,3 @@ abstract class SimpleSAML_Auth_ProcessingFilter {
 	abstract public function process(&$request);
 
 }
-
-?>
