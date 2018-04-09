@@ -3,11 +3,6 @@
 // Set the path for the Yii framework.
 $yii = __DIR__.'/../vendor/yiisoft/yii/framework/yii.php';
 
-// simpleSAMLphp autoloading
-if (file_exists(__DIR__.'/../simplesamlphp/lib/_autoload.php')) {
-    $loader = include_once __DIR__ . '/../simplesamlphp/lib/_autoload.php';
-}
-
 // Composer autoloading
 if (file_exists(__DIR__.'/../vendor/autoload.php')) {
     $loader = include_once __DIR__ . '/../vendor/autoload.php';
