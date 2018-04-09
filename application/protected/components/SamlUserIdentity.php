@@ -3,6 +3,7 @@ namespace Sil\DevPortal\components;
 
 use Sil\DevPortal\components\UserAuthenticationData;
 use Sil\DevPortal\models\User;
+use SimpleSAML\Auth\Simple;
 
 class SamlUserIdentity extends UserIdentity
 {
@@ -14,7 +15,7 @@ class SamlUserIdentity extends UserIdentity
     public function __construct() 
     {
         $this->config = \Yii::app()->params['saml'];
-        $this->auth = new \SimpleSAML_Auth_Simple($this->config['default-sp']);
+        $this->auth = new Simple($this->config['default-sp']);
     }
     
     /**
