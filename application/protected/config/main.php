@@ -152,7 +152,7 @@ return array(
             'default-sp' => 'default-sp',
             'enabled' => (bool)$samlEnabled,
             'map' => array(
-                'authProviderUserIdentifierField' => 'eduPersonTargetedID',
+                'authProviderUserIdentifierField' => 'entryUUID',
                 'firstNameField' => 'givenName',
                 'firstNameFieldElement' => 0,
                 'lastNameField' => 'sn',
