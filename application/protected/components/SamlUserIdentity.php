@@ -7,7 +7,7 @@ use SimpleSAML\Auth\Simple;
 
 class SamlUserIdentity extends UserIdentity
 {
-    /** @var \SimpleSAML_Auth_Simple */
+    /** @var SimpleSAML\Auth\Simple */
     protected $auth;
     
     protected $config;
