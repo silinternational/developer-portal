@@ -44,14 +44,14 @@ services:
         volumes_from:
             - data
         working_dir: /data
-        command: composer install --no-plugins --no-scripts --prefer-dist
+        command: composer install --no-scripts
 
     composerupdate:
         image: silintl/php7:latest
         volumes_from:
             - data
         working_dir: /data
-        command: composer update --no-plugins --no-scripts --prefer-dist
+        command: composer update --no-scripts
 
     yiimigrate:
         image: silintl/php7:latest

@@ -7,9 +7,16 @@ else
     sed -i /etc/rsyslog.conf -e "s/LOGENTRIESKEY/${LOGENTRIES_KEY}/"
     # Start syslog
     rsyslogd
+    
+    # Give syslog time to finish starting.
+    sleep 10
 fi
 
 chown -R www-data:www-data /data/protected/runtime /data/public/assets
+
+mkdir -p -v /data/vendor/simplesamlphp/simplesamlphp/cert
+cp /tmp/ssp-overrides/config/* /data/vendor/simplesamlphp/simplesamlphp/config
+cp /tmp/ssp-overrides/metadata/* /data/vendor/simplesamlphp/simplesamlphp/metadata
 
 # Run database migrations
 /data/protected/yiic migrate --interactive=0

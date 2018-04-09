@@ -9,6 +9,9 @@ RUN mkdir -p /data
 # Copy in vhost configuration
 COPY build/developer-portal.conf /etc/apache2/sites-enabled/
 
+# Copy the SimpleSAMLphp configuration files to a temporary location
+COPY build/ssp-overrides /tmp/ssp-overrides
+
 # Copy in syslog config
 RUN rm -f /etc/rsyslog.d/*
 COPY build/rsyslog.conf /etc/rsyslog.conf
