@@ -3,7 +3,7 @@
 $IDP = getenv('SAML_IDP') ?: 'https://openidp.feide.no';
 $SSO_URL = getenv('SAML_SSO_URL') ?: 'https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php';
 $SLO_URL = getenv('SAML_SLO_URL') ?: 'https://openidp.feide.no/simplesaml/saml2/idp/SingleLogoutService.php';
-$CERT_FINGERPRINT = getenv('SAML_CERT_FINGERPRINT') ?: 'c9ed4dfb07caf13fc21e0fec1572047eb8a7a4cb';
+$CERT_DATA = getenv('SAML_CERT_DATA') ?: null;
 $ORG_NAME = getenv('SAML_ORG_NAME') ?: 'OpenIdP';
 $ORG_URL = getenv('SAML_ORG_URL') ?: 'https://openidp.feide.no';
 
@@ -24,7 +24,7 @@ $metadata[$IDP] = array(
         ),
     ),
     'SingleLogoutService' => $SLO_URL,
-    'certFingerprint' => $CERT_FINGERPRINT,
+    'certData' => $CERT_DATA,
     'NameIDFormat' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
     'OrganizationName' => $ORG_NAME,
     'OrganizationDisplayName' => $ORG_NAME,
