@@ -35,4 +35,5 @@ $metadata[$IDP] = array(
             'oid2name',
         ),
     ),
+    'sign.authnrequest' => true,
 );
