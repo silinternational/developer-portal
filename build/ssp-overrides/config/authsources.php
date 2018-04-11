@@ -51,6 +51,9 @@ $config = array(
           */
         //'signature.algorithm' => 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256',
 
+        // Certificate / key for signing and decrypting.
+        'privatekey' => 'saml.pem',
+        'certificate' => 'saml.crt',
     ),
 
 );

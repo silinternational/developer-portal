@@ -13,7 +13,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'user2'  => array(
         'user_id'       => 2,
@@ -25,7 +25,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithNoPendingKeys' => array(
         'user_id'       => 3,
@@ -37,7 +37,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithApprovedKey' => array(
         'user_id'       => 4,
@@ -49,7 +49,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithDeniedKey' => array(
         'user_id'       => 5,
@@ -61,7 +61,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithPendingKey' => array(
         'user_id'       => 6,
@@ -73,7 +73,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithRevokedKey' => array(
         'user_id'       => 7,
@@ -85,7 +85,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userThatOwnsASingleApi' => array(
         'user_id'       => 8,
@@ -97,7 +97,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_ADMIN,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithRoleOfUser' => array(
         'user_id'       => 9,
@@ -109,7 +109,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithFirstKeyForApiWithTwoKeys' => array(
         'user_id'       => 10,
@@ -121,7 +121,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithSecondKeyForApiWithTwoKeys' => array(
         'user_id'       => 11,
@@ -133,7 +133,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWith1stPKForApiWithTwoPendingKeys' => array(
         'user_id'       => 12,
@@ -145,7 +145,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWith2ndPKForApiWithTwoPendingKeys' => array(
         'user_id'       => 13,
@@ -157,7 +157,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userThatDoesNotOwnAnyApis' => array(
         'user_id'       => 14,
@@ -169,7 +169,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_OWNER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithRoleOfAdmin' => array(
         'user_id'       => 15,
@@ -181,7 +181,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_ADMIN,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithRoleOfOwner' => array(
         'user_id'       => 17,
@@ -193,7 +193,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_OWNER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'user18' => array(
         'user_id'       => 18,
@@ -205,7 +205,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_OWNER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithKeyToApiOwnedByUser18' => array(
         'user_id'       => 19,
@@ -217,7 +217,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithRoleOfAdminButNoKeys' => array(
         'user_id'       => 20,
@@ -229,7 +229,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_ADMIN,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'ownerThatDoesNotOwnAnyApisOrKeys' => array(
         'user_id'       => 21,
@@ -241,7 +241,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_OWNER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithPendingKeyForApiOwnedByUser18' => array(
         'user_id'       => 22,
@@ -253,19 +253,19 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
-    'userFromInsite' => array(
+    'userFromSAML' => array(
         'user_id'       => 23,
-        'email'         => 'userFromInsite@jaars.net',
+        'email'         => 'userFromSAML@jaars.net',
         'first_name'    => 'User From',
-        'last_name'     => 'Insite',
-        'display_name'  => 'User From Insite',
+        'last_name'     => 'SAML',
+        'display_name'  => 'User From SAML',
         'status'        => User::STATUS_ACTIVE,
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
         'auth_provider_user_identifier' => 'fake-identifier-1462913079',
     ),
     'userFromTrustedAuthProviderLackingIdentifier' => array(
@@ -278,7 +278,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
         'auth_provider_user_identifier' => null,
     ),
     'userFromOtherAuthProviderLackingIdentifier' => array(
@@ -374,7 +374,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithDeniedKeyForApiOwnedByUser18' => array(
         'user_id'       => 32,
@@ -386,7 +386,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithRevokedKeyForApiOwnedByUser18' => array(
         'user_id'       => 33,
@@ -398,7 +398,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'firstUserWithKeyDependentOnAvd3' => array(
         'user_id'       => 34,
@@ -410,7 +410,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'secondUserWithKeyDependentOnAvd3' => array(
         'user_id'       => 35,
@@ -422,7 +422,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithKeyNotDependentOnAvd3' => array(
         'user_id'       => 36,
@@ -434,7 +434,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithDeniedKeyRelatedToAvd3' => array(
         'user_id'       => 37,
@@ -446,7 +446,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'userWithKeyAllowedByTwoApiVisibilityDomains' => array(
         'user_id'       => 38,
@@ -458,7 +458,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'Insite',
+        'auth_provider' => 'SAML',
     ),
     'normalUserWithNoKeys' => array(
         'user_id'       => 39,

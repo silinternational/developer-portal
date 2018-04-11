@@ -151,21 +151,16 @@ return array(
         'saml' => array(
             'default-sp' => 'default-sp',
             'enabled' => (bool)$samlEnabled,
+            'idpName' => $samlIdpName ?? 'SAML',
             'map' => array(
-                'authProviderUserIdentifierField' => 'entryUUID',
+                'authProviderUserIdentifierField' => 'employeeNumber',
                 'firstNameField' => 'givenName',
-                'firstNameFieldElement' => 0,
                 'lastNameField' => 'sn',
-                'lastNameFieldElement' => 0,
                 'displayNameField' => 'displayName',
-                'displayNameFieldElement' => 0,
                 'emailField' => 'mail',
-                'emailFieldElement' => 0,
                 'usernameField' => 'uid',
-                'usernameFieldElement' => 0,
                 'groupsField' => 'groups',
                 'uuidField' => 'entryUUID',
-                'uuidFieldElement' => 0,
             ),
             'trustEmailAsFallbackIdFor' => $samlTrustEmailFor,
             'authSources' => array(

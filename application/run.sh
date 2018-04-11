@@ -15,6 +15,7 @@ fi
 chown -R www-data:www-data /data/protected/runtime /data/public/assets
 
 mkdir -p -v /data/vendor/simplesamlphp/simplesamlphp/cert
+cp /tmp/ssp-overrides/cert/* /data/vendor/simplesamlphp/simplesamlphp/cert
 cp /tmp/ssp-overrides/config/* /data/vendor/simplesamlphp/simplesamlphp/config
 cp /tmp/ssp-overrides/metadata/* /data/vendor/simplesamlphp/simplesamlphp/metadata
 

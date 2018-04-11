@@ -150,7 +150,7 @@ class SamlUserIdentityTest extends \CDbTestCase
             '\Sil\DevPortal\components\SamlUserIdentity'
         );
         $idp = 'dummy.idp.entity.id'; // Match value in config/test.php file.
-        $expectedResult = 'Insite';
+        $expectedResult = 'SAML';
         \Phake::when($samlUserIdentity)->getAuthSourceIdpEntityId->thenReturn($idp);
         \Phake::when($samlUserIdentity)->getNameOfAuthProvider->thenCallParent();
         

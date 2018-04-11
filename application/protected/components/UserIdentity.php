@@ -56,7 +56,7 @@ abstract class UserIdentity extends \CBaseUserIdentity
                  * as returned by the auth. provider.
                  * 
                  * NOTE: This also provides an opportunity to populate any
-                 * missing auth_provider_user_identifier fields for Insite
+                 * missing auth_provider_user_identifier fields for SAML
                  * logins done before we were tracking that data.
                  */
                 $this->updateUserRecord($userAuthData);
