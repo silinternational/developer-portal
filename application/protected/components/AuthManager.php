@@ -84,7 +84,7 @@ class AuthManager
         $defaultProvider = null;
         switch ($authType) {
             case 'saml':
-                $defaultProvider = 'Insite';
+                $defaultProvider = 'SAML';
                 break;
                 
             case 'hybrid':
