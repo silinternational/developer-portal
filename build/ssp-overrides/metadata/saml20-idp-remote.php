@@ -35,5 +35,11 @@ $metadata[$IDP] = array(
             'oid2name',
         ),
     ),
+
+    'redirect.sign' => true,
+    'redirect.validate' => true,
+    'assertion.encryption' => true,
+    'sign.logout' => true,
+    'validate.logout' => true,
     'sign.authnrequest' => true,
 );
