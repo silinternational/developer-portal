@@ -84,7 +84,7 @@ class AuthManager
         $defaultProvider = null;
         switch ($authType) {
             case 'saml':
-                $defaultProvider = 'Insite';
+                $defaultProvider = 'SAML';
                 break;
                 
             case 'hybrid':
@@ -206,16 +206,18 @@ class AuthManager
     
     /**
      * Get the list of login options.
-     * 
-     * @return array<string,LoginOption> The list of login options, where keys are
-     *     the display name for that authentication types (e.g. Google) and
-     *     values are a LoginOption value object.
+     *
+     * @return LoginOption[] The list of login options.
      */
     public function getLoginOptions()
     {
         $loginOptions = array();
         if ($this->isAuthTypeEnabled('saml')) {
-            $loginOptions[] = new LoginOption('saml', null, 'Insite');
+            $loginOptions[] = new LoginOption(
+                'saml',
+                null,
+                \Yii::app()->params['saml']['idpName']
+            );
         }
         if ($this->isAuthTypeEnabled('hybrid')) {
             $hybridAuthManager = new HybridAuthManager();

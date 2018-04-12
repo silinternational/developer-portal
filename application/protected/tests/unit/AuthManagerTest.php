@@ -162,7 +162,7 @@ class AuthManagerTest extends \CTestCase
         // Arrange:
         $testCases = [
             ['authType' => null, 'expected' => null],
-            ['authType' => 'saml', 'expected' => 'insite'],
+            ['authType' => 'saml', 'expected' => 'saml'],
             ['authType' => 'someunknownvalue', 'expected' => null],
         ];
         $authManager = new AuthManager();

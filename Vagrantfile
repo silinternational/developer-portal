@@ -18,11 +18,6 @@ Vagrant.configure(2) do |config|
   # using a specific IP.
   config.vm.network "private_network", ip: "192.168.33.10"
 
-  # Synced folders for container data.
-  config.vm.synced_folder "./application", "/application",
-  # 33 is the www-data user/group in the ubuntu container
-  mount_options: ["uid=33","gid=33"]
-  
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:

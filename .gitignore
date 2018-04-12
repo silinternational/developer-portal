@@ -20,8 +20,8 @@ application/runtime/
 
 # simplesaml config files
 application/simplesamlphp/cert/
-build/saml.crt
-build/saml.pem
+build/ssp-overrides/cert/
+*.pem
 
 # favicon files (to be put in place via s3-expand)
 application/public/android-chrome-192x192.png

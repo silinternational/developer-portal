@@ -99,12 +99,12 @@ return array(
         'created'         => '2016-06-07 15:08:12',
         'updated'         => '2016-06-07 15:08:12',
     ),
-    'allInsiteApi'  => array(
+    'allSAMLApi'  => array(
         'api_id'          => 7,
-        'code'            => 'test-all-insite',
-        'display_name'    => 'An API Visible to All Insite Users',
+        'code'            => 'test-all-saml',
+        'display_name'    => 'An API Visible to All SAML Users',
         'endpoint'        => 'localhost',
-        'default_path'    => '/all-insite',
+        'default_path'    => '/all-saml',
         'queries_second'  => 10,
         'queries_day'     => 1000,
         'approval_type'   => Api::APPROVAL_TYPE_AUTO,
@@ -115,7 +115,7 @@ return array(
         'created'         => '2016-06-07 15:08:12',
         'updated'         => '2016-06-07 15:08:12',
     ),
-    'specificInsiteGroupApi'  => array(
+    'specificSAMLGroupApi'  => array(
         'api_id'          => 8,
         'code'            => 'test-specific-access-group',
         'display_name'    => 'An API Visible to a Specific Access Group',

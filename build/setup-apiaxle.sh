@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+sleep 10
+
 # Setup ApiAxle with dev key/secret
 curl -X POST -H 'Content-type: application/json' 'http://api/v1/api/apiaxle' -d '{"endPoint":"api", "endPointTimeout": 5, "tokenSkewProtectionCount": 5}'
 curl -X POST -H 'Content-type: application/json' 'http://api/v1/key/developer-portal-dev-key' -d '{"sharedSecret":"developer-portal-dev-secret","qps":10000,"qpd":100000}'

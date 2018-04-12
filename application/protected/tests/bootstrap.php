@@ -3,13 +3,6 @@
 // Define a constant to indicate that this is a testing environment.
 define('APPLICATION_ENV', 'testing');
 
-// simpleSAMLphp autoloading
-if (file_exists(__DIR__ . '/../../simplesamlphp/lib/_autoload.php')) {
-    $loader = include_once __DIR__ . '/../../simplesamlphp/lib/_autoload.php';
-} else {
-    die('Unable to find simpleSAMLphp autoloader file.');
-}
-
 // Composer autoloading
 if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
     $loader = include_once __DIR__ . '/../../vendor/autoload.php';

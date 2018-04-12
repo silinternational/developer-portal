@@ -1,13 +1,16 @@
-FROM silintl/php-web:latest
+FROM silintl/php7:latest
 MAINTAINER Phillip Shipley <phillip_shipley@sil.org>
 
-ENV REFRESHED_AT 2015-07-24
+ENV REFRESHED_AT 2016-12-16
 
 # Make sure /data is available
 RUN mkdir -p /data
 
 # Copy in vhost configuration
 COPY build/developer-portal.conf /etc/apache2/sites-enabled/
+
+# Copy the SimpleSAMLphp configuration files to a temporary location
+COPY build/ssp-overrides /tmp/ssp-overrides
 
 # Copy in syslog config
 RUN rm -f /etc/rsyslog.d/*

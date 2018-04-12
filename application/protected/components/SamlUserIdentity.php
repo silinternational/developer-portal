@@ -3,10 +3,11 @@ namespace Sil\DevPortal\components;
 
 use Sil\DevPortal\components\UserAuthenticationData;
 use Sil\DevPortal\models\User;
+use SimpleSAML\Auth\Simple;
 
 class SamlUserIdentity extends UserIdentity
 {
-    /** @var \SimpleSAML_Auth_Simple */
+    /** @var SimpleSAML\Auth\Simple */
     protected $auth;
     
     protected $config;
@@ -14,7 +15,7 @@ class SamlUserIdentity extends UserIdentity
     public function __construct() 
     {
         $this->config = \Yii::app()->params['saml'];
-        $this->auth = new \SimpleSAML_Auth_Simple($this->config['default-sp']);
+        $this->auth = new Simple($this->config['default-sp']);
     }
     
     /**
@@ -200,6 +201,9 @@ class SamlUserIdentity extends UserIdentity
         }
         // Otherwise...
         else {
+            // Keep the SimpleSMLphp session from clobbering the Yii session.
+            $sspSession = \SimpleSAML_Session::getSessionFromRequest();
+            $sspSession->cleanup();
             
             // Get an easier reference to our config data for mapping returned
             // field names to our names for those fields.
@@ -207,9 +211,9 @@ class SamlUserIdentity extends UserIdentity
 
             // Get the attributes returned by the authentication process.
             $attrs = $this->auth->getAttributes();
-            $eduPersonTargetedID = $this->getValueFromSamlAttributes(
+            $authProviderUserIdentifier = $this->getValueFromSamlAttributes(
                 $attrs,
-                'eduPersonTargetedID'
+                $map['authProviderUserIdentifierField']
             );
             $authProvider = $this->getNameOfAuthProvider();
             $emailAddress = $this->getValueFromSamlAttributes(
@@ -241,7 +245,7 @@ class SamlUserIdentity extends UserIdentity
 
             return new UserAuthenticationData(
                 $authProvider,
-                $eduPersonTargetedID,
+                $authProviderUserIdentifier,
                 $emailAddress,
                 $firstName,
                 $lastName,

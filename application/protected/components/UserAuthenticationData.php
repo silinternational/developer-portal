@@ -21,8 +21,8 @@ class UserAuthenticationData
 
     /**
      * Constructor.
-     * 
-     * @param string $authProvider The authentication provider (e.g. 'Insite',
+     *
+     * @param string $authProvider The authentication provider (e.g. 'SAML',
      *     'Google', etc.).
      * @param string $authProviderUserIdentifier The authentication provider's
      *     unique identifier for this user.
