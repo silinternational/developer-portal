@@ -115,6 +115,7 @@ class LinksManagerTest extends CDbTestCase
             'Get Key',
             'Show Active Keys',
             'Show Pending Keys',
+            'See API Usage',
             'Email Users With Keys',
             'Edit API',
             'Delete API',
@@ -148,6 +149,7 @@ class LinksManagerTest extends CDbTestCase
             'Request Key',
             'Show Active Keys',
             'Show Pending Keys',
+            'See API Usage',
             'Edit API',
             'Delete API',
         );
@@ -180,6 +182,7 @@ class LinksManagerTest extends CDbTestCase
             'Get Key',
             'Show Active Keys',
             'Show Pending Keys',
+            'See API Usage',
             'Email Users With Keys',
             'Edit API',
             'Delete API',
