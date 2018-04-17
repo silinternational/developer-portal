@@ -163,7 +163,7 @@ class Key extends \KeyBase
      * Attempt to approve a pending (i.e. - requested) Key, receiving back an
      * indicator of whether it was successful.
      * 
-     * @param User $approvingUser The user to record as the one who approved
+     * @param User|null $approvingUser The user to record as the one who approved
      *     the request for this Key (for Keys to Apis that require approval).
      *     Defaults to null (used for auto-approved Keys).
      * @return boolean True if the Key was successfully approved. If not, check
