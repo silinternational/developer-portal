@@ -286,6 +286,8 @@ class Key extends \KeyBase
                     return false;
             }
         }
+        
+        return false;
     }
     
     protected function createInApiAxle(ApiAxleClient $apiAxle)

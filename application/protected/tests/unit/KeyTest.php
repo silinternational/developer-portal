@@ -356,6 +356,40 @@ class KeyTest extends DeveloperPortalTestCase
         );
     }
     
+    public function testCanBeDeletedBy_notOwnKeyNonAdmin()
+    {
+        // Arrange:
+        /* @var $key Key */
+        $key = $this->keys('revokedKeyUser7');
+        /* @var $user User */
+        $user = $this->users('normalUserWithNoKeys');
+        
+        // Pre-assert:
+        $this->assertFalse(
+            $key->isOwnedBy($user),
+            'This test requires a Key NOT owned by the given User.'
+        );
+        $this->assertEquals(
+            Key::STATUS_REVOKED,
+            $key->status,
+            'This test requires a revoked Key.'
+        );
+        $this->assertFalse(
+            $user->isAdmin(),
+            'This test requires a non-Admin User.'
+        );
+        
+        // Act:
+        $result = $key->canBeDeletedBy($user);
+        
+        // Assert:
+        $this->assertFalse(
+            $result,
+            'Failed to report that a non-Admin User can NOT delete a Key '
+            . 'belonging to a different User.'
+        );
+    }
+    
     public function testCanBeDeletedBy()
     {
         $this->markTestIncomplete('Tests not yet written.');
