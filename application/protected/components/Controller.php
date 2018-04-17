@@ -162,7 +162,7 @@ class Controller extends CController
      * 
      * @return array
      */
-    public final function accessRules()
+    final public function accessRules()
     {
         return array(
             array( // Admins can go anywhere.
@@ -185,6 +185,7 @@ class Controller extends CController
                     'invitedUsers',
                     'inviteUser',
                     'pendingKeys',
+                    'usage',
                 ),
                 'roles' => array('owner'),
             ),

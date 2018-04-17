@@ -1179,9 +1179,15 @@ class ApiController extends \Controller
             );
         }
         
+        $interval = \UsageStats::INTERVAL_DAY;
+        $usageStats = new \UsageStats($interval);
+        $usageStats->addEntry($api->display_name, $api->getUsage($interval));
+        
         // Show the page.
         $this->render('usage', array(
             'api' => $api,
+            'usageStats' => $usageStats,
+            'summary' => $api->getUsageSummary()
         ));
     }
 }
