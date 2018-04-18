@@ -149,16 +149,21 @@ class Client extends BaseClient
      * @param integer $timeStart A Unix timestamp.
      * @param string $granularity The desired granularity (e.g. - 'second',
      *     'minute', 'hour', or 'day').
+     * @param integer|null $timeEnd (Optional:) A Unix timestamp for an end date.
      * @return array The stats data.
      */
-    public function getApiStats($apiName, $timeStart, $granularity)
+    public function getApiStats($apiName, $timeStart, $granularity, $timeEnd = null)
     {
-        $response = $this->api()->getStats([
+        $parameters = [
             'id' => $apiName,
             'from' => $timeStart,
             'granularity' => $granularity,
             'format_timeseries' => false,
-        ]);
+        ];
+        if ($timeEnd !== null) {
+            $parameters['to'] = $timeEnd;
+        }
+        $response = $this->api()->getStats($parameters);
         return $this->getDataFromResponse($response);
     }
     

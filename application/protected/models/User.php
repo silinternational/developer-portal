@@ -1000,7 +1000,6 @@ class User extends \UserBase
      * Assemble the user's display name if it does not yet exist.
      * 
      * @param string $attribute The name of the attribute to be validated.
-     * @param array $params The options specified in the validation rule.
      */
     public function assembleDisplayNameIfEmpty($attribute)
     {

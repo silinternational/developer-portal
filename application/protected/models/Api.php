@@ -527,7 +527,6 @@ class Api extends \ApiBase
         $granularity = 'minute',
         $includeCurrentInterval = true,
         $rewindBy = 0
-
     ) {
         // Get the ApiAxle Api object for this Api model.
         $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
@@ -573,6 +572,58 @@ class Api extends \ApiBase
         
         // Return the resulting data.
         return $usage;
+    }
+    
+    /**
+     * Get a summary of this Api's usage (by month).
+     * 
+     * @return array A hash with month names keys and totals as values.
+     */
+    public function getUsageSummary()
+    {
+        // Get the ApiAxle Api object for this Api model.
+        $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
+        
+        $summary = [];
+        for ($offset = 0; $offset < 6; $offset++) {
+            
+            $offsetMonthsAgo = strtotime('-' . $offset . ' months');
+            $timeStart = gmmktime(
+                0,
+                0,
+                0,
+                gmdate('n', $offsetMonthsAgo),
+                1,
+                gmdate('Y', $offsetMonthsAgo)
+            );
+            /* NOTE: Make sure you don't include the first day of the next
+             *       month. That's why we're subtracting 1 second here.  */
+            $timeEnd = strtotime('+1 month', $timeStart) - 1;
+            
+            // Retrieve the stats from ApiAxle.
+            $axleStats = $apiAxle->getApiStats(
+                $this->code,
+                $timeStart,
+                \UsageStats::INTERVAL_DAY,
+                $timeEnd
+            );
+            
+            // Aggregate the data.
+            $totalForMonth = 0;
+            foreach ($axleStats as $categoryStats) {
+                foreach ($categoryStats as $timeData) {
+                    foreach ($timeData as $numHits) {
+                        $totalForMonth += $numHits;
+                    }
+                }
+            }
+            
+            $monthName = gmdate('M', $timeStart);
+            $summary[$monthName] = $totalForMonth;
+        }
+        
+        // Return the resulting data.
+        return $summary;
     }
     
     /**
