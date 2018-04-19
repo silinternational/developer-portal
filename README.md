@@ -56,14 +56,6 @@ Developer Portal website.
   }
   ```
 
-## Reference Links ##
-1. Yii Bootstrap extension - http://www.yiiframework.com/extension/bootstrap
-
-## How To ##
-1. Reset Database:  
-   ```./yiic dbreset db``` for main database or  
-   ```./yiic dbreset testDb``` for test database.
-
 ## Hosts file modification for running Developer Portal locally ##
 Add the following line to your hosts file (replacing ```your-domain-name``` with
 the domain name you want to use):
