@@ -16,9 +16,9 @@ COPY build/ssp-overrides /tmp/ssp-overrides
 RUN rm -f /etc/rsyslog.d/*
 COPY build/rsyslog.conf /etc/rsyslog.conf
 
-# Copy in updated php.ini
-COPY build/php.ini /etc/php5/apache2/
-COPY build/php.ini /etc/php5/cli/
+# Copy in any additional PHP ini files
+COPY build/php/*.ini /etc/php/7.0/apache2/conf.d/
+COPY build/php/*.ini /etc/php/7.0/cli/conf.d/
 
 # It is expected that /data is = application/ in project folder
 COPY application/ /data/
