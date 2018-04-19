@@ -40,7 +40,7 @@ $this->pageTitle = 'Welcome';
 
             <div class="span4">
                 <?php if ($popularApis === null): ?>
-                    <?php $homeLowerRightHtml; ?>
+                    <?= $homeLowerRightHtml; ?>
                 <?php else: ?>
                     <?php
                     $this->renderPartial('//partials/popular-apis', array(
