@@ -7,7 +7,7 @@ ENV REFRESHED_AT 2016-12-16
 RUN mkdir -p /data
 
 # Copy in vhost configuration
-COPY build/developer-portal.conf /etc/apache2/sites-enabled/
+COPY build/vhost.conf /etc/apache2/sites-enabled/
 
 # Copy the SimpleSAMLphp configuration files to a temporary location
 COPY build/ssp-overrides /tmp/ssp-overrides
