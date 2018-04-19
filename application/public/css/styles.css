@@ -123,7 +123,7 @@ dd { margin-bottom: 10px; }
   background-color: #005485;
 }
 #body .navbar-inverse .navbar-inner {
-  background-color: #0068a6;
+  background-color: #0068a6; /* NOTE: If you change this, also update run.sh */
   background-image: none;
 }
 
