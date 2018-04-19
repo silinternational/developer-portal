@@ -7,7 +7,7 @@ ENV REFRESHED_AT 2016-12-16
 RUN mkdir -p /data
 
 # Copy in vhost configuration
-COPY build/developer-portal.conf /etc/apache2/sites-enabled/
+COPY build/vhost.conf /etc/apache2/sites-enabled/
 
 # Copy the SimpleSAMLphp configuration files to a temporary location
 COPY build/ssp-overrides /tmp/ssp-overrides
@@ -16,9 +16,9 @@ COPY build/ssp-overrides /tmp/ssp-overrides
 RUN rm -f /etc/rsyslog.d/*
 COPY build/rsyslog.conf /etc/rsyslog.conf
 
-# Copy in updated php.ini
-COPY build/php.ini /etc/php5/apache2/
-COPY build/php.ini /etc/php5/cli/
+# Copy in any additional PHP ini files
+COPY build/php/*.ini /etc/php/7.0/apache2/conf.d/
+COPY build/php/*.ini /etc/php/7.0/cli/conf.d/
 
 # It is expected that /data is = application/ in project folder
 COPY application/ /data/
