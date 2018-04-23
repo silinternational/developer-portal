@@ -24,8 +24,8 @@ cp /tmp/ssp-overrides/cert/* /data/vendor/simplesamlphp/simplesamlphp/cert
 cp /tmp/ssp-overrides/config/* /data/vendor/simplesamlphp/simplesamlphp/config
 cp /tmp/ssp-overrides/metadata/* /data/vendor/simplesamlphp/simplesamlphp/metadata
 
-# Run database migrations
-/data/protected/yiic migrate --interactive=0
+# Run database migrations (exiting with an error if they fail)
+runny /data/protected/yiic migrate --interactive=0
 
 # Run apache in foreground
 apache2ctl -D FOREGROUND
