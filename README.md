@@ -1,6 +1,43 @@
 # Developer Portal #
 Developer Portal website.
 
+## Docker Image ##
+This website is available as a Docker image here:  
+<https://hub.docker.com/r/silintl/developer-portal/>
+
+We recommend using that as the `FROM` in your own Dockerfile in your own
+private repo, where you would `COPY` into your own Docker image the files needed
+by SimpleSAMLphp (if using SAML logins), your own
+`/data/public/img/logos/site-logo.png`, etc. Your Dockerfile should put the
+SAML files into `/tmp/ssp-overrides`, since the `run.sh` script will copy from
+there into the SimpleSAMLphp folders within the `vendor` folder after installing
+composer dependencies.
+
+### Example Dockerfile using this as the FROM ###
+
+    FROM silintl/developer-portal:1.0.1 
+
+    # Make sure /data is available
+    RUN mkdir -p /data
+
+    # Copy in a custom vhost configuration (if necessary)
+    COPY build/vhost.conf /etc/apache2/sites-enabled/
+
+    # Copy the SimpleSAMLphp configuration files to a temporary location
+    COPY build/ssp-overrides /tmp/ssp-overrides
+
+    COPY build/logos /data/public/img/logos
+
+    WORKDIR /data
+
+    EXPOSE 80
+
+    # Record now as the build date/time (in a friendly format).
+    RUN date -u +"%B %-d, %Y, %-I:%M%P (%Z)" > /data/protected/data/version.txt
+
+    CMD ["/data/run.sh"]
+
+
 ## Environment / Project Setup ##
 1. Install [VirtualBox](http://www.virtualbox.org/wiki/Downloads)
 2. Install [Vagrant](http://downloads.vagrantup.com/)
