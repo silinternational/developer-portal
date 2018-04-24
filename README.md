@@ -58,8 +58,8 @@ composer dependencies.
 - ```SHOW_POPULAR_APIS``` (boolean)  
   Whether to show the most popular APIs (based on the number of approved keys).
   If false, the file ```application/protected/views/partials/home-lower-right.php```
-  will be shown (which you can overwrite with whatever content you want during
-  your deployment process).
+  will be shown (which you can set the content of in the `site_text` table in
+  the database.
 
 ## Hosts file modification for running Developer Portal locally ##
 Add the following line to your hosts file (replacing ```your-domain-name``` with
