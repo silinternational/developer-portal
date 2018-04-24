@@ -23,46 +23,6 @@ Developer Portal website.
   If false, the file ```application/protected/views/partials/home-lower-right.php```
   will be shown (which you can overwrite with whatever content you want during
   your deployment process).
-- ```EXPAND_S3_FOLDERS```, etc. (strings)  
-  If you want to pull files from S3 (such as logos for the homepage), this is
-  how. You will need to create an IAM user (whose access key and secret you will
-  use for ```EXPAND_S3_KEY```, and ```EXPAND_S3_SECRET```, respectively) with a
-  permissions policy like this:  
-  ```
-  {
-      "Version": "2012-10-17",
-      "Statement": [
-          {
-              "Effect": "Allow",
-              "Action": [
-                  "s3:GetObject",
-                  "s3:List*"
-              ],
-              "Resource": [
-                  "arn:aws:s3:::YOUR-AWS-S3-BUCKET-NAME"
-              ]
-          },
-          {
-              "Effect": "Allow",
-              "Action": [
-                  "s3:Get*",
-                  "s3:List*"
-              ],
-              "Resource": [
-                  "arn:aws:s3:::YOUR-AWS-S3-BUCKET-NAME/THE-PATH/*"
-              ]
-          }
-      ]
-  }
-  ```
-
-## Reference Links ##
-1. Yii Bootstrap extension - http://www.yiiframework.com/extension/bootstrap
-
-## How To ##
-1. Reset Database:  
-   ```./yiic dbreset db``` for main database or  
-   ```./yiic dbreset testDb``` for test database.
 
 ## Hosts file modification for running Developer Portal locally ##
 Add the following line to your hosts file (replacing ```your-domain-name``` with
