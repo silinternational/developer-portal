@@ -35,6 +35,16 @@ class Controller extends CController
      */
     public $pageSubtitleIsHtml = false;
 
+    public static function canCurrentUserBrowseApis()
+    {
+        $isGuest = Yii::app()->user->isGuest;
+        if (! $isGuest) {
+            return true;
+        }
+        $canGuestsSeePublicAPIs = !Yii::app()->params['hidePublicApisFromGuests'];
+        return $canGuestsSeePublicAPIs;
+    }
+    
     /**
      * Generate the HTML for showing the page title (and subtitle, if
      * applicable).
@@ -200,14 +210,18 @@ class Controller extends CController
                 ),
                 'roles' => array('owner', 'user'),
             ),
-            array( // Anyone can see basic info about (some) APIs (policed in the controller).
+            array(
+                // Anyone (or any authenticated user) can see basic info about
+                // public APIs (policed in the controller).
                 'allow',
                 'controllers' => array('api'),
                 'actions' => array(
                     'details',
                     'index',
                 ),
-                'roles' => array('*'),
+                'roles' => array(
+                    Yii::app()->params['hidePublicApisFromGuests'] ? '@' : '*'
+                ),
             ),
             array( // Owners can do certain things with keys.
                 'allow',
@@ -238,11 +252,13 @@ class Controller extends CController
                 'actions'       => array('index', 'usageChart'),
                 'roles'         => array('owner', 'user'),
             ),
-            array( // Anyone can read the FAQs.
+            array( // Anyone (or any authenticated user) can read the FAQs.
                 'allow',
                 'controllers' => array('faq'),
                 'actions' => array('details', 'index'),
-                'roles' => array('*'),
+                'roles' => array(
+                    Yii::app()->params['hidePublicApisFromGuests'] ? '@' : '*'
+                ),
             ),
             array( // Authenticated users can view very limited info about APIs.
                 'allow',
