@@ -21,6 +21,8 @@ use Sil\DevPortal\components\AuthManager;
 <body id="body">
 <?php 
 
+$authManager = new AuthManager();
+
 // Set up the menu.
 $this->widget('bootstrap.widgets.TbNavbar', array(
     'type' => 'inverse',
@@ -107,8 +109,13 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
             'items' => array(
                 array(
                     'label' => 'Login',
-                    'visible' => Yii::app()->user->isGuest,
+                    'visible' => Yii::app()->user->isGuest && $authManager->canUseMultipleAuthTypes(),
                     'items' => AuthManager::getLoginMenuItems(),
+                ),
+                array(
+                    'label' => 'Login',
+                    'visible' => Yii::app()->user->isGuest && !$authManager->canUseMultipleAuthTypes(),
+                    'url' => $authManager->getDefaultLoginOptionUrl(),
                 ),
                 array(
                     'label' => Yii::app()->user->name,
