@@ -22,6 +22,11 @@ class AuthManager
         'test-user' => '\Sil\DevPortal\components\UserTestUserIdentity',
     );
     
+    public function areMultipleLoginOptions()
+    {
+        return (count($this->getLoginOptions()) > 1);
+    }
+    
     /**
      * Determine whether there are multiple authentication types that we are set
      * up to use (not only known, but also enabled). If there are NOT multiple

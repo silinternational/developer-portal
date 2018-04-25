@@ -109,12 +109,12 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
             'items' => array(
                 array(
                     'label' => 'Login',
-                    'visible' => Yii::app()->user->isGuest && $authManager->canUseMultipleAuthTypes(),
+                    'visible' => Yii::app()->user->isGuest && $authManager->areMultipleLoginOptions(),
                     'items' => AuthManager::getLoginMenuItems(),
                 ),
                 array(
                     'label' => 'Login',
-                    'visible' => Yii::app()->user->isGuest && !$authManager->canUseMultipleAuthTypes(),
+                    'visible' => Yii::app()->user->isGuest && !$authManager->areMultipleLoginOptions(),
                     'url' => $authManager->getDefaultLoginOptionUrl(),
                 ),
                 array(
