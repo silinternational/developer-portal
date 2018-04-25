@@ -23,9 +23,13 @@ $this->pageTitle = 'Welcome';
                 <div id="get-started">
                     <h2>Get Started</h2>
                     <div style="display: inline-block;">
-                        <?php foreach ($loginOptions as $loginOption): ?>
-                            <div style="margin: 4px;"><?= $loginOption->getLinkHtml(); ?></div>
-                        <?php endforeach; ?>
+                        <?php if (count($loginOptions) === 1): ?>
+                            <div style="margin: 4px;"><?= $loginOptions[0]->getSingleOptionLinkHtml(); ?></div>
+                        <?php else: ?>
+                            <?php foreach ($loginOptions as $loginOption): ?>
+                                <div style="margin: 4px;"><?= $loginOption->getLinkHtml(); ?></div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

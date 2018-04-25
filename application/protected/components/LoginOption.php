@@ -76,6 +76,24 @@ class LoginOption
     }
     
     /**
+     * Get the full link HTML (with logo, if available) to use when there is
+     * only a single login option.
+     * 
+     * @param string $extraCssClassString (Optional:) Any additional CSS class
+     *     string content that you want.
+     * @return string
+     */
+    public function getSingleOptionLinkHtml($extraCssClassString = '')
+    {
+        return sprintf(
+            '<a href="%s" class="btn btn-success login-logo-button %s">%s</a>',
+            \CHtml::encode($this->getUrl()),
+            \CHtml::encode($extraCssClassString),
+            'Login'
+        );
+    }
+    
+    /**
      * Get the (relative) URL for logging in with this login option.
      * 
      * @return string

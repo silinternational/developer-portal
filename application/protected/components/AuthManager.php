@@ -72,6 +72,20 @@ class AuthManager
     }
     
     /**
+     * Get the URL for the default login option (if there is one).
+     * 
+     * @return string|null The URL, or null if there is no default.
+     */
+    public function getDefaultLoginOptionUrl()
+    {
+        $loginOptions = $this->getLoginOptions();
+        if (count($loginOptions) === 1) {
+            return $loginOptions[0]->getUrl();
+        }
+        return null;
+    }
+    
+    /**
      * If there is a default provider for the given auth. type, return (the
      * slugified version of) it, regardless of whether that auth. type is
      * currently enabled.
