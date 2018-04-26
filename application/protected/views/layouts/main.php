@@ -43,6 +43,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'label' => 'Browse APIs',
                     'url' => array('api/'),
                     'active' => (($this->id == 'api') && ($this->route != 'api/playground')),
+                    'visible' => Controller::canCurrentUserBrowseApis(),
                 ),
                 array(
                     'label' => 'Keys',
@@ -88,6 +89,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'label' => 'FAQs',
                     'url' => array('/faq/'),
                     'active' => ($this->id == 'faq'),
+                    'visible' => Controller::canCurrentUserBrowseApis(),
                 ),
                 array(
                     'label' => 'Site Text',
