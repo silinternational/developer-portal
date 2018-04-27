@@ -22,6 +22,11 @@ class AuthManager
         'test-user' => '\Sil\DevPortal\components\UserTestUserIdentity',
     );
     
+    public function areMultipleLoginOptions()
+    {
+        return (count($this->getLoginOptions()) > 1);
+    }
+    
     /**
      * Determine whether there are multiple authentication types that we are set
      * up to use (not only known, but also enabled). If there are NOT multiple
@@ -69,6 +74,20 @@ class AuthManager
         } else {
             return null;
         }
+    }
+    
+    /**
+     * Get the URL for the default login option (if there is one).
+     * 
+     * @return string|null The URL, or null if there is no default.
+     */
+    public function getDefaultLoginOptionUrl()
+    {
+        $loginOptions = $this->getLoginOptions();
+        if (count($loginOptions) === 1) {
+            return $loginOptions[0]->getUrl();
+        }
+        return null;
     }
     
     /**

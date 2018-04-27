@@ -29,6 +29,7 @@ $githubOAuthEnabled = Env::get('GITHUB_OAUTH_ENABLED', false);
 $googleOAuthClientId = Env::get('GOOGLE_OAUTH_CLIENT_ID');
 $googleOAuthClientSecret = Env::get('GOOGLE_OAUTH_CLIENT_SECRET');
 $googleOAuthEnabled = Env::get('GOOGLE_OAUTH_ENABLED', false);
+$hidePublicApisFromGuests = Env::get('HIDE_PUBLIC_APIS_FROM_GUESTS', false);
 $samlEnabled = Env::get('SAML_ENABLED', false);
 $samlIdpEntityId = Env::get('SAML_IDP');
 $samlIdpName = Env::get('SAML_IDP_NAME');
@@ -146,6 +147,7 @@ return array(
         'adminEmail' => $adminEmail,
         'alertsEmail' => $alertsEmail,
         'contactUsUrl' => $contactUsUrl,
+        'hidePublicApisFromGuests' => (bool)$hidePublicApisFromGuests,
         'showPopularApis' => $showPopularApis,
         'themeColor' => $themeColor,
         'saml' => array(

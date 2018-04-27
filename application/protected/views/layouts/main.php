@@ -21,6 +21,8 @@ use Sil\DevPortal\components\AuthManager;
 <body id="body">
 <?php 
 
+$authManager = new AuthManager();
+
 // Set up the menu.
 $this->widget('bootstrap.widgets.TbNavbar', array(
     'type' => 'inverse',
@@ -41,6 +43,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'label' => 'Browse APIs',
                     'url' => array('api/'),
                     'active' => (($this->id == 'api') && ($this->route != 'api/playground')),
+                    'visible' => Controller::canCurrentUserBrowseApis(),
                 ),
                 array(
                     'label' => 'Keys',
@@ -86,6 +89,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
                     'label' => 'FAQs',
                     'url' => array('/faq/'),
                     'active' => ($this->id == 'faq'),
+                    'visible' => Controller::canCurrentUserBrowseApis(),
                 ),
                 array(
                     'label' => 'Site Text',
@@ -107,8 +111,13 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
             'items' => array(
                 array(
                     'label' => 'Login',
-                    'visible' => Yii::app()->user->isGuest,
+                    'visible' => Yii::app()->user->isGuest && $authManager->areMultipleLoginOptions(),
                     'items' => AuthManager::getLoginMenuItems(),
+                ),
+                array(
+                    'label' => 'Login',
+                    'visible' => Yii::app()->user->isGuest && !$authManager->areMultipleLoginOptions(),
+                    'url' => $authManager->getDefaultLoginOptionUrl(),
                 ),
                 array(
                     'label' => Yii::app()->user->name,
