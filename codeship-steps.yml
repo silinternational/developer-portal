@@ -19,13 +19,3 @@
   tag: master
   registry: https://index.docker.io/v1/
   encrypted_dockercfg_path: dockercfg.encrypted
-
-- name: deploy_staging
-  service: ecsdeploy
-  tag: develop
-  command: "-c staging1 -n public-developer-portal -i silintl/developer-portal -e CI_TIMESTAMP -t 600"
-
-- name: deploy_production
-  service: ecsdeploy
-  tag: master
-  command: "-c public-developer-portal-production -n public-developer-portal -i silintl/developer-portal -e CI_TIMESTAMP -t 600"

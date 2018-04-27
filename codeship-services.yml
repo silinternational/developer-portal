@@ -63,7 +63,3 @@ portal:
         SAML_SECRET_SALT: dummy-for-tests-Ac4MTgO9UJ6_wpXXKc6EGU_.gWNNkdMe
         SAML_IDP: NONE
     working_dir: /data
-
-ecsdeploy:
-    image: silintl/ecs-deploy:latest
-    encrypted_env_file: aws.env.encrypted
