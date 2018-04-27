@@ -2,30 +2,12 @@
   service: portal
   command: /data/run-tests.sh
 
-- name: push_develop
-  service: portal
-  type: push
-  image_name: silintl/developer-portal
-  image_tag: "{{.Timestamp}}"
-  tag: develop
-  registry: https://index.docker.io/v1/
-  encrypted_dockercfg_path: dockercfg.encrypted
-
 - name: push_branch_tag
   service: portal
   type: push
   image_name: silintl/developer-portal
   image_tag: "{{.Branch}}"
   exclude: master
-  registry: https://index.docker.io/v1/
-  encrypted_dockercfg_path: dockercfg.encrypted
-
-- name: push_production
-  service: portal
-  type: push
-  image_name: silintl/developer-portal
-  image_tag: "{{.Timestamp}}"
-  tag: master
   registry: https://index.docker.io/v1/
   encrypted_dockercfg_path: dockercfg.encrypted
 
