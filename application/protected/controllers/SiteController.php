@@ -145,4 +145,17 @@ class SiteController extends \Controller
             'contactLink' => \Utils::getContactLinkValue(),
         ));
     }
+    
+    public function actionWake()
+    {
+        try {
+            /** @var \CDbConnection $databaseConnection */
+            $databaseConnection = \Yii::app()->db;
+            $databaseConnection->getConnectionStatus();
+            header('Content-Type: text/plain', true, 204);
+        } catch (\Throwable $t) {
+            header('Content-Type: text/plain', true, 500);
+            // Don't show the error message. We don't want to expose that info.
+        }
+    }
 }
