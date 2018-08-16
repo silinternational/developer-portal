@@ -13,7 +13,10 @@ $mysqlPassword = Env::get('MYSQL_PASSWORD');
 $mailerUsername = Env::get('MAILER_USERNAME', false); // Defaults to false to mimic previous getenv() behavior.
 $mailerPassword = Env::get('MAILER_PASSWORD', false); // Defaults to false to mimic previous getenv() behavior.
 $appEnv = Env::get('APPLICATION_ENV', 'not set');
-$appName = Env::get('APP_NAME', 'Developer Portal');
+
+// APP_NAME is deprecated. Prefer APP_DISPLAY_NAME.
+$appDisplayName = Env::get('APP_DISPLAY_NAME', Env::get('APP_NAME', 'Developer Portal'));
+
 $adminEmail = Env::get('ADMIN_EMAIL');
 $alertsEmail = Env::get('ALERTS_EMAIL');
 $apiaxleEndpoint = Env::get('APIAXLE_ENDPOINT');
@@ -45,7 +48,7 @@ Yii::setPathOfAlias('bootstrap', dirname(__FILE__) . '/../extensions/bootstrap')
 return array(
     
     'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
-    'name' => $appName,
+    'name' => $appDisplayName,
     'theme' => 'bootstrap',
     'controllerNamespace' => '\\Sil\\DevPortal\\controllers',
     
