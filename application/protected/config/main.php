@@ -112,6 +112,7 @@ return array(
             'emulatePrepare' => false,
             'charset' => 'utf8',
             'tablePrefix' => '',
+            'autoConnect' => false,
         ),
         'errorHandler' => array(
             // Use 'site/error' action to display errors.
