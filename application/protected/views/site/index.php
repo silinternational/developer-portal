@@ -65,13 +65,4 @@ $this->pageTitle = 'Welcome';
             </div>
         <?php endif; ?>
     </div>
-
-    <script type="text/javascript">
-        $(function() {
-            $.ajax({
-                'url': 'site/wake',
-                'timeout': 1000
-            });
-        });
-    </script>
 </div>
