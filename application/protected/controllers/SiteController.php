@@ -1,6 +1,7 @@
 <?php
 namespace Sil\DevPortal\controllers;
 
+use PDO;
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
 use Sil\DevPortal\components\AuthManager;
 use Sil\DevPortal\models\Api;
@@ -151,7 +152,8 @@ class SiteController extends \Controller
         try {
             /** @var \CDbConnection $databaseConnection */
             $databaseConnection = \Yii::app()->db;
-            $databaseConnection->getConnectionStatus();
+            $databaseConnection->setAttribute(PDO::ATTR_TIMEOUT, 1);
+            $databaseConnection->setActive(true);
             header('Content-Type: text/plain', true, 204);
         } catch (\Throwable $t) {
             header('Content-Type: text/plain', true, 500);
