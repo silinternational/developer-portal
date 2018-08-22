@@ -155,7 +155,7 @@ class SiteController extends \Controller
         try {
             /** @var \CDbConnection $databaseConnection */
             $databaseConnection = \Yii::app()->db;
-            $databaseConnection->getConnectionStatus();
+            $databaseConnection->setActive(true);
             header('Content-Type: text/plain', true, 204);
         } catch (\Throwable $t) {
             header('Content-Type: text/plain', true, 500);
