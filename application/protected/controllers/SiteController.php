@@ -1,6 +1,7 @@
 <?php
 namespace Sil\DevPortal\controllers;
 
+use GuzzleHttp\Exception\ConnectException;
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
 use Sil\DevPortal\components\AuthManager;
 use Sil\DevPortal\models\Api;
@@ -36,6 +37,8 @@ class SiteController extends \Controller
         if ( ! \Yii::app()->user->isGuest) {
             $this->redirect(array('dashboard/'));
         }
+        
+        $this->wakeTheDatabase();
         
         if (\Yii::app()->params['showPopularApis']) {
             $popularApis = Api::getPopularApis();
@@ -144,5 +147,31 @@ class SiteController extends \Controller
         $this->render('privacy-policy',array(
             'contactLink' => \Utils::getContactLinkValue(),
         ));
+    }
+    
+    public function actionWake()
+    {
+        try {
+            /** @var \CDbConnection $databaseConnection */
+            $databaseConnection = \Yii::app()->db;
+            $databaseConnection->setActive(true);
+            header('Content-Type: text/plain', true, 204);
+        } catch (\Throwable $t) {
+            header('Content-Type: text/plain', true, 500);
+            // Don't show the error message. We don't want to expose that info.
+        }
+    }
+    
+    protected function wakeTheDatabase()
+    {
+        try {
+            $client = new \GuzzleHttp\Client();
+            $client->get($this->createAbsoluteUrl('site/wake'), [
+                'timeout' => 1,
+            ]);
+        } catch (ConnectException $e) {
+            // We specifically want it to time out and let us proceed without
+            // delay, so ignore this.
+        }
     }
 }

@@ -113,14 +113,8 @@ coding_style:
 
 build_failure_conditions:
 
-    # No classes/methods with a rating worse than D.
-    - 'elements.rating(< D).exists' 
-
-    # No more than two new classes/methods with a rating of C.
-    - 'elements.rating(<= C).new.count > 2'
-
-    # No new coding style issues allowed
-    - 'issues.label("coding-style").new.exists'
+    # No new classes/methods with a rating worse than D.
+    - 'elements.rating(< D).new.exists'
 
     # No issues of major or higher severity
     - 'issues.severity(>= MAJOR).exists'
