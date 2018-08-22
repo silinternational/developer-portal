@@ -2,7 +2,6 @@
 namespace Sil\DevPortal\controllers;
 
 use GuzzleHttp\Exception\ConnectException;
-use PDO;
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
 use Sil\DevPortal\components\AuthManager;
 use Sil\DevPortal\models\Api;
