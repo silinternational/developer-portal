@@ -7,8 +7,22 @@ class SiteText extends \SiteTextBase
     use \Sil\DevPortal\components\FormatModelErrorsTrait;
     use \Sil\DevPortal\components\ModelFindByPkTrait;
     
+    /**
+     * Get the HTML to show for the specified site text. If a static file
+     * exists for that site text (for example, at
+     * 'protected/views/partials/home-lower-left.html'), that will be loaded.
+     * Otherwise the corresponding Markdown (if any) will be retrieved from the
+     * database, converted to HTML, and returned.
+     *
+     * @param $name
+     * @return bool|null|string
+     */
     public static function getHtml($name)
     {
+        if (self::staticFileExists($name)) {
+            return self::getContentsOfStaticFile($name);
+        }
+        
         $siteText = self::model()->findByAttributes(array(
             'name' => $name,
         ));
@@ -19,6 +33,17 @@ class SiteText extends \SiteTextBase
         
         $markdownParser = new \CMarkdownParser();
         return $markdownParser->safeTransform($siteText->markdown_content);
+    }
+    
+    protected static function getContentsOfStaticFile($siteTextName)
+    {
+        $pathToStaticFile = self::getPathToStaticFile($siteTextName);
+        return file_get_contents($pathToStaticFile);
+    }
+    
+    protected static function getPathToStaticFile($siteTextName)
+    {
+        return __DIR__ . '/../views/partials/' . $siteTextName . '.html';
     }
     
     /**
@@ -63,5 +88,11 @@ class SiteText extends \SiteTextBase
     public function slugify($name)
     {
         return (string)\Stringy\StaticStringy::slugify($name);
+    }
+    
+    public static function staticFileExists($siteTextName)
+    {
+        $pathToStaticFile = self::getPathToStaticFile($siteTextName);
+        return file_exists($pathToStaticFile);
     }
 }
