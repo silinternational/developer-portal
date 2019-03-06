@@ -575,16 +575,16 @@
         },
         {
             "name": "hybridauth/hybridauth",
-            "version": "v2.12.0",
+            "version": "v2.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hybridauth/hybridauth.git",
-                "reference": "cfeee3fa948e2e17abc19a8d6e0ecbe637940c45"
+                "reference": "e7fb724aea4822b48e6d484e58ac8e541b205086"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/cfeee3fa948e2e17abc19a8d6e0ecbe637940c45",
-                "reference": "cfeee3fa948e2e17abc19a8d6e0ecbe637940c45",
+                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/e7fb724aea4822b48e6d484e58ac8e541b205086",
+                "reference": "e7fb724aea4822b48e6d484e58ac8e541b205086",
                 "shasum": ""
             },
             "require": {
@@ -628,7 +628,7 @@
                 "twitter",
                 "yahoo"
             ],
-            "time": "2018-08-10T12:36:54+00:00"
+            "time": "2019-01-10T10:34:15+00:00"
         },
         {
             "name": "jaimeperez/twig-configurable-i18n",
@@ -819,17 +819,6 @@
         {
             "name": "roave/security-advisories",
             "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "0abc14e0df387fe74b4b32e0b8647d1639256d38"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/0abc14e0df387fe74b4b32e0b8647d1639256d38",
-                "reference": "0abc14e0df387fe74b4b32e0b8647d1639256d38",
-                "shasum": ""
-            },
             "conflict": {
                 "3f/pygmentize": "<1.2",
                 "adodb/adodb-php": "<5.20.12",
@@ -1289,7 +1278,7 @@
                 },
                 {
                     "name": "Gert de Pagter",
-                    "email": "BackEndTea@gmail.com"
+                    "email": "backendtea@gmail.com"
                 }
             ],
             "description": "Symfony polyfill for ctype functions",
@@ -1826,6 +1815,7 @@
                 "testing",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2015-03-29T14:23:04+00:00"
         },
         {
@@ -2242,6 +2232,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2013-01-13T10:24:48+00:00"
         },
         {
