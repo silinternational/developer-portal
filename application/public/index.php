@@ -24,5 +24,7 @@ if (APPLICATION_ENV === 'development') {
     defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL', 3);
 }
 
+Yii::$enableIncludePath = false; // disable PHP include path usage
+
 // Run the application with the resulting config settings.
 Yii::createWebApplication($config)->run();
