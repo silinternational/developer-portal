@@ -1186,6 +1186,9 @@ class Key extends \KeyBase
     /**
      * @todo Refactor this to ensure that the User trying to reset this Key is
      *       actually allowed to do so. See revokeKey() for an example.
+     * @return array - An array containing either [`true`, key details] or
+     *     [`false`, error messages string]. If showing the error messages
+     *     string on a webpage, be sure to HTML-encode it.
      */
     public static function resetKey($key_id)
     {
@@ -1307,6 +1310,16 @@ class Key extends \KeyBase
         }
     }
     
+    /**
+     * Revoke the specified Key.
+     *
+     * @param mixed $key_id - The ID of the Key to be revoked.
+     * @param User $revokingUser - The User trying to revoke the Key.
+     * @return array - An array containing either [`true`, key details] or
+     *     [`false`, error messages string]. If showing the error messages
+     *     string on a webpage, be sure to HTML-encode it.
+     * @throws Exception
+     */
     public static function revokeKey($key_id, $revokingUser)
     {
         /**
