@@ -4,7 +4,7 @@
     },
     "require": {
         "danielstjules/stringy": "^2.3",
-        "yiisoft/yii": "1.1.17",
+        "yiisoft/yii": "~1.1.21",
         "guzzlehttp/guzzle": "^5",
         "forevermatt/calc-api-sig": "0.1.1",
         "hybridauth/hybridauth": "^2.8.2",

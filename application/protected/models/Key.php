@@ -1184,19 +1184,16 @@ class Key extends \KeyBase
     }
     
     /**
+     * Update the specified Key to have a new value and secret.
+     *
      * @todo Refactor this to ensure that the User trying to reset this Key is
      *       actually allowed to do so. See revokeKey() for an example.
+     * @return array - An array containing either [`true`, key details] or
+     *     [`false`, error messages string]. If showing the error messages
+     *     string on a webpage, be sure to HTML-encode it.
      */
     public static function resetKey($key_id)
     {
-        /**
-         * Updates a Key instance with a new value and secret.
-         * 
-         * Returns an array with two values ...
-         *  - a boolean as to whether the reset worked
-         *  - the Key instance or a string as an error message
-         */
-        
         /* @var $key Key */
         $key = self::model()->findByPk($key_id);  
         if (is_null($key)) { return array(false, 'Bad key_id');}
@@ -1307,15 +1304,18 @@ class Key extends \KeyBase
         }
     }
     
+    /**
+     * Revoke the specified Key.
+     *
+     * @param mixed $key_id - The ID of the Key to be revoked.
+     * @param User $revokingUser - The User trying to revoke the Key.
+     * @return array - An array containing either [`true`, key details] or
+     *     [`false`, error messages string]. If showing the error messages
+     *     string on a webpage, be sure to HTML-encode it.
+     * @throws Exception
+     */
     public static function revokeKey($key_id, $revokingUser)
     {
-        /**
-         * Revokes a Key instance.
-         * 
-         * Returns an array with two values ...
-         *  - a boolean as to whether the revokation worked
-         *  - the Key instance or a string as an error message
-         */
         /* @var $key Key */
         $key = self::model()->findByPk($key_id);  
         if (is_null($key)) {
