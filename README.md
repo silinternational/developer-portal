@@ -70,9 +70,14 @@ you are providing when running this Docker image.
   the database).
 
 ## Hosts file modification for running Developer Portal locally ##
-Add the following line to your hosts file (replacing ```your-domain-name``` with
-the domain name you want to use):
+Add one of the following lines to your hosts file (replacing
+```your-domain-name``` with the domain name you want to use).
+
+If using Vagrant:  
 ```192.168.33.10 your-domain-name```
+
+If using Docker directly (without Vagrant):  
+```127.0.0.1 your-domain-name```
 
 ## Troubleshooting ##
 If you try to access <http://your-domain-name/phpmyadmin/> and get the following 

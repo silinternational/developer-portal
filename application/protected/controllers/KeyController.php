@@ -262,7 +262,7 @@ class KeyController extends \Controller
                 \Yii::app()->user->setFlash(
                     'error',
                     '<strong>Error!</strong> Unable to reset key: <pre>'
-                    . $resetResults[1] . '</pre>'
+                    . \CHtml::encode($resetResults[1]) . '</pre>'
                 );
             }
             // Otherwise...
@@ -374,7 +374,7 @@ class KeyController extends \Controller
                 \Yii::app()->user->setFlash(
                     'error',
                     '<strong>Error!</strong> Unable to revoke key: <pre>'
-                    . $revokeResults[1] . '</pre>'
+                    . \CHtml::encode($revokeResults[1]) . '</pre>'
                 );
             }
             // Otherwise...
