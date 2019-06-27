@@ -320,6 +320,17 @@ class AuthManager
         $webUser->clearStates();
         $webUser->logout();
         
+        /**
+         * Ensure the session cookie is removed.
+         *
+         * We only began needing to do this when we upgraded from SimpleSAMLphp
+         * 1.16.3 to 1.17.2. For some reason, the user's session in Yii stays
+         * active even after logging out via SAML (when using SSP 1.17).
+         */
+        $cookie = new \CHttpCookie('PHPSESSID', '');
+        $cookie->expire = time() - 3600;
+        \Yii::app()->request->cookies['PHPSESSID'] = $cookie;
+        
         if ( ! empty($logoutUrl)) {
             \Yii::app()->controller->redirect($logoutUrl);
         }
