@@ -308,6 +308,17 @@ class AuthManager
      */
     public function logout($webUser)
     {
+        /*
+         * Switch back to interacting with the Yii session (rather than the
+         * SimpleSMLphp session) so that we can log the user out of our local
+         * Yii application.
+         *
+         * We only began needing to do this when we upgraded from SimpleSAMLphp
+         * 1.16.3 to 1.17.2.
+         */
+        $sspSession = \SimpleSAML\Session::getSessionFromRequest();
+        $sspSession->cleanup();
+        
         $authType = $webUser->getAuthType();
         
         if ($authType) {
