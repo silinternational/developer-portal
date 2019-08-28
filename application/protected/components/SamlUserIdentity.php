@@ -202,7 +202,7 @@ class SamlUserIdentity extends UserIdentity
         // Otherwise...
         else {
             // Keep the SimpleSMLphp session from clobbering the Yii session.
-            $sspSession = \SimpleSAML_Session::getSessionFromRequest();
+            $sspSession = \SimpleSAML\Session::getSessionFromRequest();
             $sspSession->cleanup();
             
             // Get an easier reference to our config data for mapping returned
