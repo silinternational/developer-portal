@@ -15,7 +15,7 @@ composer dependencies.
 
 ### Example Dockerfile using this as the FROM ###
 
-    FROM silintl/developer-portal:1.0.1 
+    FROM silintl/developer-portal:1.3.4 
 
     # Make sure /data is available
     RUN mkdir -p /data
