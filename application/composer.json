@@ -21,7 +21,6 @@
         "phpunit/phpunit-story": "*",
         "phpunit/dbunit": "*",
         "phpunit/php-invoker": "*",
-        "fillup/phpmyadmin-minimal": "4.4.13.1",
-        "johnkary/phpunit-speedtrap": "1.*"
+        "fillup/phpmyadmin-minimal": "4.4.13.1"
     }
 }
