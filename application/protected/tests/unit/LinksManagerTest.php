@@ -1,6 +1,8 @@
 <?php
 
-class LinksManagerTest extends CDbTestCase
+use Sil\DevPortal\tests\DbTestCase;
+
+class LinksManagerTest extends DbTestCase
 {
     public $fixtures = array(
         'apis' => '\Sil\DevPortal\models\Api',

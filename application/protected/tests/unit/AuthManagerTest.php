@@ -2,8 +2,9 @@
 namespace Sil\DevPortal\tests\unit;
 
 use Sil\DevPortal\components\AuthManager;
+use Sil\DevPortal\tests\TestCase;
 
-class AuthManagerTest extends \CTestCase
+class AuthManagerTest extends TestCase
 {
     public function testCanUseMultipleAuthTypes_0()
     {

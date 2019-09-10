@@ -1,6 +1,8 @@
 <?php
 
-class UtilsTest extends CDbTestCase
+use Sil\DevPortal\tests\DbTestCase;
+
+class UtilsTest extends DbTestCase
 {
 
     public function testgetFriendlyDate() 

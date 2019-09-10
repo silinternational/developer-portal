@@ -1,6 +1,8 @@
 <?php
 
-class WebUserTest extends CTestCase
+use Sil\DevPortal\tests\TestCase;
+
+class WebUserTest extends TestCase
 {
     protected function createCheckAccessErrorMessage(
         $expectedResult,

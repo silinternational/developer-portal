@@ -2,11 +2,12 @@
 namespace Sil\DevPortal\tests\unit;
 
 use Sil\DevPortal\models\ApiVisibilityUser;
+use Sil\DevPortal\tests\DbTestCase;
 
 /**
  * @method ApiVisibilityUser apiVisibilityUsers(string $fixtureName)
  */
-class ApiVisibilityUserTest extends \CDbTestCase
+class ApiVisibilityUserTest extends DbTestCase
 {
     public $fixtures = array(
         'apiVisibilityUsers' => '\Sil\DevPortal\models\ApiVisibilityUser',

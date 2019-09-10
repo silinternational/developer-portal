@@ -2,8 +2,9 @@
 namespace Sil\DevPortal\tests\unit;
 
 use Sil\DevPortal\components\UserAuthenticationData;
+use Sil\DevPortal\tests\TestCase;
 
-class HybridAuthUserIdentityTest extends \CTestCase
+class HybridAuthUserIdentityTest extends TestCase
 {
     public function testGetUserAuthData_hasEmailVerified()
     {

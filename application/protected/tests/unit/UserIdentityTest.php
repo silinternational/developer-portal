@@ -5,8 +5,9 @@ use Sil\DevPortal\components\UserAuthenticationData;
 use Sil\DevPortal\components\UserIdentity;
 use Sil\DevPortal\components\WrongAuthProviderException;
 use Sil\DevPortal\models\User;
+use Sil\DevPortal\tests\DbTestCase;
 
-class UserIdentityTest extends \CDbTestCase
+class UserIdentityTest extends DbTestCase
 {
     public $fixtures = array(
         'users' => '\Sil\DevPortal\models\User',

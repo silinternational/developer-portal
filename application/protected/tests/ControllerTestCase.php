@@ -1,7 +1,9 @@
 <?php
 
-class ControllerTestCase extends CTestCase {
-    
+use Sil\DevPortal\tests\TestCase;
+
+class ControllerTestCase extends TestCase
+{
     /**
      * The name of the controller class (e.g. - "SiteController") expected to
      * handle the URLs in these tests.

@@ -5,8 +5,9 @@ use Sil\DevPortal\components\SamlUserIdentity;
 use Sil\DevPortal\components\UserAuthenticationData;
 use Sil\DevPortal\components\UserIdentity;
 use Sil\DevPortal\models\User;
+use Sil\DevPortal\tests\DbTestCase;
 
-class SamlUserIdentityTest extends \CDbTestCase
+class SamlUserIdentityTest extends DbTestCase
 {
     public $fixtures = array(
         'users' => '\Sil\DevPortal\models\User',
