@@ -64,7 +64,9 @@ class HybridAuthUserIdentityTest extends \CTestCase
         );
         
         // Pre-assert:
-        $this->setExpectedException('Exception', 'verified', 1444924124);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('verified');
+        $this->expectExceptionCode(1444924124);
         
         // Act:
         $hybridAuthUserIdentity->getUserAuthData();

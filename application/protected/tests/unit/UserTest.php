@@ -1105,11 +1105,8 @@ class UserTest extends DeveloperPortalTestCase
         $user = $this->users('userWithRoleOfOwner');
         
         // (Pre-assert and) Act:
-        $this->setExpectedException(
-            'Exception',
-            '',
-            1426855754
-        );
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(1426855754);
         $user->getUsageStatsForAllApis('day');
         
         // NOTE: It should throw an exception before this point.
@@ -1139,11 +1136,8 @@ class UserTest extends DeveloperPortalTestCase
         $user = $this->users('userWithRoleOfOwner');
         
         // (Pre-assert and) Act:
-        $this->setExpectedException(
-            'Exception',
-            '',
-            1426860333
-        );
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(1426860333);
         $user->getUsageStatsTotals('day');
         
         // NOTE: It should throw an exception before this point.

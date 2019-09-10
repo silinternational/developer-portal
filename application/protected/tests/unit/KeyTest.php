@@ -108,7 +108,9 @@ class KeyTest extends DeveloperPortalTestCase
             $key->status,
             'This test requires a pending key.'
         );
-        $this->setExpectedException('\Exception', 'No User provided', 1465926569);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('No User provided');
+        $this->expectExceptionCode(1465926569);
         
         // Act:
         $key->approve($approvingUser);
@@ -1536,7 +1538,9 @@ class KeyTest extends DeveloperPortalTestCase
             $key->status,
             'This test requires an approved key.'
         );
-        $this->setExpectedException('\Exception', 'No User provided', 1466000163);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('No User provided');
+        $this->expectExceptionCode(1466000163);
         
         // Act:
         $key->revoke($revokingUser);

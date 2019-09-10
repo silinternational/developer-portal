@@ -186,7 +186,7 @@ class AuthManagerTest extends \CTestCase
         \Phake::when($authManager)->isAuthTypeEnabled($disabledAuthType)->thenReturn(false);
         
         // Pre-assert:
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         
         // Act:
         $authManager->getIdentityForAuthType($disabledAuthType);
