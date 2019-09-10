@@ -1076,7 +1076,7 @@ class KeyTest extends DeveloperPortalTestCase
         
         // Create a mock for the YiiMailer class, only mocking the send()
         // method.
-        $mockMailer = $this->getMock('YiiMailer', array('send'));
+        $mockMailer = $this->createPartialMock('YiiMailer', array('send'));
 
         // Set up the expectation for the send() method to be called only once.
         $mockMailer->expects($this->once())
@@ -1130,7 +1130,7 @@ class KeyTest extends DeveloperPortalTestCase
         
         // Create a mock for the YiiMailer class, only mocking the send()
         // method.
-        $mockMailer = $this->getMock('YiiMailer', array('send'));
+        $mockMailer = $this->createPartialMock('YiiMailer', array('send'));
 
         // Set up the expectation for the send() method to be called only once.
         $mockMailer->expects($this->once())
@@ -1675,7 +1675,7 @@ class KeyTest extends DeveloperPortalTestCase
         
         // Create a mock for the YiiMailer class, only mocking the send()
         // method.
-        $mockMailer = $this->getMock('YiiMailer', array('send'));
+        $mockMailer = $this->createPartialMock('YiiMailer', array('send'));
 
         // Set up the expectation for the send() method to be called only once.
         $mockMailer->expects($this->once())

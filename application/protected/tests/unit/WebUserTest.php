@@ -39,7 +39,7 @@ class WebUserTest extends CTestCase
         $expectedResult = true;
         
         // Arrange (assemble):
-        $WebUserStub = $this->getMock('WebUser', array('getRole'));
+        $WebUserStub = $this->createPartialMock('WebUser', array('getRole'));
         $WebUserStub->expects($this->any())
                     ->method('getRole')
                     ->will($this->returnValue($usersRole));
@@ -73,7 +73,7 @@ class WebUserTest extends CTestCase
         $expectedResult = true;
         
         // Arrange (assemble):
-        $WebUserStub = $this->getMock(
+        $WebUserStub = $this->createPartialMock(
             'WebUser',
             array('getIsGuest', 'getRole')
         );
@@ -119,7 +119,7 @@ class WebUserTest extends CTestCase
         $expectedResult = false;
         
         // Arrange (assemble):
-        $WebUserStub = $this->getMock(
+        $WebUserStub = $this->createPartialMock(
             'WebUser',
             array('getIsGuest', 'getRole')
         );
@@ -165,7 +165,7 @@ class WebUserTest extends CTestCase
         $expectedResult = true;
         
         // Arrange (assemble):
-        $WebUserStub = $this->getMock(
+        $WebUserStub = $this->createPartialMock(
             'WebUser',
             array('getIsGuest', 'getRole')
         );
@@ -211,7 +211,7 @@ class WebUserTest extends CTestCase
         $expectedResult = false;
         
         // Arrange (assemble):
-        $WebUserStub = $this->getMock(
+        $WebUserStub = $this->createPartialMock(
             'WebUser',
             array('getIsGuest', 'getRole')
         );
@@ -257,7 +257,7 @@ class WebUserTest extends CTestCase
         $expectedResult = false;
         
         // Arrange (assemble):
-        $WebUserStub = $this->getMock(
+        $WebUserStub = $this->createPartialMock(
             'WebUser',
             array('getIsGuest', 'getRole')
         );
@@ -298,7 +298,7 @@ class WebUserTest extends CTestCase
     {
         // Arrange:
         $fakeFlashMessages = array();
-        $webUserStub = $this->getMock('WebUser', array('getFlashes'));
+        $webUserStub = $this->createPartialMock('WebUser', array('getFlashes'));
         $webUserStub->expects($this->any())
                     ->method('getFlashes')
                     ->will($this->returnValue($fakeFlashMessages));
@@ -319,7 +319,7 @@ class WebUserTest extends CTestCase
         $fakeFlashMessages = array(
             'test' => 'A fake flash message.',
         );
-        $webUserStub = $this->getMock('WebUser', array('getFlashes'));
+        $webUserStub = $this->createPartialMock('WebUser', array('getFlashes'));
         $webUserStub->expects($this->any())
                     ->method('getFlashes')
                     ->will($this->returnValue($fakeFlashMessages));
