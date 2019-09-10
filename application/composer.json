@@ -17,10 +17,10 @@
     "require-dev": {
         "phake/phake": "2.*",
         "phpunit/phpunit": "^4.0",
-        "phpunit/phpunit-selenium": "1.*",
-        "phpunit/phpunit-story": "1.*",
-        "phpunit/dbunit": "1.*",
-        "phpunit/php-invoker": "1.*",
+        "phpunit/phpunit-selenium": "*",
+        "phpunit/phpunit-story": "*",
+        "phpunit/dbunit": "*",
+        "phpunit/php-invoker": "*",
         "fillup/phpmyadmin-minimal": "4.4.13.1",
         "johnkary/phpunit-speedtrap": "1.*"
     }
