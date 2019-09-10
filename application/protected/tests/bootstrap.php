@@ -18,7 +18,7 @@ require_once($yiit);
 $config = dirname(__FILE__) . '/../config/test.php';
 
 // Configure Phake.
-\Phake::setClient(Phake::CLIENT_PHPUNIT);
+\Phake::setClient(Phake::CLIENT_PHPUNIT6);
 
 // Run the application.
 Yii::createWebApplication($config);
