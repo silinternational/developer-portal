@@ -5,10 +5,6 @@
          convertWarningsToExceptions="true"
          stopOnFailure="true">
 
-    <selenium>
-        <browser name="Internet Explorer" browser="*iexplore" />
-        <browser name="Firefox" browser="*firefox" />
-    </selenium>
     <testsuites>
         <testsuite name="DeveloperPortal">
             <directory>./unit</directory>
