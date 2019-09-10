@@ -17,8 +17,6 @@ require_once($yiit);
 // Assemble the path to the appropriate config data.
 $config = dirname(__FILE__) . '/../config/test.php';
 
-require_once(dirname(__FILE__) . '/WebTestCase.php');
-
 // Configure Phake.
 \Phake::setClient(Phake::CLIENT_PHPUNIT);
 
