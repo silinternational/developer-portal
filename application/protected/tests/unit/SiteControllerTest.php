@@ -1,5 +1,7 @@
 <?php
 
+use Sil\DevPortal\tests\ControllerTestCase;
+
 class SiteControllerTest extends ControllerTestCase {
     
     public function setUp()

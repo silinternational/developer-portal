@@ -1,6 +1,8 @@
 <?php
+namespace Sil\DevPortal\tests;
 
-use Sil\DevPortal\tests\TestCase;
+use CHttpRequest;
+use Yii;
 
 class ControllerTestCase extends TestCase
 {
