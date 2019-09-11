@@ -20,5 +20,8 @@ $config = dirname(__FILE__) . '/../config/test.php';
 // Configure Phake.
 \Phake::setClient(Phake::CLIENT_PHPUNIT6);
 
+// Tell Yii to let other autoloaders attempt to find a class, too.
+Yii::$enableIncludePath = false;
+
 // Run the application.
 Yii::createWebApplication($config);
