@@ -1,6 +1,7 @@
 <?php
+namespace Sil\DevPortal\tests;
 
-use Sil\DevPortal\tests\DbTestCase;
+use ReflectionClass;
 
 /**
  * Class to add some useful helper functions.

@@ -1,5 +1,7 @@
 <?php
 
+use Sil\DevPortal\tests\DeveloperPortalTestCase;
+
 class UsageStatsTest extends DeveloperPortalTestCase
 {
     public function testCombineUsageCategoryArrays_noCollisions()

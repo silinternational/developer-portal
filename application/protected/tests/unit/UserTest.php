@@ -6,6 +6,7 @@ use Sil\DevPortal\models\ApiVisibilityUser;
 use Sil\DevPortal\models\Event;
 use Sil\DevPortal\models\Key;
 use Sil\DevPortal\models\User;
+use Sil\DevPortal\tests\DeveloperPortalTestCase;
 
 /**
  * @method Api apis(string $fixtureName) Get the Api with that fixture name.

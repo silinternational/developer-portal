@@ -3,6 +3,7 @@
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\Key;
 use Sil\DevPortal\models\User;
+use Sil\DevPortal\tests\DeveloperPortalTestCase;
 
 /**
  * @method Api apis(string $fixtureName)

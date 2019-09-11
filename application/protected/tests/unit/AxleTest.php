@@ -7,6 +7,7 @@ use Sil\DevPortal\components\Http\ClientG5 as HttpClient;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\Key;
 use Sil\DevPortal\models\User;
+use Sil\DevPortal\tests\DeveloperPortalTestCase;
 
 /**
  * @group ApiAxle
