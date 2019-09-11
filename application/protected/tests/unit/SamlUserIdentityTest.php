@@ -102,48 +102,6 @@ class SamlUserIdentityTest extends DbTestCase
         );
     }
     
-    public function testGetAuthSourceIdpEntityId()
-    {
-        // Arrange:
-        $samlUserIdentity = \Phake::partialMock(
-            '\Sil\DevPortal\components\SamlUserIdentity'
-        );
-        
-        // Act:
-        $result = \Phake::makeVisible($samlUserIdentity)->getAuthSourceIdpEntityId();
-        
-        // Assert:
-        $this->assertTrue(
-            is_string($result),
-            'Failed to return a string.'
-        );
-        $this->assertGreaterThan(
-            0,
-            strlen($result),
-            'Failed to return a non-empty string.'
-        );
-    }
-    
-    public function testGetLogoutUrl()
-    {
-        // Arrange:
-        $samlUserIdentity = new SamlUserIdentity();
-        
-        // Act:
-        $logoutUrl = $samlUserIdentity->getLogoutUrl();
-        
-        // Assert:
-        $this->assertTrue(
-            is_string($logoutUrl),
-            'Failed to return a string.'
-        );
-        $this->assertStringStartsWith(
-            'http',
-            $logoutUrl,
-            'Failed to return a string that looks like a URL.'
-        );
-    }
-    
     public function testGetNameOfAuthProvider_knownValue()
     {
         // Arrange:
