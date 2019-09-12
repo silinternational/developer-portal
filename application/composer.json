@@ -11,16 +11,11 @@
         "silinternational/php-env": "0.*",
         "silinternational/apiaxle-sdk-php": "^1.0",
         "simplesamlphp/simplesamlphp": "~1.17.2",
-        "guzzlehttp/guzzle-services": "^0.6",
-        "roave/security-advisories": "dev-master"
+        "guzzlehttp/guzzle-services": "^0.6"
     },
     "require-dev": {
         "phake/phake": "^3.1",
         "phpunit/phpunit": "^8.0",
-        "phpunit/phpunit-selenium": "*",
-        "phpunit/phpunit-story": "*",
-        "phpunit/dbunit": "*",
-        "phpunit/php-invoker": "*",
-        "fillup/phpmyadmin-minimal": "4.4.13.1"
+        "roave/security-advisories": "dev-master"
     }
 }
