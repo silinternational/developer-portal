@@ -23,6 +23,9 @@ composerupdate:
 db:
 	docker-compose up -d db
 
+phpmyadmin:
+	docker-compose up -d phpmyadmin
+
 phpunit:
 	docker-compose run --rm phpunit
 
