@@ -1716,7 +1716,7 @@ class UserTest extends DeveloperPortalTestCase
             is_string($user['email']),
             'This test requires an actual email address.'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             '@',
             $user['email'],
             'This test requires a user fixture with an email address.'

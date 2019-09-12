@@ -312,9 +312,10 @@ class UsageStatsTest extends DeveloperPortalTestCase
         );
         
         // Assert:
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             $expected,
             $actual,
+            60, // Acceptable difference (in seconds) due to code execution time.
             sprintf(
                 "Failed to return correct start time for usage-by-%s "
                 . "(%sincluding the current, incomplete %s). \n"
@@ -325,8 +326,7 @@ class UsageStatsTest extends DeveloperPortalTestCase
                 $intervalName,
                 date('r', $expected),
                 date('r', $actual)
-            ),
-            60 // Acceptable difference (in seconds) due to code execution time.
+            )
         );
     }
     
@@ -355,9 +355,10 @@ class UsageStatsTest extends DeveloperPortalTestCase
         );
         
         // Assert:
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             $expected,
             $actual,
+            60, // Acceptable difference (in seconds) due to code execution time.
             sprintf(
                 "Failed to return correct start time for usage-by-%s "
                 . "(%sincluding the current, incomplete %s). \n"
@@ -368,8 +369,7 @@ class UsageStatsTest extends DeveloperPortalTestCase
                 $intervalName,
                 date('r', $expected),
                 date('r', $actual)
-            ),
-            60 // Acceptable difference (in seconds) due to code execution time.
+            )
         );
     }
     
@@ -398,9 +398,10 @@ class UsageStatsTest extends DeveloperPortalTestCase
         );
         
         // Assert:
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             $expected,
             $actual,
+            1, // Acceptable difference (in seconds) due to code execution time.
             sprintf(
                 "Failed to return correct start time for usage-by-%s "
                 . "(%sincluding the current, incomplete %s). \n"
@@ -411,8 +412,7 @@ class UsageStatsTest extends DeveloperPortalTestCase
                 $intervalName,
                 date('r', $expected),
                 date('r', $actual)
-            ),
-            1 // Acceptable difference (in seconds) due to code execution time.
+            )
         );
     }
     
@@ -441,9 +441,10 @@ class UsageStatsTest extends DeveloperPortalTestCase
         );
         
         // Assert:
-        $this->assertEquals(
+        $this->assertEqualsWithDelta(
             $expected,
             $actual,
+            1, // Acceptable difference (in seconds) due to code execution time.
             sprintf(
                 "Failed to return correct start time for usage-by-%s "
                 . "(%sincluding the current, incomplete %s). \n"
@@ -454,8 +455,7 @@ class UsageStatsTest extends DeveloperPortalTestCase
                 $intervalName,
                 date('r', $expected),
                 date('r', $actual)
-            ),
-            1 // Acceptable difference (in seconds) due to code execution time.
+            )
         );
     }
     
