@@ -15,6 +15,15 @@ services:
             MYSQL_USER: developer_portal
             MYSQL_PASSWORD: developer_portal
 
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        ports:
+            - "8001:80"
+        depends_on:
+            - db
+        environment:
+            PMA_HOST: db
+
     testdb:
         image: silintl/mariadb:latest
         ports:
