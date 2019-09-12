@@ -1,9 +1,11 @@
 <?php
 
+use Sil\DevPortal\tests\DbTestCase;
+
 /**
  * Test accessing the pages of the website as a UnitTestUser.
  */
-class HttpAdminTest extends CDbTestCase
+class HttpAdminTest extends DbTestCase
 {
     public $fixtures = array(
         'apis' => '\Sil\DevPortal\models\Api',

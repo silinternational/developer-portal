@@ -1,4 +1,4 @@
-FROM silintl/php7:latest
+FROM silintl/php7:7.2
 MAINTAINER Phillip Shipley <phillip_shipley@sil.org>
 
 ENV REFRESHED_AT 2016-12-16
@@ -17,8 +17,8 @@ RUN rm -f /etc/rsyslog.d/*
 COPY build/rsyslog.conf /etc/rsyslog.conf
 
 # Copy in any additional PHP ini files
-COPY build/php/*.ini /etc/php/7.0/apache2/conf.d/
-COPY build/php/*.ini /etc/php/7.0/cli/conf.d/
+COPY build/php/*.ini /etc/php/7.2/apache2/conf.d/
+COPY build/php/*.ini /etc/php/7.2/cli/conf.d/
 
 # It is expected that /data is = application/ in project folder
 COPY application/ /data/

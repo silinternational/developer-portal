@@ -17,10 +17,11 @@ require_once($yiit);
 // Assemble the path to the appropriate config data.
 $config = dirname(__FILE__) . '/../config/test.php';
 
-require_once(dirname(__FILE__) . '/WebTestCase.php');
-
 // Configure Phake.
-\Phake::setClient(Phake::CLIENT_PHPUNIT);
+\Phake::setClient(Phake::CLIENT_PHPUNIT7);
+
+// Tell Yii to let other autoloaders attempt to find a class, too.
+Yii::$enableIncludePath = false;
 
 // Run the application.
 Yii::createWebApplication($config);

@@ -2,8 +2,9 @@
 namespace Sil\DevPortal\tests\unit;
 
 use Sil\DevPortal\models\Event;
+use Sil\DevPortal\tests\DbTestCase;
 
-class EventTest extends \CDbTestCase
+class EventTest extends DbTestCase
 {
     public $fixtures = array(
         'events' => '\Sil\DevPortal\models\Event',

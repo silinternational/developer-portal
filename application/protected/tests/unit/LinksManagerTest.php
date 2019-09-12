@@ -1,6 +1,8 @@
 <?php
 
-class LinksManagerTest extends CDbTestCase
+use Sil\DevPortal\tests\DbTestCase;
+
+class LinksManagerTest extends DbTestCase
 {
     public $fixtures = array(
         'apis' => '\Sil\DevPortal\models\Api',
@@ -58,12 +60,12 @@ class LinksManagerTest extends CDbTestCase
         $result = LinksManager::generateActionsDropdownHtml($actionLinks);
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $actionLink1Html,
             $result,
             'Failed to include the HTML for the first ActionLink given.'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             $actionLink2Html,
             $result,
             'Failed to include the HTML for the second ActionLink given.'

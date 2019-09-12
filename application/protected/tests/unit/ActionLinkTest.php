@@ -1,6 +1,8 @@
 <?php
 
-class ActionLinkTest extends CTestCase
+use Sil\DevPortal\tests\TestCase;
+
+class ActionLinkTest extends TestCase
 {
     public function testGetAsHtml_hasGivenUrlString()
     {
@@ -12,7 +14,7 @@ class ActionLinkTest extends CTestCase
         $linkAsHtml = $actionLink->getAsHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $url,
             $linkAsHtml,
             'Failed to include the given URL string in the generated HTML.'
@@ -30,7 +32,7 @@ class ActionLinkTest extends CTestCase
         $linkAsHtml = $actionLink->getAsHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $text,
             $linkAsHtml,
             'Failed to include the given link text in the generated HTML.'
@@ -48,7 +50,7 @@ class ActionLinkTest extends CTestCase
         $linkAsHtml = $actionLink->getAsHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $icon,
             $linkAsHtml,
             'Failed to include the specified icon in the generated HTML.'
@@ -67,13 +69,13 @@ class ActionLinkTest extends CTestCase
         $linkAsHtml = $actionLink->getAsHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $text,
             $linkAsHtml,
             'Failed to include the given link text in the generated HTML (when '
             . 'both link text and an icon are specified).'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             $icon,
             $linkAsHtml,
             'Failed to include the specified icon in the generated HTML (when '

@@ -2,8 +2,9 @@
 namespace Sil\DevPortal\tests\unit;
 
 use Sil\DevPortal\components\HybridAuthManager;
+use Sil\DevPortal\tests\TestCase;
 
-class HybridAuthManagerTest extends \CTestCase
+class HybridAuthManagerTest extends TestCase
 {
     public function testGetBaseUrl_matchesGivenValue()
     {

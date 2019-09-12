@@ -6,12 +6,13 @@ use Sil\DevPortal\components\ApiAxle\KeyInfo;
 use Sil\DevPortal\components\ApiAxle\KeyringInfo;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\Key;
+use Sil\DevPortal\tests\DbTestCase;
 
 /**
  * @method Api apis(string $fixtureName)
  * @method Key keys(string $fixtureName)
  */
-class ClientTest extends \CDbTestCase
+class ClientTest extends DbTestCase
 {
     public $fixtures = array(
         'apis' => Api::class,

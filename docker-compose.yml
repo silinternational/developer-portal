@@ -15,6 +15,15 @@ services:
             MYSQL_USER: developer_portal
             MYSQL_PASSWORD: developer_portal
 
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        ports:
+            - "8001:80"
+        depends_on:
+            - db
+        environment:
+            PMA_HOST: db
+
     testdb:
         image: silintl/mariadb:latest
         ports:
@@ -40,21 +49,21 @@ services:
             - ./local.env
 
     composer:
-        image: silintl/php7:latest
+        image: silintl/php7:7.2
         volumes_from:
             - data
         working_dir: /data
         command: composer install --no-scripts
 
     composerupdate:
-        image: silintl/php7:latest
+        image: silintl/php7:7.2
         volumes_from:
             - data
         working_dir: /data
         command: composer update --no-scripts
 
     yiimigrate:
-        image: silintl/php7:latest
+        image: silintl/php7:7.2
         volumes_from:
             - data
         links:
@@ -66,7 +75,7 @@ services:
         command: bash -c "whenavail db 3306 100 ./yiic migrate --interactive=0"
 
     yiimigratetestdb:
-        image: silintl/php7:latest
+        image: silintl/php7:7.2
         volumes_from:
             - data
         links:
@@ -81,7 +90,7 @@ services:
           MYSQL_DATABASE: test
 
     phpunit:
-        image: silintl/php7:latest
+        image: silintl/php7:7.2
         volumes_from:
             - data
         links:
@@ -122,7 +131,7 @@ services:
         command: proxy 80 -q
 
     axlesetup:
-        image: silintl/php7:latest
+        image: silintl/php7:7.2
         links:
             - api
         volumes:

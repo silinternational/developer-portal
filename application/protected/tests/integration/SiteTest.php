@@ -2,8 +2,9 @@
 namespace Sil\DevPortal\tests\integration;
 
 use Sil\DevPortal\components\Http\ClientG5 as HttpClient;
+use Sil\DevPortal\tests\TestCase;
 
-class SiteTest extends \CTestCase
+class SiteTest extends TestCase
 {
     public function testSystemCheck()
     {

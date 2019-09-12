@@ -1,11 +1,14 @@
 <?php
+namespace Sil\DevPortal\tests;
+
+use ReflectionClass;
 
 /**
  * Class to add some useful helper functions.
  * @author Matt Henderson
  */
-class DeveloperPortalTestCase extends CDbTestCase {
-
+class DeveloperPortalTestCase extends DbTestCase
+{
     /**
      * Check to confirm that all the values in an array are unique.
      * @param array $a The array whose values should be checked for uniqueness.

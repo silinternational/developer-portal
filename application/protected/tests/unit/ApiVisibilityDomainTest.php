@@ -5,6 +5,7 @@ use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\ApiVisibilityDomain;
 use Sil\DevPortal\models\Key;
 use Sil\DevPortal\models\User;
+use Sil\DevPortal\tests\DbTestCase;
 
 /**
  * @method Api apis(string $fixtureName)
@@ -12,7 +13,7 @@ use Sil\DevPortal\models\User;
  * @method Key keys(string $fixtureName)
  * @method User users(string $fixtureName)
  */
-class ApiVisibilityDomainTest extends \CDbTestCase
+class ApiVisibilityDomainTest extends DbTestCase
 {
     public $fixtures = array(
         'api' => '\Sil\DevPortal\models\Api',
@@ -106,8 +107,8 @@ class ApiVisibilityDomainTest extends \CDbTestCase
         
         // Assert:
         $this->assertTrue(is_string($linksAsHtmlList));
-        $this->assertContains('<ul>', $linksAsHtmlList);
-        $this->assertContains('</ul>', $linksAsHtmlList);
+        $this->assertStringContainsString('<ul>', $linksAsHtmlList);
+        $this->assertStringContainsString('</ul>', $linksAsHtmlList);
     }
     
     public function testIsApparentlyValidDomain_valid()
