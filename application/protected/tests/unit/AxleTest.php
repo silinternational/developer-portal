@@ -25,7 +25,7 @@ class AxleTest extends DeveloperPortalTestCase
         'keys' => Key::class,
     );  
     
-    public function setUp()
+    public function setUp(): void
     {
         global $ENABLE_AXLE;
         if(!isset($ENABLE_AXLE) || !$ENABLE_AXLE){
@@ -127,7 +127,7 @@ class AxleTest extends DeveloperPortalTestCase
         return $list;
     }
     
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         try {
             $apiAxle = self::getApiAxleClient();
