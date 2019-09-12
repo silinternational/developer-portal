@@ -18,7 +18,7 @@ require_once($yiit);
 $config = dirname(__FILE__) . '/../config/test.php';
 
 // Configure Phake.
-\Phake::setClient(Phake::CLIENT_PHPUNIT6);
+\Phake::setClient(Phake::CLIENT_PHPUNIT7);
 
 // Tell Yii to let other autoloaders attempt to find a class, too.
 Yii::$enableIncludePath = false;

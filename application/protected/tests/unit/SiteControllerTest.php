@@ -4,7 +4,7 @@ use Sil\DevPortal\tests\ControllerTestCase;
 
 class SiteControllerTest extends ControllerTestCase {
     
-    public function setUp()
+    public function setUp(): void
     {
         // Define what controller is expected to handle all of the tests in this
         // class.

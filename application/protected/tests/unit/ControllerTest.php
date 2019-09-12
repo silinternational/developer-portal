@@ -15,7 +15,7 @@ class ControllerTest extends TestCase
         $result = $controller->generatePageTitleHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $pageTitle,
             $result,
             'Failed to include the page title in the resulting HTML.'
@@ -54,7 +54,7 @@ class ControllerTest extends TestCase
         $result = $controller->generatePageTitleHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $encodedPageSubtitle,
             $result,
             'Failed to include the (HTML encoded) page subtitle in the '
@@ -72,7 +72,7 @@ class ControllerTest extends TestCase
         $result = $controller->generatePageTitleHtml();
         
         // Assert:
-        $this->assertNotContains(
+        $this->assertStringNotContainsString(
             '<small>',
             $result,
             'Incorrectly included the HTML tag for holding the page subtitle'
@@ -94,7 +94,7 @@ class ControllerTest extends TestCase
         $result = $controller->generatePageTitleHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $pageSubtitle,
             $result,
             'Failed to include the page subtitle HTML (unencoded) in the '

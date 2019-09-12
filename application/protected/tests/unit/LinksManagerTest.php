@@ -60,12 +60,12 @@ class LinksManagerTest extends DbTestCase
         $result = LinksManager::generateActionsDropdownHtml($actionLinks);
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $actionLink1Html,
             $result,
             'Failed to include the HTML for the first ActionLink given.'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             $actionLink2Html,
             $result,
             'Failed to include the HTML for the second ActionLink given.'

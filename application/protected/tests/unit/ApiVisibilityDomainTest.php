@@ -107,8 +107,8 @@ class ApiVisibilityDomainTest extends DbTestCase
         
         // Assert:
         $this->assertTrue(is_string($linksAsHtmlList));
-        $this->assertContains('<ul>', $linksAsHtmlList);
-        $this->assertContains('</ul>', $linksAsHtmlList);
+        $this->assertStringContainsString('<ul>', $linksAsHtmlList);
+        $this->assertStringContainsString('</ul>', $linksAsHtmlList);
     }
     
     public function testIsApparentlyValidDomain_valid()

@@ -26,7 +26,7 @@ class KeyTest extends DeveloperPortalTestCase
         }            
     }
   
-    public function setUp()
+    public function setUp(): void
     {
         global $ENABLE_AXLE;
         if(!isset($ENABLE_AXLE) || $ENABLE_AXLE == true){

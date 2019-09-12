@@ -20,7 +20,7 @@ class ApiTest extends DeveloperPortalTestCase
         'users' => '\Sil\DevPortal\models\User',
     );
     
-    public function setUp()
+    public function setUp(): void
     {
         global $ENABLE_AXLE;
         if(!isset($ENABLE_AXLE) || $ENABLE_AXLE == true){
@@ -247,13 +247,13 @@ class ApiTest extends DeveloperPortalTestCase
         $result = Api::generateBadgeHtml($badgeValue);
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             strval($badgeValue),
             $result,
             'Failed to include the given badge value in the generated badge '
             . 'HTML.'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             strval($badgeValue),
             strip_tags($result),
             'Failed to include the given badge value in the text contents of '
@@ -270,7 +270,7 @@ class ApiTest extends DeveloperPortalTestCase
         $result = Api::generateBadgeHtml(3, $extraCssClass);
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $extraCssClass,
             $result,
             'Failed to include the extra CSS class given in the generated '
@@ -287,7 +287,7 @@ class ApiTest extends DeveloperPortalTestCase
         $result = Api::generateBadgeHtml(3, null, $hoverTitle);
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $hoverTitle,
             $result,
             'Failed to include the hover title text given in the generated '
@@ -304,7 +304,7 @@ class ApiTest extends DeveloperPortalTestCase
         $result = Api::generateBadgeHtml(3, null, null, $linkTarget);
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $linkTarget,
             $result,
             'Failed to include the link target URL in the generated badge '
@@ -337,13 +337,13 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->getActiveKeyCountBadgeHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             strval(2),
             $result,
             'Failed to include the correct number of active keys in the '
             . 'generated badge HTML.'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             strval(2),
             strip_tags($result),
             'Failed to include the correct number of active keys in the text '
@@ -361,7 +361,7 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->getActiveKeyCountBadgeHtml($hoverTitle);
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $hoverTitle,
             $result,
             'Failed to include the given hover title text in the generated '
@@ -379,7 +379,7 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->getActiveKeyCountBadgeHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             'badge-',
             $result,
             'Failed to highlight the badge for a non-zero badge value.'
@@ -396,7 +396,7 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->getActiveKeyCountBadgeHtml();
         
         // Assert:
-        $this->assertNotContains(
+        $this->assertStringNotContainsString(
             'badge-',
             $result,
             'Incorrectly highlighted the badge for a badge value of zero.'
@@ -518,13 +518,13 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->getPendingKeyCountBadgeHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             strval(2),
             $result,
             'Failed to include the correct number of pending keys in the '
             . 'generated badge HTML.'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             strval(2),
             strip_tags($result),
             'Failed to include the correct number of pending keys in the text '
@@ -541,13 +541,13 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->getInvitedDomainsCountBadgeHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             strval(1),
             $result,
             'Failed to include the correct number of invited domains in the '
             . 'generated badge HTML.'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             strval(1),
             strip_tags($result),
             'Failed to include the correct number of invited domains in the '
@@ -564,13 +564,13 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->getInvitedUsersCountBadgeHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             strval(2),
             $result,
             'Failed to include the correct number of invited users in the '
             . 'generated badge HTML.'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             strval(2),
             strip_tags($result),
             'Failed to include the correct number of invited users in the text '
@@ -588,7 +588,7 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->getPendingKeyCountBadgeHtml($hoverTitle);
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $hoverTitle,
             $result,
             'Failed to include the given hover title text in the generated '
@@ -606,7 +606,7 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->getPendingKeyCountBadgeHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             'badge-',
             $result,
             'Failed to highlight the badge for a non-zero badge value.'
@@ -623,7 +623,7 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->getPendingKeyCountBadgeHtml();
         
         // Assert:
-        $this->assertNotContains(
+        $this->assertStringNotContainsString(
             'badge-',
             $result,
             'Incorrectly highlighted the badge for a badge value of zero.'
@@ -725,7 +725,7 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->getStyledPublicUrlHtml();
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             '>' . CHtml::encode($api->code) . '</',
             $result,
             'Api code does not seem to be in HTML tags in styled public URL.'
@@ -743,7 +743,7 @@ class ApiTest extends DeveloperPortalTestCase
         $result = $api->getStyledPublicUrlHtml($cssClass);
         
         // Assert:
-        $this->assertContains(
+        $this->assertStringContainsString(
             $cssClass,
             $result,
             'HTML for styled public URL does not contain given CSS class.'

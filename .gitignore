@@ -18,6 +18,9 @@ aws.env
 # yii runtime stuff
 application/runtime/
 
+# PHPUnit cache
+.phpunit.result.cache
+
 # simplesaml config files
 application/simplesamlphp/cert/
 build/ssp-overrides/cert/
