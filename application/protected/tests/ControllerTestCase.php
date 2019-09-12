@@ -1,7 +1,11 @@
 <?php
+namespace Sil\DevPortal\tests;
 
-class ControllerTestCase extends CTestCase {
-    
+use CHttpRequest;
+use Yii;
+
+class ControllerTestCase extends TestCase
+{
     /**
      * The name of the controller class (e.g. - "SiteController") expected to
      * handle the URLs in these tests.

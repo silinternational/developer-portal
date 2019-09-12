@@ -1,9 +1,11 @@
 <?php
 
+use Sil\DevPortal\tests\DbTestCase;
+
 /**
  * Test accesing the pages of the website as an anonymous (?) user.
  */
-class HttpTest extends CDbTestCase
+class HttpTest extends DbTestCase
 {
     public $fixtures = array(
         'apis' => '\Sil\DevPortal\models\Api',

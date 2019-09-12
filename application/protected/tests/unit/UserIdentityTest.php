@@ -3,9 +3,11 @@ namespace Sil\DevPortal\tests\unit;
 
 use Sil\DevPortal\components\UserAuthenticationData;
 use Sil\DevPortal\components\UserIdentity;
+use Sil\DevPortal\components\WrongAuthProviderException;
 use Sil\DevPortal\models\User;
+use Sil\DevPortal\tests\DbTestCase;
 
-class UserIdentityTest extends \CDbTestCase
+class UserIdentityTest extends DbTestCase
 {
     public $fixtures = array(
         'users' => '\Sil\DevPortal\models\User',
@@ -105,7 +107,8 @@ class UserIdentityTest extends \CDbTestCase
         \Phake::when($userIdentity)->createUserRecord->thenCallParent();
         
         // Pre-assert:
-        $this->setExpectedException('\Exception', '', 1444679705);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(1444679705);
         
         // Act:
         \Phake::makeVisible($userIdentity)->createUserRecord($userAuthData);
@@ -179,7 +182,8 @@ class UserIdentityTest extends \CDbTestCase
             'This test requires an email address that is already in use in the '
             . 'test database.'
         );
-        $this->setExpectedException('\Exception', '', 1444679782);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(1444679782);
         
         // Act:
         \Phake::makeVisible($userIdentity)->createUserRecord($userAuthData);
@@ -403,7 +407,8 @@ class UserIdentityTest extends \CDbTestCase
         \Phake::when($userIdentity)->updateUserRecord->thenCallParent();
         
         // Pre-assert:
-        $this->setExpectedException('\Exception', '', 1445976913);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(1445976913);
         
         // Act:
         \Phake::makeVisible($userIdentity)->updateUserRecord($userAuthData);
@@ -521,9 +526,7 @@ class UserIdentityTest extends \CDbTestCase
         \Phake::when($userIdentity)->warnIfEmailIsInUseByDiffAuthProvider->thenCallParent();
         
         // Pre-assert:
-        $this->setExpectedException(
-            'Sil\DevPortal\components\WrongAuthProviderException'
-        );
+        $this->expectException(WrongAuthProviderException::class);
         
         // Act:
         \Phake::makeVisible($userIdentity)->warnIfEmailIsInUseByDiffAuthProvider(

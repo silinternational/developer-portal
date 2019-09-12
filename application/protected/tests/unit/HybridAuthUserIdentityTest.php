@@ -2,8 +2,9 @@
 namespace Sil\DevPortal\tests\unit;
 
 use Sil\DevPortal\components\UserAuthenticationData;
+use Sil\DevPortal\tests\TestCase;
 
-class HybridAuthUserIdentityTest extends \CTestCase
+class HybridAuthUserIdentityTest extends TestCase
 {
     public function testGetUserAuthData_hasEmailVerified()
     {
@@ -64,7 +65,9 @@ class HybridAuthUserIdentityTest extends \CTestCase
         );
         
         // Pre-assert:
-        $this->setExpectedException('Exception', 'verified', 1444924124);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('verified');
+        $this->expectExceptionCode(1444924124);
         
         // Act:
         $hybridAuthUserIdentity->getUserAuthData();

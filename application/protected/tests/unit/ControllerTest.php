@@ -1,6 +1,8 @@
 <?php
 
-class ControllerTest extends CTestCase
+use Sil\DevPortal\tests\TestCase;
+
+class ControllerTest extends TestCase
 {
     public function testGeneratePageTitleHtml_hasTitle()
     {

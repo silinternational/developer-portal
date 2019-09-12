@@ -6,6 +6,7 @@ use Sil\DevPortal\models\ApiVisibilityUser;
 use Sil\DevPortal\models\Event;
 use Sil\DevPortal\models\Key;
 use Sil\DevPortal\models\User;
+use Sil\DevPortal\tests\DeveloperPortalTestCase;
 
 /**
  * @method Api apis(string $fixtureName) Get the Api with that fixture name.
@@ -1105,11 +1106,8 @@ class UserTest extends DeveloperPortalTestCase
         $user = $this->users('userWithRoleOfOwner');
         
         // (Pre-assert and) Act:
-        $this->setExpectedException(
-            'Exception',
-            '',
-            1426855754
-        );
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(1426855754);
         $user->getUsageStatsForAllApis('day');
         
         // NOTE: It should throw an exception before this point.
@@ -1139,11 +1137,8 @@ class UserTest extends DeveloperPortalTestCase
         $user = $this->users('userWithRoleOfOwner');
         
         // (Pre-assert and) Act:
-        $this->setExpectedException(
-            'Exception',
-            '',
-            1426860333
-        );
+        $this->expectException(\Exception::class);
+        $this->expectExceptionCode(1426860333);
         $user->getUsageStatsTotals('day');
         
         // NOTE: It should throw an exception before this point.

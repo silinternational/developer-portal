@@ -5,8 +5,9 @@ use Sil\DevPortal\components\SamlUserIdentity;
 use Sil\DevPortal\components\UserAuthenticationData;
 use Sil\DevPortal\components\UserIdentity;
 use Sil\DevPortal\models\User;
+use Sil\DevPortal\tests\DbTestCase;
 
-class SamlUserIdentityTest extends \CDbTestCase
+class SamlUserIdentityTest extends DbTestCase
 {
     public $fixtures = array(
         'users' => '\Sil\DevPortal\models\User',
@@ -98,48 +99,6 @@ class SamlUserIdentityTest extends \CDbTestCase
             $result,
             'Incorrectly found user (NOT from the trusted auth. provider) by '
             . 'email when record in database lacked auth. provider identifier.'
-        );
-    }
-    
-    public function testGetAuthSourceIdpEntityId()
-    {
-        // Arrange:
-        $samlUserIdentity = \Phake::partialMock(
-            '\Sil\DevPortal\components\SamlUserIdentity'
-        );
-        
-        // Act:
-        $result = \Phake::makeVisible($samlUserIdentity)->getAuthSourceIdpEntityId();
-        
-        // Assert:
-        $this->assertTrue(
-            is_string($result),
-            'Failed to return a string.'
-        );
-        $this->assertGreaterThan(
-            0,
-            strlen($result),
-            'Failed to return a non-empty string.'
-        );
-    }
-    
-    public function testGetLogoutUrl()
-    {
-        // Arrange:
-        $samlUserIdentity = new SamlUserIdentity();
-        
-        // Act:
-        $logoutUrl = $samlUserIdentity->getLogoutUrl();
-        
-        // Assert:
-        $this->assertTrue(
-            is_string($logoutUrl),
-            'Failed to return a string.'
-        );
-        $this->assertStringStartsWith(
-            'http',
-            $logoutUrl,
-            'Failed to return a string that looks like a URL.'
         );
     }
     

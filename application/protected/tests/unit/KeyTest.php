@@ -3,6 +3,7 @@
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\Key;
 use Sil\DevPortal\models\User;
+use Sil\DevPortal\tests\DeveloperPortalTestCase;
 
 /**
  * @method Api apis(string $fixtureName)
@@ -108,7 +109,9 @@ class KeyTest extends DeveloperPortalTestCase
             $key->status,
             'This test requires a pending key.'
         );
-        $this->setExpectedException('\Exception', 'No User provided', 1465926569);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('No User provided');
+        $this->expectExceptionCode(1465926569);
         
         // Act:
         $key->approve($approvingUser);
@@ -1074,7 +1077,7 @@ class KeyTest extends DeveloperPortalTestCase
         
         // Create a mock for the YiiMailer class, only mocking the send()
         // method.
-        $mockMailer = $this->getMock('YiiMailer', array('send'));
+        $mockMailer = $this->createPartialMock('YiiMailer', array('send'));
 
         // Set up the expectation for the send() method to be called only once.
         $mockMailer->expects($this->once())
@@ -1128,7 +1131,7 @@ class KeyTest extends DeveloperPortalTestCase
         
         // Create a mock for the YiiMailer class, only mocking the send()
         // method.
-        $mockMailer = $this->getMock('YiiMailer', array('send'));
+        $mockMailer = $this->createPartialMock('YiiMailer', array('send'));
 
         // Set up the expectation for the send() method to be called only once.
         $mockMailer->expects($this->once())
@@ -1536,7 +1539,9 @@ class KeyTest extends DeveloperPortalTestCase
             $key->status,
             'This test requires an approved key.'
         );
-        $this->setExpectedException('\Exception', 'No User provided', 1466000163);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('No User provided');
+        $this->expectExceptionCode(1466000163);
         
         // Act:
         $key->revoke($revokingUser);
@@ -1671,7 +1676,7 @@ class KeyTest extends DeveloperPortalTestCase
         
         // Create a mock for the YiiMailer class, only mocking the send()
         // method.
-        $mockMailer = $this->getMock('YiiMailer', array('send'));
+        $mockMailer = $this->createPartialMock('YiiMailer', array('send'));
 
         // Set up the expectation for the send() method to be called only once.
         $mockMailer->expects($this->once())

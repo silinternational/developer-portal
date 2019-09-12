@@ -1,6 +1,8 @@
 <?php
 
-class ActionLinkTest extends CTestCase
+use Sil\DevPortal\tests\TestCase;
+
+class ActionLinkTest extends TestCase
 {
     public function testGetAsHtml_hasGivenUrlString()
     {

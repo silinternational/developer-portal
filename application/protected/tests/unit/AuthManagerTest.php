@@ -2,8 +2,9 @@
 namespace Sil\DevPortal\tests\unit;
 
 use Sil\DevPortal\components\AuthManager;
+use Sil\DevPortal\tests\TestCase;
 
-class AuthManagerTest extends \CTestCase
+class AuthManagerTest extends TestCase
 {
     public function testCanUseMultipleAuthTypes_0()
     {
@@ -186,7 +187,7 @@ class AuthManagerTest extends \CTestCase
         \Phake::when($authManager)->isAuthTypeEnabled($disabledAuthType)->thenReturn(false);
         
         // Pre-assert:
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         
         // Act:
         $authManager->getIdentityForAuthType($disabledAuthType);
