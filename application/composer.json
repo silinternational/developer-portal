@@ -16,7 +16,7 @@
     },
     "require-dev": {
         "phake/phake": "^3.1",
-        "phpunit/phpunit": "^6.0",
+        "phpunit/phpunit": "^7.0",
         "phpunit/phpunit-selenium": "*",
         "phpunit/phpunit-story": "*",
         "phpunit/dbunit": "*",
