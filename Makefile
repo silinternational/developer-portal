@@ -1,4 +1,6 @@
 
+start: web
+
 api:
 	docker-compose up -d api
 
@@ -49,8 +51,6 @@ rmdb:
 rmtestdb:
 	docker-compose kill testdb
 	docker-compose rm -f testdb
-
-start: web
 
 test: testunit
 
