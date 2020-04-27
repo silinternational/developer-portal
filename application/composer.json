@@ -10,7 +10,7 @@
         "hybridauth/hybridauth": "^2.8.2",
         "silinternational/php-env": "0.*",
         "silinternational/apiaxle-sdk-php": "^1.0",
-        "simplesamlphp/simplesamlphp": "~1.17.7",
+        "simplesamlphp/simplesamlphp": "~1.18.6",
         "guzzlehttp/guzzle-services": "^0.6"
     },
     "require-dev": {
