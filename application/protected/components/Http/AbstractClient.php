@@ -43,14 +43,16 @@ abstract class AbstractClient
     
     /**
      * Send the specified request and get the response.
-     * 
+     *
      * @param string $method The request method to use (GET, POST, etc.).
      * @param string $url The URL to request.
      * @param ParamsCollection|null $paramsCollection (Optional:) Any custom
      *     parameters to include.
+     * @param string|null $rawBody (Optional:) A raw request body. If provided,
+     *     any "form" params are ignored. (Has no effect for "GET" requests.)
      * @return Response An object representing the response.
      */
-    public function request($method, $url, $paramsCollection = null)
+    public function request($method, $url, $paramsCollection = null, $rawBody = null)
     {
         if ($paramsCollection === null) {
             $paramsCollection = new ParamsCollection();
@@ -64,6 +66,9 @@ abstract class AbstractClient
             $paramsQuery = \CMap::mergeArray($paramsQuery, $paramsForm);
             $paramsForm = [];
             $requestBody = null;
+        } elseif (! empty($rawBody)) {
+            $requestBody = $rawBody;
+            $paramsForm = [];
         } else {
             $requestBody = http_build_query($paramsForm);
         }
