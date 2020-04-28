@@ -825,6 +825,7 @@ class ApiController extends \Controller
         $debugText = null;
         $method = $request->getPost('method', 'GET');
         $requestPath = $request->getPost('path', '');
+        $rawRequestBody = $request->getPost('raw-request-body');
         $requestedUrl = null;
         $rawApiRequest = null;
         $response = new Response();
@@ -893,7 +894,8 @@ class ApiController extends \Controller
                 $response = $client->request(
                     $method,
                     $url,
-                    $paramsCollection
+                    $paramsCollection,
+                    $rawRequestBody
                 );
                 $debugText = $response->getDebugText();
                 $rawApiRequest = $response->getRawRequest();
@@ -922,6 +924,7 @@ class ApiController extends \Controller
                 'apiOptions' => $apiOptions,
                 'params' => $params,
                 'path' => $requestPath,
+                'rawRequestBody' => $rawRequestBody,
                 'responseBody' => $response->getPrettyPrintedBody(),
                 'responseHeaders' => $response->getHeaders(),
                 'requestedUrl' => $requestedUrl,

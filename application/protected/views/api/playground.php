@@ -5,6 +5,7 @@
 /* @var $apiOptions array */
 /* @var $params array[] */
 /* @var $path string */
+/* @var $rawRequestBody string|null */
 /* @var $responseBody string */
 /* @var $responseHeaders string */
 /* @var $requestedUrl string */
@@ -132,6 +133,10 @@ echo CHtml::form(array('/api/playground/'), 'post');
             </tbody>
         </table>
         <a class="btn btn-default btn-small" href="javascript:addParameter()">Add Parameter</a>
+        <div>
+          <h4>Provide a custom request body <small class="muted">(optional)</small></h4>
+          <textarea class="input-block-level" name="raw-request-body"><?= CHtml::encode($rawRequestBody); ?></textarea>
+        </div>
     </div>
     <div class="span3" style="padding-top: 30px;">
         <label class="checkbox">
