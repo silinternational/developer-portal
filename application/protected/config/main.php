@@ -1,6 +1,7 @@
 <?php
 
 use Sil\DevPortal\components\HybridAuthManager;
+use Sil\DevPortal\components\log\StdoutLogRoute;
 use Sil\PhpEnv\Env;
 
 /**
@@ -122,7 +123,7 @@ return array(
             'class' => 'CLogRouter',
             'routes' => array(
                 array(
-                    'class' => 'CSysLogRoute',
+                    'class' => StdoutLogRoute::class,
                     'levels' => 'error, warning',
                     'filter' => array(
                         'class' => 'CLogFilter',
