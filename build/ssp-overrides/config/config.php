@@ -2,6 +2,7 @@
 /*
  * The configuration of SimpleSAMLphp
  *
+ * merged with simplesamlphp/simplesamlphp/config-templates/config.php 1.18.7
  */
 
 $BASE_URL = getenv('SAML_BASE_URL') ?: 'simplesaml/';
