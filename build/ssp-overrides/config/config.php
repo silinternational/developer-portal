@@ -214,6 +214,16 @@ $config = [
      */
     'enable.http_post' => false,
 
+    /*
+     * Set the allowed clock skew between encrypting/decrypting assertions
+     *
+     * If you have an server that is constantly out of sync, this option
+     * allows you to adjust the allowed clock-skew.
+     *
+     * Allowed range: 180 - 300
+     * Defaults to 180.
+     */
+    'assertion.allowed_clock_skew' => 180,
 
 
     /************************
@@ -389,7 +399,7 @@ $config = [
      * Example:
      *   'proxy.auth' = 'myuser:password'
      */
-    'proxy.auth' => false,
+    //'proxy.auth' => 'myuser:password',
 
 
 
@@ -415,11 +425,17 @@ $config = [
      */
     'database.username' => 'simplesamlphp',
     'database.password' => 'secret',
+    'database.options' => [],
 
     /*
      * (Optional) Table prefix
      */
     'database.prefix' => '',
+
+    /*
+     * (Optional) Driver options
+     */
+    'database.driver_options' => [],
 
     /*
      * True or false if you would like a persistent database connection
@@ -461,13 +477,6 @@ $config = [
     'enable.saml20-idp' => false,
     'enable.shib13-idp' => false,
     'enable.adfs-idp' => false,
-    'enable.wsfed-sp' => false,
-    'enable.authmemcookie' => false,
-
-    /*
-     * Default IdP for WS-Fed.
-     */
-    'default-wsfed-idp' => 'urn:federation:pingfederate:localhost',
 
     /*
      * Whether SimpleSAMLphp should sign the response or the assertion in SAML 1.1 authentication
@@ -567,6 +576,18 @@ $config = [
     'session.cookie.secure' => false,
 
     /*
+     * Set the SameSite attribute in the cookie.
+     *
+     * You can set this to the strings 'None', 'Lax', or 'Strict' to support
+     * the RFC6265bis SameSite cookie attribute. If set to null, no SameSite
+     * attribute will be sent.
+     *
+     * Example:
+     *  'session.cookie.samesite' => 'None',
+     */
+    'session.cookie.samesite' => null,
+
+    /*
      * Options to override the default settings for php sessions.
      */
     'session.phpsession.cookiename' => 'SimpleSAML',
@@ -600,7 +621,7 @@ $config = [
      * See docs/simplesamlphp-advancedfeatures.txt for function code example.
      *
      * Example:
-     *   'session.check_function' => ['sspmod_example_Util', 'checkSession'],
+     *   'session.check_function' => ['\SimpleSAML\Module\example\Util', 'checkSession'],
      */
 
 
@@ -732,14 +753,47 @@ $config = [
      *************************************/
 
     /*
+     * Language-related options.
+     */
+    'language' => [
+        /*
+         * An array in the form 'language' => <list of alternative languages>.
+         *
+         * Each key in the array is the ISO 639 two-letter code for a language,
+         * and its value is an array with a list of alternative languages that
+         * can be used if the given language is not available at some point.
+         * Each alternative language is also specified by its ISO 639 code.
+         *
+         * For example, for the "no" language code (Norwegian), we would have:
+         *
+         * 'priorities' => [
+         *      'no' => ['nb', 'nn', 'en', 'se'],
+         *      ...
+         * ],
+         *
+         * establishing that if a translation for the "no" language code is
+         * not available, we look for translations in "nb" (Norwegian Bokmål),
+         * and so on, in that order.
+         */
+        'priorities' => [
+            'no' => ['nb', 'nn', 'en', 'se'],
+            'nb' => ['no', 'nn', 'en', 'se'],
+            'nn' => ['no', 'nb', 'en', 'se'],
+            'se' => ['nb', 'no', 'nn', 'en'],
+            'nr' => ['zu', 'en'],
+            'nd' => ['zu', 'en'],
+        ],
+    ],
+
+    /*
      * Languages available, RTL languages, and what language is the default.
      */
-    'language.available' => array(
-        'en', 'no', 'nn', 'se', 'da', 'de', 'sv', 'fi', 'es', 'fr', 'it', 'nl', 'lb', 'cs',
-        'sl', 'lt', 'hr', 'hu', 'pl', 'pt', 'pt-br', 'tr', 'ja', 'zh', 'zh-tw', 'ru', 'et',
-        'he', 'id', 'sr', 'lv', 'ro', 'eu', 'el', 'af'
-    ),
-    'language.rtl' => array('ar', 'dv', 'fa', 'ur', 'he'),
+    'language.available' => [
+        'en', 'no', 'nn', 'se', 'da', 'de', 'sv', 'fi', 'es', 'ca', 'fr', 'it', 'nl', 'lb',
+        'cs', 'sl', 'lt', 'hr', 'hu', 'pl', 'pt', 'pt-br', 'tr', 'ja', 'zh', 'zh-tw', 'ru',
+        'et', 'he', 'id', 'sr', 'lv', 'ro', 'eu', 'el', 'af', 'zu', 'xh',
+    ],
+    'language.rtl' => ['ar', 'dv', 'fa', 'ur', 'he'],
     'language.default' => 'en',
 
     /*
@@ -757,17 +811,7 @@ $config = [
     'language.cookie.secure' => false,
     'language.cookie.httponly' => false,
     'language.cookie.lifetime' => (60 * 60 * 24 * 900),
-
-    /*
-     * Which i18n backend to use.
-     *
-     * "SimpleSAMLphp" is the home made system, valid for 1.x.
-     * For 2.x, only "gettext/gettext" will be possible.
-     *
-     * Home-made templates will always use "SimpleSAMLphp".
-     * To use twig (where avaliable), select "gettext/gettext".
-     */
-    'language.i18n.backend' => 'SimpleSAMLphp',
+    'language.cookie.samesite' => null,
 
     /**
      * Custom getLanguage function called from SimpleSAML\Locale\Language::getLanguage().
@@ -850,6 +894,43 @@ $config = [
      */
     'template.auto_reload' => false,
 
+    /*
+     * Set this option to true to indicate that your installation of SimpleSAMLphp
+     * is running in a production environment. This will affect the way resources
+     * are used, offering an optimized version when running in production, and an
+     * easy-to-debug one when not. Set it to false when you are testing or
+     * developing the software, in which case a banner will be displayed to remind
+     * users that they're dealing with a non-production instance.
+     *
+     * Defaults to true.
+     */
+    'production' => true,
+
+    /*
+     * SimpleSAMLphp modules can host static resources which are served through PHP.
+     * The serving of the resources can be configured through these settings.
+     */
+    'assets' => [
+        /*
+         * These settings adjust the caching headers that are sent
+         * when serving static resources.
+         */
+        'caching' => [
+            /*
+             * Amount of seconds before the resource should be fetched again
+             */
+            'max_age' => 86400,
+            /*
+             * Calculate a checksum of every file and send it to the browser
+             * This allows the browser to avoid downloading assets again in situations
+             * where the Last-Modified header cannot be trusted,
+             * for example in cluster setups
+             *
+             * Defaults false
+             */
+            'etag' => false,
+        ],
+    ],
 
 
     /*********************
@@ -980,6 +1061,12 @@ $config = [
      **************************/
 
     /*
+     * This option allows you to specify a directory for your metadata outside of the standard metadata directory
+     * included in the standard distribution of the software.
+     */
+    'metadatadir' => 'metadata',
+
+    /*
      * This option configures the metadata sources. The metadata sources is given as an array with
      * different metadata sources. When searching for metadata, SimpleSAMLphp will search through
      * the array from start to end.
@@ -1084,7 +1171,7 @@ $config = [
     'metadata.sign.privatekey' => null,
     'metadata.sign.privatekey_pass' => null,
     'metadata.sign.certificate' => null,
-
+    'metadata.sign.algorithm' => null,
 
 
     /****************************
