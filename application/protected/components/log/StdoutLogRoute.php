@@ -4,7 +4,7 @@ namespace Sil\DevPortal\components\log;
 
 use CLogRoute;
 
-class StreamLogRoute extends CLogRoute
+class StdoutLogRoute extends CLogRoute
 {
     protected function processLogs($logs)
     {
