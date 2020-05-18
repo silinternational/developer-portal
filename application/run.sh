@@ -16,4 +16,4 @@ cp /tmp/ssp-overrides/metadata/* /data/vendor/simplesamlphp/simplesamlphp/metada
 runny /data/protected/yiic migrate --interactive=0
 
 # Run apache in foreground
-apache2ctl -k run -D FOREGROUND
+apache2ctl -k start -D FOREGROUND
