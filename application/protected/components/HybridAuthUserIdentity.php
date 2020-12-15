@@ -1,8 +1,6 @@
 <?php
 namespace Sil\DevPortal\components;
 
-use Sil\DevPortal\components\UserAuthenticationData;
-
 class HybridAuthUserIdentity extends UserIdentity
 {
     /**
@@ -43,7 +41,7 @@ class HybridAuthUserIdentity extends UserIdentity
             // that Google will no longer accept, have HybridAuth forget about
             // any active user and re-send the user to the provider's login
             // screen again.
-            $hybridAuth->logoutAllProviders();
+            $hybridAuth->disconnectAllAdapters();
             $authProviderAdapter = $hybridAuth->authenticate($authProvider);
             $userProfile = $authProviderAdapter->getUserProfile();
         }
