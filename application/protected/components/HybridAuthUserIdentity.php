@@ -5,10 +5,15 @@ use Sil\DevPortal\components\UserAuthenticationData;
 
 class HybridAuthUserIdentity extends UserIdentity
 {
-    protected function getHybridAuthInstance()
+    /**
+     * @param string $providerSlug
+     * @return \Hybridauth\Hybridauth
+     * @throws \Hybridauth\Exception\InvalidArgumentException
+     */
+    protected function getHybridAuthInstance(string $providerSlug)
     {
         $hybridAuthManager = new HybridAuthManager();
-        return $hybridAuthManager->getHybridAuthInstance();
+        return $hybridAuthManager->getHybridAuthInstance($providerSlug);
     }
     
     /**
@@ -21,7 +26,7 @@ class HybridAuthUserIdentity extends UserIdentity
      */
     public function getUserAuthData($providerSlug = null)
     {
-        $hybridAuth = $this->getHybridAuthInstance();
+        $hybridAuth = $this->getHybridAuthInstance($providerSlug);
         
         // Try to authenticate the user with the authentication provider. The
         // user will be redirected to that auth. provider for authentication, or
@@ -98,7 +103,7 @@ class HybridAuthUserIdentity extends UserIdentity
     
     public function logout()
     {
-        $hybridAuth = $this->getHybridAuthInstance();
-        $hybridAuth->logoutAllProviders();
+        $hybridAuth = $this->getHybridAuthInstance('');
+        $hybridAuth->disconnectAllAdapters();
     }
 }
