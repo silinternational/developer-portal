@@ -6,15 +6,7 @@ use Stringy\StaticStringy as SS;
 
 class AuthController extends \Controller
 {
-    /**
-     * The HybridAuth endpoint, needed for authentications managed by
-     * HybridAuth.
-     */
-    public function actionHybridEndpoint()
-    {
-        \Hybrid_Endpoint::process();
-    }
-    
+
     public function actionLogin($authType = null, $providerSlug = null)
     {
         $authManager = new AuthManager();

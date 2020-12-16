@@ -1,6 +1,8 @@
 <?php
 namespace Sil\DevPortal\components;
 
+use Hybridauth\Hybridauth;
+
 class HybridAuthManager
 {
     /** @var string|null */
@@ -18,19 +20,20 @@ class HybridAuthManager
     {
         $this->baseUrl = $baseUrl;
     }
-    
+
     /**
      * Get the URL that points to our HybridAuth endpoint. If no base URL was
      * provided to the constructor, a default value will be used.
-     * 
+     *
+     * @param string $providerSlug
      * @return string
      */
-    protected function getBaseUrl()
+    protected function getBaseUrl(string $providerSlug)
     {
         if ($this->baseUrl !== null) {
             return $this->baseUrl;
         } else {
-            return \Yii::app()->createAbsoluteUrl('auth/hybridEndpoint');
+            return \Yii::app()->createAbsoluteUrl('auth/login/hybrid/' . $providerSlug);
         }
     }
     
@@ -54,13 +57,17 @@ class HybridAuthManager
         }
         return $enabledProviders;
     }
-    
-    protected function getHybridAuthConfig()
+
+    /**
+     * @param string $providerSlug
+     * @return array
+     */
+    protected function getHybridAuthConfig(string $providerSlug)
     {
-        $config = array(
-            'base_url' => $this->getBaseUrl(),
+        $config = [
+            'callback' => $this->getBaseUrl($providerSlug),
             'providers' => $this->getProvidersConfig(),
-        );
+        ];
         
         if ($this->debugMode) {
             $config['debugMode'] = true;
@@ -69,18 +76,20 @@ class HybridAuthManager
         
         return $config;
     }
-    
+
     /**
-     * Get an instance of Hybrid_Auth (already configured) to use for
+     * Get an instance of Hybridauth (already configured) to use for
      * authenticating a user.
-     * 
-     * @return \Hybrid_Auth
+     *
+     * @param string $providerSlug
+     * @return Hybridauth
+     * @throws \Hybridauth\Exception\InvalidArgumentException
      */
-    public function getHybridAuthInstance()
+    public function getHybridAuthInstance(string $providerSlug)
     {
-        return new \Hybrid_Auth($this->getHybridAuthConfig());
+        return new Hybridauth($this->getHybridAuthConfig($providerSlug));
     }
-    
+
     /**
      * Get the wrapper path for one of HybridAuth's additional providers. If
      * the given $providerName is not one we have manually configured within

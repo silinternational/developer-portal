@@ -134,6 +134,8 @@ services:
         image: silintl/php7:7.2
         links:
             - api
+        env_file:
+            -   common.env
         volumes:
             - ./build/setup-apiaxle.sh:/usr/local/bin/setup-apiaxle.sh
         command: setup-apiaxle.sh
