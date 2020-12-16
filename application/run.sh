@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# start cron in background for php session gc
+cron
+
 chown -R www-data:www-data /data/protected/runtime /data/public/assets
 
 # If a THEME_COLOR was provided, use that for the website navbar.
