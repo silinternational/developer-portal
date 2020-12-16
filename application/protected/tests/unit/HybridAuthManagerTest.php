@@ -9,7 +9,7 @@ class HybridAuthManagerTest extends TestCase
     public function testGetBaseUrl_matchesGivenValue()
     {
         // Arrange:
-        $expectedBaseUrl = 'http://local/sample/url';
+        $expectedBaseUrl = 'http://local/hybrid/github';
         /* @var $hybridAuthManager HybridAuthManager */
         $hybridAuthManager = \Phake::partialMock(
             'Sil\DevPortal\components\HybridAuthManager',
@@ -17,7 +17,7 @@ class HybridAuthManagerTest extends TestCase
         );
         
         // Act:
-        $actualBaseUrl = \Phake::makeVisible($hybridAuthManager)->getBaseUrl();
+        $actualBaseUrl = \Phake::makeVisible($hybridAuthManager)->getBaseUrl('github');
         
         // Assert:
         $this->assertEquals(
@@ -37,7 +37,7 @@ class HybridAuthManagerTest extends TestCase
         \Phake::when($hybridAuthManager)->getBaseUrl->thenCallParent();
         
         // Act:
-        $baseUrl = \Phake::makeVisible($hybridAuthManager)->getBaseUrl();
+        $baseUrl = \Phake::makeVisible($hybridAuthManager)->getBaseUrl('github');
         
         // Assert:
         $this->assertTrue(
