@@ -306,7 +306,7 @@ class Key extends \KeyBase
         }
     }
     
-    protected function existsInApiAxle()
+    protected function existsInApiAxle(ApiAxleClient $apiAxle)
     {
         if (empty($this->value)) {
             throw new \Exception(sprintf(
@@ -314,7 +314,7 @@ class Key extends \KeyBase
                 $this->key_id
             ), 1478185810);
         }
-        return $this->getApiAxleClient()->keyExists($this->value);
+        return $apiAxle->keyExists($this->value);
     }
     
     public function generateNewValueAndSecret()

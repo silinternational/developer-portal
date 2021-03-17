@@ -900,9 +900,9 @@ class Api extends \ApiBase
         $apiAxle->createApi($this->code, $this->getDataForApiAxle());
     }
     
-    protected function existsInApiAxle()
+    protected function existsInApiAxle(ApiAxleClient $apiAxle)
     {
-        return $this->getApiAxleClient()->apiExists($this->code);
+        return $apiAxle->apiExists($this->code);
     }
     
     /**
