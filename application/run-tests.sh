@@ -11,7 +11,7 @@ cp /tmp/ssp-overrides/metadata/* /data/vendor/simplesamlphp/simplesamlphp/metada
 echo -e "Waiting for db to run migrations...\n\n"
 START=`date +%s`
 whenavail db 3306 240 echo 'db ready'
-/data/protected/yiic migrate --interactive=0
+runny /data/protected/yiic migrate --interactive=0
 END=`date +%s`
 TIME=$(($END-$START))
 echo -e "Migrations should be done. Ran for $TIME seconds.\n\n"
