@@ -52,8 +52,7 @@ COPY build/ssp-overrides /tmp/ssp-overrides
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Copy in any additional PHP ini files
-COPY build/php/*.ini /etc/php/7.2/apache2/conf.d/
-COPY build/php/*.ini /etc/php/7.2/cli/conf.d/
+COPY build/php/*.ini "$PHP_INI_DIR/conf.d/"
 
 # get s3cmd and s3-expand
 RUN pip install s3cmd
