@@ -1,4 +1,6 @@
 {
+    "name": "silinternational/developer-portal",
+    "description": "Developer Portal website",
     "autoload": {
         "psr-4": {"Sil\\DevPortal\\": "protected/"}
     },
