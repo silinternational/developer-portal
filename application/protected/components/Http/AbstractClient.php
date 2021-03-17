@@ -1,7 +1,7 @@
 <?php
 namespace Sil\DevPortal\components\Http;
 
-use Stringy\StaticStringy as SS;
+use function Symfony\Component\String\u;
 
 /**
  * The base class for our Guzzle wrapper classes.
@@ -16,7 +16,7 @@ abstract class AbstractClient
         
         // Find the beginning of the request section.
         while ($line !== null) {
-            if (SS::startsWith($line, '> ')) {
+            if (u($line)->startsWith('> ')) {
                 $fullRequest .= substr($line, 2);
                 break;
             }
@@ -26,7 +26,7 @@ abstract class AbstractClient
         
         // Collect lines until the end of the request section.
         while ($line !== null) {
-            if (SS::startsWith($line, '* ') || SS::startsWith($line, '< ')) {
+            if (u($line)->startsWith('* ') || u($line)->startsWith('< ')) {
                 break;
             }
             $fullRequest .= $line;
@@ -76,7 +76,7 @@ abstract class AbstractClient
         // Append the query string parameters to the URL.
         if ( ! empty($paramsQuery)) {
             list($urlMinusFragment, ) = explode('#', $url);
-            $urlMinusFragment .= SS::contains($url, '?') ? '&' : '?';
+            $urlMinusFragment .= u($url)->containsAny('?') ? '&' : '?';
             $paramsQueryPairs = [];
             foreach ($paramsQuery as $name => $value) {
                 $paramsQueryPairs[] = rawurlencode($name) . '=' . rawurlencode($value);

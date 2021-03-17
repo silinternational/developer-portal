@@ -9,7 +9,7 @@ use Sil\DevPortal\models\ApiVisibilityDomain;
 use Sil\DevPortal\models\ApiVisibilityUser;
 use Sil\DevPortal\models\Key;
 use Sil\DevPortal\models\User;
-use Stringy\StaticStringy as SS;
+use function Symfony\Component\String\u;
 
 class ApiController extends \Controller
 {
@@ -844,7 +844,7 @@ class ApiController extends \Controller
             
             /* Create copy of the request path for manipulation, ensuring it
              * begins with a forward-slash (/).  */
-            $path = SS::ensureLeft($requestPath, '/');
+            $path = u($requestPath)->ensureStart('/');
             
             /* @var $key Key */
             $key = Key::model()->findByPk($keyId);

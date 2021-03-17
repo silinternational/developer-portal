@@ -1,7 +1,7 @@
 <?php
 namespace Sil\DevPortal\components;
 
-use Stringy\StaticStringy as SS;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class AuthManager
 {
@@ -340,6 +340,7 @@ class AuthManager
     
     public static function slugify($string)
     {
-        return (string)SS::slugify($string);
+        $slugger = new AsciiSlugger();
+        return (string)$slugger->slug($string)->lower();
     }
 }
