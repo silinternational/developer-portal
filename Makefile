@@ -14,7 +14,7 @@ bounce:
 
 clean:
 	docker-compose kill
-	docker-compose rm -f
+	docker system prune -f --volumes
 
 composer:
 	docker-compose run --rm composer
