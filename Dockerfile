@@ -22,6 +22,8 @@ RUN apt-get update -y && \
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 RUN curl https://bitbucket.org/silintl/docker-whenavail/raw/master/whenavail -o /usr/local/bin/whenavail
 RUN chmod a+x /usr/local/bin/whenavail
+RUN curl https://raw.githubusercontent.com/silinternational/runny/0.2/runny -o /usr/local/bin/runny
+RUN chmod a+x /usr/local/bin/runny
 
 # Install and enable, see the README on the docker hub for the image
 RUN docker-php-ext-configure gd --with-freetype=/usr/include --with-jpeg=/usr/include && \
