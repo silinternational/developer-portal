@@ -48,6 +48,9 @@ RUN sed -i -E 's@ErrorLog .*@ErrorLog /proc/self/fd/2@i' /etc/apache2/apache2.co
 # Copy the SimpleSAMLphp configuration files to a temporary location
 COPY build/ssp-overrides /tmp/ssp-overrides
 
+# Use the default production configuration
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
 # Copy in any additional PHP ini files
 COPY build/php/*.ini /etc/php/7.2/apache2/conf.d/
 COPY build/php/*.ini /etc/php/7.2/cli/conf.d/
