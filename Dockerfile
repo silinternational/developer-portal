@@ -24,7 +24,7 @@ RUN curl https://bitbucket.org/silintl/docker-whenavail/raw/master/whenavail -o 
 RUN chmod a+x /usr/local/bin/whenavail
 
 # Install and enable, see the README on the docker hub for the image
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include --with-jpeg-dir=/usr/include && \
+RUN docker-php-ext-configure gd --with-freetype=/usr/include --with-jpeg=/usr/include && \
     docker-php-ext-install -j$(nproc) gd && \
     docker-php-ext-install pdo pdo_mysql mbstring xml curl && \
     docker-php-ext-enable gd pdo pdo_mysql mbstring xml curl
