@@ -1049,7 +1049,7 @@ class Api extends \ApiBase
         return ($this->approval_type !== self::APPROVAL_TYPE_AUTO);
     }
     
-    protected function shouldExistInApiAxle()
+    protected function shouldExistInApiAxle(): bool
     {
         return true;
     }

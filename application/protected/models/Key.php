@@ -1493,7 +1493,7 @@ class Key extends \KeyBase
         }
     }
     
-    protected function shouldExistInApiAxle()
+    protected function shouldExistInApiAxle(): bool
     {
         return $this->isApproved();
     }

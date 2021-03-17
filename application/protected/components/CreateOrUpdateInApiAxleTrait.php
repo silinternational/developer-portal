@@ -123,11 +123,9 @@ trait CreateOrUpdateInApiAxleTrait
      * example, all Apis should exist in ApiAxle, but only approved Keys
      * should exist in ApiAxle.
      * 
-     * @param ApiAxleClient $apiAxle The client to use for interacting with
-     *     ApiAxle.
      * @return boolean
      */
-    abstract protected function shouldExistInApiAxle(ApiAxleClient $apiAxle);
+    abstract protected function shouldExistInApiAxle(): bool;
     
     /**
      * Update the record for this in ApiAxle. Throws an exception if
