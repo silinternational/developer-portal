@@ -418,7 +418,7 @@ class Key extends \KeyBase
     {
         try{
             $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
-            if (( ! empty($this->value)) && $this->existsInApiAxle()) {
+            if (( ! empty($this->value)) && $this->existsInApiAxle($apiAxle)) {
                 $apiAxle->unlinkKeyFromApi($this->value, $this->api->code);
                 $apiAxle->unlinkKeyFromKeyring(
                     $this->value,
