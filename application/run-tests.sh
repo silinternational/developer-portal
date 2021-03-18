@@ -4,6 +4,10 @@ set -e
 
 echo "Running run-tests.sh, started at: $CI_TIMESTAMP"
 
+# Install composer dependencies
+cd /data
+runny composer install --no-scripts --optimize-autoloader --no-interaction
+
 mkdir -p -v /data/vendor/simplesamlphp/simplesamlphp/cert
 cp /tmp/ssp-overrides/cert/* /data/vendor/simplesamlphp/simplesamlphp/cert
 cp /tmp/ssp-overrides/config/* /data/vendor/simplesamlphp/simplesamlphp/config
