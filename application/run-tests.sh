@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 echo "Running run-tests.sh, started at: $CI_TIMESTAMP"
 
 mkdir -p -v /data/vendor/simplesamlphp/simplesamlphp/cert
