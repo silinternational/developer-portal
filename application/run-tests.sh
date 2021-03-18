@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 echo "Running run-tests.sh, started at: $CI_TIMESTAMP"
 
 # Install composer dependencies
