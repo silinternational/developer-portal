@@ -37,12 +37,15 @@ RUN mkdir -p /data
 # Copy in vhost configuration
 COPY build/vhost.conf /etc/apache2/sites-enabled/
 
-# If apache2 hasn't run there is no config file.
-CMD ["apache2ctl", "configtest"]
-
 # .htaccess file needs Rewrite and Headers modules
 RUN a2enmod rewrite
 RUN a2enmod headers
+
+# Ensure the DocumentRoot folder exists
+RUN mkdir -p /data/public/
+
+# If apache2 hasn't run there is no config file.
+RUN ["apache2ctl", "configtest"]
 
 # ErrorLog inside a VirtualHost block is ineffective for unknown reasons
 RUN sed -i -E 's@ErrorLog .*@ErrorLog /proc/self/fd/2@i' /etc/apache2/apache2.conf
