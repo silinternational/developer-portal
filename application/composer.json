@@ -1,9 +1,12 @@
 {
+    "name": "silinternational/developer-portal",
+    "description": "Developer Portal website",
     "autoload": {
         "psr-4": {"Sil\\DevPortal\\": "protected/"}
     },
     "require": {
-        "danielstjules/stringy": "^2.3",
+        "symfony/string": "^5.2",
+        "symfony/translation-contracts": "^1.1|^2", 
         "yiisoft/yii": "~1.1.21",
         "guzzlehttp/guzzle": "^5",
         "forevermatt/calc-api-sig": "0.1.1",

@@ -2,7 +2,7 @@
 namespace Sil\DevPortal\controllers;
 
 use Sil\DevPortal\components\AuthManager;
-use Stringy\StaticStringy as SS;
+use function Symfony\Component\String\u;
 
 class AuthController extends \Controller
 {
@@ -16,11 +16,11 @@ class AuthController extends \Controller
          * them back to the page they came from.  */
         if (\Yii::app()->user->getReturnUrl() === '/') {
             $referrer = \Yii::app()->request->getUrlReferrer();
-            $absoluteUrlForThisWebsite = SS::ensureRight(\Yii::app()->getBaseUrl(true), '/');
+            $absoluteUrlForThisWebsite = u(\Yii::app()->getBaseUrl(true))->ensureEnd('/');
             $authControllerUrl = $absoluteUrlForThisWebsite . 'auth/';
             if ($referrer &&
-                SS::startsWith($referrer, $absoluteUrlForThisWebsite) &&
-                ( ! SS::startsWith($referrer, $authControllerUrl))) {
+                u($referrer)->startsWith($absoluteUrlForThisWebsite) &&
+                ( ! u($referrer)->startsWith($authControllerUrl))) {
                 \Yii::app()->user->setReturnUrl($referrer);
             }
         }
