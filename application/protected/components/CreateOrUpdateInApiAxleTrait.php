@@ -22,7 +22,7 @@ trait CreateOrUpdateInApiAxleTrait
             $apiAxle = $this->getApiAxleClient();
         }
         
-        if ( ! $this->shouldExistInApiAxle($apiAxle)) {
+        if ( ! $this->shouldExistInApiAxle()) {
             return true;
         }
         
