@@ -306,7 +306,7 @@ class Key extends \KeyBase
         }
     }
     
-    protected function existsInApiAxle()
+    protected function existsInApiAxle(ApiAxleClient $apiAxle)
     {
         if (empty($this->value)) {
             throw new \Exception(sprintf(
@@ -314,7 +314,7 @@ class Key extends \KeyBase
                 $this->key_id
             ), 1478185810);
         }
-        return $this->getApiAxleClient()->keyExists($this->value);
+        return $apiAxle->keyExists($this->value);
     }
     
     public function generateNewValueAndSecret()
@@ -418,7 +418,7 @@ class Key extends \KeyBase
     {
         try{
             $apiAxle = new ApiAxleClient(\Yii::app()->params['apiaxle']);
-            if (( ! empty($this->value)) && $this->existsInApiAxle()) {
+            if (( ! empty($this->value)) && $this->existsInApiAxle($apiAxle)) {
                 $apiAxle->unlinkKeyFromApi($this->value, $this->api->code);
                 $apiAxle->unlinkKeyFromKeyring(
                     $this->value,
@@ -1493,7 +1493,7 @@ class Key extends \KeyBase
         }
     }
     
-    protected function shouldExistInApiAxle()
+    protected function shouldExistInApiAxle(): bool
     {
         return $this->isApproved();
     }
