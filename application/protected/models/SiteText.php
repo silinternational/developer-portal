@@ -1,6 +1,8 @@
 <?php
 namespace Sil\DevPortal\models;
 
+use Sil\DevPortal\components\AuthManager;
+
 class SiteText extends \SiteTextBase
 {
     use \Sil\DevPortal\components\FixRelationsClassPathsTrait;
@@ -87,7 +89,7 @@ class SiteText extends \SiteTextBase
     
     public function slugify($name)
     {
-        return (string)\Stringy\StaticStringy::slugify($name);
+        return AuthManager::slugify($name);
     }
     
     public static function staticFileExists($siteTextName)

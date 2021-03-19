@@ -1,8 +1,6 @@
 <?php
 namespace Sil\DevPortal\components\Http;
 
-use Stringy\StaticStringy as SS;
-
 /**
  * A simple wrapper class around Guzzle (version 6).
  */
