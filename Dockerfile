@@ -4,7 +4,7 @@ LABEL maintainer="matt_henderson@sil.org"
 RUN apt-get update -y && \
     apt-get install -y \
 # Needed to install s3cmd
-        python-pip \
+        python-pip && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
