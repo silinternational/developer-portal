@@ -1,4 +1,4 @@
-FROM silintl/php7-apache:0.1.1
+FROM silintl/php7-apache:0.1.2
 LABEL maintainer="matt_henderson@sil.org"
 
 RUN apt-get update -y && \
