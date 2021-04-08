@@ -10,9 +10,6 @@ if [[ "x" != "x$THEME_COLOR" ]]; then
     sed -i /data/public/css/styles.css -e "s/0068a6/${THEME_COLOR}/"
 fi
 
-# Install composer dependencies
-runny composer install --no-dev --no-scripts --optimize-autoloader --no-interaction
-
 mkdir -p -v /data/vendor/simplesamlphp/simplesamlphp/cert
 cp /tmp/ssp-overrides/cert/* /data/vendor/simplesamlphp/simplesamlphp/cert
 cp /tmp/ssp-overrides/config/* /data/vendor/simplesamlphp/simplesamlphp/config
