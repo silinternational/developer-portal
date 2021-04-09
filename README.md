@@ -8,33 +8,38 @@ This website is available as a Docker image here:
 We recommend using that as the `FROM` in your own Dockerfile in your own
 private repo, where you would `COPY` into your own Docker image the files needed
 by SimpleSAMLphp (if using SAML logins), your own
-`/data/public/img/logos/site-logo.png`, etc. Your Dockerfile should put the
-SAML files into `/tmp/ssp-overrides`, since the `run.sh` script will copy from
-there into the SimpleSAMLphp folders within the `vendor` folder after installing
-composer dependencies.
+`/data/public/img/logos/site-logo.png`, etc.
+
+Your Dockerfile should (in this order)...
+
+1. Put any custom SAML files into `/tmp/ssp-overrides`.
+2. Run the `/tmp/install-deps-and-ssp-overrides.sh`, since it will move the SAML
+   files into the SimpleSAMLphp folders within the `vendor` folder after
+   installing composer dependencies.
 
 ### Example Dockerfile using this as the FROM ###
 
-    FROM silintl/developer-portal:1.3.4 
-
-    # Make sure /data is available
-    RUN mkdir -p /data
-
-    # Copy in a custom vhost configuration (if necessary)
-    COPY build/vhost.conf /etc/apache2/sites-enabled/
-
-    # Copy the SimpleSAMLphp configuration files to a temporary location
+    FROM silintl/developer-portal:4.0.0
+    
+    ENV REFRESHED_AT 2021-04-08
+    
+    # Put in place any additional custom SAML files:
     COPY build/ssp-overrides /tmp/ssp-overrides
-
+    
+    # Put dependencies and SSP overrides in their final location
+    RUN /tmp/install-deps-and-ssp-overrides.sh
+    
+    # Copy in any custom files needed, which are stored in this repo.
+    COPY build/favicons /data/public
     COPY build/logos /data/public/img/logos
-
+    
     WORKDIR /data
-
+    
     EXPOSE 80
-
+    
     # Record now as the build date/time (in a friendly format).
     RUN date -u +"%B %-d, %Y, %-I:%M%P (%Z)" > /data/protected/data/version.txt
-
+    
     CMD ["/data/run.sh"]
 
 
