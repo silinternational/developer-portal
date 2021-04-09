@@ -4,7 +4,8 @@ echo "Running run-tests.sh, started at: $CI_TIMESTAMP"
 
 # Install composer dependencies
 cd /data
-runny composer install --no-scripts --optimize-autoloader --no-interaction
+echo "Installing dev dependencies..."
+runny composer install --no-scripts --no-interaction
 
 mkdir -p -v /data/vendor/simplesamlphp/simplesamlphp/cert
 cp /tmp/ssp-overrides/cert/* /data/vendor/simplesamlphp/simplesamlphp/cert
@@ -29,9 +30,6 @@ echo -e "Linking key to api...\n\n"
 curl -X PUT 'http://api/v1/api/apiaxle/linkkey/developer-portal-dev-key'
 
 # Run phpunit tests
-cd /data
-echo "Installing dev dependencies..."
-composer install --prefer-dist --no-interaction
 cd /data/protected/tests
 echo -e "Running tests\n\n"
 /data/vendor/bin/phpunit unit/
