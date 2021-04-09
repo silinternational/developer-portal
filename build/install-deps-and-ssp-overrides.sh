@@ -4,7 +4,7 @@ set -e
 
 # Install composer dependencies
 cd /data
-composer install --no-dev --no-scripts --optimize-autoloader --no-interaction
+composer install --no-dev --no-progress --no-scripts --optimize-autoloader --no-interaction
 
 # Copy the SSP override files into place
 mkdir -p -v /data/vendor/simplesamlphp/simplesamlphp/cert
