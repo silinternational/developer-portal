@@ -26,6 +26,7 @@ COPY build/ssp-overrides /tmp/ssp-overrides
 # Put in place the script to be used by child Docker images to install Composer
 # dependencies and move the SSP overrides into place.
 COPY build/install-deps-and-ssp-overrides.sh /tmp
+RUN chmod +x /tmp/install-deps-and-ssp-overrides.sh
 
 # Copy in any additional PHP ini files
 COPY build/php/*.ini "$PHP_INI_DIR/conf.d/"

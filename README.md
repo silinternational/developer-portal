@@ -19,7 +19,7 @@ Your Dockerfile should (in this order)...
 
 ### Example Dockerfile using this as the FROM ###
 
-    FROM silintl/developer-portal:4.0.0
+    FROM silintl/developer-portal:4.0.1
     
     ENV REFRESHED_AT 2021-04-08
     
