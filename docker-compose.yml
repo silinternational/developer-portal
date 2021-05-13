@@ -70,7 +70,7 @@ services:
         volumes_from:
             - data
         working_dir: /data
-        command: composer update --no-scripts
+        command: bash -c "composer update --no-scripts; composer show --direct --format=json > direct-dependencies.json"
 
     yiimigrate:
         image: developer-portal-local
