@@ -22,7 +22,7 @@
         },
         {
             "name": "phake/phake",
-            "version": "v3.1.8",
+            "version": "v3.1.9",
             "description": "The Phake mock testing library"
         },
         {
@@ -32,7 +32,7 @@
         },
         {
             "name": "roave/security-advisories",
-            "version": "dev-master 07314cf",
+            "version": "dev-master 5ffdb87",
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it"
         },
         {
@@ -52,7 +52,7 @@
         },
         {
             "name": "symfony/string",
-            "version": "v5.2.6",
+            "version": "v5.2.8",
             "description": "Provides an object-oriented API to strings and deals with bytes, UTF-8 code points and grapheme clusters in a unified way"
         },
         {
