@@ -118,6 +118,7 @@ class LinksManagerTest extends DbTestCase
             'Show Active Keys',
             'Show Pending Keys',
             'See API Usage',
+            'See API Usage By Key',
             'Email Users With Keys',
             'Edit API',
             'Delete API',
@@ -152,6 +153,7 @@ class LinksManagerTest extends DbTestCase
             'Show Active Keys',
             'Show Pending Keys',
             'See API Usage',
+            'See API Usage By Key',
             'Edit API',
             'Delete API',
         );
@@ -185,6 +187,7 @@ class LinksManagerTest extends DbTestCase
             'Show Active Keys',
             'Show Pending Keys',
             'See API Usage',
+            'See API Usage By Key',
             'Email Users With Keys',
             'Edit API',
             'Delete API',
