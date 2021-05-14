@@ -1193,4 +1193,32 @@ class ApiController extends \Controller
             'summary' => $api->getUsageSummary()
         ));
     }
+    
+    public function actionUsageByKey($code)
+    {
+        // Get the current user's model.
+        /* @var $currentUser User */
+        $currentUser = \Yii::app()->user->user;
+        
+        // Get the API by the code name.
+        /* @var $api Api */
+        $api = Api::model()->findByAttributes(['code' => $code]);
+        
+        // If that is NOT an Api that the User has permission to manage, say so.
+        if ( ! $currentUser->hasAdminPrivilegesForApi($api)) {
+            throw new \CHttpException(
+                403,
+                'That is not an API that you have permission to manage.'
+            );
+        }
+        
+        $interval = \UsageStats::INTERVAL_DAY;
+        $usageStats = $api->getUsageStatsForKeys($interval);
+        
+        // Show the page.
+        $this->render('usage-by-key', array(
+            'api' => $api,
+            'usageStats' => $usageStats,
+        ));
+    }
 }

@@ -196,6 +196,7 @@ class Controller extends CController
                     'inviteUser',
                     'pendingKeys',
                     'usage',
+                    'usageByKey',
                 ),
                 'roles' => array('owner'),
             ),
