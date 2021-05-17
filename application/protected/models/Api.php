@@ -2,11 +2,6 @@
 namespace Sil\DevPortal\models;
 
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
-use Sil\DevPortal\models\ApiVisibilityDomain;
-use Sil\DevPortal\models\ApiVisibilityUser;
-use Sil\DevPortal\models\Event;
-use Sil\DevPortal\models\Key;
-use Sil\DevPortal\models\User;
 
 /**
  * The followings are the available model relations (defined in the parent
@@ -572,6 +567,41 @@ class Api extends \ApiBase
         
         // Return the resulting data.
         return $usage;
+    }
+
+    /**
+     * Get the usage stats for the approved Keys to this Api.
+     *
+     * @param string $interval The name of the time interval (e.g. -
+     *     'second', 'minute',  'hour', 'day') by which the data should be
+     *     grouped.
+     * @param int $rewindBy (Optional:) How many intervals to "back up"
+     *     the starting point by. Used for getting older data.
+     * @return \UsageStats
+     */
+    public function getUsageStatsForKeys(string $interval, $rewindBy = 0): \UsageStats
+    {
+        // Get all of this Api's Keys.
+        $keys = Key::model()->with('user')->findAllByAttributes([
+            'status' => Key::STATUS_APPROVED,
+            'api_id' => $this->api_id,
+        ], [
+            'order' => 'user.display_name',
+        ]);
+
+        // Get the keys' usage.
+        $usageStats = new \UsageStats($interval, $rewindBy);
+        foreach ($keys as $key) {
+            try {
+                $usage = $key->getUsage($interval, true, $rewindBy);
+            } catch (\Exception $e) {
+                $usage = $e->getMessage();
+            }
+            $usageStats->addEntry($key->user->display_name, $usage);
+        }
+
+        // Return the resulting usage stats.
+        return $usageStats;
     }
     
     /**

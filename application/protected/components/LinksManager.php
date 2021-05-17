@@ -155,6 +155,15 @@ class LinksManager extends CComponent
                 'signal'
             );
             
+            $actionLinks[] = new ActionLink(
+                array(
+                    '/api/usage-by-key/',
+                    'code' => $api->code,
+                ),
+                'See API Usage By Key',
+                'signal'
+            );
+            
             if ($api->approvedKeyCount > 0) {
                 $actionLinks[] = new ActionLink(sprintf(
                     'mailto:%s?subject=%s&bcc=%s',
