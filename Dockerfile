@@ -1,4 +1,4 @@
-FROM silintl/php7-apache:7.4.16
+FROM silintl/php7-apache:7.4.19
 LABEL maintainer="matt_henderson@sil.org"
 
 RUN apt-get update -y && \
