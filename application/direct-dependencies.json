@@ -27,12 +27,12 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.5.15",
+            "version": "8.5.17",
             "description": "The PHP Unit Testing framework."
         },
         {
             "name": "roave/security-advisories",
-            "version": "dev-master 5ffdb87",
+            "version": "dev-master 1a08d0c",
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it"
         },
         {
@@ -52,7 +52,7 @@
         },
         {
             "name": "symfony/string",
-            "version": "v5.2.8",
+            "version": "v5.3.3",
             "description": "Provides an object-oriented API to strings and deals with bytes, UTF-8 code points and grapheme clusters in a unified way"
         },
         {
@@ -62,7 +62,7 @@
         },
         {
             "name": "yiisoft/yii",
-            "version": "1.1.23",
+            "version": "1.1.24",
             "description": "Yii Web Programming Framework"
         }
     ]
