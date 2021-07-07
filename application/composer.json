@@ -18,7 +18,7 @@
     },
     "require-dev": {
         "phake/phake": "^3.1",
-        "phpunit/phpunit": "^8.0",
+        "phpunit/phpunit": "^9.0",
         "roave/security-advisories": "dev-master"
     }
 }
