@@ -9,6 +9,10 @@ services:
         build: .
         image: developer-portal-local
 
+    developer-portal-apiaxle:
+        build: apiaxle/
+        image: silintl/developer-portal-apiaxle
+
     db:
         image: mariadb:10
         ports:
@@ -130,7 +134,9 @@ services:
         image: redis:latest
 
     api:
-        image: apiaxle/apiaxle:1.15.0
+        image: silintl/developer-portal-apiaxle
+        depends_on:
+            - developer-portal-apiaxle
         links:
             - redis
         ports:
@@ -138,7 +144,9 @@ services:
         command: api 80
 
     proxy:
-        image: apiaxle/apiaxle:1.15.0
+        image: silintl/developer-portal-apiaxle
+        depends_on:
+            - developer-portal-apiaxle
         links:
             - api
             - redis
