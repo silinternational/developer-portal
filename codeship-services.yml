@@ -9,6 +9,11 @@ db:
 redis:
     image: redis:latest
 
+customApiAxle:
+    build:
+        image: silintl/developer-portal-apiaxle
+        dockerfile_path: ./apiaxle/Dockerfile
+
 api:
     image: apiaxle/apiaxle:1.15.0
     environment:
@@ -24,7 +29,10 @@ api:
     command: api 80
 
 proxy:
-    image: apiaxle/apiaxle:1.15.0
+    build:
+        image: silintl/developer-portal-apiaxle
+        dockerfile_path: ./apiaxle/Dockerfile
+        cached: false
     environment:
         REDIS_HOST: redis
         REDIS_PORT: 6379

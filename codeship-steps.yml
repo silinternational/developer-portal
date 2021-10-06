@@ -2,6 +2,24 @@
   service: portal
   command: /data/run-tests.sh
 
+- name: custom_apiaxle_push_branch_tag
+  service: customApiAxle
+  type: push
+  image_name: silintl/developer-portal-apiaxle
+  image_tag: "{{.Branch}}"
+  exclude: main
+  registry: https://index.docker.io/v1/
+  encrypted_dockercfg_path: dockercfg.encrypted
+
+- name: custom_apiaxle_push_latest_tag
+  service: customApiAxle
+  type: push
+  image_name: silintl/developer-portal-apiaxle
+  image_tag: "latest"
+  tag: main
+  registry: https://index.docker.io/v1/
+  encrypted_dockercfg_path: dockercfg.encrypted
+
 - name: push_branch_tag
   service: portal
   type: push
