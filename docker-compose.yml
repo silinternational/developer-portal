@@ -7,7 +7,7 @@ services:
 
     base:
         build: .
-        image: developer-portal-local
+        image: silintl/developer-portal:local
 
     db:
         image: mariadb:10
@@ -39,7 +39,7 @@ services:
             MYSQL_PASSWORD: developer_portal
 
     web:
-        image: developer-portal-local
+        image: silintl/developer-portal:local
         depends_on:
             - base
         volumes_from:
@@ -55,7 +55,7 @@ services:
             - ./local.env
 
     composer:
-        image: developer-portal-local
+        image: silintl/developer-portal:local
         depends_on:
             - base
         volumes_from:
@@ -64,7 +64,7 @@ services:
         command: composer install --no-scripts
 
     composerupdate:
-        image: developer-portal-local
+        image: silintl/developer-portal:local
         depends_on:
             - base
         volumes_from:
@@ -73,7 +73,7 @@ services:
         command: bash -c "composer update --no-scripts; composer show --direct --format=json > direct-dependencies.json"
 
     yiimigrate:
-        image: developer-portal-local
+        image: silintl/developer-portal:local
         depends_on:
             - base
         volumes_from:
@@ -87,7 +87,7 @@ services:
         command: bash -c "whenavail db 3306 100 ./yiic migrate --interactive=0"
 
     yiimigratetestdb:
-        image: developer-portal-local
+        image: silintl/developer-portal:local
         depends_on:
             - base
         volumes_from:
@@ -104,7 +104,7 @@ services:
           MYSQL_DATABASE: test
 
     phpunit:
-        image: developer-portal-local
+        image: silintl/developer-portal:local
         depends_on:
             - base
         volumes_from:
@@ -147,7 +147,7 @@ services:
         command: proxy 80 -q
 
     axlesetup:
-        image: developer-portal-local
+        image: silintl/developer-portal:local
         depends_on:
             - base
         links:
