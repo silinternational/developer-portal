@@ -1,10 +1,10 @@
-FROM silintl/php7-apache:7.4.25
+FROM silintl/php7:7.4
 LABEL maintainer="matt_henderson@sil.org"
 
 RUN apt-get update -y && \
     apt-get install -y \
 # Needed to install s3cmd
-        python-pip && \
+        python3-pip && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
