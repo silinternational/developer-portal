@@ -46,7 +46,7 @@ Your Dockerfile should (in this order)...
 ## A Note About Semantic Versioning ##
 The environment variables that this code uses are (for the purposes of
 semantic versioning) considered this code's public interface. That is how
-backwards-compability will be determined. If a new version of this code is
+backwards-compatibility will be determined. If a new version of this code is
 released that bumps the major version number (e.g. from `1.x.y` to `2.0.0`),
 you will probably have to change something about what environment variables
 you are providing when running this Docker image.
