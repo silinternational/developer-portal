@@ -130,7 +130,7 @@ services:
         image: redis:latest
 
     api:
-        image: apiaxle/apiaxle:1.15.0
+        image: silintl/apiaxle-js:1.15.2
         links:
             - redis
         ports:
@@ -138,7 +138,7 @@ services:
         command: api 80
 
     proxy:
-        image: apiaxle/apiaxle:1.15.0
+        image: silintl/apiaxle-js:1.15.2
         links:
             - api
             - redis
