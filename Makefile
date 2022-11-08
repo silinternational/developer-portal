@@ -52,6 +52,10 @@ rmtestdb:
 	docker-compose kill testdb
 	docker-compose rm -f testdb
 
+testenv: composer rmtestdb testdb yiimigratetestdb rmapiaxle apiaxle web
+	@echo "\n\n../../vendor/bin/phpunit --testsuite DeveloperPortal\n"
+	docker-compose run --rm phpunit bash
+
 test: testunit
 
 testdb:
