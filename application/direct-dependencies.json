@@ -2,68 +2,120 @@
     "installed": [
         {
             "name": "forevermatt/calc-api-sig",
+            "direct-dependency": true,
+            "homepage": null,
+            "source": "https://github.com/forevermatt/calc-api-sig/tree/0.1.1",
             "version": "0.1.1",
-            "description": null
+            "description": null,
+            "abandoned": false
         },
         {
             "name": "guzzlehttp/guzzle",
+            "direct-dependency": true,
+            "homepage": "http://guzzlephp.org/",
+            "source": "https://github.com/guzzle/guzzle/tree/5.3",
             "version": "5.3.4",
-            "description": "Guzzle is a PHP HTTP client library and framework for building RESTful web service clients"
+            "description": "Guzzle is a PHP HTTP client library and framework for building RESTful web service clients",
+            "abandoned": false
         },
         {
             "name": "guzzlehttp/guzzle-services",
+            "direct-dependency": true,
+            "homepage": null,
+            "source": "https://github.com/guzzle/guzzle-services/tree/master",
             "version": "0.6.0",
-            "description": "Provides an implementation of the Guzzle Command library that uses Guzzle service descriptions to describe web services, serialize requests, and parse responses into easy to use model structures."
+            "description": "Provides an implementation of the Guzzle Command library that uses Guzzle service descriptions to describe web services, serialize requests, and parse responses into easy to use model structures.",
+            "abandoned": false
         },
         {
             "name": "hybridauth/hybridauth",
+            "direct-dependency": true,
+            "homepage": "https://hybridauth.github.io",
+            "source": "https://github.com/hybridauth/hybridauth/tree/3.7.1",
             "version": "3.7.1",
-            "description": "PHP Social Authentication Library"
+            "description": "PHP Social Authentication Library",
+            "abandoned": false
         },
         {
             "name": "phake/phake",
+            "direct-dependency": true,
+            "homepage": "https://github.com/mlively/Phake",
+            "source": "https://github.com/phake/phake/tree/v3.1.9",
             "version": "v3.1.9",
-            "description": "The Phake mock testing library"
+            "description": "The Phake mock testing library",
+            "abandoned": false
         },
         {
             "name": "phpunit/phpunit",
+            "direct-dependency": true,
+            "homepage": "https://phpunit.de/",
+            "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.6",
             "version": "9.5.6",
-            "description": "The PHP Unit Testing framework."
+            "description": "The PHP Unit Testing framework.",
+            "abandoned": false
         },
         {
             "name": "roave/security-advisories",
+            "direct-dependency": true,
+            "homepage": null,
+            "source": "https://github.com/Roave/SecurityAdvisories/tree/latest",
             "version": "dev-master 1a08d0c",
-            "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it"
+            "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it",
+            "abandoned": false
         },
         {
             "name": "silinternational/apiaxle-sdk-php",
+            "direct-dependency": true,
+            "homepage": null,
+            "source": "https://github.com/silinternational/apiaxle-sdk-php/tree/master",
             "version": "1.0.3",
-            "description": "PHP client for ApiAxle APIs"
+            "description": "PHP client for ApiAxle APIs",
+            "abandoned": false
         },
         {
             "name": "silinternational/php-env",
+            "direct-dependency": true,
+            "homepage": null,
+            "source": "https://github.com/silinternational/php-env/tree/0.2.0",
             "version": "0.2.0",
-            "description": null
+            "description": null,
+            "abandoned": false
         },
         {
             "name": "simplesamlphp/simplesamlphp",
+            "direct-dependency": true,
+            "homepage": "http://simplesamlphp.org",
+            "source": "https://github.com/simplesamlphp/simplesamlphp",
             "version": "v1.18.8",
-            "description": "A PHP implementation of a SAML 2.0 service provider and identity provider, also compatible with Shibboleth 1.3 and 2.0."
+            "description": "A PHP implementation of a SAML 2.0 service provider and identity provider, also compatible with Shibboleth 1.3 and 2.0.",
+            "abandoned": false
         },
         {
             "name": "symfony/string",
+            "direct-dependency": true,
+            "homepage": "https://symfony.com",
+            "source": "https://github.com/symfony/string/tree/v5.3.3",
             "version": "v5.3.3",
-            "description": "Provides an object-oriented API to strings and deals with bytes, UTF-8 code points and grapheme clusters in a unified way"
+            "description": "Provides an object-oriented API to strings and deals with bytes, UTF-8 code points and grapheme clusters in a unified way",
+            "abandoned": false
         },
         {
             "name": "symfony/translation-contracts",
+            "direct-dependency": true,
+            "homepage": "https://symfony.com",
+            "source": "https://github.com/symfony/translation-contracts/tree/v2.4.0",
             "version": "v2.4.0",
-            "description": "Generic abstractions related to translation"
+            "description": "Generic abstractions related to translation",
+            "abandoned": false
         },
         {
             "name": "yiisoft/yii",
+            "direct-dependency": true,
+            "homepage": "http://www.yiiframework.com/",
+            "source": "https://github.com/yiisoft/yii",
             "version": "1.1.24",
-            "description": "Yii Web Programming Framework"
+            "description": "Yii Web Programming Framework",
+            "abandoned": false
         }
     ]
 }

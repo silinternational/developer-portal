@@ -8,17 +8,22 @@
         "symfony/string": "^5.2",
         "symfony/translation-contracts": "^1.1|^2", 
         "yiisoft/yii": "~1.1.21",
-        "guzzlehttp/guzzle": "^5",
-        "forevermatt/calc-api-sig": "0.1.1",
+        "guzzlehttp/guzzle": "^5 || ^6.5 || ^7.4",
+        "forevermatt/calc-api-sig": "^0.1.1",
         "hybridauth/hybridauth": "^3.6.0",
-        "silinternational/php-env": "0.*",
-        "silinternational/apiaxle-sdk-php": "^1.0",
-        "simplesamlphp/simplesamlphp": "~1.18.6",
-        "guzzlehttp/guzzle-services": "^0.6"
+        "silinternational/php-env": "0.* || ^2.1 || ^3.0",
+        "silinternational/apiaxle-sdk-php": "dev-feature/newVersion",
+        "simplesamlphp/simplesamlphp": "~1.18.6 || ^1.19",
+        "guzzlehttp/guzzle-services": "^0.6 || ^1.0"
     },
     "require-dev": {
         "phake/phake": "^3.1",
         "phpunit/phpunit": "^9.0",
         "roave/security-advisories": "dev-master"
+    },
+    "config": {
+        "allow-plugins": {
+            "simplesamlphp/composer-module-installer": true
+        }
     }
 }
