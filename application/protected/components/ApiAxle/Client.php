@@ -118,7 +118,7 @@ class Client extends BaseClient
         $response = $this->keyring()->delete(['id' => $keyringName]);
         return $this->getDataFromResponse($response);
     }
-    
+
     /**
      * Get the information about the specified API (or null if no such API was
      * found).
@@ -135,13 +135,18 @@ class Client extends BaseClient
                 $this->getDataFromResponse($response)
             );
         } catch (\Exception $e) {
-            if ($e->getCode() === 404) {
+            if (self::got404($e)) {
                 return null;
             }
             $this->throwWithBetterMessage($e);
         }
     }
-    
+
+    private function got404(\Exception $e) {
+        return ($e->getCode() === 404 ||
+            str_contains($e->getMessage(), "resulted in a `404 Not Found`"));
+    }
+
     /**
      * Get usage statistics for the specified API.
      * 
@@ -204,7 +209,7 @@ class Client extends BaseClient
             $response = $this->key()->get(['id' => $keyValue]);
             return new KeyInfo($keyValue, $this->getDataFromResponse($response));
         } catch (\Exception $e) {
-            if ($e->getCode() === 404) {
+            if (self::got404($e)) {
                 return null;
             }
             $this->throwWithBetterMessage($e);
@@ -252,7 +257,7 @@ class Client extends BaseClient
             $this->keyring()->get(['id' => $keyringName]);
             return true;
         } catch (\Exception $e) {
-            if ($e->getCode() === 404) {
+            if (self::got404($e)) {
                 return false;
             }
             $this->throwWithBetterMessage($e);
