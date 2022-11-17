@@ -142,7 +142,7 @@ class Client extends BaseClient
         }
     }
 
-    private function got404(\Exception $e) {
+    private static function got404(\Exception $e) {
         return ($e->getCode() === 404 ||
             str_contains($e->getMessage(), "resulted in a `404 Not Found`"));
     }
