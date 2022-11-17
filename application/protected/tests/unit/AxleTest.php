@@ -378,7 +378,7 @@ class AxleTest extends DeveloperPortalTestCase
                 $response = $client->request('GET', $url, $paramsCollection);
                 $responseData = json_decode($response->getBody());
 
-               if ($responseData->meta->status_code == 403) {
+                if ($responseData->meta->status_code == 403) {
                     $foundInvalidSignatureOffset = true;
                 } else {
                     $lastValidSignatureOffset = $i;
