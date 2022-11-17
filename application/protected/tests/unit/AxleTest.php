@@ -3,7 +3,7 @@
 use Sil\DevPortal\components\ApiAxle\ApiInfo;
 use Sil\DevPortal\components\ApiAxle\KeyInfo;
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
-use Sil\DevPortal\components\Http\ClientG6 as HttpClient;
+use Sil\DevPortal\components\Http\ClientG7 as HttpClient;
 use Sil\DevPortal\components\Http\ParamsCollection;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\Key;

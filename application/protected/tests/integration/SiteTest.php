@@ -1,7 +1,7 @@
 <?php
 namespace Sil\DevPortal\tests\integration;
 
-use Sil\DevPortal\components\Http\ClientG6 as HttpClient;
+use Sil\DevPortal\components\Http\ClientG7 as HttpClient;
 use Sil\DevPortal\tests\TestCase;
 
 class SiteTest extends TestCase
