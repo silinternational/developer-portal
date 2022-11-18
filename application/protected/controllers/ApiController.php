@@ -1,7 +1,7 @@
 <?php
 namespace Sil\DevPortal\controllers;
 
-use Sil\DevPortal\components\Http\ClientG5 as Client;
+use Sil\DevPortal\components\Http\ClientG7 as Client;
 use Sil\DevPortal\components\Http\ParamsCollection;
 use Sil\DevPortal\components\Http\Response;
 use Sil\DevPortal\models\Api;
