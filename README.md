@@ -19,6 +19,7 @@ Your Dockerfile should (in this order)...
 
 ### Example Dockerfile using this as the FROM ###
 
+    # Change 4.0.1 to the latest tagged version or whichever you want to have
     FROM silintl/developer-portal:4.0.1
     
     ENV REFRESHED_AT 2021-04-08
