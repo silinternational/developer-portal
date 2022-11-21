@@ -10,7 +10,7 @@ redis:
     image: redis:latest
 
 api:
-    image: apiaxle/apiaxle:1.15.0
+    image: silintl/apiaxle-js:1.15.2
     environment:
         REDIS_HOST: redis
         REDIS_PORT: 6379
@@ -24,7 +24,7 @@ api:
     command: api 80
 
 proxy:
-    image: apiaxle/apiaxle:1.15.0
+    image: silintl/apiaxle-js:1.15.2
     environment:
         REDIS_HOST: redis
         REDIS_PORT: 6379

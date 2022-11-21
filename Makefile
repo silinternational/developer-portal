@@ -57,6 +57,10 @@ test: testunit
 testdb:
 	docker-compose up -d testdb
 
+testenv: composer rmtestdb testdb yiimigratetestdb rmapiaxle apiaxle web
+	@echo "\n\n../../vendor/bin/phpunit --testsuite DeveloperPortal\n"
+	docker-compose run --rm phpunit bash
+
 testunit: composer rmtestdb testdb yiimigratetestdb rmapiaxle apiaxle web phpunit
 
 web: apiaxle db composer yiimigrate

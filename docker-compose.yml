@@ -70,7 +70,7 @@ services:
         volumes_from:
             - data
         working_dir: /data
-        command: bash -c "composer update --no-scripts; composer show --direct --format=json > direct-dependencies.json"
+        command: bash -c "composer update --no-scripts; composer show --direct > direct-dependencies.txt"
 
     yiimigrate:
         image: silintl/developer-portal:local
@@ -130,7 +130,7 @@ services:
         image: redis:latest
 
     api:
-        image: apiaxle/apiaxle:1.15.0
+        image: silintl/apiaxle-js:1.15.2
         links:
             - redis
         ports:
@@ -138,7 +138,7 @@ services:
         command: api 80
 
     proxy:
-        image: apiaxle/apiaxle:1.15.0
+        image: silintl/apiaxle-js:1.15.2
         links:
             - api
             - redis

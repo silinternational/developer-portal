@@ -3,7 +3,8 @@
 use Sil\DevPortal\components\ApiAxle\ApiInfo;
 use Sil\DevPortal\components\ApiAxle\KeyInfo;
 use Sil\DevPortal\components\ApiAxle\Client as ApiAxleClient;
-use Sil\DevPortal\components\Http\ClientG5 as HttpClient;
+use Sil\DevPortal\components\Http\ClientG7 as HttpClient;
+use Sil\DevPortal\components\Http\ParamsCollection;
 use Sil\DevPortal\models\Api;
 use Sil\DevPortal\models\Key;
 use Sil\DevPortal\models\User;
@@ -338,13 +339,13 @@ class AxleTest extends DeveloperPortalTestCase
             $key->requiresSignature(),
             'This test requires a key to an API that requires a signature.'
         );
-        $urlMinusSignature = sprintf(
-            '%s://%s.%s/?api_key=%s&api_sig=',
+        $url = sprintf(
+            '%s://%s.%s',
             $key->api->getApiProxyProtocol(),
             $key->api->code,
-            $key->api->getApiProxyDomain(),
-            $key->value
+            $key->api->getApiProxyDomain()
         );
+
         $client = new HttpClient();
         foreach ([3, Api::SIGNATURE_WINDOW_MAX] as $signatureWindow) {
             $key->api->signature_window = $signatureWindow;
@@ -361,9 +362,22 @@ class AxleTest extends DeveloperPortalTestCase
                     time() + $i
                 );
 
+                $paramsCollection = new ParamsCollection();
+                $paramsCollection->addParam(
+                    ParamsCollection::TYPE_QUERY,
+                    'api_key',
+                    $key->value
+                );
+                $paramsCollection->addParam(
+                    ParamsCollection::TYPE_QUERY,
+                    'api_sig',
+                    $signature
+                );
+
                 // Act:
-                $response = $client->request('GET', $urlMinusSignature . $signature);
+                $response = $client->request('GET', $url, $paramsCollection);
                 $responseData = json_decode($response->getBody());
+
                 if ($responseData->meta->status_code == 403) {
                     $foundInvalidSignatureOffset = true;
                 } else {
@@ -691,10 +705,17 @@ class AxleTest extends DeveloperPortalTestCase
         $this->assertTrue($key->save());
         
         $url = sprintf(
-            '%s://%s.%s/?api_key=%s',
+            '%s://%s.%s/',
             $key->api->getApiProxyProtocol(),
             $key->api->code,
-            $key->api->getApiProxyDomain(),
+            $key->api->getApiProxyDomain()
+        );
+
+
+        $paramsCollection = new ParamsCollection();
+        $paramsCollection->addParam(
+            ParamsCollection::TYPE_QUERY,
+            'api_key',
             $key->value
         );
         
@@ -702,7 +723,7 @@ class AxleTest extends DeveloperPortalTestCase
         $preStats = $key->getUsage(UsageStats::INTERVAL_SECOND);
         
         // Act:
-        $httpClient->request('GET', $url);
+        $httpClient->request('GET', $url, $paramsCollection);
         $postStats = $key->getUsage(UsageStats::INTERVAL_SECOND);
         
         // Assert:
