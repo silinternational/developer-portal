@@ -85,6 +85,31 @@ If using Vagrant:
 If using Docker directly (without Vagrant):  
 ```127.0.0.1 your-domain-name```
 
+### Local API for development/testing
+
+If you want to add an API to the developer portal locally, such as for
+development or manual testing...
+
+1. Bring up the developer portal: `make`
+2. Bring up phpMyAdmin: `make phpmyadmin`
+3. Bring up httpbin: `make httpbin`
+4. Log in to the developer portal (e.g. <http://localhost/> or your custom domain name)
+5. Log in to phpMyAdmin:
+   - Go to <http://localhost:8001>
+   - Use `developer_portal` as the username and password
+   - Change your user record's `role` to "admin"
+6. In the developer portal, add an API:
+   - When logged into the local developer portal, click "Browse APIs"
+   - Click the "Publish a new API" button
+   - Use `test` as the API code name, `httpbin` as the Endpoint, "HTTP" as the
+     Endpoint Protocol, and whatever you want for the other values
+   - Click the "Save" button
+7. Grant yourself a key to that API ("Actions" > "Get/Request Key", etc.)
+8. Click the "API Playground" link in the header menu
+9. Put `/anything` in the Path field (literally) and submit the form
+10. You should see an API response (at the bottom) from the local httpbin docker
+    container.
+
 ## Troubleshooting ##
 If you try to access <http://your-domain-name/phpmyadmin/> and get the following 
 error... 
