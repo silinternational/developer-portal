@@ -127,7 +127,7 @@ services:
           SAML_IDP: NONE
 
     redis:
-        image: redis:latest
+        image: redis:6
 
     api:
         image: silintl/apiaxle-js:1.15.2
