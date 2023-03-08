@@ -25,6 +25,9 @@ composerupdate:
 db:
 	docker-compose up -d db
 
+httpbin:
+	docker-compose up -d httpbin
+
 phpmyadmin:
 	docker-compose up -d phpmyadmin
 

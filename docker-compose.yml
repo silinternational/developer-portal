@@ -20,7 +20,7 @@ services:
             MYSQL_PASSWORD: developer_portal
 
     phpmyadmin:
-        image: phpmyadmin/phpmyadmin:latest
+        image: phpmyadmin/phpmyadmin:5
         ports:
             - "8001:80"
         depends_on:
@@ -127,7 +127,7 @@ services:
           SAML_IDP: NONE
 
     redis:
-        image: redis:latest
+        image: redis:6
 
     api:
         image: silintl/apiaxle-js:1.15.2
@@ -157,3 +157,6 @@ services:
         volumes:
             - ./build/setup-apiaxle.sh:/usr/local/bin/setup-apiaxle.sh
         command: setup-apiaxle.sh
+
+    httpbin:
+        image: kennethreitz/httpbin:latest
