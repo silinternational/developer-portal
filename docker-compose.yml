@@ -157,3 +157,6 @@ services:
         volumes:
             - ./build/setup-apiaxle.sh:/usr/local/bin/setup-apiaxle.sh
         command: setup-apiaxle.sh
+
+    httpbin:
+        image: kennethreitz/httpbin:latest
