@@ -20,7 +20,7 @@ services:
             MYSQL_PASSWORD: developer_portal
 
     phpmyadmin:
-        image: phpmyadmin/phpmyadmin:5
+        image: phpmyadmin:5
         ports:
             - "8001:80"
         depends_on:

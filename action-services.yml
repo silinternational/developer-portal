@@ -1,0 +1,63 @@
+services:
+  db:
+    image: mariadb:10
+    environment:
+      MYSQL_ROOT_PASSWORD: r00tp@ss!
+      MYSQL_DATABASE: test
+      MYSQL_USER: developer_portal
+      MYSQL_PASSWORD: developer_portal
+
+  redis:
+    image: redis:latest
+
+  api:
+    image: silintl/apiaxle-js:1.15.2
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DEBUG_MODE: 'false'
+      API_NAME_REGEX: "^(.+?)\\.api\\."
+      NODE_ENV: production
+    links:
+    - redis
+    ports:
+    - "80"
+    command: api 80
+
+  proxy:
+    image: silintl/apiaxle-js:1.15.2
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DEBUG_MODE: 'false'
+      API_NAME_REGEX: "^(.+?)\\.api\\."
+      NODE_ENV: production
+    links:
+    - api
+    - redis
+    ports:
+    - "80"
+    command: proxy 80 -q
+
+  portal:
+    build: .
+    links:
+    - db
+    - proxy:apiaxle.api.proxy
+    - proxy:test.api.proxy
+    - api
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: test
+      MYSQL_USER: developer_portal
+      MYSQL_PASSWORD: developer_portal
+      APIAXLE_ENDPOINT: http://apiaxle.api.proxy/v1
+      APIAXLE_KEY: developer-portal-dev-key
+      APIAXLE_SECRET: developer-portal-dev-secret
+      APIAXLE_SSL_VERIFYPEER: 'false'
+      GOOGLE_OAUTH_ENABLED: 'false'
+      SAML_ENTITY_ID: http://developer-portal.local/simplesaml/module.php/saml/sp/metadata.php/default-sp
+      SAML_ADMIN_PASSWORD: dummy-for-tests-q6.eYWtfLF-BTQXf-OktD5lVFCOFyC4B
+      SAML_SECRET_SALT: dummy-for-tests-Ac4MTgO9UJ6_wpXXKc6EGU_.gWNNkdMe
+      SAML_IDP: NONE
+    working_dir: /data
