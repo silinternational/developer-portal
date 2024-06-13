@@ -12,6 +12,7 @@ $mysqlDatabase = Env::get('MYSQL_DATABASE');
 $mysqlUser = Env::get('MYSQL_USER');
 $mysqlPassword = Env::get('MYSQL_PASSWORD');
 $mailerHostname = Env::get('MAILER_HOSTNAME', 'smtp.gmail.com');
+$mailerFromEmail = Env::get('MAILER_FROM_EMAIL', 'no_reply@example.com');
 $mailerUsername = Env::get('MAILER_USERNAME', false); // Defaults to false to mimic previous getenv() behavior.
 $mailerPassword = Env::get('MAILER_PASSWORD', false); // Defaults to false to mimic previous getenv() behavior.
 $appEnv = Env::get('APPLICATION_ENV', 'not set');
@@ -212,7 +213,7 @@ return array(
         'smtp' => array(
             'host' => $mailerHostname,
             'port' => 465,
-            'fromEmail' => $mailerUsername,
+            'fromEmail' => $mailerFromEmail,
             'fromName' => 'API Admin (no-reply)',
             'auth' => true,
             'secure' => 'ssl',
