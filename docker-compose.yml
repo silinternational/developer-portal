@@ -1,10 +1,4 @@
-version: '2'
 services:
-    data:
-        image: silintl/data-volume:latest
-        volumes:
-            - ./application:/data
-
     base:
         build: .
         image: silintl/developer-portal:local
@@ -42,8 +36,8 @@ services:
         image: silintl/developer-portal:local
         depends_on:
             - base
-        volumes_from:
-            - data
+        volumes:
+            - ./application:/data
         ports:
             - "80:80"
         links:
@@ -58,26 +52,16 @@ services:
         image: silintl/developer-portal:local
         depends_on:
             - base
-        volumes_from:
-            - data
+        volumes:
+            - ./application:/data
         working_dir: /data
-        command: composer install --no-scripts
-
-    composerupdate:
-        image: silintl/developer-portal:local
-        depends_on:
-            - base
-        volumes_from:
-            - data
-        working_dir: /data
-        command: bash -c "composer update --no-scripts; composer show --direct > direct-dependencies.txt"
 
     yiimigrate:
         image: silintl/developer-portal:local
         depends_on:
             - base
-        volumes_from:
-            - data
+        volumes:
+            - ./application:/data
         links:
             - db
         env_file:
@@ -90,8 +74,8 @@ services:
         image: silintl/developer-portal:local
         depends_on:
             - base
-        volumes_from:
-            - data
+        volumes:
+            - ./application:/data
         links:
             - testdb
         env_file:
@@ -107,8 +91,8 @@ services:
         image: silintl/developer-portal:local
         depends_on:
             - base
-        volumes_from:
-            - data
+        volumes:
+            - ./application:/data
         links:
             - testdb
             - proxy:apiaxle.api.proxy
@@ -131,6 +115,7 @@ services:
 
     api:
         image: silintl/apiaxle-js:1.15.2
+        platform: linux/amd64
         links:
             - redis
         ports:
@@ -139,6 +124,7 @@ services:
 
     proxy:
         image: silintl/apiaxle-js:1.15.2
+        platform: linux/amd64
         links:
             - api
             - redis
