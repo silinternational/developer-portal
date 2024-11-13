@@ -125,6 +125,7 @@ services:
 
     api:
         image: silintl/apiaxle-js:1.15.2
+        platform: linux/amd64
         links:
             - redis
         ports:
@@ -133,6 +134,7 @@ services:
 
     proxy:
         image: silintl/apiaxle-js:1.15.2
+        platform: linux/amd64
         links:
             - api
             - redis
