@@ -17,7 +17,7 @@
   },
   {
     "name": "guzzlehttp/guzzle",
-    "version": "7.8.0"
+    "version": "7.8.1"
   },
   {
     "name": "guzzlehttp/guzzle-services",
@@ -37,7 +37,7 @@
   },
   {
     "name": "hybridauth/hybridauth",
-    "version": "v3.10.0"
+    "version": "v3.11.0"
   },
   {
     "name": "phpfastcache/riak-client",
@@ -89,11 +89,11 @@
   },
   {
     "name": "silinternational/apiaxle-sdk-php",
-    "version": "2.0.1"
+    "version": "2.0.2"
   },
   {
     "name": "silinternational/php-env",
-    "version": "3.1.0"
+    "version": "3.2.0"
   },
   {
     "name": "simplesamlphp/assert",
@@ -277,7 +277,7 @@
   },
   {
     "name": "symfony/http-foundation",
-    "version": "v5.4.31"
+    "version": "v5.4.46"
   },
   {
     "name": "symfony/http-kernel",
@@ -325,11 +325,11 @@
   },
   {
     "name": "symfony/string",
-    "version": "v5.4.31"
+    "version": "v5.4.47"
   },
   {
     "name": "symfony/translation-contracts",
-    "version": "v2.5.2"
+    "version": "v2.5.3"
   },
   {
     "name": "symfony/var-dumper",
@@ -361,6 +361,6 @@
   },
   {
     "name": "yiisoft/yii",
-    "version": "1.1.29"
+    "version": "1.1.30"
   }
 ]
