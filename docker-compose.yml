@@ -1,9 +1,4 @@
 services:
-    data:
-        image: silintl/data-volume:latest
-        volumes:
-            - ./application:/data
-
     base:
         build: .
         image: silintl/developer-portal:local
@@ -41,8 +36,8 @@ services:
         image: silintl/developer-portal:local
         depends_on:
             - base
-        volumes_from:
-            - data
+        volumes:
+            - ./application:/data
         ports:
             - "80:80"
         links:
@@ -57,8 +52,8 @@ services:
         image: silintl/developer-portal:local
         depends_on:
             - base
-        volumes_from:
-            - data
+        volumes:
+            - ./application:/data
         working_dir: /data
         command: composer install --no-scripts
 
@@ -66,8 +61,8 @@ services:
         image: silintl/developer-portal:local
         depends_on:
             - base
-        volumes_from:
-            - data
+        volumes:
+            - ./application:/data
         working_dir: /data
         command: bash -c "composer update --no-scripts; composer show --direct > direct-dependencies.txt"
 
@@ -75,8 +70,8 @@ services:
         image: silintl/developer-portal:local
         depends_on:
             - base
-        volumes_from:
-            - data
+        volumes:
+            - ./application:/data
         links:
             - db
         env_file:
@@ -89,8 +84,8 @@ services:
         image: silintl/developer-portal:local
         depends_on:
             - base
-        volumes_from:
-            - data
+        volumes:
+            - ./application:/data
         links:
             - testdb
         env_file:
@@ -106,8 +101,8 @@ services:
         image: silintl/developer-portal:local
         depends_on:
             - base
-        volumes_from:
-            - data
+        volumes:
+            - ./application:/data
         links:
             - testdb
             - proxy:apiaxle.api.proxy
