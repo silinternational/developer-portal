@@ -17,10 +17,14 @@ clean:
 	docker compose rm -f
 
 composer:
-	docker compose run --rm composer
+	docker compose run --rm composer composer install --no-scripts
+
+composershow:
+	docker compose run --rm composer bash -c 'composer show --format=json --no-dev --no-ansi --locked | jq "[.locked[] | { \"name\": .name, \"version\": .version }]" > dependencies.json'
 
 composerupdate:
-	docker compose run --rm composerupdate
+	docker compose run --rm composer composer update --no-scripts
+	make composershow
 
 db:
 	docker compose up -d db

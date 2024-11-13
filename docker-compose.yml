@@ -55,16 +55,6 @@ services:
         volumes:
             - ./application:/data
         working_dir: /data
-        command: composer install --no-scripts
-
-    composerupdate:
-        image: silintl/developer-portal:local
-        depends_on:
-            - base
-        volumes:
-            - ./application:/data
-        working_dir: /data
-        command: bash -c "composer update --no-scripts; composer show --direct > direct-dependencies.txt"
 
     yiimigrate:
         image: silintl/developer-portal:local
