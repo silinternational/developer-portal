@@ -19,8 +19,12 @@ clean:
 composer:
 	docker compose run --rm composer composer install --no-scripts
 
+composershow:
+	docker compose run --rm composer bash -c 'composer show --format=json --no-dev --no-ansi --locked | jq "[.locked[] | { \"name\": .name, \"version\": .version }]" > dependencies.json'
+
 composerupdate:
-	docker compose run --rm composer bash -c "composer update --no-scripts; composer show --direct > direct-dependencies.txt"
+	docker compose run --rm composer composer update --no-scripts
+	make composershow
 
 db:
 	docker compose up -d db
