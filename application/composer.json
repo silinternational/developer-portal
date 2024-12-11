@@ -19,10 +19,5 @@
         "phake/phake": "^3.1",
         "phpunit/phpunit": "^9.0",
         "roave/security-advisories": "dev-master"
-    },
-    "config": {
-        "allow-plugins": {
-            "simplesamlphp/composer-module-installer": true
-        }
     }
 }

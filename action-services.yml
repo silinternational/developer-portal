@@ -56,8 +56,4 @@ services:
       APIAXLE_SECRET: developer-portal-dev-secret
       APIAXLE_SSL_VERIFYPEER: 'false'
       GOOGLE_OAUTH_ENABLED: 'false'
-      SAML_ENTITY_ID: http://developer-portal.local/simplesaml/module.php/saml/sp/metadata.php/default-sp
-      SAML_ADMIN_PASSWORD: dummy-for-tests-q6.eYWtfLF-BTQXf-OktD5lVFCOFyC4B
-      SAML_SECRET_SALT: dummy-for-tests-Ac4MTgO9UJ6_wpXXKc6EGU_.gWNNkdMe
-      SAML_IDP: NONE
     working_dir: /data
