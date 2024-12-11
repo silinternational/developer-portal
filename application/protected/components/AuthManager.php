@@ -17,7 +17,6 @@ class AuthManager
      */
     private $knownAuthTypes = array(
         'hybrid' => '\Sil\DevPortal\components\HybridAuthUserIdentity',
-        'saml' => '\Sil\DevPortal\components\SamlUserIdentity',
         'test-owner' => '\Sil\DevPortal\components\OwnerTestUserIdentity',
         'test-user' => '\Sil\DevPortal\components\UserTestUserIdentity',
     );
@@ -102,10 +101,6 @@ class AuthManager
     {
         $defaultProvider = null;
         switch ($authType) {
-            case 'saml':
-                $defaultProvider = 'SAML';
-                break;
-                
             case 'hybrid':
                 $hybridAuthManager = new HybridAuthManager();
                 $enabledProviders = $hybridAuthManager->getEnabledProvidersList();
@@ -132,7 +127,7 @@ class AuthManager
      * authentication. Throws an InvalidArgumentException if an unknown auth
      * type is provided.
      * 
-     * @param string $authType The authentication type (eg: 'saml', 'hybrid').
+     * @param string $authType The authentication type (eg: 'hybrid').
      * @return UserIdentity An instance of the correct subclass of
      *     <code>\Sil\DevPortal\components\UserIdentity</code>.
      * @throws \InvalidArgumentException
@@ -231,13 +226,6 @@ class AuthManager
     public function getLoginOptions()
     {
         $loginOptions = array();
-        if ($this->isAuthTypeEnabled('saml')) {
-            $loginOptions[] = new LoginOption(
-                'saml',
-                null,
-                \Yii::app()->params['saml']['idpName']
-            );
-        }
         if ($this->isAuthTypeEnabled('hybrid')) {
             $hybridAuthManager = new HybridAuthManager();
             foreach ($hybridAuthManager->getEnabledProvidersList() as $provider) {
@@ -266,8 +254,6 @@ class AuthManager
     public function isAuthTypeEnabled($authType)
     {
         switch ($authType) {
-            case 'saml':
-                return $this->isSamlAuthEnabled();
             case 'hybrid':
                 return $this->isHybridAuthEnabled();
             case 'test-user':
@@ -285,12 +271,7 @@ class AuthManager
         $hybridAuthManager = new HybridAuthManager();
         return $hybridAuthManager->isHybridAuthEnabled();
     }
-    
-    protected function isSamlAuthEnabled()
-    {
-        return \Yii::app()->params['saml']['enabled'];
-    }
-    
+
     protected function isTestAuthEnabled()
     {
         $applicationEnv = $this->getApplicationEnv();
@@ -308,19 +289,6 @@ class AuthManager
      */
     public function logout($webUser)
     {
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            /*
-             * Switch back to interacting with the Yii session (rather than the
-             * SimpleSMLphp session) so that we can log the user out of our local
-             * Yii application.
-             *
-             * We only began needing to do this when we upgraded from SimpleSAMLphp
-             * 1.16.3 to 1.17.2.
-             */
-            $sspSession = \SimpleSAML\Session::getSessionFromRequest();
-            $sspSession->cleanup();
-        }
-        
         $authType = $webUser->getAuthType();
         
         if ($authType) {

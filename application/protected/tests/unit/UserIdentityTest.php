@@ -96,7 +96,7 @@ class UserIdentityTest extends DbTestCase
     {
         // Arrange:
         $userAuthData = new UserAuthenticationData(
-            'SAML',
+            'Google',
             uniqid(),
             '', // Empty string as (intentionally invalid) email address.
             'Test',
@@ -128,7 +128,7 @@ class UserIdentityTest extends DbTestCase
             microtime(true)
         );
         $userAuthData = new UserAuthenticationData(
-            'SAML',
+            'Google',
             uniqid(),
             $newEmailAddress,
             'Test',
@@ -166,7 +166,7 @@ class UserIdentityTest extends DbTestCase
         // Arrange:
         $dataFromExistingUser = $this->users['user1'];
         $userAuthData = new UserAuthenticationData(
-            'SAML',
+            'Google',
             uniqid(),
             $dataFromExistingUser['email'],
             $dataFromExistingUser['first_name'],
@@ -194,7 +194,7 @@ class UserIdentityTest extends DbTestCase
     public function testFindUserRecord_existingUser()
     {
         // Arrange:
-        $existingUser = $this->users('userFromSAML');
+        $existingUser = $this->users('normalUserWithNoKeys');
         $userAuthData = \Phake::mock('\Sil\DevPortal\components\UserAuthenticationData');
         \Phake::when($userAuthData)->getAuthProvider->thenReturn(
             $existingUser->auth_provider
@@ -224,7 +224,7 @@ class UserIdentityTest extends DbTestCase
         // Arrange:
         $userAuthData = \Phake::mock('\Sil\DevPortal\components\UserAuthenticationData');
         \Phake::when($userAuthData)->getAuthProvider->thenReturn(
-            'SAML'
+            'Google'
         );
         \Phake::when($userAuthData)->getAuthProviderUserIdentifier->thenReturn(
             'fake-identifier-1461943872'
@@ -329,7 +329,7 @@ class UserIdentityTest extends DbTestCase
         $userIdentity = \Phake::mock('Sil\DevPortal\components\UserIdentity');
         \Phake::when($userIdentity)->loadIdentity->thenCallParent();
         \Phake::when($userIdentity)->getAuthType->thenReturn($authType);
-        $user = $this->users('userFromSAML');
+        $user = $this->users('normalUserWithNoKeys');
         $accessGroups = array('test access_group', 'other-test_ACCESS-group');
         $uuid = uniqid(); // Dummy value for uuid.
         
@@ -396,7 +396,7 @@ class UserIdentityTest extends DbTestCase
         // Arrange:
         $tempUniqueId = uniqid();
         $userAuthData = new UserAuthenticationData(
-            'SAML',
+            'Google',
             'fake-identifier-1461943899',
             $tempUniqueId . '@jaars.net',
             'Some Test',
@@ -424,7 +424,7 @@ class UserIdentityTest extends DbTestCase
     {
         // Arrange:
         /* @var $user User */
-        $user = $this->users('userFromSAML');
+        $user = $this->users('normalUserWithNoKeys');
         $newFirstName = uniqid(); // Random value.
         $newLastName = uniqid(); // Random value.
         $newDisplayName = uniqid(); // Random value.
@@ -513,9 +513,9 @@ class UserIdentityTest extends DbTestCase
     {
         // Arrange:
         /* @var $user User */
-        $user = $this->users('userFromSAML');
+        $user = $this->users('normalUserWithNoKeys');
         $userAuthData = new UserAuthenticationData(
-            'Google',
+            'GitHub',
             uniqid(),
             $user->email,
             $user->first_name,
