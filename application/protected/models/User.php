@@ -24,7 +24,6 @@ class User extends \UserBase
     const AUTH_PROVIDER_BITBUCKET = 'Bitbucket';
     const AUTH_PROVIDER_GITHUB = 'GitHub';
     const AUTH_PROVIDER_GOOGLE = 'Google';
-    const AUTH_PROVIDER_SAML = 'SAML';
     const AUTH_PROVIDER_TEST = 'TEST';
     
     const ROLE_USER = 'user';
@@ -714,7 +713,6 @@ class User extends \UserBase
             self::AUTH_PROVIDER_BITBUCKET,
             self::AUTH_PROVIDER_GITHUB,
             self::AUTH_PROVIDER_GOOGLE,
-            self::AUTH_PROVIDER_SAML,
             self::AUTH_PROVIDER_TEST,
         );
     }

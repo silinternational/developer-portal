@@ -7,11 +7,6 @@ cd /data
 echo "Installing dev dependencies..."
 runny composer install --no-scripts --no-interaction
 
-mkdir -p -v /data/vendor/simplesamlphp/simplesamlphp/cert
-cp /tmp/ssp-overrides/cert/* /data/vendor/simplesamlphp/simplesamlphp/cert
-cp /tmp/ssp-overrides/config/* /data/vendor/simplesamlphp/simplesamlphp/config
-cp /tmp/ssp-overrides/metadata/* /data/vendor/simplesamlphp/simplesamlphp/metadata
-
 # Run database migrations
 echo -e "Waiting for db to run migrations...\n\n"
 START=`date +%s`

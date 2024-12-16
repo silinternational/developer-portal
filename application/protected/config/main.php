@@ -36,10 +36,6 @@ $googleOAuthClientId = Env::get('GOOGLE_OAUTH_CLIENT_ID');
 $googleOAuthClientSecret = Env::get('GOOGLE_OAUTH_CLIENT_SECRET');
 $googleOAuthEnabled = Env::get('GOOGLE_OAUTH_ENABLED', false);
 $hidePublicApisFromGuests = Env::get('HIDE_PUBLIC_APIS_FROM_GUESTS', false);
-$samlEnabled = Env::get('SAML_ENABLED', false);
-$samlIdpEntityId = Env::get('SAML_IDP');
-$samlIdpName = Env::get('SAML_IDP_NAME');
-$samlTrustEmailFor = Env::get('SAML_TRUST_EMAIL_FOR');
 $showPopularApis = (bool)Env::get('SHOW_POPULAR_APIS', false);
 $themeColor = Env::get('THEME_COLOR');
 
@@ -157,27 +153,6 @@ return array(
         'hidePublicApisFromGuests' => (bool)$hidePublicApisFromGuests,
         'showPopularApis' => $showPopularApis,
         'themeColor' => $themeColor,
-        'saml' => array(
-            'default-sp' => 'default-sp',
-            'enabled' => (bool)$samlEnabled,
-            'idpName' => $samlIdpName ?? 'SAML',
-            'map' => array(
-                'authProviderUserIdentifierField' => 'employeeNumber',
-                'firstNameField' => 'givenName',
-                'lastNameField' => 'sn',
-                'displayNameField' => 'displayName',
-                'emailField' => 'mail',
-                'usernameField' => 'uid',
-                'groupsField' => 'groups',
-                'uuidField' => 'entryUUID',
-            ),
-            'trustEmailAsFallbackIdFor' => $samlTrustEmailFor,
-            'authSources' => array(
-                
-                // Auth Provider Name => IdP Entity ID
-                $samlIdpName => $samlIdpEntityId,
-            ),
-        ),
         'hybridAuth' => array(
             'providers' => array(
                 'Google' => array(

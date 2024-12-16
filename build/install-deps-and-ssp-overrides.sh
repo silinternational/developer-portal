@@ -6,9 +6,5 @@ set -e
 cd /data
 composer install --no-dev --no-progress --no-scripts --optimize-autoloader --no-interaction
 
-# Copy the SSP override files into place
-mkdir -p -v /data/vendor/simplesamlphp/simplesamlphp/cert
-find /tmp/ssp-overrides/ -path '/tmp/ssp-overrides/cert/*' -exec cp {} /data/vendor/simplesamlphp/simplesamlphp/cert \;
-cp /tmp/ssp-overrides/config/* /data/vendor/simplesamlphp/simplesamlphp/config
-cp /tmp/ssp-overrides/metadata/* /data/vendor/simplesamlphp/simplesamlphp/metadata
-rm -rf /tmp/ssp-overrides
+# Note: Copying the SSP override files into place is no longer relevant, since
+# we no longer support SAML as a login option for the Developer Portal.

@@ -6,28 +6,18 @@ This website is available as a Docker image here:
 <https://hub.docker.com/r/silintl/developer-portal/>
 
 We recommend using that as the `FROM` in your own Dockerfile in your own
-private repo, where you would `COPY` into your own Docker image the files needed
-by SimpleSAMLphp (if using SAML logins), your own
-`/data/public/img/logos/site-logo.png`, etc.
+private repo, where you would `COPY` into your own Docker image any custom files
+you need (e.g. your own `/data/public/img/logos/site-logo.png`, etc.).
 
-Your Dockerfile should (in this order)...
-
-1. Put any custom SAML files into `/tmp/ssp-overrides`.
-2. Run the `/tmp/install-deps-and-ssp-overrides.sh`, since it will move the SAML
-   files into the SimpleSAMLphp folders within the `vendor` folder after
-   installing composer dependencies.
+Your Dockerfile should also run `/tmp/install-deps-and-ssp-overrides.sh`, since
+that is what installs the necessary composer dependencies.
 
 ### Example Dockerfile using this as the FROM ###
 
-    # Change 4.1.6 to the latest tagged version or whichever you want to have
-    FROM silintl/developer-portal:4.1.6
+    # Change 5.0.0 to the latest tagged version or whichever you want to have
+    FROM silintl/developer-portal:5.0.0
     
-    ENV REFRESHED_AT 2021-04-08
-    
-    # Put in place any additional custom SAML files:
-    COPY build/ssp-overrides /tmp/ssp-overrides
-    
-    # Put dependencies and SSP overrides in their final location
+    # Install dependencies
     RUN /tmp/install-deps-and-ssp-overrides.sh
     
     # Copy in any custom files needed, which are stored in this repo.
