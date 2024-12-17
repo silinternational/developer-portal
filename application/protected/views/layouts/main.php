@@ -170,11 +170,6 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
 $this->renderPartial('//partials/google-analytics', array(
     'user' => Yii::app()->user
 ));
-
-if ( ! Yii::app()->user->isGuest) {
-    ?><script type="text/javascript" src="https://www.jira.insitehome.org/s/en_USly0wxi-1988229788/6100/10/1.4.0-m3/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=04a5241e"></script>
-    <?php
-}
 ?>
 </body>
 </html>
