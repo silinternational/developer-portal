@@ -20,11 +20,8 @@ RUN mkdir -p /data/public/
 # Make sure the Apache config is valid
 RUN ["apache2ctl", "configtest"]
 
-# Copy the SimpleSAMLphp configuration files to a temporary location
-COPY build/ssp-overrides /tmp/ssp-overrides
-
 # Put in place the script to be used by child Docker images to install Composer
-# dependencies and move the SSP overrides into place.
+# dependencies.
 COPY build/install-deps-and-ssp-overrides.sh /tmp
 RUN chmod +x /tmp/install-deps-and-ssp-overrides.sh
 

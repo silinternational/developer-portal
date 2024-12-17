@@ -13,7 +13,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'user2'  => array(
         'user_id'       => 2,
@@ -25,7 +25,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithNoPendingKeys' => array(
         'user_id'       => 3,
@@ -37,7 +37,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithApprovedKey' => array(
         'user_id'       => 4,
@@ -49,7 +49,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithDeniedKey' => array(
         'user_id'       => 5,
@@ -61,7 +61,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithPendingKey' => array(
         'user_id'       => 6,
@@ -73,7 +73,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithRevokedKey' => array(
         'user_id'       => 7,
@@ -85,7 +85,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userThatOwnsASingleApi' => array(
         'user_id'       => 8,
@@ -97,7 +97,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_ADMIN,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithRoleOfUser' => array(
         'user_id'       => 9,
@@ -109,7 +109,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithFirstKeyForApiWithTwoKeys' => array(
         'user_id'       => 10,
@@ -121,7 +121,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithSecondKeyForApiWithTwoKeys' => array(
         'user_id'       => 11,
@@ -133,7 +133,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWith1stPKForApiWithTwoPendingKeys' => array(
         'user_id'       => 12,
@@ -145,7 +145,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWith2ndPKForApiWithTwoPendingKeys' => array(
         'user_id'       => 13,
@@ -157,7 +157,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userThatDoesNotOwnAnyApis' => array(
         'user_id'       => 14,
@@ -169,7 +169,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_OWNER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithRoleOfAdmin' => array(
         'user_id'       => 15,
@@ -181,7 +181,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_ADMIN,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithRoleOfOwner' => array(
         'user_id'       => 17,
@@ -193,7 +193,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_OWNER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'user18' => array(
         'user_id'       => 18,
@@ -205,7 +205,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_OWNER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithKeyToApiOwnedByUser18' => array(
         'user_id'       => 19,
@@ -217,7 +217,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithRoleOfAdminButNoKeys' => array(
         'user_id'       => 20,
@@ -229,7 +229,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_ADMIN,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'ownerThatDoesNotOwnAnyApisOrKeys' => array(
         'user_id'       => 21,
@@ -241,7 +241,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_OWNER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithPendingKeyForApiOwnedByUser18' => array(
         'user_id'       => 22,
@@ -253,20 +253,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
-    ),
-    'userFromSAML' => array(
-        'user_id'       => 23,
-        'email'         => 'userFromSAML@jaars.net',
-        'first_name'    => 'User From',
-        'last_name'     => 'SAML',
-        'display_name'  => 'User From SAML',
-        'status'        => User::STATUS_ACTIVE,
-        'created'       => '2016-06-07 10:10:20',
-        'updated'       => '2016-06-07 10:10:20',
-        'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
-        'auth_provider_user_identifier' => 'fake-identifier-1462913079',
+        'auth_provider' => 'Google',
     ),
     'userFromTrustedAuthProviderLackingIdentifier' => array(
         'user_id'       => 24,
@@ -278,7 +265,7 @@ return array(
         'created'       => '2016-06-07 10:10:20',
         'updated'       => '2016-06-07 10:10:20',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
         'auth_provider_user_identifier' => null,
     ),
     'userFromOtherAuthProviderLackingIdentifier' => array(
@@ -374,7 +361,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithDeniedKeyForApiOwnedByUser18' => array(
         'user_id'       => 32,
@@ -386,7 +373,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithRevokedKeyForApiOwnedByUser18' => array(
         'user_id'       => 33,
@@ -398,7 +385,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'firstUserWithKeyDependentOnAvd3' => array(
         'user_id'       => 34,
@@ -410,7 +397,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'secondUserWithKeyDependentOnAvd3' => array(
         'user_id'       => 35,
@@ -422,7 +409,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithKeyNotDependentOnAvd3' => array(
         'user_id'       => 36,
@@ -434,7 +421,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithDeniedKeyRelatedToAvd3' => array(
         'user_id'       => 37,
@@ -446,7 +433,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'userWithKeyAllowedByTwoApiVisibilityDomains' => array(
         'user_id'       => 38,
@@ -458,7 +445,7 @@ return array(
         'created'       => '2016-06-07 15:44:28',
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
-        'auth_provider' => 'SAML',
+        'auth_provider' => 'Google',
     ),
     'normalUserWithNoKeys' => array(
         'user_id'       => 39,
@@ -471,6 +458,7 @@ return array(
         'updated'       => '2016-06-07 15:44:28',
         'role'          => User::ROLE_USER,
         'auth_provider' => 'Google',
+        'auth_provider_user_identifier' => uniqid(),
     ),
     'userWithKeyToCallableTestApi' => array(
         'user_id'       => 40,

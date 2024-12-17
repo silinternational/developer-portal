@@ -37,13 +37,6 @@ return CMap::mergeArray(
         'params' => array(
             'mail' => false,
             'smtp' => false,
-            'saml' => array(
-                'trustEmailAsFallbackIdFor' => 'SAML',
-                
-                'authSources' => array(
-                    'SAML' => 'dummy.idp.entity.id',
-                ),
-            ),
         ),
     )
 );

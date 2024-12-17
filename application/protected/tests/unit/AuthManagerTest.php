@@ -13,9 +13,9 @@ class AuthManagerTest extends TestCase
         $authManager = \Phake::mock('\Sil\DevPortal\components\AuthManager');
         \Phake::when($authManager)->canUseMultipleAuthTypes->thenCallParent();
         \Phake::when($authManager)->getKnownAuthTypeNames->thenReturn(
-            array('hybrid', 'saml')
+            array('hybrid', 'test-user')
         );
-        \Phake::when($authManager)->isAuthTypeEnabled('saml')->thenReturn(false);
+        \Phake::when($authManager)->isAuthTypeEnabled('test-user')->thenReturn(false);
         \Phake::when($authManager)->isAuthTypeEnabled('hybrid')->thenReturn(false);
         
         // Act:
@@ -35,9 +35,9 @@ class AuthManagerTest extends TestCase
         $authManager = \Phake::mock('\Sil\DevPortal\components\AuthManager');
         \Phake::when($authManager)->canUseMultipleAuthTypes->thenCallParent();
         \Phake::when($authManager)->getKnownAuthTypeNames->thenReturn(
-            array('hybrid', 'saml')
+            array('hybrid', 'test-user')
         );
-        \Phake::when($authManager)->isAuthTypeEnabled('saml')->thenReturn(false);
+        \Phake::when($authManager)->isAuthTypeEnabled('test-user')->thenReturn(false);
         \Phake::when($authManager)->isAuthTypeEnabled('hybrid')->thenReturn(true);
         
         // Act:
@@ -57,9 +57,9 @@ class AuthManagerTest extends TestCase
         $authManager = \Phake::mock('\Sil\DevPortal\components\AuthManager');
         \Phake::when($authManager)->canUseMultipleAuthTypes->thenCallParent();
         \Phake::when($authManager)->getKnownAuthTypeNames->thenReturn(
-            array('hybrid', 'saml')
+            array('hybrid', 'test-user')
         );
-        \Phake::when($authManager)->isAuthTypeEnabled('saml')->thenReturn(true);
+        \Phake::when($authManager)->isAuthTypeEnabled('test-user')->thenReturn(true);
         \Phake::when($authManager)->isAuthTypeEnabled('hybrid')->thenReturn(true);
         
         // Act:
@@ -97,9 +97,9 @@ class AuthManagerTest extends TestCase
         $authManager = \Phake::mock('\Sil\DevPortal\components\AuthManager');
         \Phake::when($authManager)->getDefaultAuthType->thenCallParent();
         \Phake::when($authManager)->getKnownAuthTypeNames->thenReturn(
-            array('hybrid', 'saml')
+            array('hybrid', 'test-user')
         );
-        \Phake::when($authManager)->isAuthTypeEnabled('saml')->thenReturn(false);
+        \Phake::when($authManager)->isAuthTypeEnabled('test-user')->thenReturn(false);
         \Phake::when($authManager)->isAuthTypeEnabled('hybrid')->thenReturn(false);
         
         // Act:
@@ -119,9 +119,9 @@ class AuthManagerTest extends TestCase
         $authManager = \Phake::mock('\Sil\DevPortal\components\AuthManager');
         \Phake::when($authManager)->getDefaultAuthType->thenCallParent();
         \Phake::when($authManager)->getKnownAuthTypeNames->thenReturn(
-            array('hybrid', 'saml')
+            array('hybrid', 'test-user')
         );
-        \Phake::when($authManager)->isAuthTypeEnabled('saml')->thenReturn(false);
+        \Phake::when($authManager)->isAuthTypeEnabled('test-user')->thenReturn(false);
         \Phake::when($authManager)->isAuthTypeEnabled('hybrid')->thenReturn(true);
         
         // Act:
@@ -142,9 +142,9 @@ class AuthManagerTest extends TestCase
         $authManager = \Phake::mock('\Sil\DevPortal\components\AuthManager');
         \Phake::when($authManager)->getDefaultAuthType->thenCallParent();
         \Phake::when($authManager)->getKnownAuthTypeNames->thenReturn(
-            array('hybrid', 'saml')
+            array('hybrid', 'test-user')
         );
-        \Phake::when($authManager)->isAuthTypeEnabled('saml')->thenReturn(true);
+        \Phake::when($authManager)->isAuthTypeEnabled('test-user')->thenReturn(true);
         \Phake::when($authManager)->isAuthTypeEnabled('hybrid')->thenReturn(true);
         
         // Act:
@@ -163,7 +163,7 @@ class AuthManagerTest extends TestCase
         // Arrange:
         $testCases = [
             ['authType' => null, 'expected' => null],
-            ['authType' => 'saml', 'expected' => 'saml'],
+            ['authType' => 'test-user', 'expected' => 'test'],
             ['authType' => 'someunknownvalue', 'expected' => null],
         ];
         $authManager = new AuthManager();
@@ -239,21 +239,7 @@ class AuthManagerTest extends TestCase
             'Failed to return false for an unknown auth type.'
         );
     }
-    
-    public function testIsAuthTypeEnabled_saml()
-    {
-        // Arrange:
-        /* @var $authManager AuthManager */
-        $authManager = \Phake::mock('\Sil\DevPortal\components\AuthManager');
-        \Phake::when($authManager)->isAuthTypeEnabled->thenCallParent();
-        
-        // Act:
-        $authManager->isAuthTypeEnabled('saml');
-        
-        // Assert:
-        \Phake::verify($authManager)->isSamlAuthEnabled;
-    }
-    
+
     public function testIsTestAuthEnabled()
     {
         // Arrange:
