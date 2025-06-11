@@ -26,7 +26,8 @@ COPY build/install-deps-and-ssp-overrides.sh /tmp
 RUN chmod +x /tmp/install-deps-and-ssp-overrides.sh
 
 # Copy in any additional PHP ini files
-COPY build/php/*.ini "$PHP_INI_DIR/conf.d/"
+COPY build/php/*.ini /etc/php/8.1/apache2/conf.d/
+COPY build/php/*.ini /etc/php/8.1/cli/conf.d/
 
 # get s3cmd and s3-expand
 RUN pip install s3cmd
