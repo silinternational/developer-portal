@@ -80,7 +80,7 @@ If using Docker directly (without Vagrant):
 If you want to add an API to the developer portal locally, such as for
 development or manual testing...
 
-1. Bring up the developer portal: `make`
+1. Bring up (a clean instance of) the developer portal: `make clean; make`
 2. Bring up phpMyAdmin: `make phpmyadmin`
 3. Bring up httpbin: `make httpbin`
 4. Log in to the developer portal (e.g. <http://localhost/> or your custom domain name)
